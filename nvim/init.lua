@@ -56,6 +56,7 @@ require('packer').startup(function(use)
   use 'ahmedkhalf/project.nvim' -- Detect project root
   use 'Eandrju/cellular-automaton.nvim'
   use 'voldikss/vim-floaterm'
+  use 'xiyaowong/nvim-transparent'
 
   -- Fuzzy Finder (files, lsp, etc)
   use { 'nvim-telescope/telescope.nvim', branch = '0.1.x', requires = { 'nvim-lua/plenary.nvim' } }
@@ -139,16 +140,6 @@ vim.opt.clipboard = 'unnamedplus'
 -- Set colorscheme
 vim.o.termguicolors = true
 vim.cmd [[colorscheme tokyonight-moon]]
-vim.api.nvim_set_hl(0, "Normal", {bg="NONE", ctermbg="NONE"})
-vim.api.nvim_set_hl(0, "SignColumn", {bg="NONE", ctermbg="NONE"})
--- vim.api.nvim_set_hl(0, "FidgetTitle", {bg="NONE", ctermbg="NONE"}) -- TODO
--- vim.api.nvim_set_hl(0, "FidgetTask", {bg="NONE", ctermbg="NONE"}) -- TODO
-vim.api.nvim_set_hl(0, "DiagnosticVirtualTextWarn", {bg="NONE", ctermbg="NONE"})
-vim.api.nvim_set_hl(0, "DiagnosticVirtualTextError", {bg="NONE", ctermbg="NONE"})
-vim.api.nvim_set_hl(0, "DiagnosticVirtualTextHint", {bg="NONE", ctermbg="NONE"})
-vim.api.nvim_set_hl(0, "DiagnosticVirtualTextInfo", {bg="NONE", ctermbg="NONE"})
--- vim.api.nvim_set_hl(0, "Floaterm", {bg="NONE", ctermbg="NONE"}) -- TODO
--- vim.api.nvim_set_hl(0, "FloatermBorder", {fg="NONE", bg="NONE", ctermbg="NONE"}) -- TODO
 
 -- Set completeopt to have a better completion experience
 vim.o.completeopt = 'menuone,noselect'
@@ -419,6 +410,19 @@ vim.keymap.set("n", "<leader>l", function() ui.nav_file(4) end)
 
 
 require("project_nvim").setup {}
+
+require("transparent").setup({
+  enable = true,
+  extra_groups = {
+    "DiagnosticVirtualTextWarn",
+    "DiagnosticVirtualTextError",
+    "DiagnosticVirtualTextHint",
+    "DiagnosticVirtualTextInfo",
+    "TelescopeNormal",
+    "FidgetTitle", -- TODO
+    "FidgetTask", -- TODO
+  }
+})
 
 vim.g['floaterm_width'] = 160
 vim.g['floaterm_height'] = 50

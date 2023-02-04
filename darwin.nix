@@ -46,12 +46,13 @@
         pkgs.obsidian
         pkgs.pipenv
       ];
-    nvimLspDeps = [
+    nvimDeps = [
         pkgs.nodejs
         pkgs.cargo
+        pkgs.ripgrep
     ];
     in
-      work ++ nvimLspDeps ++ 
+      work ++ nvimDeps ++ 
       [ pkgs.keepassxc
         pkgs.slack
         pkgs.iterm2
