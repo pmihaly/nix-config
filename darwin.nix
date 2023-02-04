@@ -59,6 +59,7 @@
         pkgs.lazygit
         pkgs.git
         pkgs.httpie
+        pkgs.gping
         pkgs.fzf
         pkgs.syncthing
         pkgs.bat
@@ -186,6 +187,7 @@
     ms = "pushd ~/.nix-config ; make switch-mac ; popd";
     cn = "nvim ~/.nix-config";
     c = "cd ~/.nix-config";
+    ping = "gping";
   };
 
   programs.zsh = {
