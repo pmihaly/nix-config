@@ -2,6 +2,7 @@
 
 {
   nixpkgs.config.allowUnfree = true;
+  documentation.enable = false;
 
   home-manager.useGlobalPkgs = true;
   home-manager.useUserPackages = true;
