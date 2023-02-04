@@ -218,7 +218,7 @@
   fonts = {
     fontDir.enable = true;
     fonts = [
-      pkgs.cascadia-code
+      pkgs.fira-mono
     ];
   };
 
