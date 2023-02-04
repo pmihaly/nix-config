@@ -78,7 +78,36 @@
       enableAliases = true;
     };
 
-    programs.lf.enable = true;
+    programs.lf = {
+      enable = true;
+      settings = {
+        scrolloff = 999;
+        hidden = true;
+        smartcase = true;
+      };
+      commands = {
+        delete = 
+          ''
+            ''${{
+              clear; tput cup $(($(tput lines)/3)); tput bold
+              set -f
+              printf "%s\n\t" "$fx"
+              printf "delete? [y/N] "
+              read ans
+              [ "$ans" = "y" ] && echo "$fx" | tr ' ' '\ ' | xargs -I{} rm -rf -- "{}"
+            }}
+          '';
+        mkdirWithParent = '' $mkdir -p "$(echo $* | tr ' ' '\ ')" '';
+        touchWithParent = '' $mkdir -p "$(dirname "$*")" && touch "$*" '';
+        open = '' $$EDITOR $f '';
+      };
+      keybindings = {
+        D = "delete";
+        U = "!du -sh";
+        m = "push :mkdirWithParent<space>";
+        t = "push :touchWithParent<space>";
+      };
+    };
   };
 
   homebrew = {
