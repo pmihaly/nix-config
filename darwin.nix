@@ -213,6 +213,13 @@
   system.defaults.NSGlobalDomain.NSAutomaticSpellingCorrectionEnabled = false;
   system.defaults.NSGlobalDomain.NSNavPanelExpandedStateForSaveMode = true;
   system.defaults.NSGlobalDomain.NSNavPanelExpandedStateForSaveMode2 = true;
+  system.defaults.NSGlobalDomain.AppleFontSmoothing = 2;
+  system.defaults.NSGlobalDomain.AppleShowAllFiles = true;
+  system.defaults.NSGlobalDomain.AppleShowAllExtensions = true;
+  system.defaults.finder.FXPreferredViewStyle = "clmv";
+  system.defaults.finder.ShowPathbar = true;
+  system.defaults.finder.QuitMenuItem = true;
+  system.defaults.finder.ShowStatusBar = true;
   system.defaults.dock.autohide = true;
 
   fonts = {
