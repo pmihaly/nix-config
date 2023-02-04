@@ -57,6 +57,14 @@ require('packer').startup(function(use)
   use 'Eandrju/cellular-automaton.nvim'
   use 'voldikss/vim-floaterm'
   use 'xiyaowong/nvim-transparent'
+  use({
+    "kylechui/nvim-surround",
+    tag = "*",
+    config = function()
+      require("nvim-surround").setup({ })
+    end
+  })
+  use 'wellle/targets.vim'
 
   -- Fuzzy Finder (files, lsp, etc)
   use { 'nvim-telescope/telescope.nvim', branch = '0.1.x', requires = { 'nvim-lua/plenary.nvim' } }
