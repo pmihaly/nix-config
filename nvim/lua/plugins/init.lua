@@ -1,7 +1,7 @@
 return {
-
   {
     'numToStr/Comment.nvim',
+    event = 'VeryLazy',
     config = true,
   },
   'tpope/vim-sleuth',
@@ -20,12 +20,19 @@ return {
     }
   },
   {
-    'kylechui/nvim-surround',
-    config = true,
+    'wellle/targets.vim',
+    event = 'VeryLazy',
   },
-  'wellle/targets.vim',
   {
-    'windwp/nvim-autopairs',
-    config = true,
+    'echasnovski/mini.pairs',
+    version = false,
+    event = 'VeryLazy',
+    config = function () require('mini.pairs').setup() end
+  },
+  {
+    'echasnovski/mini.surround',
+    version = false,
+    event = 'VeryLazy',
+    config = function () require('mini.surround').setup() end
   },
 }
