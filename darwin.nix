@@ -226,7 +226,7 @@
   fonts = {
     fontDir.enable = true;
     fonts = [
-      pkgs.fira-mono
+      pkgs.nerdfonts
     ];
   };
 
