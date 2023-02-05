@@ -28,6 +28,23 @@ require('packer').startup(function(use)
     requires = { 'hrsh7th/cmp-nvim-lsp', 'L3MON4D3/LuaSnip', 'saadparwaiz1/cmp_luasnip' },
   }
 
+  -- Testing
+  use {
+    "nvim-neotest/neotest",
+    requires = {
+      "nvim-lua/plenary.nvim",
+      "nvim-treesitter/nvim-treesitter",
+      "antoinemadec/FixCursorHold.nvim"
+    }
+  }
+
+  use {
+    "nvim-neotest/neotest-python",
+    requires = {
+      "nvim-treesitter/nvim-treesitter",
+    }
+  };
+
   use { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
     run = function()
@@ -58,7 +75,7 @@ require('packer').startup(function(use)
     "kylechui/nvim-surround",
     tag = "*",
     config = function()
-      require("nvim-surround").setup({ })
+      require("nvim-surround").setup({})
     end
   })
   use 'wellle/targets.vim'
@@ -137,10 +154,10 @@ vim.o.smartcase = true
 -- Decrease update time
 vim.o.updatetime = 50
 vim.wo.signcolumn = 'yes'
-vim.o.showcmd=false
-vim.o.cmdheight=0
-vim.o.laststatus=0
-vim.o.splitright = true       -- Vertical split to the right
+vim.o.showcmd = false
+vim.o.cmdheight = 0
+vim.o.laststatus = 0
+vim.o.splitright = true -- Vertical split to the right
 
 -- Always center the cursor
 vim.o.scrolloff = 999
@@ -171,8 +188,8 @@ vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = tr
 
 
 -- Remap for indenting visual selection
-vim.keymap.set('v', '<', '<gv', {noremap = true})
-vim.keymap.set('v', '>', '>gv', {noremap = true})
+vim.keymap.set('v', '<', '<gv', { noremap = true })
+vim.keymap.set('v', '>', '>gv', { noremap = true })
 
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
@@ -364,6 +381,7 @@ local servers = {
   nil_ls = {},
   pylsp = {},
   -- shellcheck = {},
+  -- debugpy = {},
   sqlls = {},
   yamlls = {},
 }
@@ -405,9 +423,9 @@ vim.keymap.set("n", "<leader>wj", "<C-w>j")
 vim.keymap.set("n", "<leader>wk", "<C-w>k")
 vim.keymap.set("n", "<leader>wl", "<C-w>l")
 vim.keymap.set("n", "<leader>s", ":%s//g<Left><Left>")
-vim.keymap.set({"n", "t"}, "<leader>;", function() vim.api.nvim_command('FloatermToggle') end)
-vim.keymap.set({"n", "v"}, "<leader>v", function() vim.api.nvim_command('FloatermNew --autoclose=2 lazygit') end)
-vim.keymap.set({"n", "v"}, "<leader>f", function() vim.api.nvim_command('FloatermNew --autoclose=2 lf') end)
+vim.keymap.set({ "n", "t" }, "<leader>;", function() vim.api.nvim_command('FloatermToggle') end)
+vim.keymap.set({ "n", "v" }, "<leader>v", function() vim.api.nvim_command('FloatermNew --autoclose=2 lazygit') end)
+vim.keymap.set({ "n", "v" }, "<leader>f", function() vim.api.nvim_command('FloatermNew --autoclose=2 lf') end)
 
 local mark = require("harpoon.mark")
 local ui = require("harpoon.ui")
@@ -435,10 +453,25 @@ require("transparent").setup({
   }
 })
 
+
+vim.keymap.set("n", "<leader>tr", function() require("neotest").run.run() end)
+vim.keymap.set("n", "<leader>ta", function() require("neotest").run.run(vim.fn.expand("%")) end)
+vim.keymap.set("n", "<leader>tl", function() require("neotest").run.run_last() end)
+vim.keymap.set("n", "<leader>ts", function() require("neotest").summary.toggle() end)
+vim.keymap.set("n", "<leader>to", function() require("neotest").output_panel.toggle() end)
+
 vim.g['floaterm_width'] = 160
 vim.g['floaterm_height'] = 50
 vim.g['floaterm_title'] = false
 vim.g['floaterm_opener'] = 'edit'
+
+require("neotest").setup({
+  adapters = {
+    require("neotest-python")({
+      dap = { justMyCode = false },
+    })
+  }
+})
 
 
 -- nvim-cmp setup
