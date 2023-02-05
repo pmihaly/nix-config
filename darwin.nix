@@ -36,10 +36,10 @@
     work = [
         python310
         pkgs.awscli
-        pkgs.git-lfs 
-        pkgs.saml2aws 
-        pkgs.openssl 
-        pkgs.libmemcached 
+        pkgs.git-lfs
+        pkgs.saml2aws
+        pkgs.openssl
+        pkgs.libmemcached
         pkgs.memcached
         pkgs.mysql
         pkgs.openvpn
@@ -52,7 +52,7 @@
         pkgs.ripgrep
     ];
     in
-      work ++ nvimDeps ++ 
+      work ++ nvimDeps ++
       [ pkgs.keepassxc
         pkgs.slack
         pkgs.iterm2
@@ -90,7 +90,7 @@
       };
       defaultProfiles = [ "gpu-hq" ];
       scripts = [
-        pkgs.mpvScripts.sponsorblock 
+        pkgs.mpvScripts.sponsorblock
         pkgs.mpvScripts.thumbnail
       ];
       bindings = {
@@ -126,7 +126,7 @@
         smartcase = true;
       };
       commands = {
-        delete = 
+        delete =
           ''
             ''${{
               clear; tput cup $(($(tput lines)/3)); tput bold
@@ -156,11 +156,11 @@
       upgrade = true;
       cleanup = "zap";
     };
-    casks = 
+    casks =
     let work = [
         "sequel-ace"
         "pycharm-ce"
-      ]; 
+      ];
     in
     work ++ [
       "amethyst"
@@ -197,8 +197,8 @@
     enableBashCompletion = true;
     enableFzfCompletion = true;
     enableFzfGit = true;
-    enableFzfHistory = true; 
-    enableSyntaxHighlighting = true; 
+    enableFzfHistory = true;
+    enableSyntaxHighlighting = true;
   };
 
   system.keyboard.enableKeyMapping = true;
