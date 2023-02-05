@@ -13,7 +13,12 @@ return {
       }
     end
   },
-  'Eandrju/cellular-automaton.nvim',
+  {
+    'Eandrju/cellular-automaton.nvim',
+    keys = {
+      { '<leader>mr', function() vim.api.nvim_command('CellularAutomaton make_it_rain') end, mode = 'n'},
+    }
+  },
   {
     'kylechui/nvim-surround',
     config = true,
