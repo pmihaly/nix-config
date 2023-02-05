@@ -7,7 +7,11 @@ return {
   'tpope/vim-sleuth',
   {
     'ahmedkhalf/project.nvim',
-    config = function() require("project_nvim").setup {} end
+    config = function()
+      require('project_nvim').setup {
+        ignore_lsp = { 'sumneko_lua' }
+      }
+    end
   },
   'Eandrju/cellular-automaton.nvim',
   {
