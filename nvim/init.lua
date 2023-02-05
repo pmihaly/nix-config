@@ -326,8 +326,8 @@ require('nvim-treesitter.configs').setup {
 }
 
 -- Diagnostic keymaps
-vim.keymap.set('n', '[d', vim.diagnostic.goto_prev)
-vim.keymap.set('n', ']d', vim.diagnostic.goto_next)
+vim.keymap.set('n', 'gap', vim.diagnostic.goto_prev)
+vim.keymap.set('n', 'gan', vim.diagnostic.goto_next)
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float)
 
 -- LSP settings.
@@ -347,15 +347,13 @@ local on_attach = function(_, bufnr)
     vim.keymap.set('n', keys, func, { buffer = bufnr, desc = desc })
   end
 
-  nmap('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
-  nmap('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
+  nmap('<leader>r', vim.lsp.buf.rename, '[R]e[n]ame')
+  nmap('<leader>gh', vim.lsp.buf.code_action, '[C]ode [A]ction')
 
   nmap('gd', vim.lsp.buf.definition, '[G]oto [D]efinition')
   nmap('gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
-  nmap('gI', vim.lsp.buf.implementation, '[G]oto [I]mplementation')
+  nmap('gi', vim.lsp.buf.implementation, '[G]oto [I]mplementation')
   nmap('<leader>D', vim.lsp.buf.type_definition, 'Type [D]efinition')
-  nmap('<leader>ds', require('telescope.builtin').lsp_document_symbols, '[D]ocument [S]ymbols')
-  nmap('<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
 
   -- See `:help K` for why this keymap
   nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
@@ -381,7 +379,6 @@ local servers = {
   nil_ls = {},
   pylsp = {},
   -- shellcheck = {},
-  -- debugpy = {},
   sqlls = {},
   yamlls = {},
 }
@@ -430,7 +427,7 @@ vim.keymap.set({ "n", "v" }, "<leader>f", function() vim.api.nvim_command('Float
 local mark = require("harpoon.mark")
 local ui = require("harpoon.ui")
 
-vim.keymap.set("n", "<leader>u", mark.add_file)
+vim.keymap.set("n", "<leader>n", mark.add_file)
 vim.keymap.set("n", "<leader>i", ui.toggle_quick_menu)
 
 vim.keymap.set("n", "<leader>h", function() ui.nav_file(1) end)
