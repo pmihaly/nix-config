@@ -65,6 +65,11 @@ require('packer').startup(function(use)
     end
   })
   use 'wellle/targets.vim'
+  use 'mbbill/undotree'
+  use {
+    "windwp/nvim-autopairs",
+    config = function() require("nvim-autopairs").setup {} end
+  }
 
   -- Fuzzy Finder (files, lsp, etc)
   use { 'nvim-telescope/telescope.nvim', branch = '0.1.x', requires = { 'nvim-lua/plenary.nvim' } }
@@ -143,7 +148,7 @@ vim.o.splitright = true       -- Vertical split to the right
 -- Always center the cursor
 vim.o.scrolloff = 999
 
-vim.opt.clipboard = 'unnamedplus'
+vim.o.clipboard = 'unnamedplus'
 
 -- Set colorscheme
 vim.o.termguicolors = true
@@ -172,7 +177,13 @@ vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = tr
 vim.keymap.set('v', '<', '<gv', {noremap = true})
 vim.keymap.set('v', '>', '>gv', {noremap = true})
 
+vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
+vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
+
 vim.keymap.set("n", "<leader>mr", "<cmd>CellularAutomaton make_it_rain<CR>")
+
+-- :set paste<CR>p<CR>:normal =<CR>:set nopaste<CR>
+vim.keymap.set("n", "<leader>p", ":set paste<CR>p<CR>:normal =<CR>:set nopaste<CR>")
 
 
 -- [[ Highlight on yank ]]
@@ -416,6 +427,7 @@ vim.keymap.set("n", "<leader>j", function() ui.nav_file(2) end)
 vim.keymap.set("n", "<leader>k", function() ui.nav_file(3) end)
 vim.keymap.set("n", "<leader>l", function() ui.nav_file(4) end)
 
+vim.keymap.set("n", "<leader>u", function() vim.api.nvim_command('UndotreeToggle') end)
 
 require("project_nvim").setup {}
 
