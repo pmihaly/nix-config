@@ -18,9 +18,6 @@ require('packer').startup(function(use)
       'williamboman/mason.nvim',
       'williamboman/mason-lspconfig.nvim',
 
-      -- Useful status updates for LSP
-      'j-hui/fidget.nvim',
-
       -- Additional lua configuration, makes nvim stuff amazing
       'folke/neodev.nvim',
     },
@@ -412,10 +409,6 @@ vim.keymap.set({"n", "t"}, "<leader>;", function() vim.api.nvim_command('Floater
 vim.keymap.set({"n", "v"}, "<leader>v", function() vim.api.nvim_command('FloatermNew --autoclose=2 lazygit') end)
 vim.keymap.set({"n", "v"}, "<leader>f", function() vim.api.nvim_command('FloatermNew --autoclose=2 lf') end)
 
--- Turn on lsp status information
-require('fidget').setup()
-
-
 local mark = require("harpoon.mark")
 local ui = require("harpoon.ui")
 
@@ -439,8 +432,6 @@ require("transparent").setup({
     "DiagnosticVirtualTextHint",
     "DiagnosticVirtualTextInfo",
     "TelescopeNormal",
-    "FidgetTitle", -- TODO
-    "FidgetTask", -- TODO
   }
 })
 
