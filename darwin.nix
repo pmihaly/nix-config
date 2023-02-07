@@ -45,6 +45,7 @@
         pkgs.openvpn
         pkgs.obsidian
         pkgs.pipenv
+        pkgs.gremlin-console
       ];
     nvimDeps = [
         pkgs.nodejs
