@@ -165,6 +165,7 @@
     in
     work ++ [
       "amethyst"
+      "aerial"
       "raycast"
       "docker"
       "messenger"
