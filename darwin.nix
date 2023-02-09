@@ -223,6 +223,7 @@
   system.defaults.finder.QuitMenuItem = true;
   system.defaults.finder.ShowStatusBar = true;
   system.defaults.dock.autohide = true;
+  system.defaults.NSGlobalDomain.AppleInterfaceStyle = "Dark";
 
   fonts = {
     fontDir.enable = true;
