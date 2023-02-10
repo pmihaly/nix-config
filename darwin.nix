@@ -227,6 +227,7 @@
   system.defaults.dock.autohide = true;
   system.defaults.NSGlobalDomain.AppleInterfaceStyle = "Dark";
   system.defaults.trackpad.Clicking = true;
+  system.defaults.finder.FXEnableExtensionChangeWarning = false;
 
   fonts = {
     fontDir.enable = true;
