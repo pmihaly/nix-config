@@ -226,6 +226,7 @@
   system.defaults.finder.ShowStatusBar = true;
   system.defaults.dock.autohide = true;
   system.defaults.NSGlobalDomain.AppleInterfaceStyle = "Dark";
+  system.defaults.trackpad.Clicking = true;
 
   fonts = {
     fontDir.enable = true;
@@ -238,3 +239,4 @@
 
   system.stateVersion = 4;
 }
+
