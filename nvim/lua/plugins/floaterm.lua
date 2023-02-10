@@ -1,7 +1,6 @@
 return {
   {
     'voldikss/vim-floaterm',
-    event = 'VeryLazy',
     keys = {
       { '<leader>;', function() vim.api.nvim_command('FloatermToggle') end, mode = 'n'},
       { '<leader>;', function() vim.api.nvim_command('FloatermToggle') end, mode = 't'},

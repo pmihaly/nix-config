@@ -7,6 +7,7 @@ return {
   'tpope/vim-sleuth',
   {
     'ahmedkhalf/project.nvim',
+    event = 'VeryLazy',
     config = function()
       require('project_nvim').setup {
         ignore_lsp = { 'sumneko_lua' }
@@ -35,4 +36,10 @@ return {
     event = 'VeryLazy',
     config = function () require('mini.surround').setup() end
   },
+  {
+    'iamcco/markdown-preview.nvim',
+    ft = { "markdown" },
+    build = 'cd app && npm install',
+    init = function() vim.g.mkdp_filetypes = { "markdown" } end
+  }
 }
