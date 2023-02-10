@@ -16,6 +16,7 @@ return {
     dependencies = {
       { 'williamboman/mason.nvim', config = true },
       { 'folke/neodev.nvim', config = true},
+      { 'folke/lsp-colors.nvim'},
       {
         'williamboman/mason-lspconfig.nvim',
         config = function ()
