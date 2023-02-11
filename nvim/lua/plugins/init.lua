@@ -7,7 +7,6 @@ return {
   'tpope/vim-sleuth',
   {
     'ahmedkhalf/project.nvim',
-    event = 'VeryLazy',
     config = function()
       require('project_nvim').setup {
         ignore_lsp = { 'sumneko_lua' }
