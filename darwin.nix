@@ -63,7 +63,6 @@
         pkgs.git
         pkgs.httpie
         pkgs.gping
-        pkgs.fzf
         pkgs.syncthing
         pkgs.bat
         pkgs.tldr
@@ -78,9 +77,15 @@
         pkgs.stack
       ];
 
+    programs.fzf = {
+      enable = true;
+      enableZshIntegration = true;
+    };
+
+    home.sessionPath = [ "~/.local/bin" "/etc/profiles/per-user/$USER/bin" ];
+
     programs.exa = {
       enable = true;
-      enableAliases = true;
     };
 
     programs.mpv = {
@@ -150,6 +155,36 @@
         t = "push :touchWithParent<space>";
       };
     };
+
+    programs.zsh = {
+      enable = true;
+      initExtra = ''
+        autoload -U promptinit; promptinit
+        prompt walters
+        set -o vi
+        source ~/.zshrc_work
+        '';
+      enableCompletion = true;
+      enableSyntaxHighlighting = true;
+      autocd = true;
+      history = {
+        ignoreDups = true;
+      };
+      shellAliases = {
+        ls = "exa -lah";
+        cat = "bat";
+        dn = "find ~/lensadev -maxdepth 1 -type d | fzf | xargs nvim";
+        d = "cd $(find ~/lensadev -maxdepth 1 -type d | fzf)";
+        pn = "find ~/personaldev -maxdepth 1 -type d | fzf | xargs nvim";
+        p = "cd $(find ~/personaldev -maxdepth 1 -type d | fzf)";
+        lg = "lazygit";
+        ld = "lazydocker";
+        ms = "pushd ~/.nix-config ; make switch-mac ; popd";
+        cn = "nvim ~/.nix-config";
+        c = "cd ~/.nix-config";
+        ping = "gping";
+      };
+    };
   };
 
   homebrew = {
@@ -175,59 +210,35 @@
     ];
   };
 
-  environment.variables = {
-    EDITOR = "nvim";
-  };
-  environment.systemPath = [ "~/.local/bin" ];
-  environment.shellAliases = {
-    ls = "exa -lah";
-    cat = "bat";
-    dn = "find ~/lensadev -maxdepth 1 -type d | fzf | xargs nvim";
-    d = "cd $(find ~/lensadev -maxdepth 1 -type d | fzf)";
-    pn = "find ~/personaldev -maxdepth 1 -type d | fzf | xargs nvim";
-    p = "cd $(find ~/personaldev -maxdepth 1 -type d | fzf)";
-    lg = "lazygit";
-    ld = "lazydocker";
-    ms = "pushd ~/.nix-config ; make switch-mac ; popd";
-    cn = "nvim ~/.nix-config";
-    c = "cd ~/.nix-config";
-    ping = "gping";
+  system.keyboard = {
+    enableKeyMapping = true;
+    remapCapsLockToEscape = true;
   };
 
-  programs.zsh = {
-    enable = true;
-    interactiveShellInit = "set -o vi";
-    enableBashCompletion = true;
-    enableFzfCompletion = true;
-    enableFzfGit = true;
-    enableFzfHistory = true;
-    enableSyntaxHighlighting = true;
+  system.defaults = {
+    NSGlobalDomain.AppleKeyboardUIMode = 3;
+    NSGlobalDomain.ApplePressAndHoldEnabled = false;
+    NSGlobalDomain.InitialKeyRepeat = 10;
+    NSGlobalDomain.KeyRepeat = 1;
+    NSGlobalDomain.NSAutomaticCapitalizationEnabled = false;
+    NSGlobalDomain.NSAutomaticDashSubstitutionEnabled = false;
+    NSGlobalDomain.NSAutomaticPeriodSubstitutionEnabled = false;
+    NSGlobalDomain.NSAutomaticQuoteSubstitutionEnabled = false;
+    NSGlobalDomain.NSAutomaticSpellingCorrectionEnabled = false;
+    NSGlobalDomain.NSNavPanelExpandedStateForSaveMode = true;
+    NSGlobalDomain.NSNavPanelExpandedStateForSaveMode2 = true;
+    NSGlobalDomain.AppleFontSmoothing = 2;
+    NSGlobalDomain.AppleShowAllFiles = true;
+    NSGlobalDomain.AppleShowAllExtensions = true;
+    finder.FXPreferredViewStyle = "clmv";
+    finder.ShowPathbar = true;
+    finder.QuitMenuItem = true;
+    finder.ShowStatusBar = true;
+    dock.autohide = true;
+    NSGlobalDomain.AppleInterfaceStyle = "Dark";
+    trackpad.Clicking = true;
+    finder.FXEnableExtensionChangeWarning = false;
   };
-
-  system.keyboard.enableKeyMapping = true;
-  system.keyboard.remapCapsLockToEscape = true;
-  system.defaults.NSGlobalDomain.AppleKeyboardUIMode = 3;
-  system.defaults.NSGlobalDomain.ApplePressAndHoldEnabled = false;
-  system.defaults.NSGlobalDomain.InitialKeyRepeat = 10;
-  system.defaults.NSGlobalDomain.KeyRepeat = 1;
-  system.defaults.NSGlobalDomain.NSAutomaticCapitalizationEnabled = false;
-  system.defaults.NSGlobalDomain.NSAutomaticDashSubstitutionEnabled = false;
-  system.defaults.NSGlobalDomain.NSAutomaticPeriodSubstitutionEnabled = false;
-  system.defaults.NSGlobalDomain.NSAutomaticQuoteSubstitutionEnabled = false;
-  system.defaults.NSGlobalDomain.NSAutomaticSpellingCorrectionEnabled = false;
-  system.defaults.NSGlobalDomain.NSNavPanelExpandedStateForSaveMode = true;
-  system.defaults.NSGlobalDomain.NSNavPanelExpandedStateForSaveMode2 = true;
-  system.defaults.NSGlobalDomain.AppleFontSmoothing = 2;
-  system.defaults.NSGlobalDomain.AppleShowAllFiles = true;
-  system.defaults.NSGlobalDomain.AppleShowAllExtensions = true;
-  system.defaults.finder.FXPreferredViewStyle = "clmv";
-  system.defaults.finder.ShowPathbar = true;
-  system.defaults.finder.QuitMenuItem = true;
-  system.defaults.finder.ShowStatusBar = true;
-  system.defaults.dock.autohide = true;
-  system.defaults.NSGlobalDomain.AppleInterfaceStyle = "Dark";
-  system.defaults.trackpad.Clicking = true;
-  system.defaults.finder.FXEnableExtensionChangeWarning = false;
 
   fonts = {
     fontDir.enable = true;
