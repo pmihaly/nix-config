@@ -34,48 +34,47 @@
     let python310 = pkgs.python310.withPackages (p: with p; [
       keyring
     ]);
-    work = [
+    work = with pkgs; [
         python310
-        pkgs.awscli
-        pkgs.git-lfs
-        pkgs.saml2aws
-        pkgs.openssl
-        pkgs.libmemcached
-        pkgs.memcached
-        pkgs.mysql
-        pkgs.openvpn
-        pkgs.obsidian
-        pkgs.pipenv
-        pkgs.gremlin-console
+        awscli
+        git-lfs
+        saml2aws
+        openssl
+        libmemcached
+        memcached
+        mysql
+        openvpn
+        obsidian
+        pipenv
+        gremlin-console
       ];
-    nvimDeps = [
-        pkgs.nodejs
-        pkgs.cargo
-        pkgs.ripgrep
+    nvimDeps = with pkgs; [
+        nodejs
+        cargo
+        ripgrep
     ];
     in
-      work ++ nvimDeps ++
-      [ pkgs.keepassxc
-        pkgs.slack
-        pkgs.iterm2
-        pkgs.lazydocker
-        pkgs.lazygit
-        pkgs.git
-        pkgs.httpie
-        pkgs.gping
-        pkgs.syncthing
-        pkgs.bat
-        pkgs.tldr
-        pkgs.btop
-        pkgs.neofetch
-        pkgs.kubectl
-        pkgs.kube3d
-        pkgs.kubectx
-        pkgs.k9s
-        pkgs.yq
-        pkgs.jq
-        pkgs.stack
-      ];
+      work ++ nvimDeps ++ (with pkgs; [ keepassxc
+        slack
+        iterm2
+        lazydocker
+        lazygit
+        git
+        httpie
+        gping
+        syncthing
+        bat
+        tldr
+        btop
+        neofetch
+        kubectl
+        kube3d
+        kubectx
+        k9s
+        yq
+        jq
+        stack
+      ]);
 
     programs.fzf = {
       enable = true;
