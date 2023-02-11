@@ -161,10 +161,24 @@
       initExtra = ''
         autoload -U promptinit; promptinit
         prompt walters
+
         set -o vi
+
+        zstyle ':completion:*:*:*:default' menu yes select search interactive # browseable, searchable completions
+
+        hash kubectl 2>/dev/null && . <(kubectl completion zsh)
+        hash k3d 2>/dev/null && . <(k3d completion zsh)
+
+        complete -C 'aws_completer' aws
+
         source ~/.zshrc_work
         '';
       enableCompletion = true;
+      completionInit = ''
+        autoload bashcompinit && bashcompinit
+        autoload -Uz compinit && compinit
+      '';
+
       enableSyntaxHighlighting = true;
       autocd = true;
       history = {
