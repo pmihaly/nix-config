@@ -158,6 +158,12 @@
         U = "!du -sh";
         m = "push :mkdirWithParent<space>";
         t = "push :touchWithParent<space>";
+        "<enter>" = "open";
+        A = "rename"; # at the very end
+        c = "push A<c-u>"; # new rename
+        I = "push A<c-a>"; # at the very beginning
+        i = "push A<a-b><a-b><a-f>"; # before extention
+        a = "push A<a-b>"; # after extention
       };
     };
 
