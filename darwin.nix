@@ -82,7 +82,12 @@
       enableZshIntegration = true;
     };
 
-    home.sessionPath = [ "~/.local/bin" "/etc/profiles/per-user/$USER/bin" "/run/current-system/sw/bin/" ];
+    home.sessionPath = [
+      "~/.local/bin"
+      "/usr/local/bin"
+      "/etc/profiles/per-user/$USER/bin"
+      "/run/current-system/sw/bin/"
+    ];
 
     programs.exa = {
       enable = true;
