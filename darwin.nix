@@ -74,7 +74,6 @@
         k9s
         yq
         jq
-        stack
         ytfzf
       ]);
 
