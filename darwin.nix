@@ -75,6 +75,7 @@
         yq
         jq
         stack
+        ytfzf
       ]);
 
     programs.fzf = {
@@ -98,7 +99,6 @@
       config = {
         fullscreen = true;
         ytdl-format = "bestvideo[height<=?1080][vcodec!=?vp9]+bestaudio/best";
-        osc = false;
       };
       defaultProfiles = [ "gpu-hq" ];
       scripts = [
