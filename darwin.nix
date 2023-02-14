@@ -231,6 +231,7 @@
     let work = [
         "sequel-ace"
         "pycharm-ce"
+        "insomnia"
       ];
     in
     work ++ [
