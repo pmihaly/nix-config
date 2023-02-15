@@ -265,6 +265,7 @@
     NSGlobalDomain.AppleFontSmoothing = 2;
     NSGlobalDomain.AppleShowAllFiles = true;
     NSGlobalDomain.AppleShowAllExtensions = true;
+    NSGlobalDomain."com.apple.keyboard.fnState" = true;
     finder.FXPreferredViewStyle = "clmv";
     finder.ShowPathbar = true;
     finder.QuitMenuItem = true;
