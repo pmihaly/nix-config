@@ -18,7 +18,7 @@
       withNodeJs = true;
       extraConfig = builtins.concatStringsSep "\n" [
         ''
-        luafile ${builtins.toString ./nvim/init.lua}
+          luafile ${builtins.toString ./nvim/init.lua}
         ''
       ];
     };
@@ -31,29 +31,30 @@
     };
 
     home.packages =
-    let python310 = pkgs.python310.withPackages (p: with p; [
-      keyring
-    ]);
-    work = with pkgs; [
-        python310
-        awscli
-        git-lfs
-        saml2aws
-        openssl
-        libmemcached
-        memcached
-        mysql
-        openvpn
-        obsidian
-        pipenv
-        gremlin-console
-      ];
-    nvimDeps = with pkgs; [
-        nodejs
-        cargo
-        ripgrep
-    ];
-    in
+      let
+        python310 = pkgs.python310.withPackages (p: with p; [
+          keyring
+        ]);
+        work = with pkgs; [
+          python310
+          awscli
+          git-lfs
+          saml2aws
+          openssl
+          libmemcached
+          memcached
+          mysql
+          openvpn
+          obsidian
+          pipenv
+          gremlin-console
+        ];
+        nvimDeps = with pkgs; [
+          nodejs
+          cargo
+          ripgrep
+        ];
+      in
       work ++ nvimDeps ++ (with pkgs; [
         keepassxc
         slack
@@ -75,6 +76,7 @@
         yq
         jq
         wget
+        asciiquarium
       ]);
 
     programs.yt-dlp = {
@@ -187,7 +189,7 @@
         complete -C 'aws_completer' aws
 
         source ~/.zshrc_work
-        '';
+      '';
       enableCompletion = true;
       completionInit = ''
         autoload bashcompinit && bashcompinit
@@ -220,6 +222,24 @@
       nix-direnv.enable = true;
       enableZshIntegration = true;
     };
+
+    programs.alacritty = {
+      enable = true;
+      settings = {
+        window.decorations = "buttonless";
+        font.normal.family = "FiraCode Nerd Font Mono";
+        font.size = 13;
+        shell.program = "/bin/zsh";
+        window.padding.x = 100;
+        window.padding.y = 30;
+        colors = { bright = { black = "#4c566a"; blue = "#81a1c1"; cyan = "#8fbcbb"; green = "#a3be8c"; magenta = "#b48ead"; red = "#bf616a"; white = "#eceff4"; yellow = "#ebcb8b"; }; cursor = { cursor = "#d8dee9"; text = "#2e3440"; }; dim = { black = "#373e4d"; blue = "#68809a"; cyan = "#6d96a5"; green = "#809575"; magenta = "#8c738c"; red = "#94545d"; white = "#aeb3bb"; yellow = "#b29e75"; }; normal = { black = "#3b4252"; blue = "#81a1c1"; cyan = "#88c0d0"; green = "#a3be8c"; magenta = "#b48ead"; red = "#bf616a"; white = "#e5e9f0"; yellow = "#ebcb8b"; }; primary = { background = "#2e3440"; dim_foreground = "#a5abb6"; foreground = "#d8dee9"; }; search = { footer_bar = { background = "#434c5e"; foreground = "#d8dee9"; }; matches = { background = "#88c0d0"; foreground = "CellBackground"; }; }; selection = { background = "#4c566a"; text = "CellForeground"; }; vi_mode_cursor = { cursor = "#d8dee9"; text = "#2e3440"; }; };
+      };
+    };
+
+    programs.tmux = {
+      enable = true;
+      plugins = with pkgs; [ tmuxPlugins.nord ];
+    };
   };
 
   homebrew = {
@@ -229,20 +249,20 @@
       cleanup = "zap";
     };
     casks =
-    let work = [
+      let work = [
         "sequel-ace"
         "pycharm-ce"
         "insomnia"
       ];
-    in
-    work ++ [
-      "aerial"
-      "raycast"
-      "docker"
-      "messenger"
-      "signal"
-      "google-chrome"
-    ];
+      in
+      work ++ [
+        "aerial"
+        "raycast"
+        "docker"
+        "messenger"
+        "signal"
+        "google-chrome"
+      ];
   };
 
   system.keyboard = {
@@ -289,14 +309,14 @@
     config = {
       focus_follows_mouse = "autoraise";
       mouse_follows_focus = "off";
-      window_placement    = "second_child";
-      top_padding         = 30;
-      bottom_padding      = 30;
-      left_padding        = 30;
-      right_padding       = 30;
-      window_gap          = 30;
-      layout              = "bsp";
-      split_ratio         = 0.55;
+      window_placement = "second_child";
+      top_padding = 30;
+      bottom_padding = 30;
+      left_padding = 30;
+      right_padding = 30;
+      window_gap = 30;
+      layout = "bsp";
+      split_ratio = 0.55;
     };
     extraConfig = ''
       yabai -m rule --add label="Finder" app="^Finder$" title="(Co(py|nnect)|Move|Info|Pref)" manage=off
@@ -311,7 +331,7 @@
       yabai -m rule --add label="mpv" app="^mpv$" manage=off
       yabai -m rule --add label="Software Update" title="Software Update" manage=off
       yabai -m rule --add label="About This Mac" app="System Information" title="About This Mac" manage=off
-      '';
+    '';
   };
 
   services.skhd = {
