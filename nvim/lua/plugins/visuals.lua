@@ -9,6 +9,7 @@ return {
   },
   {
     'lukas-reineke/indent-blankline.nvim',
+    event = 'BufReadPost',
     opts = {
       char = '┊',
       show_trailing_blankline_indent = false,
@@ -16,6 +17,7 @@ return {
   },
   {
     'xiyaowong/nvim-transparent',
+    event = 'VeryLazy',
     opts = {
       enable = true,
       extra_groups = {
@@ -29,6 +31,7 @@ return {
   },
   {
     'lewis6991/gitsigns.nvim',
+    event = 'BufReadPost',
     config = function()
       require('gitsigns').setup()
     end
