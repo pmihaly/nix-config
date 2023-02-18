@@ -233,6 +233,7 @@
         window_padding_width = "30 100";
         hide_window_decorations = "titlebar-only";
         macos_option_as_alt = true;
+        cursor_blink_interval = 0;
       };
     };
   };
