@@ -239,6 +239,7 @@
     programs.tmux = {
       enable = true;
       plugins = with pkgs; [ tmuxPlugins.nord ];
+      extraConfig = "tmux set-default colorset-option -ga terminal-overrides \",xterm-256color:Tc\"";
     };
   };
 
