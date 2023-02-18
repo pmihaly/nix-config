@@ -289,13 +289,11 @@
       focus_follows_mouse = "autoraise";
       mouse_follows_focus = "off";
       window_placement    = "second_child";
-      window_opacity      = "on";
-      window_shadow       = "on";
-      top_padding         = 10;
-      bottom_padding      = 10;
-      left_padding        = 10;
-      right_padding       = 10;
-      window_gap          = 10;
+      top_padding         = 30;
+      bottom_padding      = 30;
+      left_padding        = 30;
+      right_padding       = 30;
+      window_gap          = 30;
       layout              = "bsp";
       split_ratio         = 0.55;
     };
