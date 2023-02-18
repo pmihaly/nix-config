@@ -234,6 +234,7 @@
         hide_window_decorations = "titlebar-only";
         macos_option_as_alt = true;
         cursor_blink_interval = 0;
+        enable_audio_bell = false;
       };
     };
   };
