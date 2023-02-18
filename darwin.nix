@@ -74,6 +74,7 @@
         k9s
         yq
         jq
+        wget
       ]);
 
     programs.yt-dlp = {
