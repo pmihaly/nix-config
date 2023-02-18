@@ -58,7 +58,6 @@
       work ++ nvimDeps ++ (with pkgs; [
         keepassxc
         slack
-        iterm2
         lazydocker
         lazygit
         git
