@@ -223,16 +223,17 @@
       enableZshIntegration = true;
     };
 
-    programs.alacritty = {
+    programs.kitty = {
       enable = true;
+      font = {
+        name = "FiraCode Nerd Font Mono";
+        size = 13;
+      };
+      theme = "Nord";
       settings = {
-        window.decorations = "buttonless";
-        font.normal.family = "FiraCode Nerd Font Mono";
-        font.size = 13;
-        shell.program = "/bin/zsh";
-        window.padding.x = 100;
-        window.padding.y = 30;
-        colors = { bright = { black = "#4c566a"; blue = "#81a1c1"; cyan = "#8fbcbb"; green = "#a3be8c"; magenta = "#b48ead"; red = "#bf616a"; white = "#eceff4"; yellow = "#ebcb8b"; }; cursor = { cursor = "#d8dee9"; text = "#2e3440"; }; dim = { black = "#373e4d"; blue = "#68809a"; cyan = "#6d96a5"; green = "#809575"; magenta = "#8c738c"; red = "#94545d"; white = "#aeb3bb"; yellow = "#b29e75"; }; normal = { black = "#3b4252"; blue = "#81a1c1"; cyan = "#88c0d0"; green = "#a3be8c"; magenta = "#b48ead"; red = "#bf616a"; white = "#e5e9f0"; yellow = "#ebcb8b"; }; primary = { background = "#2e3440"; dim_foreground = "#a5abb6"; foreground = "#d8dee9"; }; search = { footer_bar = { background = "#434c5e"; foreground = "#d8dee9"; }; matches = { background = "#88c0d0"; foreground = "CellBackground"; }; }; selection = { background = "#4c566a"; text = "CellForeground"; }; vi_mode_cursor = { cursor = "#d8dee9"; text = "#2e3440"; }; };
+        window_padding_width = "30 100";
+        hide_window_decorations = "titlebar-only";
+        macos_option_as_alt = true;
       };
     };
 
