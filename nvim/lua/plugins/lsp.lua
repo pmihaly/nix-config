@@ -5,7 +5,7 @@ local servers = {
   nil_ls = {},
   pylsp = {},
   sqlls = {},
-  sumneko_lua = {},
+  lua_ls = {},
   yamlls = {},
 }
 
