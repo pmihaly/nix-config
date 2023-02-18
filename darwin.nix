@@ -271,6 +271,7 @@
     finder.QuitMenuItem = true;
     finder.ShowStatusBar = true;
     dock.autohide = true;
+    dock.static-only = true;
     NSGlobalDomain.AppleInterfaceStyle = "Dark";
     trackpad.Clicking = true;
     finder.FXEnableExtensionChangeWarning = false;
