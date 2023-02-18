@@ -321,7 +321,15 @@
 
   services.nix-daemon.enable = true;
 
-  nix.settings.experimental-features = "nix-command flakes";
+  nix = {
+    settings.experimental-features = "nix-command flakes";
+    settings.auto-optimise-store = true;
+    gc = {
+      automatic = true;
+      interval = { Hour = 3; Minute = 15; };
+      user = "mihaly.papp";
+    };
+  };
 
   system.stateVersion = 4;
 }
