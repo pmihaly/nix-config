@@ -16,11 +16,6 @@
       vimAlias = true;
       vimdiffAlias = true;
       withNodeJs = true;
-      extraConfig = builtins.concatStringsSep "\n" [
-        ''
-          luafile ${builtins.toString ./nvim/init.lua}
-        ''
-      ];
     };
 
     xdg.configFile = {
