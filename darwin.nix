@@ -98,7 +98,7 @@
       enable = true;
       config = {
         fullscreen = true;
-        ytdl-format = "bestvideo[height<=?1080][vcodec!=?vp9]+bestaudio/best";
+        ytdl-format = "bestvideo+bestaudio/best";
         osc = false;
       };
       defaultProfiles = [ "gpu-hq" ];
