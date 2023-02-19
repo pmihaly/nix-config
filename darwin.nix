@@ -264,29 +264,33 @@
   };
 
   system.defaults = {
-    NSGlobalDomain.AppleKeyboardUIMode = 3;
-    NSGlobalDomain.ApplePressAndHoldEnabled = false;
-    NSGlobalDomain.InitialKeyRepeat = 10;
-    NSGlobalDomain.KeyRepeat = 1;
-    NSGlobalDomain.NSAutomaticCapitalizationEnabled = false;
-    NSGlobalDomain.NSAutomaticDashSubstitutionEnabled = false;
-    NSGlobalDomain.NSAutomaticPeriodSubstitutionEnabled = false;
-    NSGlobalDomain.NSAutomaticQuoteSubstitutionEnabled = false;
-    NSGlobalDomain.NSAutomaticSpellingCorrectionEnabled = false;
-    NSGlobalDomain.NSNavPanelExpandedStateForSaveMode = true;
-    NSGlobalDomain.NSNavPanelExpandedStateForSaveMode2 = true;
-    NSGlobalDomain.AppleFontSmoothing = 2;
-    NSGlobalDomain.AppleShowAllFiles = true;
-    NSGlobalDomain.AppleShowAllExtensions = true;
-    NSGlobalDomain."com.apple.keyboard.fnState" = true;
-    finder.FXPreferredViewStyle = "clmv";
-    finder.ShowPathbar = true;
-    finder.QuitMenuItem = true;
-    finder.ShowStatusBar = true;
-    finder.CreateDesktop = false;
+    NSGlobalDomain = {
+      AppleKeyboardUIMode = 3;
+      ApplePressAndHoldEnabled = false;
+      InitialKeyRepeat = 10;
+      KeyRepeat = 1;
+      NSAutomaticCapitalizationEnabled = false;
+      NSAutomaticDashSubstitutionEnabled = false;
+      NSAutomaticPeriodSubstitutionEnabled = false;
+      NSAutomaticQuoteSubstitutionEnabled = false;
+      NSAutomaticSpellingCorrectionEnabled = false;
+      NSNavPanelExpandedStateForSaveMode = true;
+      NSNavPanelExpandedStateForSaveMode2 = true;
+      AppleFontSmoothing = 2;
+      AppleShowAllFiles = true;
+      AppleShowAllExtensions = true;
+      "com.apple.keyboard.fnState" = true;
+      AppleInterfaceStyle = "Dark";
+    };
+    finder = {
+      FXPreferredViewStyle = "clmv";
+      ShowPathbar = true;
+      QuitMenuItem = true;
+      ShowStatusBar = true;
+      CreateDesktop = false;
+    };
     dock.autohide = true;
     dock.static-only = true;
-    NSGlobalDomain.AppleInterfaceStyle = "Dark";
     trackpad.Clicking = true;
     finder.FXEnableExtensionChangeWarning = false;
   };
