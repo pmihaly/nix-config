@@ -312,7 +312,7 @@
       bottom_padding = 30;
       left_padding = 30;
       right_padding = 30;
-      window_gap = 30;
+      window_gap = 10;
       layout = "bsp";
       split_ratio = 0.55;
     };
