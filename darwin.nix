@@ -61,7 +61,6 @@
         syncthing
         bat
         tldr
-        btop
         neofetch
         kubectl
         kube3d
@@ -232,6 +231,15 @@
         macos_option_as_alt = true;
         cursor_blink_interval = 0;
         enable_audio_bell = false;
+      };
+    };
+
+    programs.btop = {
+      enable = true;
+      settings = {
+        theme_background = false;
+        true_color = true;
+        update_ms = 200;
       };
     };
   };
