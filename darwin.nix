@@ -72,6 +72,7 @@
         wget
         asciiquarium
         cbonsai
+        scrub
       ]);
 
     programs.yt-dlp = {
