@@ -287,6 +287,7 @@
     finder.ShowPathbar = true;
     finder.QuitMenuItem = true;
     finder.ShowStatusBar = true;
+    finder.CreateDesktop = false;
     dock.autohide = true;
     dock.static-only = true;
     NSGlobalDomain.AppleInterfaceStyle = "Dark";
