@@ -71,6 +71,7 @@
         jq
         wget
         asciiquarium
+        cbonsai
       ]);
 
     programs.yt-dlp = {
