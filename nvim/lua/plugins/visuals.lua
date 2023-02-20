@@ -16,20 +16,6 @@ return {
     }
   },
   {
-    'xiyaowong/nvim-transparent',
-    event = 'VeryLazy',
-    opts = {
-      enable = true,
-      extra_groups = {
-        'DiagnosticVirtualTextWarn',
-        'DiagnosticVirtualTextError',
-        'DiagnosticVirtualTextHint',
-        'DiagnosticVirtualTextInfo',
-        'TelescopeNormal',
-      }
-    }
-  },
-  {
     'lewis6991/gitsigns.nvim',
     event = 'BufReadPost',
     config = function()
