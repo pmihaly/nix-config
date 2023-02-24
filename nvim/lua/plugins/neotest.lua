@@ -25,6 +25,9 @@ return {
           require('neotest-python')({
             dap = { justMyCode = false },
           })
+        },
+        output = {
+          enabled = false
         }
       }
     end,
