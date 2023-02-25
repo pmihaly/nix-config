@@ -74,6 +74,7 @@
         scrub
         duf
         onefetch
+        act
       ]);
 
     programs.yt-dlp = {
