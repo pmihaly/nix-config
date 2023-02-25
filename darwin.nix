@@ -72,6 +72,8 @@
         asciiquarium
         cbonsai
         scrub
+        duf
+        onefetch
       ]);
 
     programs.yt-dlp = {
