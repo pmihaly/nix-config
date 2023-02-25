@@ -1,0 +1,28 @@
+name: weekly-lockfile-update
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: 00 12 * * 0
+
+jobs:
+  build:
+    name: weekly-lockfile-update
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Nix
+        uses: cachix/install-nix-action@v19
+
+      - name: Clone project
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Update lockfile
+        run: "nix flake update"
+
+      - name: Commit and push changes
+        uses: actions-js/push@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: master
+          message: "chore: update flake.lock"
