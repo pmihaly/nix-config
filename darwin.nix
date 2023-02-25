@@ -76,6 +76,7 @@
         onefetch
         act
         thokr
+        gum # pretty shell scripts
       ]);
 
     programs.yt-dlp = {
