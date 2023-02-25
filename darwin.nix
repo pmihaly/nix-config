@@ -75,6 +75,7 @@
         duf
         onefetch
         act
+        thokr
       ]);
 
     programs.yt-dlp = {
@@ -212,6 +213,7 @@
         cn = "nvim ~/.nix-config";
         c = "cd ~/.nix-config";
         ping = "gping";
+        thokr = "thokr --full-sentences 20";
       };
     };
 
