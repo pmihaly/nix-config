@@ -69,13 +69,13 @@
         yq
         jq
         wget
-        asciiquarium
-        cbonsai
-        scrub
-        duf
-        onefetch
-        act
-        thokr
+        asciiquarium # useless
+        cbonsai # useless
+        scrub # delete files securely
+        duf # prettier lsblk
+        onefetch # neofetch for git repos
+        act # running github actions locally
+        thokr # writing speed
         gum # pretty shell scripts
       ]);
 
