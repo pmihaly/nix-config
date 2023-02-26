@@ -77,6 +77,7 @@
         act # running github actions locally
         thokr # writing speed
         gum # pretty shell scripts
+        massren # mass file rename
       ]);
 
     programs.yt-dlp = {
@@ -162,6 +163,7 @@
       keybindings = {
         D = "delete";
         U = "!du -sh";
+        R = "!massren";
         m = "push :mkdirWithParent<space>";
         t = "push :touchWithParent<space>";
         "<enter>" = "open";
