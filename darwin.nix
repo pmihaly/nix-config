@@ -191,7 +191,7 @@
 
         complete -C 'aws_completer' aws
 
-        source ~/.zshrc_work
+        [ -f .zshrc_work ] && . ~/.zshrc_work
       '';
       enableCompletion = true;
       completionInit = ''
