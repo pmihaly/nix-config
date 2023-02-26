@@ -327,10 +327,10 @@
       focus_follows_mouse = "autoraise";
       mouse_follows_focus = "off";
       window_placement = "second_child";
-      top_padding = 30;
-      bottom_padding = 30;
-      left_padding = 30;
-      right_padding = 30;
+      top_padding = 40;
+      bottom_padding = 40;
+      left_padding = 40;
+      right_padding = 40;
       window_gap = 10;
       layout = "bsp";
       split_ratio = 0.55;
