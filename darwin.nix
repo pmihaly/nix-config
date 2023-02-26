@@ -68,6 +68,7 @@
         k9s
         yq
         jq
+        jiq # interactive jq
         wget
         asciiquarium # useless
         cbonsai # useless
