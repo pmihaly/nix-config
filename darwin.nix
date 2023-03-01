@@ -79,6 +79,7 @@
         thokr # writing speed
         gum # pretty shell scripts
         massren # mass file rename
+        discord
       ]);
 
     programs.yt-dlp = {
