@@ -268,6 +268,7 @@
       ];
       in
       work ++ [
+        "sourcetree"
         "aerial"
         "raycast"
         "docker"
