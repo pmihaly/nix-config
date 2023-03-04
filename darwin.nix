@@ -220,6 +220,9 @@
         ping = "gping";
         thokr = "thokr --full-sentences 20";
         kbp = "sudo touch /dev/null ; lsof -iTCP -sTCP:LISTEN -n -P +c0 | awk 'NR>1{gsub(/.*:/,\"\",$9); print $9, $1, $2}' | fzf --multi --with-nth=1,2 --header='Select processes to be killed' | cut -d' ' -f3 | xargs kill -9";
+        kaf="kubectl apply -f";
+        kak="function _kak() { kubectl kustomize --enable-helm \"$1\" | kubectl apply -f -; }; _kak";
+        pis="function _pis() { kubectl kustomize --enable-helm \"$1\" | kubectl delete -f -; }; _pis";
       };
     };
 
