@@ -43,6 +43,7 @@
           obsidian
           pipenv
           gremlin-console
+          redis
         ];
         nvimDeps = with pkgs; [
           nodejs
