@@ -103,7 +103,6 @@
     programs.mpv = {
       enable = true;
       config = {
-        fullscreen = true;
         ytdl-format = "bestvideo+bestaudio/best";
         osc = false;
       };
