@@ -63,10 +63,6 @@
         bat
         tldr
         neofetch
-        kubectl
-        kube3d
-        kubectx
-        k9s
         yq
         jq
         jiq # interactive jq
