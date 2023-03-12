@@ -207,7 +207,7 @@
         ignoreDups = true;
       };
       shellAliases = {
-        ls = "exa -lah --git";
+        ls = "exa -lah $([ -d .git ] && echo '--git')";
         cat = "bat";
         dn = "find ~/lensadev -maxdepth 1 -type d | fzf | xargs nvim";
         d = "cd $(find ~/lensadev -maxdepth 1 -type d | fzf)";
