@@ -242,6 +242,8 @@
         macos_option_as_alt = true;
         cursor_blink_interval = 0;
         enable_audio_bell = false;
+        confirm_os_window_close = 0;
+        close_on_child_death = true;
       };
     };
 
