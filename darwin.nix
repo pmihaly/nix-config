@@ -77,6 +77,7 @@
         gum # pretty shell scripts
         massren # mass file rename
         discord
+        nix-tree # visualisation of nix derivations
       ]);
 
     programs.yt-dlp = {
