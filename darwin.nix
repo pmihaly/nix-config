@@ -60,7 +60,6 @@
         httpie
         gping
         syncthing
-        bat
         tldr
         neofetch
         yq
@@ -82,6 +81,13 @@
 
     programs.yt-dlp = {
       enable = true;
+    };
+
+    programs.bat = {
+      enable = true;
+      config = {
+        theme = "Nord";
+      };
     };
 
     programs.fzf = {
