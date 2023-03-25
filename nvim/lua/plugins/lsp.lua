@@ -1,11 +1,12 @@
 local servers = {
   dockerls = {},
   jsonls = {},
+  kotlin_language_server = {},
+  lua_ls = {},
   marksman = {},
   nil_ls = {},
   pylsp = {},
   sqlls = {},
-  lua_ls = {},
   yamlls = {},
 }
 
