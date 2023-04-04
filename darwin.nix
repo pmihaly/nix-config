@@ -44,6 +44,7 @@
           pipenv
           gremlin-console
           redis
+          jwt-cli
         ];
         nvimDeps = with pkgs; [
           nodejs
