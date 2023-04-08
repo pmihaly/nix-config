@@ -63,7 +63,7 @@
         syncthing
         tldr
         neofetch
-        yq
+        yq-go
         jq
         jiq # interactive jq
         wget
