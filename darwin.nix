@@ -78,6 +78,8 @@
         massren # mass file rename
         discord
         nix-tree # visualisation of nix derivations
+        shellcheck
+        shfmt
       ]);
 
     programs.yt-dlp = {
