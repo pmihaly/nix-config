@@ -195,17 +195,18 @@
         zstyle ':completion:*:*:*:default' menu yes select search interactive # browseable, searchable completions
         zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 
-        hash kubectl 2>/dev/null && . <(kubectl completion zsh)
-        hash k3d 2>/dev/null && . <(k3d completion zsh)
-
-        complete -C 'aws_completer' aws
-
         [ -f .zshrc_work ] && . ~/.zshrc_work
       '';
       enableCompletion = true;
       completionInit = ''
         autoload bashcompinit && bashcompinit
         autoload -Uz compinit && compinit
+
+        hash kubectl 2>/dev/null && . <(kubectl completion zsh)
+        hash k3d 2>/dev/null && . <(k3d completion zsh)
+        hash yq 2>/dev/null && . <(yq shell-completion zsh)
+
+        complete -C 'aws_completer' aws
       '';
 
       enableSyntaxHighlighting = true;
