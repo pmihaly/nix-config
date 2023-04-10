@@ -80,6 +80,7 @@
         nix-tree # visualisation of nix derivations
         shellcheck
         shfmt
+        fd # alternative to find
       ]);
 
     programs.yt-dlp = {
