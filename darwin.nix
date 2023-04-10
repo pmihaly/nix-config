@@ -193,6 +193,7 @@
         set -o vi
 
         zstyle ':completion:*:*:*:default' menu yes select search interactive # browseable, searchable completions
+        zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 
         hash kubectl 2>/dev/null && . <(kubectl completion zsh)
         hash k3d 2>/dev/null && . <(k3d completion zsh)
