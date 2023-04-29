@@ -224,7 +224,7 @@
         lg = "lazygit";
         ld = "lazydocker";
         ms = "pushd ~/.nix-config ; make switch-mac ; popd";
-        re = "sudo nix-store --verify --check-contents --repair";
+        nix-repair = "sudo nix-store --verify --check-contents --repair";
         cn = "nvim ~/.nix-config";
         c = "cd ~/.nix-config";
         ping = "gping";
