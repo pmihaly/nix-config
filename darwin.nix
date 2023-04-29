@@ -233,6 +233,7 @@
         kaf="kubectl apply -f";
         kak="function _kak() { kubectl kustomize --enable-helm \"$1\" | kubectl apply -f -; }; _kak";
         pis="function _pis() { kubectl kustomize --enable-helm \"$1\" | kubectl delete -f -; }; _pis";
+        urlencode="jq -sRr @uri";
       };
     };
 
