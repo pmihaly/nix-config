@@ -67,8 +67,6 @@
         jq
         jiq # interactive jq
         wget
-        asciiquarium # useless
-        cbonsai # useless
         scrub # delete files securely
         duf # prettier lsblk
         onefetch # neofetch for git repos
