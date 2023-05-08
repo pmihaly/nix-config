@@ -56,7 +56,6 @@
         keepassxc
         slack
         lazydocker
-        lazygit
         git
         httpie
         gping
@@ -81,8 +80,14 @@
         fd # alternative to find
       ]);
 
-    programs.yt-dlp = {
+
+    programs.lazygit = {
       enable = true;
+      settings = {
+        services = {
+          "gsh.lensa.com" = "gitlab:gitlab.lensa.com";
+        };
+      };
     };
 
     programs.bat = {
