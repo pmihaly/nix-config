@@ -87,6 +87,7 @@
         services = {
           "gsh.lensa.com" = "gitlab:gitlab.lensa.com";
         };
+        notARepository = "quit";
       };
     };
 
