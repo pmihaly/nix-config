@@ -39,7 +39,6 @@
           libmemcached
           memcached
           mysql
-          openvpn
           obsidian
           pipenv
           gremlin-console
