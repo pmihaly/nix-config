@@ -198,7 +198,7 @@
         zstyle ':completion:*:*:*:default' menu yes select search interactive # browseable, searchable completions
         zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 
-        [ -f .zshrc_work ] && . ~/.zshrc_work
+        [ -f ~/.zshrc_work ] && . ~/.zshrc_work
       '';
       enableCompletion = true;
       completionInit = ''
