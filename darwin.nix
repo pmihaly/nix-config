@@ -27,22 +27,12 @@
 
     home.packages =
       let
-        python310 = pkgs.python310.withPackages (p: with p; [
-          keyring
-        ]);
         work = with pkgs; [
-          python310
           awscli
           git-lfs
           saml2aws
           openssl
-          libmemcached
-          memcached
-          mysql
           obsidian
-          pipenv
-          gremlin-console
-          redis
           jwt-cli
         ];
         nvimDeps = with pkgs; [
