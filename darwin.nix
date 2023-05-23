@@ -223,10 +223,14 @@
         ping = "gping";
         thokr = "thokr --full-sentences 20";
         kbp = "sudo touch /dev/null ; lsof -iTCP -sTCP:LISTEN -n -P +c0 | awk 'NR>1{gsub(/.*:/,\"\",$9); print $9, $1, $2}' | fzf --multi --with-nth=1,2 --header='Select processes to be killed' | cut -d' ' -f3 | xargs kill -9";
-        kaf="kubectl apply -f";
-        kak="function _kak() { kubectl kustomize --enable-helm \"$1\" | kubectl apply -f -; }; _kak";
-        pis="function _pis() { kubectl kustomize --enable-helm \"$1\" | kubectl delete -f -; }; _pis";
-        urlencode="jq -sRr @uri";
+        kaf = "kubectl apply -f";
+        kak = "function _kak() { kubectl kustomize --enable-helm \"$1\" | kubectl apply -f -; }; _kak";
+        pis = "function _pis() { kubectl kustomize --enable-helm \"$1\" | kubectl delete -f -; }; _pis";
+        urlencode = "jq -sRr @uri";
+        dselect = "docker ps --format '{{.ID}}\t{{.Image}}' | fzf --with-nth 2 | cut -f1";
+        dim = "dselect | tee >(tr -d '\n' | pbcopy)";
+        dl = "dselect | xargs docker logs -f";
+        dex = "container=$(dselect); docker exec -it \"\$container\" \"\${@:-bash}\"";
       };
     };
 
