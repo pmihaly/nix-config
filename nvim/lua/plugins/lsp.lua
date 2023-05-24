@@ -5,7 +5,6 @@ local servers = {
   lua_ls = {},
   marksman = {},
   nil_ls = {},
-  pylsp = {},
   sqlls = {},
   yamlls = {},
 }
