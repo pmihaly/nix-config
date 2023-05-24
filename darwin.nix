@@ -255,6 +255,7 @@
         enable_audio_bell = false;
         confirm_os_window_close = 0;
         close_on_child_death = true;
+        cursor = "#bf40bf";
       };
       keybindings = {
         "alt+1" = "send_text all docker ps | grep ";
