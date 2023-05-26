@@ -227,7 +227,7 @@
         kak = "function _kak() { kubectl kustomize --enable-helm \"$1\" | kubectl apply -f -; }; _kak";
         pis = "function _pis() { kubectl kustomize --enable-helm \"$1\" | kubectl delete -f -; }; _pis";
         urlencode = "jq -sRr @uri";
-        dselect = "docker ps --format '{{.ID}}\t{{.Image}}' | fzf --with-nth 2 | cut -f1";
+        dselect = "_f(){ gum spin --spinner points --title 'Listing containers...' --show-output -- docker ps --format '{{.ID}}\t{{.Image}}' }; _f | fzf --sync --with-nth 2 | cut -f1";
         dim = "dselect | tee >(tr -d '\n' | pbcopy)";
         dl = "dselect | xargs docker logs -f";
         dex = "container=$(dselect); docker exec -it \"\$container\" \"\${@:-bash}\"";
