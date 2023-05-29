@@ -388,6 +388,8 @@
     };
   };
 
+  users.users."mihaly.papp".home = "/Users/mihaly.papp";
+
   system.stateVersion = 4;
 }
 
