@@ -231,6 +231,7 @@
         dim = "dselect | tee >(tr -d '\n' | pbcopy)";
         dl = "dselect | xargs docker logs -f";
         dex = "container=$(dselect); docker exec -it \"\$container\" \"\${@:-bash}\"";
+        ticket = "git branch --show-current | grep -oE \"[A-Z]+-[0-9]+\"";
       };
     };
 
