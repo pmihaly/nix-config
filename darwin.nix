@@ -258,10 +258,6 @@
         close_on_child_death = true;
         cursor = "#bf40bf";
       };
-      keybindings = {
-        "alt+1" = "send_text all docker ps | grep ";
-        "alt+2" = "send_text all docker logs -f ";
-      };
     };
 
     programs.btop = {
