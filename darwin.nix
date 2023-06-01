@@ -249,7 +249,7 @@
       };
       theme = "Nord";
       settings = {
-        window_padding_width = "30 100";
+        window_padding_width = "30 150";
         hide_window_decorations = "titlebar-only";
         macos_option_as_alt = true;
         cursor_blink_interval = 0;
