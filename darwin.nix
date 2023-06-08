@@ -302,6 +302,56 @@
         update_ms = 200;
       };
     };
+
+    programs.newsboat = {
+      enable = true;
+      autoReload = true;
+      urls = [
+        { url="http://www.daemonology.net/hn-daily/index.rss"; }
+        { url="https://nitter.net/GergelyOrosz/rss"; }
+        { url="http://feeds.feedburner.com/ThePragmaticEngineer"; }
+        { url="https://www.reddit.com/r/ExperiencedDevs/.rss"; }
+      ];
+      extraConfig = ''
+        #show-read-feeds no
+        auto-reload yes
+
+        bind-key j down
+        bind-key k up
+        bind-key j next articlelist
+        bind-key k prev articlelist
+        bind-key J next-feed articlelist
+        bind-key K prev-feed articlelist
+        bind-key G end
+        bind-key g home
+        bind-key d pagedown
+        bind-key u pageup
+        bind-key l open
+        bind-key h quit
+        bind-key a toggle-article-read
+        bind-key n next-unread
+        bind-key N prev-unread
+        bind-key D pb-download
+        bind-key U show-urls
+        bind-key x pb-delete
+
+        macro , open-in-browser
+
+        color listnormal cyan default
+        color listfocus black yellow standout bold
+        color listnormal_unread blue default
+        color listfocus_unread yellow default bold
+        color info red black bold
+        color article cyan default
+
+        highlight article "^(Feed|Link):.*$" color6 default bold
+        highlight article "^(Title|Date|Author):.*$" color6 default bold
+        highlight article "https?://[^ ]+" color10 default underline
+        highlight article "\\[[0-9]+\\]" color10 default bold
+        highlight article "\\[image\\ [0-9]+\\]" color10 default bold
+        highlight feedlist "^─.*$" color6 color236 bold
+      '';
+    };
   };
 
   homebrew = {
