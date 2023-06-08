@@ -34,6 +34,7 @@
           openssl
           obsidian
           jwt-cli
+          libossp_uuid # uuid from cli
         ];
         nvimDeps = with pkgs; [
           nodejs
