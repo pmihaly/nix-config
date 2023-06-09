@@ -366,6 +366,7 @@
         "sequel-ace"
         "pycharm-ce"
         "insomnia"
+        "vscodium"
       ];
       in
       work ++ [
