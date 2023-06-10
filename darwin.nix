@@ -223,6 +223,10 @@
         zstyle ':completion:*:*:*:default' menu yes select search interactive # browseable, searchable completions
         zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 
+        autoload -z edit-command-line
+        zle -N edit-command-line
+        bindkey "^X" edit-command-line
+
         [ -f ~/.zshrc_work ] && . ~/.zshrc_work
       '';
       enableCompletion = true;
