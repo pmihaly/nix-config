@@ -6,7 +6,8 @@
 
   home-manager.useGlobalPkgs = true;
   home-manager.useUserPackages = true;
-  home-manager.users."mihaly.papp" = { pkgs, ... }: {
+  home-manager.users."mihaly.papp" = { pkgs, ... }:
+  let darkMode = true; in {
     home.stateVersion = "22.05";
 
     programs.neovim = {
@@ -288,7 +289,7 @@
         name = "FiraCode Nerd Font Mono";
         size = 13;
       };
-      theme = "Nord";
+      theme = if darkMode then "Nord" else null;
       settings = {
         window_padding_width = "30 150";
         hide_window_decorations = "titlebar-only";
@@ -298,7 +299,30 @@
         confirm_os_window_close = 0;
         close_on_child_death = true;
         cursor = "#bf40bf";
-      };
+      } // (if darkMode then {} else {
+        active_border_color = "#81A1C1";
+        foreground = "#2E3440";
+        background = "#F9FAFB";
+        selection_foreground = "#FFFACD";
+        selection_background = "#000000";
+        url_color = "#0087BD";
+        color0 = "#3B4252";
+        color8 = "#4C566A";
+        color1 = "#BF616A";
+        color9 = "#BF616A";
+        color2 = "#A3BE8C";
+        color10 = "#A3BE8C";
+        color3 = "#EBCB8B";
+        color11 = "#EBCB8B";
+        color4 = "#5E81AC";
+        color12 = "#81A1C1";
+        color5 = "#B48EAD";
+        color13 = "#B48EAD";
+        color6 = "#88C0D0";
+        color14 = "#8FBCBB";
+        color7 = "#D8DEE9";
+        color15 = "#E5E9F0";
+      });
     };
 
     programs.btop = {
