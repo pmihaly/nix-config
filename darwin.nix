@@ -409,6 +409,7 @@
       AppleShowAllExtensions = true;
       "com.apple.keyboard.fnState" = true;
       AppleInterfaceStyle = "Dark";
+      _HIHideMenuBar = true;
     };
     finder = {
       FXPreferredViewStyle = "clmv";
