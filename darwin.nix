@@ -306,11 +306,18 @@
           close_on_child_death = true;
           cursor = "#bf40bf";
         };
-        extraConfig =
-          if darkMode then
-            "" else
-            (builtins.readFile (builtins.fetchurl { url = "https://raw.githubusercontent.com/mtyn/polar/master/polar/kitty-terminal/polar.conf"; sha256 = "1qmlrcjdmp2fh5kw6xjnr8vm48ph12l6977hhp488p2lc5mx5aar"; }))
-        ;
+        extraConfig = builtins.concatStringsSep "\n"
+          [
+            ''
+              modify_font underline_position 0.5
+              modify_font underline_thickness 130%
+            ''
+
+            (if darkMode then
+              "" else
+              builtins.readFile (builtins.fetchurl { url = "https://raw.githubusercontent.com/mtyn/polar/20d9540e88c91b6f5f2b1010770877674fc1ece1/polar/kitty-terminal/polar.conf"; sha256 = "1qmlrcjdmp2fh5kw6xjnr8vm48ph12l6977hhp488p2lc5mx5aar"; })
+            )
+          ];
       };
 
       programs.btop = {
