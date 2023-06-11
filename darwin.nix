@@ -341,6 +341,8 @@
         extraConfig = ''
           #show-read-feeds no
           auto-reload yes
+          show-keymap-hint no
+          show-title-bar no
 
           bind-key j down
           bind-key k up
