@@ -37,6 +37,13 @@
             obsidian
             jwt-cli
             libossp_uuid # uuid from cli
+            (vscode-with-extensions.override
+              {
+                vscodeExtensions = with vscode-extensions; [
+                  arcticicestudio.nord-visual-studio-code
+                  eamodio.gitlens
+                ];
+              })
           ];
           nvimDeps = with pkgs; [
             nodejs
@@ -411,7 +418,6 @@
         "sequel-ace"
         "pycharm-ce"
         "insomnia"
-        "vscodium"
       ];
       in
       work ++ [
