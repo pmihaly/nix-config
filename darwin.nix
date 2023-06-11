@@ -305,6 +305,7 @@
           revo = "function _f() { TMP=$(mktemp) ; revolut.sh ~/Sync/finances.yaml <$1 > $TMP && $EDITOR $TMP && envelopes <$TMP > ~/Sync/finances.yaml && rm -f $TMP }; _f";
           fin = "$EDITOR ~/Sync/finances.yaml";
           nb = "newsboat";
+          ns = "nix search nixpkgs";
         };
       };
 
