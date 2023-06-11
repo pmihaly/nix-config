@@ -319,10 +319,10 @@
           hide_window_decorations = "titlebar-only";
           macos_option_as_alt = true;
           cursor_blink_interval = 0;
+          cursor_shape = "block";
           enable_audio_bell = false;
           confirm_os_window_close = 0;
           close_on_child_death = true;
-          cursor = "#bf40bf";
         };
         extraConfig = builtins.concatStringsSep "\n"
           [
