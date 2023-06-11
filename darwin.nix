@@ -299,30 +299,11 @@
         confirm_os_window_close = 0;
         close_on_child_death = true;
         cursor = "#bf40bf";
-      } // (if darkMode then {} else {
-        active_border_color = "#81A1C1";
-        foreground = "#2E3440";
-        background = "#F9FAFB";
-        selection_foreground = "#FFFACD";
-        selection_background = "#000000";
-        url_color = "#0087BD";
-        color0 = "#3B4252";
-        color8 = "#4C566A";
-        color1 = "#BF616A";
-        color9 = "#BF616A";
-        color2 = "#A3BE8C";
-        color10 = "#A3BE8C";
-        color3 = "#EBCB8B";
-        color11 = "#EBCB8B";
-        color4 = "#5E81AC";
-        color12 = "#81A1C1";
-        color5 = "#B48EAD";
-        color13 = "#B48EAD";
-        color6 = "#88C0D0";
-        color14 = "#8FBCBB";
-        color7 = "#D8DEE9";
-        color15 = "#E5E9F0";
-      });
+      };
+      extraConfig = if darkMode then
+        "" else
+        (builtins.readFile (builtins.fetchurl {url = "https://raw.githubusercontent.com/mtyn/polar/master/polar/kitty-terminal/polar.conf"; sha256="1qmlrcjdmp2fh5kw6xjnr8vm48ph12l6977hhp488p2lc5mx5aar";}))
+        ;
     };
 
     programs.btop = {
