@@ -26,7 +26,27 @@ return {
   },
   {
     'echasnovski/mini.starter',
-    config = function () require('mini.starter').setup() end,
+    config = function() require('mini.starter').setup() end,
     version = '*'
   },
+  {
+    'lukas-reineke/headlines.nvim',
+    ft = { 'markdown' },
+    dependencies = 'nvim-treesitter/nvim-treesitter',
+    config = {
+      markdown = {
+        headline_highlights = {
+          'Headline1',
+          'Headline2',
+          'Headline3',
+          'Headline4',
+          'Headline5',
+          'Headline6',
+        },
+        codeblock_highlight = 'CodeBlock',
+        dash_highlight = 'Dash',
+        quote_highlight = 'Quote',
+      },
+    }
+  }
 }
