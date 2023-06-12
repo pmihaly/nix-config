@@ -318,12 +318,13 @@
 
       programs.kitty = {
         enable = true;
-        font = {
-          name = "Iosevka Custom Medium Extended";
-          size = 13;
-        };
         theme = if darkMode then "Nord" else null;
         settings = {
+          font_size = 13;
+          font_family = "Iosevka Custom Medium Extended";
+          bold_font = "Iosevka Custom Bold Extended";
+          italic_font = "Iosevka Custom Medium Extended Italic";
+          bold_italic_font = "Iosevka Custom Bold Extended Italic";
           window_padding_width = "30 150";
           hide_window_decorations = "titlebar-only";
           macos_option_as_alt = true;
@@ -509,6 +510,12 @@
           shape = "upright"
           menu = "upright"
           css = "normal"
+
+          [buildPlans.iosevka-custom.slopes.italic]
+          angle = 9.4
+          shape = "italic"
+          menu = "italic"
+          css = "italic"
         '';
         set = "custom";
       })
