@@ -232,7 +232,6 @@
           [
             ''
               autoload -U promptinit; promptinit
-              # prompt walters
 
               set -o vi
 
