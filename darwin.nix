@@ -236,7 +236,6 @@
 
               set -o vi
 
-              # zstyle ':completion:*:*:*:default' menu yes select search interactive # browseable, searchable completions
               zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 
               autoload -z edit-command-line
