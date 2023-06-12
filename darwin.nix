@@ -343,7 +343,53 @@
 
             (if darkMode then
               "" else
-              builtins.readFile (builtins.fetchurl { url = "https://raw.githubusercontent.com/mtyn/polar/20d9540e88c91b6f5f2b1010770877674fc1ece1/polar/kitty-terminal/polar.conf"; sha256 = "1qmlrcjdmp2fh5kw6xjnr8vm48ph12l6977hhp488p2lc5mx5aar"; })
+              ''
+                # Polar Colorscheme for Kitty
+                # Based on:
+                # - https://gist.github.com/marcusramberg/64010234c95a93d953e8c79fdaf94192
+                # - https://github.com/arcticicestudio/nord-hyper
+
+                active_border_color #81A1C1
+
+                foreground            #4C566A
+                background            #F9FAFB
+                selection_foreground  #FFFACD
+                selection_background  #000000
+                url_color             #0087BD
+                cursor                #81A1C1
+
+                # black
+                color0   #3B4252
+                color8   #4C566A
+
+                # red
+                color1   #BF616A
+                color9   #BF616A
+
+                # green
+                color2   #A3BE8C
+                color10  #A3BE8C
+
+                # yellow
+                color3   #EBCB8B
+                color11  #EBCB8B
+
+                # blue
+                color4  #5E81AC
+                color12 #81A1C1
+
+                # magenta
+                color5   #B48EAD
+                color13  #B48EAD
+
+                # cyan
+                color6   #88C0D0
+                color14  #8FBCBB
+
+                # white
+                color7   #D8DEE9
+                color15  #E5E9F0
+              ''
             )
           ];
       };
