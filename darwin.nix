@@ -501,7 +501,7 @@
       AppleShowAllExtensions = true;
       "com.apple.keyboard.fnState" = true;
       AppleInterfaceStyle = "Dark";
-      _HIHideMenuBar = true;
+      _HIHideMenuBar = false;
     };
     finder = {
       FXPreferredViewStyle = "clmv";
