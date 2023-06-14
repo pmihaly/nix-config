@@ -519,6 +519,8 @@
   fonts = {
     fontDir.enable = true;
     fonts = [
+      pkgs.comic-mono # the original hideous font revamped to be actually kinda cozy
+      pkgs.comic-neue # "Make your lemonade stand look like a fortune 500 company"
       (pkgs.nerdfonts.override {
         fonts = [ "FiraCode" ];
       })
