@@ -409,6 +409,7 @@
           { url = "https://nitter.net/GergelyOrosz/rss"; }
           { url = "http://feeds.feedburner.com/ThePragmaticEngineer"; }
           { url = "https://www.reddit.com/r/ExperiencedDevs/.rss"; }
+          { url = "https://news.ycombinator.com/rss"; }
         ];
         extraConfig = ''
           #show-read-feeds no
