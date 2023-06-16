@@ -80,6 +80,7 @@
           tig # prettier git tree
           moreutils # extend unix pipelining
           # parallel # conflicts with moreutils with the `parallel` bin of moreutils # `Array().map()` of the shell
+          keepass-diff # diffing .kdbx files
         ]);
 
 
