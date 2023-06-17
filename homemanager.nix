@@ -291,6 +291,7 @@
           lg = "lazygit";
           ld = "lazydocker";
           ms = "pushd ~/.nix-config ; make switch-mac ; popd";
+          mp = "pushd ~/.nix-config ; sudo make switch-pc ; popd";
           nr = "sudo nix-store --verify --check-contents --repair";
           ns = "nix search nixpkgs";
           ncg = "nix-collect-garbage";
