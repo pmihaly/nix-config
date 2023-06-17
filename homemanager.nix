@@ -21,6 +21,14 @@
         };
       };
 
+      xdg.configFile = {
+        hypr = {
+          source = ./hypr;
+          recursive = true;
+        };
+      };
+
+
       home.packages =
         let
           work = with pkgs; [
@@ -80,6 +88,8 @@
           gnumake
           iosevka-custom
           nerdfonts-fira-code
+          swaybg # setting wallpapers in wayland
+          wofi # wayland equivalent of rofi
         ]);
 
 

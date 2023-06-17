@@ -26,14 +26,14 @@
     LC_TIME = "hu_HU.UTF-8";
   };
 
-  services.xserver.enable = true;
-  services.xserver.displayManager.gdm.enable = true;
-  services.xserver.desktopManager.gnome.enable = true;
-  services.xserver = {
-    layout = "hu";
-    xkbVariant = "";
+  programs.hyprland = {
+    enable = true;
+    xwayland = {
+      enable = true;
+      hidpi = false;
+    };
+    nvidiaPatches = false;
   };
-  console.keyMap = "hu101";
 
   sound.enable = true;
   hardware.pulseaudio.enable = false;
