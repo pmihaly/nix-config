@@ -51,7 +51,8 @@
             nodejs
             cargo
             ripgrep
-            clang
+            gcc
+            unzip
           ];
         in
         work ++ nvimDeps ++ (with pkgs; [
