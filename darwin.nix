@@ -306,7 +306,7 @@
           dl = "dselect | xargs docker logs -f";
           dex = "container=$(dselect); docker exec -it \"\$container\" \"\${@:-bash}\"";
           ticket = "git branch --show-current | grep -oE \"[A-Z]+-[0-9]+\"";
-          revo = "function _f() { TMP=$(mktemp) ; revolut.sh ~/Sync/finances.yaml <$1 > $TMP && $EDITOR $TMP && envelopes <$TMP > ~/Sync/finances.yaml && rm -f $TMP }; _f";
+          revo = "function _f() { revolut.sh ~/Sync/finances.yaml | vipe --suffix yaml | envelopes > ~/Sync/finances.yaml }; _f";
           fin = "$EDITOR ~/Sync/finances.yaml";
           nb = "newsboat";
         };
