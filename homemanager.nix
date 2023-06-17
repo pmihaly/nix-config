@@ -3,6 +3,8 @@
     {
       home.stateVersion = "22.05";
 
+      nixpkgs.overlays = import ./overlays;
+
       programs.neovim = {
         enable = true;
         defaultEditor = true;
@@ -76,6 +78,8 @@
           keepass-diff # diffing .kdbx files
           watch # run a command periodically
           gnumake
+          iosevka-custom
+          nerdfonts-fira-code
         ]);
 
 

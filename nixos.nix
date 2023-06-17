@@ -54,6 +54,10 @@
 
   programs.zsh.enable = true;
 
+  fonts.fonts = [
+    pkgs.iosevka
+  ];
+
   services.xserver.displayManager.autoLogin.enable = true;
   services.xserver.displayManager.autoLogin.user = "misi";
 
@@ -63,6 +67,7 @@
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
+  nixpkgs.overlays = import ./overlays;
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
