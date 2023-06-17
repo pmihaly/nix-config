@@ -232,23 +232,9 @@
 
       programs.zsh = {
         enable = true;
-        initExtra = builtins.concatStringsSep "\n"
-          [
-            ''
-              autoload -U promptinit; promptinit
-
-              set -o vi
-
-              zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
-
-              autoload -z edit-command-line
-              zle -N edit-command-line
-              bindkey "^X" edit-command-line
-
-              export IGLOO_ZSH_PROMPT_THEME_HIDE_TIME=true
-
-              [ -f ~/.zshrc_work ] && . ~/.zshrc_work
-            ''
+        initExtra =
+          let iglooPrompt = builtins.concatStringsSep "\n" [
+            "export IGLOO_ZSH_PROMPT_THEME_HIDE_TIME=true"
             (builtins.readFile
               (builtins.fetchurl
                 {
@@ -262,6 +248,24 @@
                   sha256 = "17ln78ww66mg1k2yljpap74rf6fjjiw818x4pc2d5l6yjqgv8wfl";
                 }))
           ];
+          in
+          builtins.concatStringsSep "\n"
+            [
+              ''
+                autoload -U promptinit; promptinit
+
+                set -o vi
+
+                zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+
+                autoload -z edit-command-line
+                zle -N edit-command-line
+                bindkey "^X" edit-command-line
+
+                [ -f ~/.zshrc_work ] && . ~/.zshrc_work
+              ''
+              iglooPrompt
+            ];
         enableCompletion = true;
         completionInit = ''
           autoload bashcompinit && bashcompinit
