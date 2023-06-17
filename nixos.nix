@@ -69,5 +69,9 @@
     enableSSHSupport = true;
   };
 
+  home-manager.useGlobalPkgs = true;
+  home-manager.useUserPackages = true;
+  home-manager.users."misi" = import ./homemanager.nix;
+
   system.stateVersion = "23.05";
 }
