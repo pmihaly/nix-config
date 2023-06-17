@@ -70,6 +70,11 @@
   nixpkgs.config.allowUnfree = true;
   nixpkgs.overlays = import ./overlays;
 
+  nix = {
+    settings.experimental-features = "nix-command flakes";
+    settings.auto-optimise-store = true;
+  };
+
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
   programs.mtr.enable = true;
