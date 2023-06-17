@@ -49,7 +49,10 @@
     isNormalUser = true;
     description = "misi";
     extraGroups = [ "networkmanager" "wheel" ];
+    shell = pkgs.zsh;
   };
+
+  programs.zsh.enable = true;
 
   services.xserver.displayManager.autoLogin.enable = true;
   services.xserver.displayManager.autoLogin.user = "misi";
