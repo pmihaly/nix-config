@@ -409,9 +409,9 @@
         enable = true;
         autoReload = true;
         urls = [
-          { url = "http://www.daemonology.net/hn-daily/index.rss"; }
+          { url = "https://www.daemonology.net/hn-daily/index.rss"; }
           { url = "https://nitter.net/GergelyOrosz/rss"; }
-          { url = "http://feeds.feedburner.com/ThePragmaticEngineer"; }
+          { url = "https://feeds.feedburner.com/ThePragmaticEngineer"; }
           { url = "https://www.reddit.com/r/ExperiencedDevs/.rss"; }
           { url = "https://news.ycombinator.com/rss"; }
         ];
