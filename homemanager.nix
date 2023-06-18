@@ -89,6 +89,7 @@
           gnumake
           iosevka-custom
           nerdfonts-fira-code
+          lsof
         ]);
 
 
