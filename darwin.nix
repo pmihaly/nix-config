@@ -1,5 +1,6 @@
-{ config, pkgs, ... }:
-
+{ config, pkgs, lib, ... }:
+let utils = import ./utils.nix { inherit lib; };
+in
 {
   nixpkgs.config.allowUnfree = true;
   nixpkgs.overlays = import ./overlays;
@@ -7,7 +8,15 @@
 
   home-manager.useGlobalPkgs = true;
   home-manager.useUserPackages = true;
-  home-manager.users."mihaly.papp" = import ./homemanager.nix;
+
+
+  home-manager.users."mihaly.papp" =
+    utils.recursiveMerge [
+      (import ./homemanager.nix { inherit pkgs; })
+      {
+        home.packages = [ ];
+      }
+    ];
 
   homebrew = {
     enable = true;

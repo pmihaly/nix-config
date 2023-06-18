@@ -2,8 +2,10 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
+let utils = import ./utils.nix { inherit lib; };
+in
 {
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
@@ -85,7 +87,16 @@
 
   home-manager.useGlobalPkgs = true;
   home-manager.useUserPackages = true;
-  home-manager.users."misi" = import ./homemanager.nix;
+  home-manager.users."misi" =
+    utils.recursiveMerge [
+      (import ./homemanager.nix { inherit pkgs; })
+      {
+        home.packages = with pkgs; [
+          swaybg # setting wallpapers in wayland
+          wofi # wayland equivalent of rofi
+        ];
+      }
+    ];
 
   system.stateVersion = "23.05";
 }
