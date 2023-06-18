@@ -96,6 +96,7 @@ in
           swaybg # setting wallpapers in wayland
           wofi # wayland equivalent of rofi
           librewolf # unmozillad-firefox
+          ytfzf
         ];
 
         gtk = {
