@@ -95,7 +95,7 @@ in
         home.packages = with pkgs; [
           swaybg # setting wallpapers in wayland
           wofi # wayland equivalent of rofi
-          librewolf # unmozillad-firefox
+          librewolf-wayland # unmozillad-firefox
           ytfzf
         ];
 
