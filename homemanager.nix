@@ -286,6 +286,7 @@
         '';
 
         enableSyntaxHighlighting = true;
+        enableAutosuggestions = true;
         autocd = true;
         history = {
           ignoreDups = true;
