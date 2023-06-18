@@ -58,7 +58,7 @@ in
   programs.zsh.enable = true;
 
   fonts.fonts = [
-    pkgs.iosevka
+    pkgs.iosevka-custom
   ];
 
   services.xserver.displayManager.autoLogin.enable = true;
