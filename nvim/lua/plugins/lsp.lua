@@ -7,6 +7,7 @@ local servers = {
   nil_ls = {},
   sqlls = {},
   yamlls = {},
+  pylsp = {},
 }
 
 return {
