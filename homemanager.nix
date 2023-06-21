@@ -21,14 +21,6 @@
         };
       };
 
-      xdg.configFile = {
-        hypr = {
-          source = ./hypr;
-          recursive = true;
-        };
-      };
-
-
       home.packages =
         let
           work = with pkgs; [

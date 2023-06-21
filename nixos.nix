@@ -99,6 +99,13 @@ in
           ytfzf
         ];
 
+      xdg.configFile = {
+        hypr = {
+          source = ./hypr;
+          recursive = true;
+        };
+      };
+
         gtk = {
           enable = true;
           theme = {
