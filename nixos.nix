@@ -97,6 +97,7 @@ in
           wofi # wayland equivalent of rofi
           librewolf-wayland # unmozillad-firefox
           ytfzf
+          wl-clipboard # `wl-copy` and `wl-paste`
         ];
 
       xdg.configFile = {
