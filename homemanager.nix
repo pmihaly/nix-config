@@ -81,6 +81,7 @@
           iosevka-custom
           nerdfonts-fira-code
           lsof
+          qrencode # str to qr code
         ]);
 
 
@@ -315,6 +316,7 @@
           revo = "function _f() { revolut.sh ~/Sync/finances.yaml | vipe --suffix yaml | envelopes > ~/Sync/finances.yaml }; _f";
           fin = "$EDITOR ~/Sync/finances.yaml";
           nb = "newsboat";
+          qr = "qrencode -t ansiutf8";
         };
       };
 
