@@ -51,7 +51,7 @@ in
   users.users.misi = {
     isNormalUser = true;
     description = "misi";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "networkmanager" "wheel" "docker" ];
     shell = pkgs.zsh;
   };
 
@@ -83,6 +83,11 @@ in
     pinentryFlavor = "gtk2";
   };
 
+  virtualisation.docker = {
+    enable = true;
+    storageDriver = "btrfs";
+  };
+
   home-manager.useGlobalPkgs = true;
   home-manager.useUserPackages = true;
   home-manager.users."misi" =
@@ -92,7 +97,7 @@ in
         home.packages = with pkgs; [
           swaybg # setting wallpapers in wayland
           wofi # wayland equivalent of rofi
-          librewolf-wayland # unmozillad-firefox
+          custom-firefox
           ytfzf
           wl-clipboard # `wl-copy` and `wl-paste`
         ];
