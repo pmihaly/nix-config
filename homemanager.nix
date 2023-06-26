@@ -228,6 +228,7 @@
           I = "push A<c-a>"; # at the very beginning
           i = "push A<a-b><a-b><a-f>"; # before extention
           a = "push A<a-b>"; # after extention
+          M = "mark-save";
         };
       };
 
