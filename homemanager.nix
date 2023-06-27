@@ -430,6 +430,7 @@
           auto-reload yes
           show-keymap-hint no
           show-title-bar no
+          scrolloff 999
 
           bind-key j down
           bind-key k up
