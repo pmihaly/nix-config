@@ -22,15 +22,15 @@
         menu = 400
         css = 400
 
-        [buildPlans.iosevka-custom.weights.medium]
-        shape = 500
-        menu = 500
-        css = 500
+        [buildPlans.iosevka-custom.weights.bold]
+        shape = 700
+        menu = 700
+        css = 700
 
-        [buildPlans.iosevka-custom.weights.semibold]
-        shape = 600
-        menu = 600
-        css = 600
+        [buildPlans.iosevka-custom.weights.extrabold]
+        shape = 800
+        menu = 800
+        css = 800
 
         [buildPlans.iosevka-custom.slopes.upright]
         angle = 0
