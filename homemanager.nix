@@ -345,10 +345,6 @@
           confirm_os_window_close = 0;
           close_on_child_death = true;
         };
-        extraConfig = ''
-              modify_font underline_position 0.5
-              modify_font underline_thickness 130%
-            '';
       };
 
       programs.btop = {
