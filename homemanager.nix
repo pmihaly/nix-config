@@ -300,6 +300,7 @@
           nr = "sudo nix-store --verify --check-contents --repair";
           ns = "nix search nixpkgs";
           ncg = "nix-collect-garbage --delete-old";
+          nsh = "nix-shell -p";
           cn = "nvim ~/.nix-config";
           c = "cd ~/.nix-config";
           ping = "gping";
