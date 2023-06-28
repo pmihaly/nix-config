@@ -29,6 +29,16 @@ in
     LC_TIME = "hu_HU.UTF-8";
   };
 
+  services.greetd = {
+    enable = true;
+    settings = {
+      default_session = {
+        command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --cmd Hyprland";
+        user = "misi";
+      };
+    };
+  };
+
   programs.hyprland = {
     enable = true;
     xwayland = {
