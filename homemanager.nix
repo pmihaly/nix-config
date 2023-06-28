@@ -41,7 +41,6 @@
       nvimDeps = with pkgs; [
         nodejs
         cargo
-        ripgrep
         gcc
         unzip
       ];
@@ -81,6 +80,7 @@
       nerdfonts-fira-code
       lsof
       qrencode # str to qr code
+      ripgrep # basically grep
     ]);
 
 
@@ -318,6 +318,7 @@
       fin = "$EDITOR ~/Sync/finances.yaml";
       nb = "newsboat";
       qr = "qrencode -t ansiutf8";
+      sr = "function _f() { rg -l \"$1\" | xargs sed -i \"s/$1/$2/g\" }; _f";
     };
   };
 
