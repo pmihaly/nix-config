@@ -81,6 +81,7 @@
       lsof
       qrencode # str to qr code
       ripgrep # basically grep
+      killall
     ]);
 
 
