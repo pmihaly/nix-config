@@ -82,6 +82,7 @@
       qrencode # str to qr code
       ripgrep # basically grep
       killall
+      sd # more intuitive search and replace
     ]);
 
 
@@ -319,7 +320,7 @@
       fin = "$EDITOR ~/Sync/finances.yaml";
       nb = "newsboat";
       qr = "qrencode -t ansiutf8";
-      sr = "function _f() { rg -l \"$1\" | xargs sed -i \"s/$1/$2/g\" }; _f";
+      sr = "function _f() { fd --type file --exec sd \"$1\" \"$2\" }; _f";
     };
   };
 
