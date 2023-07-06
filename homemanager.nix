@@ -280,7 +280,13 @@
       complete -C 'aws_completer' aws
     '';
 
-    enableSyntaxHighlighting = true;
+    syntaxHighlighting = {
+      enable = true;
+      styles = {
+        main = "";
+        brackets = "";
+      };
+    };
     enableAutosuggestions = true;
     autocd = true;
     history = {
