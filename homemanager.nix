@@ -383,6 +383,7 @@
       { url = "https://programming.dev/feeds/c/nix.xml?sort=Active"; }
       { url = "https://programming.dev/feeds/c/commandline.xml?sort=Active"; }
       { url = "https://beehaw.org/feeds/c/technology.xml?sort=Active"; }
+      { url = "https://lobste.rs/rss"; }
     ];
     extraConfig = ''
       #show-read-feeds no
