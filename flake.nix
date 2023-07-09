@@ -8,9 +8,10 @@
     darwin.url = "github:lnl7/nix-darwin";
     darwin.inputs.nixpkgs.follows = "nixpkgs";
     hyprland.url = "github:hyprwm/Hyprland";
+    nur.url = "github:nix-community/NUR";
   };
 
-  outputs = { self, nixpkgs, home-manager, darwin, hyprland }: {
+  outputs = { self, nixpkgs, home-manager, darwin, hyprland, nur }: {
 
     darwinConfigurations."mac" = darwin.lib.darwinSystem {
       system = "aarch64-darwin";
@@ -24,6 +25,7 @@
       modules = [
         home-manager.nixosModules.home-manager
         hyprland.nixosModules.default
+        nur.nixosModules.nur
         ./pc-hardware.nix
         ./nixos.nix
       ];
