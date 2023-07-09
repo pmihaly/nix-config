@@ -165,6 +165,7 @@ in
                     user_pref("browser.disableResetPrompt", true);
                     user_pref("browser.newtab.preload", false);
                     user_pref("browser.newtabpage.activity-stream.section.highlights.includePocket", false);
+                    user_pref("browser.newtabpage.enabled", false);
                     user_pref("browser.newtabpage.enhanced", false);
                     user_pref("browser.newtabpage.introShown", true);
                     user_pref("browser.safebrowsing.appRepURL", "");
