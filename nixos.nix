@@ -287,10 +287,6 @@ in
             package = pkgs.nordzy-icon-theme;
             name = "Nordzy";
           };
-          cursorTheme = {
-            package = pkgs.nordzy-cursor-theme;
-            name = "Nordzy-cursors";
-          };
         };
       }
     ];
