@@ -30,14 +30,6 @@
         obsidian
         jwt-cli
         libossp_uuid # uuid from cli
-        (vscode-with-extensions.override
-          {
-            vscodeExtensions = with vscode-extensions; [
-              arcticicestudio.nord-visual-studio-code
-              eamodio.gitlens
-              asvetliakov.vscode-neovim
-            ];
-          })
       ];
       nvimDeps = with pkgs; [
         nodejs
@@ -429,5 +421,21 @@
       highlight article "\\[image\\ [0-9]+\\]" color10 default bold
       highlight feedlist "^─.*$" color6 color236 bold
     '';
+  };
+
+  programs.vscode = {
+    enable = true;
+    enableExtensionUpdateCheck = false;
+    enableUpdateCheck = false;
+    extensions = with pkgs.vscode-extensions; [
+      arcticicestudio.nord-visual-studio-code
+      eamodio.gitlens
+      asvetliakov.vscode-neovim
+    ];
+    userSettings = {
+      "workbench.colorTheme" = "Nord";
+      "editor.cursorSmoothCaretAnimation" = "on";
+      "editor.smoothScrolling" = true;
+    };
   };
 }
