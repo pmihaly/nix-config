@@ -35,6 +35,7 @@
             vscodeExtensions = with vscode-extensions; [
               arcticicestudio.nord-visual-studio-code
               eamodio.gitlens
+              asvetliakov.vscode-neovim
             ];
           })
       ];
