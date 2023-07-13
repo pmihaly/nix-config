@@ -440,8 +440,6 @@
       "editor.smoothScrolling" = true;
       "editor.minimap.enabled" = false;
       "editor.formatOnSave" = true;
-      "editor.cursorSurroundingLines" = 999;
-      "editor.cursorSurroundingLinesStyle" = "all";
       "files.autoSave" = "onFocusChange";
       "files.insertFinalNewline" = true;
       "files.trimTrailingWhitespace" = true;
