@@ -70,7 +70,7 @@
       gnumake
       iosevka-custom
       nerdfonts-fira-code
-      lsof
+      lsof # used by kbp alias - Lists open files and the corresponding processes
       qrencode # str to qr code
       ripgrep # basically grep
       killall
