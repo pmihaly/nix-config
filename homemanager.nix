@@ -76,6 +76,7 @@
       killall
       sd # more intuitive search and replace
       wally-cli # tool to flash the moonlander keyboard
+      zathura # pdf reader
     ]);
 
 
