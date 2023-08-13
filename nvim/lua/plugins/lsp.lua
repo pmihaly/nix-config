@@ -88,7 +88,7 @@ return {
         'marksman',
         'nil_ls',
         'sqlls',
-        -- 'nil_ls', -- nix
+        'nil_ls', -- nix
       })
 
       require'lspconfig'.pylsp.setup{
