@@ -1,67 +1,110 @@
-local servers = {
-  dockerls = {},
-  jsonls = {},
-  kotlin_language_server = {},
-  lua_ls = {},
-  marksman = {},
-  nil_ls = {},
-  sqlls = {},
-  yamlls = {},
-  pylsp = {},
-}
-
 return {
   {
-    'neovim/nvim-lspconfig',
-    event = "BufReadPre",
-    dependencies = {
-      { 'williamboman/mason.nvim', config = true },
-      { 'folke/lsp-colors.nvim'},
-      {
-        'williamboman/mason-lspconfig.nvim',
-        config = function ()
+    'VonHeikemen/lsp-zero.nvim',
+    branch = 'v2.x',
+    lazy = true,
+    config = function()
+      -- This is where you modify the settings for lsp-zero
+      -- Note: autocompletion settings will not take effect
 
-          local on_attach = function(_, bufnr)
-
-            vim.keymap.set('n', 'gap', vim.diagnostic.goto_prev)
-            vim.keymap.set('n', 'gan', vim.diagnostic.goto_next)
-            vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float)
-            vim.keymap.set('n', '<leader>r', vim.lsp.buf.rename)
-            vim.keymap.set('n', 'gh', vim.lsp.buf.code_action)
-            vim.keymap.set('n', 'gd', vim.lsp.buf.definition)
-            vim.keymap.set('n', 'gr', require('telescope.builtin').lsp_references)
-            vim.keymap.set('n', 'gi', vim.lsp.buf.implementation)
-            vim.keymap.set('n', 'gt', vim.lsp.buf.type_definition)
-            vim.keymap.set('n', 'K', vim.lsp.buf.hover)
-            vim.keymap.set('n', 'gD', vim.lsp.buf.declaration)
-
-            vim.api.nvim_buf_create_user_command(bufnr, 'Format', function(_)
-              vim.lsp.buf.format()
-            end, { desc = 'Format current buffer with LSP' })
-          end
-
-          local capabilities = vim.lsp.protocol.make_client_capabilities()
-          capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
-
-          local mason_lspconfig = require 'mason-lspconfig'
-
-          mason_lspconfig.setup {
-            ensure_installed = vim.tbl_keys(servers),
-            automatic_installation = true,
-          }
-
-          mason_lspconfig.setup_handlers {
-            function(server_name)
-              require('lspconfig')[server_name].setup {
-                capabilities = capabilities,
-                on_attach = on_attach,
-                settings = servers[server_name],
-              }
-            end,
-          }
-
-        end
-      },
-    },
+      require('lsp-zero.settings').preset({})
+    end
   },
+
+  -- Autocompletion
+  {
+    'hrsh7th/nvim-cmp',
+    event = 'InsertEnter',
+    dependencies = {
+      {'L3MON4D3/LuaSnip'},
+    },
+    config = function()
+      -- Here is where you configure the autocompletion settings.
+      -- The arguments for .extend() have the same shape as `manage_nvim_cmp`:
+      -- https://github.com/VonHeikemen/lsp-zero.nvim/blob/v2.x/doc/md/api-reference.md#manage_nvim_cmp
+
+      require('lsp-zero.cmp').extend()
+
+      -- And you can configure cmp even more, if you want to.
+      local cmp = require('cmp')
+      local cmp_action = require('lsp-zero.cmp').action()
+
+      cmp.setup({
+        mapping = {
+          ['<C-Space>'] = cmp.mapping.complete(),
+          ['<C-f>'] = cmp_action.luasnip_jump_forward(),
+          ['<C-b>'] = cmp_action.luasnip_jump_backward(),
+        }
+      })
+    end
+  },
+
+  -- LSP
+  {
+    'neovim/nvim-lspconfig',
+    cmd = 'LspInfo',
+    event = {'BufReadPre', 'BufNewFile'},
+    dependencies = {
+      {'hrsh7th/cmp-nvim-lsp'},
+      {'williamboman/mason-lspconfig.nvim'},
+      {'williamboman/mason.nvim'},
+    },
+    config = function()
+      -- This is where all the LSP shenanigans will live
+
+      local lsp = require('lsp-zero')
+
+      lsp.on_attach(function(client, bufnr)
+        -- see :help lsp-zero-keybindings
+        -- to learn the available actions
+        lsp.default_keymaps({buffer = bufnr})
+        local opts = {buffer = bufnr}
+        vim.keymap.set('n', 'K', '<cmd>lua vim.lsp.buf.hover()<cr>', opts)
+        vim.keymap.set('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<cr>', opts)
+        vim.keymap.set('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<cr>', opts)
+        vim.keymap.set('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<cr>', opts)
+        vim.keymap.set('n', 'go', '<cmd>lua vim.lsp.buf.type_definition()<cr>', opts)
+        vim.keymap.set('n', 'gr', '<cmd>lua vim.lsp.buf.references()<cr>', opts)
+        vim.keymap.set('n', 'gs', '<cmd>lua vim.lsp.buf.signature_help()<cr>', opts)
+        vim.keymap.set('n', '<F2>', '<cmd>lua vim.lsp.buf.rename()<cr>', opts)
+        vim.keymap.set({'n', 'x'}, '<F3>', '<cmd>lua vim.lsp.buf.format({async = true})<cr>', opts)
+        vim.keymap.set('n', '<F4>', '<cmd>lua vim.lsp.buf.code_action()<cr>', opts)
+
+        vim.keymap.set('n', 'gl', '<cmd>lua vim.diagnostic.open_float()<cr>', opts)
+        vim.keymap.set('n', '[d', '<cmd>lua vim.diagnostic.goto_prev()<cr>', opts)
+        vim.keymap.set('n', ']d', '<cmd>lua vim.diagnostic.goto_next()<cr>', opts)
+
+      end)
+
+      lsp.ensure_installed({
+        -- Replace these with whatever servers you want to install
+        -- from https://github.com/williamboman/mason-lspconfig.nvim#available-lsp-servers
+        'tsserver',
+        'pylsp',
+        'dockerls',
+        'docker_compose_language_service',
+        'yamlls',
+        'jsonls',
+        'marksman',
+        'nil_ls',
+        'sqlls',
+        -- 'nil_ls', -- nix
+      })
+
+      require'lspconfig'.pylsp.setup{
+        settings = {
+          pylsp = {
+            plugins = {
+              pycodestyle = {
+                ignore = {'W391'},
+                maxLineLength = 150
+              }
+            }
+          }
+        }
+      }
+
+      lsp.setup()
+    end
+  }
 }
