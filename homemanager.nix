@@ -36,6 +36,9 @@
         cargo
         gcc
         unzip
+        (pkgs.python310.withPackages (p: with p; [  # vimspector debugpy
+          setuptools
+        ]))
       ];
     in
     work ++ nvimDeps ++ (with pkgs; [
