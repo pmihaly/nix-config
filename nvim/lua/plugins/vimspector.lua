@@ -2,7 +2,6 @@ return {
   {
     'puremourning/vimspector',
     keys = {
-      { '<Leader>dd', ':call vimspector#Launch()<CR>', mode = 'n' },
       { '<Leader>dq', ':call vimspector#Reset()<CR>', mode = 'n' },
       { '<Leader>dc', ':call vimspector#Continue()<CR>', mode = 'n' },
       { '<Leader>dt', ':call vimspector#ToggleBreakpoint()<CR>', mode = 'n' },
@@ -19,5 +18,12 @@ return {
       vim.g.vimspector_base_dir = '/Users/mihaly.papp/.local/share/nvim/lazy/vimspector'
       vim.g.vimspector_install_gadgets = { 'debugpy' }
     end,
+  },
+  {
+    'nvim-telescope/telescope-vimspector.nvim',
+    build = function() pcall(require('telescope').load_extension, 'vimspector') end,
+    keys = {
+      { '<leader>dd', '<cmd>Telescope vimspector configurations<cr>', mode = 'n'},
+    },
   },
 }
