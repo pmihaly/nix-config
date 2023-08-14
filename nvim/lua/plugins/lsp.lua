@@ -86,7 +86,6 @@ return {
         'yamlls',
         'jsonls',
         'marksman',
-        'nil_ls',
         'sqlls',
         'nil_ls', -- nix
       })
