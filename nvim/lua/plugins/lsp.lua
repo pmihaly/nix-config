@@ -70,7 +70,7 @@ return {
         vim.keymap.set({'n', 'x'}, '<F3>', '<cmd>lua vim.lsp.buf.format({async = true})<cr>', opts)
         vim.keymap.set('n', '<F4>', '<cmd>lua vim.lsp.buf.code_action()<cr>', opts)
 
-        vim.keymap.set('n', 'gh', '<cmd>lua vim.diagnostic.open_float()<cr>', opts)
+        vim.keymap.set('n', 'gh', vim.lsp.buf.code_action)
         vim.keymap.set('n', 'gap', '<cmd>lua vim.diagnostic.goto_prev()<cr>', opts)
         vim.keymap.set('n', 'gan', '<cmd>lua vim.diagnostic.goto_next()<cr>', opts)
 
