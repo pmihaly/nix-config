@@ -55,6 +55,9 @@ return {
   {
     'github/copilot.vim',
     cmd = 'Copilot',
-    event = 'InsertEnter'
+    event = 'InsertEnter',
+    config = function()
+      vim.g.copilot_filetypes = { VimspectorPrompt = false }
+    end,
   }
 }
