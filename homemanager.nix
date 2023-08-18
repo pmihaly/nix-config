@@ -81,6 +81,7 @@
       wally-cli # tool to flash the moonlander keyboard
       zathura # pdf reader
       anki-bin
+      transmission
     ]);
 
 
