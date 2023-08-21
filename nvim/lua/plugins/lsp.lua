@@ -91,6 +91,7 @@ return {
         -- from https://github.com/williamboman/mason-lspconfig.nvim#available-lsp-servers
         'tsserver',
         'pylsp',
+        'pyright',
         'dockerls',
         'docker_compose_language_service',
         'yamlls',
