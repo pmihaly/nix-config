@@ -82,6 +82,7 @@
       zathura # pdf reader
       anki-bin
       transmission
+      du-dust # prettier du -sh
     ]);
 
 
@@ -218,7 +219,7 @@
     };
     keybindings = {
       D = "delete";
-      U = "!du -sh";
+      U = "!dust";
       R = "!massren";
       m = "push :mkdirWithParent<space>";
       t = "push :touchWithParent<space>";
@@ -325,6 +326,7 @@
       nb = "newsboat";
       qr = "qrencode -t ansiutf8";
       sr = "function _f() { fd --type file --exec sd \"$1\" \"$2\" }; _f";
+      du = "dust";
     };
   };
 
