@@ -84,6 +84,7 @@
       transmission
       du-dust # prettier du -sh
       choose # frendlier cut
+      pup # jq for html
     ]);
 
 
