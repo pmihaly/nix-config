@@ -83,6 +83,7 @@
       anki-bin
       transmission
       du-dust # prettier du -sh
+      choose # frendlier cut
     ]);
 
 
