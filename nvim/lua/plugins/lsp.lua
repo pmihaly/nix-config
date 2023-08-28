@@ -99,6 +99,7 @@ return {
         'marksman',
         'sqlls',
         'nil_ls', -- nix
+        'nginx-language-server',
       })
 
       require'lspconfig'.pylsp.setup{
