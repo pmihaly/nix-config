@@ -479,8 +479,7 @@
       set-option -g status-interval 5
       set-option -g automatic-rename on
       set-option -g automatic-rename-format '#{b:pane_current_path}'
-      set-option -g status-left ""
-      set-option -g status-right ""
+      set-option -g status off
 
       unbind-key C-b
       set-option -g prefix C-Space
