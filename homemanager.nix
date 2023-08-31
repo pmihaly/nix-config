@@ -147,6 +147,7 @@
   programs.fzf = {
     enable = true;
     enableZshIntegration = true;
+    tmux.enableShellIntegration = true;
   };
 
   home.sessionPath = [
@@ -465,5 +466,25 @@
         "editor.defaultFormatter" = "esbenp.prettier-vscode";
       };
     };
+  };
+
+  programs.tmux = {
+    enable = true;
+    plugins = with pkgs; [
+      tmuxPlugins.sensible
+      tmuxPlugins.nord
+      tmuxPlugins.tmux-fzf
+    ];
+    extraConfig = ''
+      set-option -g status-interval 5
+      set-option -g automatic-rename on
+      set-option -g automatic-rename-format '#{b:pane_current_path}'
+      set-option -g status-left ""
+      set-option -g status-right ""
+
+      unbind-key C-b
+      set-option -g prefix C-Space
+      bind-key C-Space send-prefix
+    '';
   };
 }
