@@ -259,6 +259,7 @@
       builtins.concatStringsSep "\n"
         [
           ''
+            [ -z $TMUX ] && tmux
             autoload -U promptinit; promptinit
 
             set -o vi
