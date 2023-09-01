@@ -359,7 +359,7 @@
       close_on_child_death = true;
     };
     extraConfig = ''
-      modify_font underline_position 0.5
+      modify_font underline_position 1.5
       modify_font underline_thickness 140%
     '';
   };
