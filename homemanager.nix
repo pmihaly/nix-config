@@ -476,6 +476,7 @@
       tmuxPlugins.nord
     ];
     mouse=true;
+    clock24=true;
     extraConfig = ''
       set-option -g status-interval 5
       set-option -g automatic-rename on
