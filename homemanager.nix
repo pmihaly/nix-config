@@ -473,7 +473,6 @@
     plugins = with pkgs; [
       tmuxPlugins.sensible
       tmuxPlugins.nord
-      tmuxPlugins.tmux-fzf
     ];
     extraConfig = ''
       set-option -g status-interval 5
@@ -484,6 +483,8 @@
       unbind-key C-b
       set-option -g prefix C-Space
       bind-key C-Space send-prefix
+
+      bind j display-popup -E "tmux list-windows -F '#{window_index} #{b:pane_current_path} #{pane_current_command}' | fzf --with-nth=2,3 | choose 0 | xargs tmux select-window -t"
     '';
   };
 }
