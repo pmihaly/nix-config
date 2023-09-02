@@ -85,7 +85,7 @@
       du-dust # prettier du -sh
       choose # frendlier cut
       pup # jq for html
-      nushell # structured data manipulation - replaces jq, jiq and yq
+      nushellFull # structured data manipulation - replaces jq, jiq and yq
     ]);
 
 
