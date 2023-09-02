@@ -553,7 +553,7 @@
       set-option -g prefix C-Space
       bind-key C-Space send-prefix
 
-      bind j display-popup -E "tmux list-windows -F '#{window_index} #{b:pane_current_path} #{pane_current_command}' | fzf --with-nth=2,3 | choose 0 | xargs tmux select-window -t"
+      bind j display-popup -E "tmux list-windows -F '#{window_index} #{b:pane_current_path} #{pane_current_command}' | grep -v \"$(tmux display-message -p '#I') \" | fzf --with-nth=2,3 | choose 0 | xargs tmux select-window -t"
 
       set -g @fuzzback-bind ?
       set -g @fzf-url-bind u
