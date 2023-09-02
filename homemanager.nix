@@ -293,9 +293,9 @@
     shellAliases = {
       ls = "exa -lah $([ -d .git ] && echo '--git')";
       cat = "bat";
-      dn = "find ~/lensadev -maxdepth 1 -type d | fzf | xargs nvim";
+      dn = "cd $(find ~/lensadev -maxdepth 1 -type d | fzf) && nvim";
       d = "cd $(find ~/lensadev -maxdepth 1 -type d | fzf)";
-      pn = "find ~/personaldev -maxdepth 1 -type d | fzf | xargs nvim";
+      pn = "cd $(find ~/personaldev -maxdepth 1 -type d | fzf) && nvim";
       p = "cd $(find ~/personaldev -maxdepth 1 -type d | fzf)";
       lg = "lazygit";
       ld = "lazydocker";
