@@ -542,6 +542,8 @@
       tmuxPlugins.nord
       tmuxPlugins.fuzzback
       tmuxPlugins.fzf-tmux-url
+      tmuxPlugins.resurrect
+      tmuxPlugins.continuum
     ];
     mouse=true;
     clock24=true;
@@ -558,6 +560,8 @@
 
       set -g @fuzzback-bind ?
       set -g @fzf-url-bind u
+
+      set -g @continuum-restore 'on'
     '';
   };
 }
