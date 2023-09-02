@@ -100,6 +100,7 @@ return {
         'sqlls',
         'nil_ls', -- nix
         'nginx-language-server',
+        'rust_analyzer',
       })
 
       require'lspconfig'.pylsp.setup{
