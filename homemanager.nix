@@ -49,22 +49,17 @@
       httpie
       syncthing
       tldr
-      neofetch
       yq-go
       jq
       jiq # interactive jq
       wget
       scrub # delete files securely
       duf # prettier lsblk
-      onefetch # neofetch for git repos
       act # running github actions locally
-      thokr # writing speed
       gum # pretty shell scripts
       massren # mass file rename
       discord
       nix-tree # visualisation of nix derivations
-      shellcheck
-      shfmt
       fd # alternative to find
       tig # prettier git tree
       moreutils # extend unix pipelining
@@ -78,9 +73,7 @@
       ripgrep # basically grep
       killall
       sd # more intuitive search and replace
-      wally-cli # tool to flash the moonlander keyboard
       zathura # pdf reader
-      anki-bin
       transmission
       du-dust # prettier du -sh
       choose # frendlier cut
