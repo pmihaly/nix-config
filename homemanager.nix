@@ -46,7 +46,8 @@
       slack
       lazydocker
       git
-      httpie
+      # httpie
+      curlie # httpie but with --curl
       syncthing
       tldr
       yq-go
@@ -325,6 +326,7 @@
       sr = "function _f() { fd --type file --exec sd \"$1\" \"$2\" }; _f";
       du = "dust";
       lsblk = "duf";
+      http = "curlie";
     };
   };
 
