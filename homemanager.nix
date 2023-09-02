@@ -63,7 +63,7 @@
       nix-tree # visualisation of nix derivations
       fd # alternative to find
       tig # prettier git tree
-      moreutils # extend unix pipelining
+      parallel # xargs but with multiprocessing
       keepass-diff # diffing .kdbx files
       watch # run a command periodically
       gnumake
