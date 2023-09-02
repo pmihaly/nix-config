@@ -259,7 +259,6 @@
       builtins.concatStringsSep "\n"
         [
           ''
-            [ -z $TMUX ] && tmux
             autoload -U promptinit; promptinit
 
             set -o vi
@@ -431,6 +430,10 @@
         startup_mode = "Fullscreen";
       };
       option_as_alt = "Both";
+      shell = {
+        program = "zsh";
+        args = [ "-c" "tmux attach || zsh" ];
+      };
     };
   };
 
