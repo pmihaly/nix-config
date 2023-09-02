@@ -305,7 +305,7 @@
       ns = "nix search nixpkgs";
       ncg = "nix-collect-garbage --delete-old";
       nsh = "nix-shell -p";
-      cn = "nvim ~/.nix-config";
+      cn = "cd ~/.nix-config && nvim";
       c = "cd ~/.nix-config";
       thokr = "thokr --full-sentences 20";
       kbp = "sudo touch /dev/null ; lsof -iTCP -sTCP:LISTEN -n -P +c0 | awk 'NR>1{gsub(/.*:/,\"\",$9); print $9, $1, $2}' | fzf --multi --with-nth=1,2 --header='Select processes to be killed' | cut -d' ' -f3 | xargs kill -9";
