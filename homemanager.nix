@@ -407,7 +407,7 @@
         };
         italic = {
           family = "Iosevka Custom";
-          style = "Extrabold Extended";
+          style = "Bold Extended Italic";
         };
         bold_italic = {
           family = "Iosevka Custom";
