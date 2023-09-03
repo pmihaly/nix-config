@@ -15,7 +15,6 @@ return {
         }
       }
     },
-    event = 'VeryLazy',
     config = function()
       require('orgmode').setup_ts_grammar()
 
