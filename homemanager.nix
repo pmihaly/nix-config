@@ -298,6 +298,8 @@
       d = "cd $(find ~/lensadev -maxdepth 1 -type d | fzf)";
       pn = "cd $(find ~/personaldev -maxdepth 1 -type d | fzf) && nvim";
       p = "cd $(find ~/personaldev -maxdepth 1 -type d | fzf)";
+      o = "cd ~/Sync/org";
+      on = "cd ~/Sync/org && nvim";
       lg = "lazygit";
       ld = "lazydocker";
       ms = "pushd ~/.nix-config ; make switch-mac ; popd";
