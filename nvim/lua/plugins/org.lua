@@ -7,6 +7,12 @@ return {
       {
         'akinsho/org-bullets.nvim',
         config = true,
+      },
+      {
+        'dhruvasagar/vim-table-mode',
+        keys = {
+          { '<leader>tm', '<cmd>TableModeToggle<cr>', mode = 'n'},
+        }
       }
     },
     event = 'VeryLazy',
