@@ -294,10 +294,10 @@
     shellAliases = {
       ls = "exa -lah $([ -d .git ] && echo '--git')";
       cat = "bat";
-      dn = "cd $(find ~/lensadev -maxdepth 1 -type d | fzf) && nvim";
       d = "cd $(find ~/lensadev -maxdepth 1 -type d | fzf)";
-      pn = "cd $(find ~/personaldev -maxdepth 1 -type d | fzf) && nvim";
+      dn = "d && nvim";
       p = "cd $(find ~/personaldev -maxdepth 1 -type d | fzf)";
+      pn = "p && nvim";
       o = "cd ~/Sync/org";
       on = "cd ~/Sync/org && nvim";
       lg = "lazygit";
