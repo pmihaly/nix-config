@@ -43,7 +43,6 @@ in
     enable = true;
     xwayland = {
       enable = true;
-      hidpi = false;
     };
     nvidiaPatches = false;
   };
@@ -67,7 +66,7 @@ in
 
   programs.zsh.enable = true;
 
-  fonts.fonts = [
+  fonts.packages = [
     pkgs.iosevka-custom
   ];
 
