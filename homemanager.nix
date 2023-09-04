@@ -299,7 +299,7 @@
       p = "cd $(find ~/personaldev -maxdepth 1 -type d | fzf)";
       pn = "p && nvim";
       o = "cd ~/Sync/org";
-      on = "cd ~/Sync/org && (fd \"^.*\.org$\" | fzf | xargs nvim)";
+      on = "o && (fd \"^.*\.org$\" | fzf | xargs nvim)";
       lg = "lazygit";
       ld = "lazydocker";
       ms = "pushd ~/.nix-config ; make switch-mac ; popd";
