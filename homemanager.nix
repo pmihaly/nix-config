@@ -469,6 +469,7 @@
       show-keymap-hint no
       show-title-bar no
       scrolloff 999
+      reload-threads 100
 
       bind-key j down
       bind-key k up
