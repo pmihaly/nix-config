@@ -563,6 +563,8 @@
 
       bind j display-popup -E "tmux list-windows -F '#{window_index} #{b:pane_current_path} #{pane_current_command}' | grep -v \"$(tmux display-message -p '#I') \" | fzf --with-nth=2,3 | choose 0 | xargs tmux select-window -t"
 
+      bind k display-popup -E "tmux list-windows -F '#{window_index} #{b:pane_current_path} #{pane_current_command}' | fzf --multi | choose 0 | xargs -I{} tmux kill-window -t {}"
+
       set -g @fuzzback-bind ?
       set -g @fzf-url-bind u
     '';
