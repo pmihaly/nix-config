@@ -548,8 +548,6 @@
       tmuxPlugins.nord
       tmuxPlugins.fuzzback
       tmuxPlugins.fzf-tmux-url
-      tmuxPlugins.resurrect
-      tmuxPlugins.continuum
     ];
     mouse=true;
     clock24=true;
@@ -558,6 +556,7 @@
       set-option -g automatic-rename on
       set-option -g automatic-rename-format '#{b:pane_current_path} #{pane_current_command}'
       set-option -g status off
+      set-option -g default-command zsh
 
       set-option -g prefix C-Space
       bind-key C-Space send-prefix
@@ -566,8 +565,6 @@
 
       set -g @fuzzback-bind ?
       set -g @fzf-url-bind u
-
-      set -g @continuum-restore 'on'
     '';
   };
 }
