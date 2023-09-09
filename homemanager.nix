@@ -306,7 +306,7 @@
       nr = "sudo nix-store --verify --check-contents --repair";
       ns = "nix search nixpkgs";
       ncg = "nix-collect-garbage --delete-old";
-      nsh = "function _f() { nix-shell -p $1 --run zsh }; _f";
+      nsh = "function _f() { nix-shell -p $* --run zsh }; _f";
       cn = "cd ~/.nix-config && nvim";
       c = "cd ~/.nix-config";
       thokr = "thokr --full-sentences 20";
