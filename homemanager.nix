@@ -156,6 +156,7 @@
 
   programs.exa = {
     enable = true;
+    package = pkgs.eza;
   };
 
   programs.mpv = {
@@ -294,7 +295,7 @@
       ignoreDups = true;
     };
     shellAliases = {
-      ls = "exa -lah $([ -d .git ] && echo '--git')";
+      ls = "eza -lah $([ -d .git ] && echo '--git')";
       cat = "bat";
       d = "cd $(find ~/lensadev -maxdepth 1 -type d | fzf)";
       dn = "d && nvim";
