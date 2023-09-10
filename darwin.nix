@@ -1,3 +1,4 @@
+{ customflakes }:
 { config, pkgs, lib, ... }:
 let utils = import ./utils.nix { inherit lib; };
 in
@@ -12,7 +13,7 @@ in
 
   home-manager.users."mihaly.papp" =
     utils.recursiveMerge [
-      (import ./homemanager.nix { inherit pkgs; })
+      (import ./homemanager.nix { inherit pkgs; inherit customflakes; })
       {
         home.packages = [ ];
       }

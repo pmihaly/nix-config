@@ -9,15 +9,16 @@
     darwin.inputs.nixpkgs.follows = "nixpkgs";
     hyprland.url = "github:hyprwm/Hyprland";
     nur.url = "github:nix-community/NUR";
+    img2theme.url = "github:pmihaly/img2theme";
   };
 
-  outputs = { self, nixpkgs, home-manager, darwin, hyprland, nur }: {
+  outputs = { self, nixpkgs, home-manager, darwin, hyprland, nur, img2theme }: {
 
     darwinConfigurations."mac" = darwin.lib.darwinSystem {
       system = "aarch64-darwin";
       modules = [
         home-manager.darwinModules.home-manager
-        ./darwin.nix
+        (import ./darwin.nix { customflakes = { inherit img2theme; }; })
       ];
     };
 
@@ -27,7 +28,7 @@
         hyprland.nixosModules.default
         nur.nixosModules.nur
         ./pc-hardware.nix
-        ./nixos.nix
+        (import ./nixos.nix { customflakes = { inherit img2theme; }; })
       ];
     };
   };

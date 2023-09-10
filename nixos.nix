@@ -2,6 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
+{ customflakes, ... }:
 { config, pkgs, lib, ... }:
 
 let utils = import ./utils.nix { inherit lib; };
@@ -101,7 +102,7 @@ in
   home-manager.useUserPackages = true;
   home-manager.users."misi" =
     utils.recursiveMerge [
-      (import ./homemanager.nix { inherit pkgs; })
+      (import ./homemanager.nix { inherit pkgs; inherit customflakes; })
       {
         home.packages = with pkgs; [
           swaybg # setting wallpapers in wayland

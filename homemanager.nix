@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, customflakes, ... }:
 {
   home.stateVersion = "22.05";
 
@@ -79,6 +79,9 @@
       choose # frendlier cut
       pup # jq for html
       nushellFull # structured data manipulation - replaces jq, jiq and yq
+    ])
+    ++ (with customflakes; [
+      img2theme.packages."${pkgs.system}".default
     ]);
 
 
