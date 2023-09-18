@@ -79,6 +79,7 @@
       choose # frendlier cut
       pup # jq for html
       nushellFull # structured data manipulation - replaces jq, jiq and yq
+      eza # pretty ls
     ])
     ++ (with customflakes; [
       img2theme.packages."${pkgs.system}".default
@@ -153,11 +154,6 @@
     "/etc/profiles/per-user/$USER/bin"
     "/run/current-system/sw/bin/"
   ];
-
-  programs.exa = {
-    enable = true;
-    package = pkgs.eza;
-  };
 
   programs.mpv = {
     enable = true;
