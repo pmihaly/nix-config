@@ -40,6 +40,7 @@ in
         "messenger"
         "signal"
         "google-chrome"
+        "caffeine"
       ];
   };
 
