@@ -80,6 +80,7 @@
       pup # jq for html
       nushellFull # structured data manipulation - replaces jq, jiq and yq
       eza # pretty ls
+      anki-bin
     ])
     ++ (with customflakes; [
       img2theme.packages."${pkgs.system}".default
