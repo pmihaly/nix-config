@@ -33,14 +33,14 @@ in
       ];
       in
       work ++ [
-        "sourcetree"
-        "aerial"
-        "raycast"
+        "aerial" # screensaver
+        "raycast" # command+space
         "docker"
         "messenger"
         "signal"
         "google-chrome"
-        "caffeine"
+        "caffeine" # keep screen alive
+        "utm" # virtual machines
       ];
   };
 
