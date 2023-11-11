@@ -38,6 +38,7 @@
         unzip
         python310
         python310Packages.setuptools # vimspector debugpy
+        go
       ];
     in
     work ++ nvimDeps ++ (with pkgs; [
