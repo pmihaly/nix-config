@@ -341,101 +341,28 @@
     enableZshIntegration = true;
   };
 
-  programs.alacritty = {
+  programs.kitty = {
     enable = true;
+    theme = "Nord";
     settings = {
-      colors = {
-        primary = {
-          background = "#2e3440";
-          foreground = "#d8dee9";
-          dim_foreground = "#a5abb6";
-        };
-        cursor = {
-          text = "#2e3440";
-          cursor = "#d8dee9";
-        };
-        vi_mode_cursor = {
-          text = "#2e3440";
-          cursor = "#d8dee9";
-        };
-        selection = {
-          text = "CellForeground";
-          background = "#4c566a";
-        };
-        search = {
-          matches = {
-            foreground = "CellBackground";
-            background = "#88c0d0";
-          };
-          footer_bar = {
-            background = "#434c5e";
-            foreground = "#d8dee9";
-          };
-        };
-        normal = {
-          black = "#3b4252";
-          red = "#bf616a";
-          green = "#a3be8c";
-          yellow = "#ebcb8b";
-          blue = "#81a1c1";
-          magenta = "#b48ead";
-          cyan = "#88c0d0";
-          white = "#e5e9f0";
-        };
-        bright = {
-          black = "#4c566a";
-          red = "#bf616a";
-          green = "#a3be8c";
-          yellow = "#ebcb8b";
-          blue = "#81a1c1";
-          magenta = "#b48ead";
-          cyan = "#8fbcbb";
-          white = "#eceff4";
-        };
-        dim = {
-          black = "#373e4d";
-          red = "#94545d";
-          green = "#809575";
-          yellow = "#b29e75";
-          blue = "#68809a";
-          magenta = "#8c738c";
-          cyan = "#6d96a5";
-          white = "#aeb3bb";
-        };
-      };
-      font = {
-        normal = {
-          family = "Iosevka Custom";
-          style = "Bold Extended";
-        };
-        bold = {
-          family = "Iosevka Custom";
-          style = "Extrabold Extended";
-        };
-        italic = {
-          family = "Iosevka Custom";
-          style = "Bold Extended Italic";
-        };
-        bold_italic = {
-          family = "Iosevka Custom";
-          style = "Extrabold Extended Italic";
-        };
-      };
-      window = {
-        padding = {
-          x = 150;
-          y = 0;
-        };
-        dynamic_padding = true;
-        decorations = "none";
-        startup_mode = "Fullscreen";
-      };
-      option_as_alt = "Both";
-      shell = {
-        program = "zsh";
-        args = [ "-c" "tmux attach || zsh" ];
-      };
+      font_size = 11;
+      font_family = "Iosevka Custom Bold Extended";
+      bold_font = "Iosevka Custom Extrabold Extended";
+      italic_font = "Iosevka Custom Bold Extended Italic";
+      bold_italic_font = "Iosevka Custom Extrabold Extended Italic";
+      window_padding_width = "0 150";
+      hide_window_decorations = "titlebar-only";
+      macos_option_as_alt = true;
+      cursor_blink_interval = 0;
+      cursor_shape = "block";
+      enable_audio_bell = false;
+      confirm_os_window_close = 0;
+      close_on_child_death = true;
     };
+    extraConfig = ''
+      modify_font underline_position 1.5
+      modify_font underline_thickness 140%
+    '';
   };
 
   programs.btop = {
