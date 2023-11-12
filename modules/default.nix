@@ -5,5 +5,6 @@
     ./firefox
     ./nvim
     ./lazygit
+    ./zsh
   ];
 }
