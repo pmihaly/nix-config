@@ -10,7 +10,7 @@
     vscode.enable = true;
     firefox.enable = true;
     nvim.enable = true;
-    lazygit.enable = true;
+    git.enable = true;
     shell.enable = true;
     mpv.enable = true;
     lf.enable = true;
@@ -36,10 +36,8 @@
       lazydocker
       syncthing
       act # running github actions locally
-      massren # mass file rename
       discord
       nix-tree # visualisation of nix derivations
-      tig # prettier git tree
       keepass-diff # diffing .kdbx files
       iosevka-custom
       nerdfonts-fira-code

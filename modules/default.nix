@@ -4,7 +4,7 @@
     ./vscode
     ./firefox
     ./nvim
-    ./lazygit
+    ./git
     ./shell
     ./mpv
     ./lf

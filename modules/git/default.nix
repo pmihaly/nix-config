@@ -1,11 +1,16 @@
-{ lib, config, ... }:
+{ pkgs, lib, config, ... }:
 
 with lib;
-let cfg = config.modules.lazygit;
+let cfg = config.modules.git;
 
 in {
-  options.modules.lazygit = { enable = mkEnableOption "lazygit"; };
+  options.modules.git = { enable = mkEnableOption "git"; };
   config = mkIf cfg.enable {
+
+    home.packages = with pkgs; [
+      tig # prettier git tree
+    ];
+
     programs.lazygit = {
       enable = true;
       settings = {
