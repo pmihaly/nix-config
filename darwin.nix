@@ -15,7 +15,7 @@ in
     utils.recursiveMerge [
       (import ./homemanager.nix { inherit pkgs; inherit customflakes; })
       {
-        home.packages = [ ];
+        home.packages = [ pkgs.firefox-darwin ];
       }
     ];
 
