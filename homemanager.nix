@@ -50,34 +50,4 @@
     ++ (with customflakes; [
       img2theme.packages."${pkgs.system}".default
     ]);
-
-  programs.tmux = {
-    enable = true;
-    plugins = with pkgs; [
-      tmuxPlugins.sensible
-      tmuxPlugins.nord
-      tmuxPlugins.fuzzback
-      tmuxPlugins.fzf-tmux-url
-    ];
-    mouse=true;
-    clock24=true;
-    extraConfig = ''
-      set-option -g status-interval 5
-      set-option -g automatic-rename on
-      set-option -g automatic-rename-format '#{b:pane_current_path} #{pane_current_command}'
-      set-option -g status off
-      set-option -g default-command zsh
-
-      set-option -g prefix C-Space
-      bind-key C-Space send-prefix
-
-      bind j display-popup -E "tmux list-windows -F '#{window_index} #{b:pane_current_path} #{pane_current_command}' | grep -v \"$(tmux display-message -p '#I') \" | fzf | choose 0 | xargs tmux select-window -t"
-
-      bind k display-popup -E "tmux list-windows -F '#{window_index} #{b:pane_current_path} #{pane_current_command}' | fzf --multi | choose 0 | xargs -I{} tmux kill-window -t {}"
-
-      set -g @fuzzback-bind ?
-      set -g @fzf-url-bind u
-    '';
-  };
-
 }
