@@ -6,5 +6,6 @@
     ./nvim
     ./lazygit
     ./zsh
+    ./mpv
   ];
 }
