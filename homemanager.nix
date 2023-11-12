@@ -10,6 +10,7 @@
     vscode.enable = true;
     firefox.enable = true;
     nvim.enable = true;
+    lazygit.enable = true;
   };
 
   home.packages =
@@ -69,55 +70,6 @@
     ++ (with customflakes; [
       img2theme.packages."${pkgs.system}".default
     ]);
-
-
-  programs.lazygit = {
-    enable = true;
-    settings = {
-      services = {
-        "gsh.lensa.com" = "gitlab:gitlab.lensa.com";
-      };
-      notARepository = "quit";
-
-      customCommands = [
-        {
-          key = "b";
-          command = "tig blame -- {{.SelectedFile.Name}}";
-          context = "files";
-          description = "blame file at tree";
-          subprocess = true;
-        }
-        {
-          key = "b";
-          command = "tig blame -- {{.SelectedSubCommit.Sha}} -- {{.SelectedCommitFile.Name}}";
-          context = "commitFiles";
-          description = "blame file at revision";
-          subprocess = true;
-        }
-        {
-          key = "B";
-          command = "tig blame -- {{.SelectedCommitFile.Name}}";
-          context = "commitFiles";
-          description = "blame file at tree";
-          subprocess = true;
-        }
-        {
-          key = "t";
-          command = "tig {{.SelectedSubCommit.Sha}} -- {{.SelectedCommitFile.Name}}";
-          context = "commitFiles";
-          description = "tig file (history of commits affecting file)";
-          subprocess = true;
-        }
-        {
-          key = "t";
-          command = "tig -- {{.SelectedFile.Name}}";
-          context = "files";
-          description = "tig file (history of commits affecting file)";
-          subprocess = true;
-        }
-      ];
-    };
-  };
 
   programs.bat = {
     enable = true;
@@ -284,7 +236,6 @@
       pn = "p && nvim";
       o = "cd ~/Sync/org";
       on = "o && (fd \"^.*\.org$\" | fzf | xargs nvim)";
-      lg = "lazygit";
       ld = "lazydocker";
       ms = "pushd ~/.nix-config ; make switch-mac ; popd";
       mp = "pushd ~/.nix-config ; sudo make switch-pc ; popd";
