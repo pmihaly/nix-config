@@ -11,7 +11,7 @@
     firefox.enable = true;
     nvim.enable = true;
     lazygit.enable = true;
-    zsh.enable = true;
+    shell.enable = true;
     mpv.enable = true;
     lf.enable = true;
     kitty.enable = true;
@@ -50,16 +50,6 @@
     ++ (with customflakes; [
       img2theme.packages."${pkgs.system}".default
     ]);
-
-  programs.btop = {
-    enable = true;
-    settings = {
-      theme_background = false;
-      true_color = true;
-      update_ms = 200;
-    };
-  };
-
 
   programs.tmux = {
     enable = true;

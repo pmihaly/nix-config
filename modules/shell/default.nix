@@ -1,10 +1,10 @@
 { pkgs, lib, config, ... }:
 
 with lib;
-let cfg = config.modules.zsh;
+let cfg = config.modules.shell;
 
 in {
-  options.modules.zsh = { enable = mkEnableOption "zsh"; };
+  options.modules.shell = { enable = mkEnableOption "shell"; };
   config = mkIf cfg.enable {
 
     home.packages = with pkgs; [
@@ -165,5 +165,13 @@ in {
       enableZshIntegration = true;
     };
 
+    programs.btop = {
+      enable = true;
+      settings = {
+        theme_background = false;
+        true_color = true;
+        update_ms = 200;
+      };
+    };
   };
 }

@@ -5,7 +5,7 @@
     ./firefox
     ./nvim
     ./lazygit
-    ./zsh
+    ./shell
     ./mpv
     ./lf
     ./kitty
