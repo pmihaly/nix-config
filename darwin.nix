@@ -13,7 +13,7 @@ in
 
   home-manager.users."mihaly.papp" =
     utils.recursiveMerge [
-      (import ./homemanager.nix { inherit pkgs; inherit customflakes; })
+      (import ./homemanager.nix { inherit pkgs config customflakes; })
       {
         home.packages = [ pkgs.firefox-darwin ];
       }

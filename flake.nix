@@ -18,6 +18,7 @@
       system = "aarch64-darwin";
       modules = [
         home-manager.darwinModules.home-manager
+        nur.hmModules.nur
         (import ./darwin.nix { customflakes = { inherit img2theme; }; })
       ];
     };
@@ -26,7 +27,7 @@
       modules = [
         home-manager.nixosModules.home-manager
         hyprland.nixosModules.default
-        nur.nixosModules.nur
+        nur.hmModules.nur
         ./pc-hardware.nix
         (import ./nixos.nix { customflakes = { inherit img2theme; }; })
       ];
