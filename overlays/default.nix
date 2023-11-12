@@ -47,24 +47,4 @@
       set = "custom";
     };
   })
-  (final: prev: {
-    firefox-darwin = prev.stdenv.mkDerivation rec {
-      pname = "Firefox";
-      version = "119.0.1";
-
-      buildInputs = [ prev.undmg ];
-      sourceRoot = ".";
-      phases = [ "unpackPhase" "installPhase" ];
-      installPhase = ''
-          mkdir -p "$out/Applications"
-          cp -r Firefox.app "$out/Applications/Firefox.app"
-        '';
-
-      src = prev.fetchurl {
-        name = "Firefox-${version}.dmg";
-        url = "https://download-installer.cdn.mozilla.net/pub/firefox/releases/${version}/mac/en-GB/Firefox%20${version}.dmg";
-        sha256 = "1pswrw5a552c5v8ls9xmclmwqprw52vparvaqp51j4il9rh5vrxa";
-      };
-    };
-  })
-  ]
+]

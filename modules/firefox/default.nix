@@ -1,4 +1,4 @@
-{ pkgs, lib, config, inputs, ... }:
+{ pkgs, lib, config, ... }:
 
 with lib;
 let cfg = config.modules.firefox;
@@ -6,9 +6,28 @@ let cfg = config.modules.firefox;
 in {
   options.modules.firefox = { enable = mkEnableOption "firefox"; };
   config = mkIf cfg.enable {
-    programs.firefox = {
+    programs.firefox =
+      let firefox-darwin = pkgs.stdenv.mkDerivation rec {
+        pname = "Firefox";
+        version = "119.0.1";
+
+        buildInputs = [ pkgs.undmg ];
+        sourceRoot = ".";
+        phases = [ "unpackPhase" "installPhase" ];
+        installPhase = ''
+          mkdir -p "$out/Applications"
+          cp -r Firefox.app "$out/Applications/Firefox.app"
+          '';
+
+        src = pkgs.fetchurl {
+          name = "Firefox-${version}.dmg";
+          url = "https://download-installer.cdn.mozilla.net/pub/firefox/releases/${version}/mac/en-GB/Firefox%20${version}.dmg";
+          sha256 = "1pswrw5a552c5v8ls9xmclmwqprw52vparvaqp51j4il9rh5vrxa";
+        };
+      }; in
+    {
       enable = true;
-      package = if pkgs.system == "aarch64-darwin" then pkgs.firefox-darwin else pkgs.firefox;
+      package = if pkgs.system == "aarch64-darwin" then firefox-darwin else pkgs.firefox;
       profiles = {
         misi = {
           id = 0;
@@ -18,12 +37,12 @@ in {
             name = "munsik";
             toolbar = true;
             bookmarks = [
-              { name = "skeler II"; url = "https://www.youtube.com/watch?v=J4t4pMZBXZg"; }
-              { name = "skeler III"; url = "https://www.youtube.com/watch?v=P4ALDytLAXQ"; }
-              { name = "breakcore to dissociate to"; url = "https://www.youtube.com/watch?v=BhZ0Ky9uqts"; }
-              { name = "arcane metal I"; url = "https://www.youtube.com/watch?v=bgu94ChWTCA"; }
-              { name = "arcane metal II"; url = "https://www.youtube.com/watch?v=BhZ0Ky9uqts"; }
-              { name = "dnb"; url = "https://www.youtube.com/watch?v=qNaCzmbaYWI"; }
+            { name = "skeler II"; url = "https://www.youtube.com/watch?v=J4t4pMZBXZg"; }
+            { name = "skeler III"; url = "https://www.youtube.com/watch?v=P4ALDytLAXQ"; }
+            { name = "breakcore to dissociate to"; url = "https://www.youtube.com/watch?v=BhZ0Ky9uqts"; }
+            { name = "arcane metal I"; url = "https://www.youtube.com/watch?v=bgu94ChWTCA"; }
+            { name = "arcane metal II"; url = "https://www.youtube.com/watch?v=BhZ0Ky9uqts"; }
+            { name = "dnb"; url = "https://www.youtube.com/watch?v=qNaCzmbaYWI"; }
             ];
           }
           ];
@@ -176,13 +195,13 @@ in {
 
           extensions = with pkgs.nur.repos.rycee.firefox-addons; [
             ublock-origin
-            clearurls
-            localcdn
-            tridactyl
-            sponsorblock
-            istilldontcareaboutcookies
-            old-reddit-redirect
-            keepassxc-browser
+              clearurls
+              localcdn
+              tridactyl
+              sponsorblock
+              istilldontcareaboutcookies
+              old-reddit-redirect
+              keepassxc-browser
           ];
         };
       };
