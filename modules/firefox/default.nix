@@ -13,6 +13,20 @@ in {
         misi = {
           id = 0;
           name = "misi";
+          bookmarks = [
+          {
+            name = "munsik";
+            toolbar = true;
+            bookmarks = [
+              { name = "skeler II"; url = "https://www.youtube.com/watch?v=J4t4pMZBXZg"; }
+              { name = "skeler III"; url = "https://www.youtube.com/watch?v=P4ALDytLAXQ"; }
+              { name = "breakcore to dissociate to"; url = "https://www.youtube.com/watch?v=BhZ0Ky9uqts"; }
+              { name = "arcane metal I"; url = "https://www.youtube.com/watch?v=bgu94ChWTCA"; }
+              { name = "arcane metal II"; url = "https://www.youtube.com/watch?v=BhZ0Ky9uqts"; }
+              { name = "dnb"; url = "https://www.youtube.com/watch?v=qNaCzmbaYWI"; }
+            ];
+          }
+          ];
           search = {
             force = true;
             default = "DuckDuckGo";
@@ -25,19 +39,26 @@ in {
                   { name = "query"; value = "{searchTerms}"; }
                   ];
                 }];
-                icon = "${pkgs.nixos-icons}/share/icons/hicolor/scalable/apps/nix-snowflake.svg";
-                definedAliases = [ "@np" ];
+                iconUpdateURL = "https://nixos.wiki/favicon.png";
+                definedAliases = [ "ns" ];
               };
-              "NixOS Wiki" = {
-                urls = [{ template = "https://nixos.wiki/index.php?search={searchTerms}"; }];
+              "Home Manager Option Search" = {
+                urls = [{
+                  template = "https://mipmip.github.io/home-manager-option-search";
+                  params = [
+                  { name = "query"; value = "{searchTerms}"; }
+                  ];
+                }];
                 iconUpdateURL = "https://nixos.wiki/favicon.png";
                 updateInterval = 24 * 60 * 60 * 1000;
-                definedAliases = [ "@nw" ];
+                definedAliases = [ "os" ];
               };
             };
           };
           settings = {
             "general.smoothScroll" = true;
+            "browser.tabs.warnOnClose" = false;
+            "browser.tabs.warnOnCloseOtherTabs" = false;
           };
           extraConfig = ''
             user_pref("app.normandy.api_url", "");
@@ -161,7 +182,7 @@ in {
             sponsorblock
             istilldontcareaboutcookies
             old-reddit-redirect
-            kristofferhagen-nord-theme
+            keepassxc-browser
           ];
         };
       };
