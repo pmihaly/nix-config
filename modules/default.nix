@@ -8,5 +8,6 @@
     ./zsh
     ./mpv
     ./lf
+    ./kitty
   ];
 }
