@@ -1,4 +1,4 @@
-{ pkgs, config, customflakes, ... }:
+{ pkgs, customflakes, ... }:
 {
   home.stateVersion = "22.05";
 
