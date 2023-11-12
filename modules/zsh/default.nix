@@ -150,7 +150,6 @@ in {
           ticket = "git branch --show-current | grep -oE \"[A-Z]+-[0-9]+\"";
           revo = "function _f() { revolut.sh ~/Sync/finances.yaml | vipe --suffix yaml | envelopes > ~/Sync/finances.yaml }; _f";
           fin = "$EDITOR ~/Sync/finances.yaml";
-          nb = "newsboat";
           qr = "qrencode -t ansiutf8";
           sr = "function _f() { fd --type file --exec sd \"$1\" \"$2\" }; _f";
           du = "dust";

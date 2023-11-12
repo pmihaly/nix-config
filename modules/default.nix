@@ -9,5 +9,6 @@
     ./mpv
     ./lf
     ./kitty
+    ./newsboat
   ];
 }
