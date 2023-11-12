@@ -7,5 +7,6 @@
     ./lazygit
     ./zsh
     ./mpv
+    ./lf
   ];
 }
