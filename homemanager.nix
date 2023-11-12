@@ -9,22 +9,7 @@
   modules = {
     vscode.enable = true;
     firefox.enable = true;
-  };
-
-  programs.neovim = {
-    enable = true;
-    defaultEditor = true;
-    viAlias = true;
-    vimAlias = true;
-    vimdiffAlias = true;
-    withNodeJs = true;
-  };
-
-  xdg.configFile = {
-    nvim = {
-      source = ./nvim;
-      recursive = true;
-    };
+    nvim.enable = true;
   };
 
   home.packages =
@@ -38,17 +23,8 @@
         jwt-cli
         libossp_uuid # uuid from cli
       ];
-      nvimDeps = with pkgs; [
-        nodejs
-        cargo
-        gcc
-        unzip
-        python310
-        python310Packages.setuptools # vimspector debugpy
-        go
-      ];
     in
-    work ++ nvimDeps ++ (with pkgs; [
+    work ++ (with pkgs; [
       keepassxc
       slack
       lazydocker

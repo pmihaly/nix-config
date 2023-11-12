@@ -16,5 +16,5 @@ vim.g.maplocalleader = ' '
 
 require('config')
 require('lazy').setup('plugins', {
-  lockfile = "~/.nix-config/nvim/lazy-lock.json",
+  lockfile = "~/.nix-config/modules/nvim/nvim/lazy-lock.json",
 })
