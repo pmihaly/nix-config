@@ -109,7 +109,13 @@ in {
             #reader-mode-button,
             #star-button-box,
             #unified-extensions-button,
-            .unified-extensions-item:not(#ublock0_raymondhill_net-browser-action)
+            .unified-extensions-item,
+            #back-button,
+            #forward-button,
+            #stop-reload-button,
+            #reload-button,
+            #PanelUI-menu-button,
+            #tabs-newtab-button
             {
               display: none !important;
             }
