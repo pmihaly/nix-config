@@ -9,7 +9,7 @@ in {
     programs.firefox =
       let firefox-darwin = pkgs.stdenv.mkDerivation rec {
         pname = "Firefox";
-        version = "119.0.1";
+        version = pkgs.firefox.version;
 
         buildInputs = [ pkgs.undmg ];
         sourceRoot = ".";
@@ -22,7 +22,7 @@ in {
         src = pkgs.fetchurl {
           name = "Firefox-${version}.dmg";
           url = "https://download-installer.cdn.mozilla.net/pub/firefox/releases/${version}/mac/en-GB/Firefox%20${version}.dmg";
-          sha256 = "1pswrw5a552c5v8ls9xmclmwqprw52vparvaqp51j4il9rh5vrxa";
+          sha256 = "0nnhkgrbw52ardpjray4ah7nz071ggvifm1d0p17rm2krn58l31v";
         };
       }; in
     {
