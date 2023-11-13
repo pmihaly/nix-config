@@ -79,6 +79,17 @@ in {
             "browser.tabs.warnOnClose" = false;
             "browser.tabs.warnOnCloseOtherTabs" = false;
           };
+          extensions = with pkgs.nur.repos.rycee.firefox-addons; [
+            ublock-origin
+              clearurls
+              localcdn
+              tridactyl
+              sponsorblock
+              istilldontcareaboutcookies
+              old-reddit-redirect
+              keepassxc-browser
+              youtube-nonstop
+          ];
           extraConfig = ''
             user_pref("app.normandy.api_url", "");
           user_pref("app.normandy.enabled", false);
@@ -192,17 +203,6 @@ in {
             '';
           userContent = ''
             '';
-
-          extensions = with pkgs.nur.repos.rycee.firefox-addons; [
-            ublock-origin
-              clearurls
-              localcdn
-              tridactyl
-              sponsorblock
-              istilldontcareaboutcookies
-              old-reddit-redirect
-              keepassxc-browser
-          ];
         };
       };
     };
