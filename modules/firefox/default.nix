@@ -40,8 +40,9 @@ in {
             { name = "skeler II"; url = "https://www.youtube.com/watch?v=J4t4pMZBXZg"; }
             { name = "skeler III"; url = "https://www.youtube.com/watch?v=P4ALDytLAXQ"; }
             { name = "breakcore to dissociate to"; url = "https://www.youtube.com/watch?v=BhZ0Ky9uqts"; }
-            { name = "arcane metal I"; url = "https://www.youtube.com/watch?v=bgu94ChWTCA"; }
-            { name = "arcane metal II"; url = "https://www.youtube.com/watch?v=BhZ0Ky9uqts"; }
+            { name = "breakcore to feel to"; url = "https://www.youtube.com/watch?v=0KaBYaQGwbs"; }
+            { name = "stubbing toe into furniture I"; url = "https://www.youtube.com/watch?v=bgu94ChWTCA"; }
+            { name = "stubbing toe into furniture II"; url = "https://www.youtube.com/watch?v=BhZ0Ky9uqts"; }
             { name = "dnb"; url = "https://www.youtube.com/watch?v=qNaCzmbaYWI"; }
             ];
           }
