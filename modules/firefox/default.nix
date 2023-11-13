@@ -75,22 +75,49 @@ in {
               };
             };
           };
-          settings = {
+          settings = let
+            tinkeringWithUserChrome = {
+              "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
+              "devtools.debugger.remote-enabled" = true;
+              "devtools.chrome.enabled" = true;
+            };
+          in tinkeringWithUserChrome // {
             "general.smoothScroll" = true;
             "browser.tabs.warnOnClose" = false;
             "browser.tabs.warnOnCloseOtherTabs" = false;
+            "browser.toolbars.bookmarks.visibility" = "newtab";
+            "browser.chrome.toolbar_tips" = false;
+            "media.videocontrols.picture-in-picture.enabled" = false;
+            "browser.newtabpage.pinned" = [];
           };
           extensions = with pkgs.nur.repos.rycee.firefox-addons; [
             ublock-origin
-              clearurls
-              localcdn
-              tridactyl
-              sponsorblock
-              istilldontcareaboutcookies
-              old-reddit-redirect
-              keepassxc-browser
-              youtube-nonstop
+            localcdn
+            clearurls
+            tridactyl
+            sponsorblock
+            istilldontcareaboutcookies
+            old-reddit-redirect
+            keepassxc-browser
+            youtube-nonstop
           ];
+          userChrome = ''
+            .tabbrowser-tab .tab-close-button,
+            #firefox-view-button,
+            #alltabs-button,
+            #tracking-protection-icon-container,
+            #reader-mode-button,
+            #star-button-box,
+            #unified-extensions-button,
+            .unified-extensions-item:not(#ublock0_raymondhill_net-browser-action)
+            {
+              display: none !important;
+            }
+
+            #tabbrowser-tabs {
+              border-inline-start: 1px solid transparent !important;
+            }
+            '';
           extraConfig = ''
             user_pref("app.normandy.api_url", "");
           user_pref("app.normandy.enabled", false);
@@ -200,10 +227,6 @@ in {
           user_pref("webgl.renderer-string-override", " ");
           user_pref("webgl.vendor-string-override", " ");
           '';
-          userChrome = ''
-            '';
-          userContent = ''
-            '';
         };
       };
     };
