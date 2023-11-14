@@ -13,8 +13,7 @@
   };
 
   outputs = { self, nixpkgs, home-manager, darwin, hyprland, nur, img2theme }: {
-
-    darwinConfigurations."mac" = darwin.lib.darwinSystem {
+    darwinConfigurations.mac = darwin.lib.darwinSystem {
       system = "aarch64-darwin";
       modules = [
         home-manager.darwinModules.home-manager
@@ -23,13 +22,21 @@
       ];
     };
 
-    nixosConfigurations."pc" = nixpkgs.lib.nixosSystem {
+    nixosConfigurations.pc = nixpkgs.lib.nixosSystem {
       modules = [
         home-manager.nixosModules.home-manager
         hyprland.nixosModules.default
         { nixpkgs.overlays = [ nur.overlay ]; }
         ./pc-hardware.nix
         (import ./nixos.nix { customflakes = { inherit img2theme; }; })
+      ];
+    };
+
+    nixosConfigurations.skylab = nixpkgs.lib.nixosSystem {
+      modules = [
+        home-manager.nixosModules.home-manager
+        ./machines/skylab/hardware.nix
+        ./machines/skylab
       ];
     };
   };
