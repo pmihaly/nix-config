@@ -22,6 +22,11 @@
     ];
   };
 
+  imports = [ ../../modules/nixos ];
+  modules = {
+    nginx.enable = true;
+  };
+
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
@@ -75,23 +80,6 @@
 
   virtualisation.arion = {
     backend = "podman-socket";
-    projects.skylab.settings = {
-      services = {
-        webserver = {
-          image.enableRecommendedContents = true;
-          service.useHostStore = true;
-          service.command = [ "sh" "-c" ''
-            cd "$$WEB_ROOT"
-            ${pkgs.python3}/bin/python -m http.server
-            '' ];
-          service.ports = [
-            "8000:8000"
-          ];
-          service.environment.WEB_ROOT = "${pkgs.nix.doc}/share/doc/nix/manual";
-          service.stop_signal = "SIGINT";
-        };
-      };
-    };
   };
 
   system.stateVersion = "23.05";
