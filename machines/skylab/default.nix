@@ -16,6 +16,10 @@
       lf.enable = true;
       newsboat.enable = true;
     };
+
+    home.packages = with pkgs; [
+      docker-client
+    ];
   };
 
   boot.loader.systemd-boot.enable = true;
@@ -43,7 +47,7 @@
   users.users.misi = {
     isNormalUser = true;
     description = "misi";
-    extraGroups = [ "wheel" "docker" ];
+    extraGroups = [ "wheel" "podman" ];
     shell = pkgs.zsh;
   };
 
@@ -60,11 +64,33 @@
     settings.auto-optimise-store = true;
   };
 
-  virtualisation.docker = {
-    enable = true;
-    rootless = {
+  virtualisation = {
+    docker.enable = false;
+    podman = {
       enable = true;
-      setSocketVariable = true;
+      dockerSocket.enable = true;
+      defaultNetwork.settings.dnsEnabled = true;
+    };
+  };
+
+  virtualisation.arion = {
+    backend = "podman-socket";
+    projects.skylab.settings = {
+      services = {
+        webserver = {
+          image.enableRecommendedContents = true;
+          service.useHostStore = true;
+          service.command = [ "sh" "-c" ''
+            cd "$$WEB_ROOT"
+            ${pkgs.python3}/bin/python -m http.server
+            '' ];
+          service.ports = [
+            "8000:8000"
+          ];
+          service.environment.WEB_ROOT = "${pkgs.nix.doc}/share/doc/nix/manual";
+          service.stop_signal = "SIGINT";
+        };
+      };
     };
   };
 
