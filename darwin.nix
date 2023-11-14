@@ -41,6 +41,7 @@ in
         "google-chrome"
         "caffeine" # keep screen alive
         "utm" # virtual machines
+        "balenaetcher"
       ];
   };
 
