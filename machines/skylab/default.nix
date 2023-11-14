@@ -43,7 +43,7 @@
   users.users.misi = {
     isNormalUser = true;
     description = "misi";
-    extraGroups = [ "networkmanager" "wheel" "docker" ];
+    extraGroups = [ "wheel" "docker" ];
     shell = pkgs.zsh;
   };
 
@@ -62,7 +62,10 @@
 
   virtualisation.docker = {
     enable = true;
-    storageDriver = "btrfs";
+    rootless = {
+      enable = true;
+      setSocketVariable = true;
+    };
   };
 
   system.stateVersion = "23.05";
