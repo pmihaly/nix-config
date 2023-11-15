@@ -6,6 +6,12 @@ let cfg = config.modules.homer;
 in {
   options.modules.homer = { enable = mkEnableOption "homer"; };
   config = mkIf cfg.enable {
+    services.nginx = {
+      virtualHosts.localhost.locations."^~ /homer" = {
+        proxyPass = "http://localhost:8080/";
+      };
+    };
+
     virtualisation.arion.projects.skylab.settings.services = {
 
       homer = {
@@ -15,16 +21,11 @@ in {
         ];
         service.environment = {
           INIT_ASSETS = "0";
+          SUBFOLDER = "/homer";
         };
         service.volumes = [
           "${toString ./.}/assets:/www/assets"
         ];
-      };
-
-      nginx.nixos.configuration.services.nginx = {
-        virtualHosts.localhost.locations."/homer" = {
-          proxyPass = "http://127.0.0.1:8080";
-        };
       };
 
     };
