@@ -10,10 +10,9 @@
     hyprland.url = "github:hyprwm/Hyprland";
     nur.url = "github:nix-community/NUR";
     img2theme.url = "github:pmihaly/img2theme";
-    arion.url = "github:hercules-ci/arion";
   };
 
-  outputs = { self, nixpkgs, home-manager, darwin, hyprland, nur, img2theme, arion }: {
+  outputs = { self, nixpkgs, home-manager, darwin, hyprland, nur, img2theme }: {
     darwinConfigurations.mac = darwin.lib.darwinSystem {
       system = "aarch64-darwin";
       modules = [
@@ -36,7 +35,6 @@
     nixosConfigurations.skylake = nixpkgs.lib.nixosSystem {
       modules = [
         home-manager.nixosModules.home-manager
-        arion.nixosModules.arion
         ./machines/skylake/hardware.nix
         ./machines/skylake
       ];
