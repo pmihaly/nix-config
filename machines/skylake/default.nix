@@ -10,16 +10,12 @@
     imports = [ ../../modules ];
 
     modules = {
-      nvim.enable = false; # TODO: fails on aarch64
+      nvim.enable = true;
       git.enable = true;
       shell.enable = true;
       lf.enable = true;
       newsboat.enable = true;
     };
-
-    home.packages = with pkgs; [
-      docker-client
-    ];
   };
 
   imports = [ ../../modules/nixos ];
@@ -36,7 +32,13 @@
     dhcpcd.enable = true;
   };
 
-  time.timeZone = "Europe/Budapest";
+  services.openssh = {
+    enable = true;
+    openFirewall = true;
+    settings.PasswordAuthentication = false;
+  };
+
+  time.timeZone = "Europe/Berlin";
   i18n.defaultLocale = "en_US.UTF-8";
   i18n.extraLocaleSettings = {
     LC_ADDRESS = "hu_HU.UTF-8";
@@ -53,34 +55,20 @@
   users.users.misi = {
     isNormalUser = true;
     description = "misi";
-    extraGroups = [ "wheel" "podman" ];
+    extraGroups = [ "wheel" ];
     shell = pkgs.zsh;
+    openssh.authorizedKeys.keys = [
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG/9W5fVVxjEIo66iLCDfwxHh0IQ6r9R3J/Fq5b9LWNM mihaly.papp@mihalypapp-MacBook-Pro"
+    ];
   };
 
   programs.zsh.enable = true;
-
-  fonts.packages = [
-    pkgs.iosevka-custom
-  ];
 
   nixpkgs.config.allowUnfree = true;
 
   nix = {
     settings.experimental-features = "nix-command flakes";
     settings.auto-optimise-store = true;
-  };
-
-  virtualisation = {
-    docker.enable = false;
-    podman = {
-      enable = true;
-      dockerSocket.enable = true;
-      defaultNetwork.settings.dnsEnabled = true;
-    };
-  };
-
-  virtualisation.arion = {
-    backend = "podman-socket";
   };
 
   system.stateVersion = "23.05";
