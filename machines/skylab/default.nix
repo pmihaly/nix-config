@@ -25,6 +25,7 @@
   imports = [ ../../modules/nixos ];
   modules = {
     nginx.enable = true;
+    homer.enable = true;
   };
 
   boot.loader.systemd-boot.enable = true;
