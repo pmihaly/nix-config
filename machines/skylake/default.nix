@@ -32,7 +32,7 @@
   boot.loader.efi.canTouchEfiVariables = true;
 
   networking = {
-    hostName = "skylab";
+    hostName = "skylake";
     dhcpcd.enable = true;
   };
 

@@ -33,12 +33,12 @@
       ];
     };
 
-    nixosConfigurations.skylab = nixpkgs.lib.nixosSystem {
+    nixosConfigurations.skylake = nixpkgs.lib.nixosSystem {
       modules = [
         home-manager.nixosModules.home-manager
         arion.nixosModules.arion
-        ./machines/skylab/hardware.nix
-        ./machines/skylab
+        ./machines/skylake/hardware.nix
+        ./machines/skylake
       ];
     };
   };
