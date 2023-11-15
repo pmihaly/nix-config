@@ -24,6 +24,9 @@
     jellyfin.enable = true;
   };
 
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
+
   networking = {
     hostName = "skylake";
     dhcpcd.enable = true;
