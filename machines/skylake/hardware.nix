@@ -29,4 +29,6 @@
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   virtualisation.hypervGuest.enable = true;
+
+  boot.loader.grub.device = "/dev/disk/by-uuid/058d9a21-06ea-438b-b270-4c545b2e7156";
 }
