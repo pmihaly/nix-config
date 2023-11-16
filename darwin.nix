@@ -1,5 +1,5 @@
 { customflakes }:
-{ config, pkgs, lib, ... }:
+{ config, pkgs, lib, inputs, ... }:
 let utils = import ./utils.nix { inherit lib; };
 in
 {
@@ -9,6 +9,10 @@ in
 
   home-manager.useGlobalPkgs = true;
   home-manager.useUserPackages = true;
+
+  environment.systemPackages = [
+    inputs.agenix.packages."${pkgs.system}".default
+  ];
 
 
   home-manager.users."mihaly.papp" =

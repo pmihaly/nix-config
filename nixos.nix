@@ -3,7 +3,7 @@
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
 { customflakes, ... }:
-{ config, pkgs, lib, ... }:
+{ config, pkgs, lib, inputs, ... }:
 
 let utils = import ./utils.nix { inherit lib; };
 in
@@ -102,7 +102,7 @@ in
   home-manager.useUserPackages = true;
   home-manager.users."misi" =
     utils.recursiveMerge [
-      (import ./homemanager.nix { inherit pkgs config customflakes; })
+      (import ./homemanager.nix { inherit pkgs config inputs customflakes; })
       {
         home.packages = with pkgs; [
           swaybg # setting wallpapers in wayland

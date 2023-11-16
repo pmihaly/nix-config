@@ -10,10 +10,16 @@
     hyprland.url = "github:hyprwm/Hyprland";
     nur.url = "github:nix-community/NUR";
     img2theme.url = "github:pmihaly/img2theme";
+    agenix.url = "github:ryantm/agenix";
   };
 
-  outputs = { self, nixpkgs, home-manager, darwin, hyprland, nur, img2theme }: {
+  outputs = { self, nixpkgs, home-manager, darwin, hyprland, nur, img2theme, agenix }@inputs: {
+
     darwinConfigurations.mac = darwin.lib.darwinSystem {
+      specialArgs = {
+        inherit inputs;
+      };
+
       system = "aarch64-darwin";
       modules = [
         home-manager.darwinModules.home-manager
@@ -23,6 +29,10 @@
     };
 
     nixosConfigurations.pc = nixpkgs.lib.nixosSystem {
+      specialArgs = {
+        inherit inputs;
+      };
+
       modules = [
         home-manager.nixosModules.home-manager
         hyprland.nixosModules.default
@@ -33,8 +43,13 @@
     };
 
     nixosConfigurations.skylake = nixpkgs.lib.nixosSystem {
+      specialArgs = {
+        inherit inputs;
+      };
+
       modules = [
         home-manager.nixosModules.home-manager
+          agenix.nixosModules.default
         ./machines/skylake
       ];
     };
