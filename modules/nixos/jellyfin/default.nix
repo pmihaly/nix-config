@@ -7,8 +7,8 @@ in {
   options.modules.jellyfin = { enable = mkEnableOption "jellyfin"; };
   config = mkIf cfg.enable {
     services.nginx = {
-      virtualHosts.localhost.locations."^~ /jellyfin" = {
-        proxyPass = "http://localhost:8096/";
+      virtualHosts."jellyfin.skylab.mihaly.codes".locations."/" = {
+        proxyPass = "http://localhost:8096";
       };
     };
 
