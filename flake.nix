@@ -35,7 +35,6 @@
     nixosConfigurations.skylake = nixpkgs.lib.nixosSystem {
       modules = [
         home-manager.nixosModules.home-manager
-        ./machines/skylake/hardware.nix
         ./machines/skylake
       ];
     };

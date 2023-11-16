@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, modulesPath, lib, ... }:
 {
   nixpkgs.overlays = import ../../overlays;
 
@@ -18,14 +18,18 @@
     };
   };
 
-  imports = [ ../../modules/nixos ];
+  imports = [ ../../modules/nixos "${modulesPath}/virtualisation/amazon-image.nix" ];
   modules = {
     nginx.enable = true;
     jellyfin.enable = true;
   };
 
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
+  boot.loader.grub = {
+    enable = true;
+    device = lib.mkForce "/dev/nvme0n1";
+  };
+
+  nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
 
   networking = {
     hostName = "skylake";
