@@ -8,7 +8,7 @@ in {
   config = mkIf cfg.enable {
     services.nginx = {
       enable = true;
-      virtualHosts."skylab.mihaly.codes".root = "${pkgs.nix.doc}/share/doc/nix/manual";
+      virtualHosts."skylake.mihaly.codes".root = "${pkgs.nix.doc}/share/doc/nix/manual";
       recommendedZstdSettings = true;
       recommendedTlsSettings = true;
       recommendedProxySettings = true;
