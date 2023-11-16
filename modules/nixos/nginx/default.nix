@@ -10,7 +10,7 @@ in {
       enable = true;
 
       virtualHosts."skylake.mihaly.codes" = {
-        addSSL = true;
+        forceSSL = true;
         enableACME = true;
         root = "${pkgs.nix.doc}/share/doc/nix/manual";
       };

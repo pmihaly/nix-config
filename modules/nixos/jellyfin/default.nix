@@ -8,7 +8,7 @@ in {
   config = mkIf cfg.enable {
     services.nginx = {
       virtualHosts."jellyfin.skylake.mihaly.codes" = {
-        addSSL = true;
+        forceSSL = true;
         enableACME = true;
 
         locations."/" = {
