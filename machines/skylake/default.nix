@@ -1,5 +1,6 @@
 { pkgs, modulesPath, lib, ... }:
 {
+  imports = [ ../../modules/nixos "${modulesPath}/virtualisation/amazon-image.nix" ];
   nixpkgs.overlays = import ../../overlays;
 
   home-manager.useGlobalPkgs = true;
@@ -18,10 +19,10 @@
     };
   };
 
-  imports = [ ../../modules/nixos "${modulesPath}/virtualisation/amazon-image.nix" ];
   modules = {
     nginx.enable = true;
     jellyfin.enable = true;
+    homer.enable = true;
   };
 
   boot.loader.grub = {

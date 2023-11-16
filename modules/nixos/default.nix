@@ -3,5 +3,6 @@
   imports = [
     ./nginx
     ./jellyfin
+    ./homer
   ];
 }

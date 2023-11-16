@@ -21,5 +21,10 @@ in {
       enable = true;
     };
 
+    modules.homer.services.Media.Jellyfin = {
+      logo = ./jellyfin.png;
+      url = "https://jellyfin.skylake.mihaly.codes";
+    };
+
   };
 }
