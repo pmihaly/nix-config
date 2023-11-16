@@ -13,7 +13,9 @@ return {
     'lukas-reineke/indent-blankline.nvim',
     event = 'BufReadPost',
     main = 'ibl',
-    opts = {}
+    opts = {
+      scope = { enabled = false },
+    }
   },
   {
     'lewis6991/gitsigns.nvim',
