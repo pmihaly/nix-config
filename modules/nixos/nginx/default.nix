@@ -8,13 +8,24 @@ in {
   config = mkIf cfg.enable {
     services.nginx = {
       enable = true;
-      virtualHosts."skylake.mihaly.codes".root = "${pkgs.nix.doc}/share/doc/nix/manual";
+
+      virtualHosts."skylake.mihaly.codes" = {
+        addSSL = true;
+        enableACME = true;
+        root = "${pkgs.nix.doc}/share/doc/nix/manual";
+      };
+
       recommendedZstdSettings = true;
       recommendedTlsSettings = true;
       recommendedProxySettings = true;
       recommendedOptimisation = true;
       recommendedGzipSettings = true;
       recommendedBrotliSettings = true;
+    };
+
+    security.acme = {
+      acceptTerms = true;
+      defaults.email = "skylab-certs@mihaly.codes";
     };
 
     networking.firewall = {

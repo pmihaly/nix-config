@@ -7,8 +7,13 @@ in {
   options.modules.jellyfin = { enable = mkEnableOption "jellyfin"; };
   config = mkIf cfg.enable {
     services.nginx = {
-      virtualHosts."jellyfin.skylake.mihaly.codes".locations."/" = {
-        proxyPass = "http://localhost:8096";
+      virtualHosts."jellyfin.skylake.mihaly.codes" = {
+        addSSL = true;
+        enableACME = true;
+
+        locations."/" = {
+          proxyPass = "http://localhost:8096";
+        };
       };
     };
 
