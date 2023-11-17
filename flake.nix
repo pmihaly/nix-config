@@ -45,6 +45,7 @@
     nixosConfigurations.skylake = nixpkgs.lib.nixosSystem {
       specialArgs = {
         inherit inputs;
+        lib = nixpkgs.lib.extend (final: prev: (import ./lib/nixos { lib = final; }));
       };
 
       modules = [
