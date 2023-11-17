@@ -1,4 +1,4 @@
-{ pkgs, lib, config, ... }:
+{ lib, config, ... }:
 
 with lib;
 let cfg = config.modules.authelia;
@@ -19,9 +19,9 @@ in {
       services.authelia.instances.skylake = {
         enable = true;
         secrets = {
-          jwtSecretFile = "${pkgs.writeText "jwtSecretFile" "supersecretkey"}";
-          storageEncryptionKeyFile = "${pkgs.writeText "storageEncryptionKeyFile" "supersecretkeyaaaaaaaaaaaaaaaaaaaaaaaaaaa"}";
-          sessionSecretFile = "${pkgs.writeText "sessionSecretFile" "supersecretkey"}";
+          jwtSecretFile = config.age.secrets."authelia/jwt-secret".path;
+          storageEncryptionKeyFile = config.age.secrets."authelia/storageEncriptionKey".path;
+          sessionSecretFile = config.age.secrets."authelia/sessionSecret".path;
         };
         settings = {
           server = {
@@ -34,22 +34,9 @@ in {
             format = "text";
           };
 
-          authentication_backend = {
-            password_reset.disable = false;
-            file = {
-              path = (pkgs.formats.yaml { }).generate "users.yml" {
-                users = {
-                  misi = {
-                    displayname = "Misi";
-                    # Generate with docker run authelia/authelia:latest authelia hash-password <your-password>
-                    password = "$argon2id$v=19$m=65536,t=3,p=4$UnHIp1WfAoLPco0z+sKPcQ$lMTppDulG/SRD7u80yE5kyCGaC/cOJ2FKb0K3v1M2Fo";
-                    email = "auth@mihaly.codes";
-                    groups = [ "admins" ];
-                  };
-                };
-              };
-            };
-          };
+          # generate passwords using:
+          # docker run authelia/authelia:latest authelia crypto hash generate argon2
+          authentication_backend.file.path = config.age.secrets."authelia/users".path;
 
           access_control = {
             default_policy = "deny";
@@ -62,7 +49,7 @@ in {
               ];
             }
             {
-              policy = "one_factor";
+              policy = "two_factor";
               domain = ["*.skylake.mihaly.codes"];
             }
             ];
@@ -106,8 +93,6 @@ in {
         unixSocket = "/run/redis-authelia-skylake/redis.sock";
         unixSocketPerm = 600;
       };
-
-      # services.authelia.secrets.jwtSecretFile = config.age.secrets.autheliaJwtSecret.path;
    };
   });
 }
