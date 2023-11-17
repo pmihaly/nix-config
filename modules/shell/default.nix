@@ -119,7 +119,7 @@ in {
           ignoreDups = true;
         };
         shellAliases = {
-          ls = "eza -lah $([ -d .git ] && echo '--git')";
+          ls = "eza -lah --icons $([ -d .git ] && echo '--git')";
           cat = "bat";
           d = "cd $(find ~/lensadev -maxdepth 1 -type d | fzf)";
           dn = "d && nvim";
