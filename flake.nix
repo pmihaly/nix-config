@@ -49,7 +49,8 @@
 
       modules = [
         home-manager.nixosModules.home-manager
-          agenix.nixosModules.default
+        agenix.nixosModules.default
+        ./secrets
         ./machines/skylake
       ];
     };

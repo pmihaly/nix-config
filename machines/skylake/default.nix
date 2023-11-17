@@ -23,6 +23,7 @@
     nginx.enable = true;
     jellyfin.enable = true;
     homer.enable = true;
+    authelia.enable = true;
   };
 
   boot.loader.grub = {

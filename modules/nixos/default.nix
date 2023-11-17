@@ -4,5 +4,6 @@
     ./nginx
     ./jellyfin
     ./homer
+    ./authelia
   ];
 }

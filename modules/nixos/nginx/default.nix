@@ -25,7 +25,7 @@ in {
 
     security.acme = {
       acceptTerms = true;
-      defaults.email = "skylab-certs@mihaly.codes";
+      defaults.email = "skylake-certs@mihaly.codes";
     };
 
     networking.firewall = {
