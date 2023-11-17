@@ -55,12 +55,15 @@ in {
             default_policy = "deny";
             rules = [
             {
-              domain = ["skylake.mihaly.codes"];
               policy = "bypass";
+              domain = [
+                "authelia.skylake.mihaly.codes"
+                "skylake.mihaly.codes"
+              ];
             }
             {
-              domain = ["*.skylake.mihaly.codes"];
               policy = "one_factor";
+              domain = ["*.skylake.mihaly.codes"];
             }
             ];
           };
