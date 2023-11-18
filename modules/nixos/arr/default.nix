@@ -7,6 +7,7 @@ let
     "${vars.serviceConfig}/sonarr"
     "${vars.serviceConfig}/radarr"
     "${vars.serviceConfig}/prowlarr"
+    "${vars.serviceConfig}/jellyseerr"
     "${vars.storage}/Media/Downloads"
     "${vars.storage}/Media/TV"
     "${vars.storage}/Media/Movies"
@@ -68,7 +69,15 @@ in {
         name = "Jellyseerr";
         logo = ./jellyseerr.svg;
       };
-      extraConfig.services.jellyseerr.enable = true;
+      extraConfig.virtualisation.oci-containers.containers.jellyseerr = {
+        image = "fallenbagel/jellyseerr:1.7.0";
+        ports = [ "5055:5055" ];
+        environment = {
+          LOG_LEVEL = "debug";
+          TZ = vars.timeZone;
+        };
+        volumes = [ "${vars.serviceConfig}/jellyseerr:/app/config" ];
+      };
     })
 
   ]);
