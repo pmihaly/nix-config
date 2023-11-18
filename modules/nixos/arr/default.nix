@@ -18,7 +18,7 @@ in {
   config = mkIf cfg.enable (mkMerge [
     {
       systemd.tmpfiles.rules =
-        map (x: "d ${x} 0775 ${vars.username} wheel - -") directories;
+        map (x: "d ${x} 0775 ${vars.username} multimedia - -") directories;
     }
 
     (mkService {
@@ -29,19 +29,9 @@ in {
         name = "Sonarr";
         logo = ./sonarr.svg;
       };
-      extraConfig = {
-        virtualisation.oci-containers.containers = {
-          sonarr = {
-            image = "lscr.io/linuxserver/sonarr:develop-4.0.0.725-ls8";
-            ports = [ "8989:8989" ];
-            volumes = [
-              "${vars.storage}/Media/Downloads:/downloads"
-              "${vars.storage}/Media/TV:/tv"
-              "${vars.serviceConfig}/sonarr:/config"
-            ];
-            environment = { TZ = vars.timeZone; };
-          };
-        };
+      extraConfig.services.sonarr = {
+        enable = true;
+        group = "multimedia";
       };
     })
 
@@ -53,19 +43,9 @@ in {
         name = "Radarr";
         logo = ./radarr.png;
       };
-      extraConfig = {
-        virtualisation.oci-containers.containers = {
-          radarr = {
-            image = "lscr.io/linuxserver/radarr:5.1.3.8246-ls193";
-            ports = [ "7878:7878" ];
-            volumes = [
-              "${vars.storage}/Media/Downloads:/downloads"
-              "${vars.storage}/Media/Movies:/Movies"
-              "${vars.serviceConfig}/radarr:/config"
-            ];
-            environment = { TZ = vars.timeZone; };
-          };
-        };
+      extraConfig.services.radarr = {
+        enable = true;
+        group = "multimedia";
       };
     })
 
@@ -77,12 +57,7 @@ in {
         name = "Prowlarr";
         logo = ./prowlarr.png;
       };
-      extraConfig = {
-        services.prowlarr = {
-          enable = true;
-          openFirewall = true;
-        };
-      };
+      extraConfig.services.prowlarr.enable = true;
     })
 
     (mkService {

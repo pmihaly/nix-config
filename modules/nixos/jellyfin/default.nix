@@ -22,7 +22,7 @@ in {
     in {
 
       systemd.tmpfiles.rules =
-        map (x: "d ${x} 0775 ${vars.username} wheel - -") directories;
+        map (x: "d ${x} 0775 ${vars.username} multimedia - -") directories;
 
       services.nginx.virtualHosts."jellyfin.${vars.domainName}".locations = {
         "/socket" = {

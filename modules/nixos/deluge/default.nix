@@ -19,7 +19,7 @@ in {
         enable = true;
         declarative = true;
         user = vars.username;
-        group = "wheel";
+        group = "multimedia";
         openFirewall = true;
         config = {
           download_location = "${vars.storage}/Media/Downloads";
