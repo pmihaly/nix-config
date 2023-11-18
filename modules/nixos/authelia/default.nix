@@ -1,4 +1,4 @@
-{ lib, config, ... }:
+{ lib, config, vars, ... }:
 
 with lib;
 let cfg = config.modules.authelia;
@@ -6,6 +6,10 @@ let cfg = config.modules.authelia;
 in {
   options.modules.authelia = {
     enable = mkEnableOption "authelia";
+    bypassDomains = mkOption {
+      default = [ ];
+      type = types.listOf types.str;
+    };
   };
   config = mkIf cfg.enable (mkService {
     subdomain = "authelia";
@@ -43,14 +47,13 @@ in {
             rules = [
             {
               policy = "bypass";
-              domain = [
-                "authelia.skylake.mihaly.codes"
-                "skylake.mihaly.codes"
+              domain = cfg.bypassDomains ++ [
+                "authelia.${vars.domainName}"
               ];
             }
             {
               policy = "two_factor";
-              domain = ["*.skylake.mihaly.codes"];
+              domain = ["*.${vars.domainName}"];
             }
             ];
           };
@@ -62,7 +65,7 @@ in {
             expiration = "12h";
             inactivity = "45m";
             remember_me_duration = "1M";
-            domain = "skylake.mihaly.codes";
+            domain = "${vars.domainName}";
             redis.host = "/run/redis-authelia-skylake/redis.sock";
           };
 

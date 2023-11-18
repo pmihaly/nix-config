@@ -1,4 +1,4 @@
-{ pkgs, lib, config, ... }:
+{ pkgs, lib, config, vars, ... }:
 
 with lib;
 let cfg = config.modules.nginx;
@@ -9,7 +9,7 @@ in {
     services.nginx = {
       enable = true;
 
-      virtualHosts."skylake.mihaly.codes" = {
+      virtualHosts."${vars.domainName}" = {
         forceSSL = true;
         enableACME = true;
         root = "${pkgs.nix.doc}/share/doc/nix/manual";
@@ -25,12 +25,14 @@ in {
 
     security.acme = {
       acceptTerms = true;
-      defaults.email = "skylake-certs@mihaly.codes";
+      defaults.email = "${vars.acmeEmail}";
     };
 
     networking.firewall = {
       enable = true;
       allowedTCPPorts = [ 80 443 ];
     };
+
+    modules.authelia.bypassDomains = [ vars.domainName ];
   };
 }

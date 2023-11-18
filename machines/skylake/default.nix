@@ -1,4 +1,4 @@
-{ pkgs, modulesPath, lib, ... }:
+{ pkgs, modulesPath, lib, vars, ... }:
 {
   imports = [ ../../modules/nixos "${modulesPath}/virtualisation/amazon-image.nix" ];
   nixpkgs.overlays = import ../../overlays;
@@ -51,7 +51,7 @@
     ];
   };
 
-  time.timeZone = "Europe/Berlin";
+  time.timeZone = vars.timeZone;
   i18n.defaultLocale = "en_US.UTF-8";
   i18n.extraLocaleSettings = {
     LC_ADDRESS = "hu_HU.UTF-8";

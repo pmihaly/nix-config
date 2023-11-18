@@ -1,11 +1,11 @@
-{ lib }:
+{ lib, vars }:
 let
 
   mkService = { subdomain, port, dashboard ? null, extraConfig }:
     lib.mkMerge [
       {
         services.nginx = {
-          virtualHosts."${subdomain}.skylake.mihaly.codes" = {
+          virtualHosts."${subdomain}.${vars.domainName}" = {
             forceSSL = true;
             enableACME = true;
 
@@ -62,7 +62,7 @@ let
               proxy_set_header Remote-Name $name;
               proxy_set_header Remote-Email $email;
 
-              error_page 401 =302 https://authelia.skylake.mihaly.codes/?rd=$target_url;
+              error_page 401 =302 https://authelia.${vars.domainName}/?rd=$target_url;
               '';
             };
           };
@@ -73,7 +73,7 @@ let
         modules.homer.services = lib.mkIf (builtins.isAttrs dashboard) {
           "${dashboard.category}"."${dashboard.name}" = {
             logo = dashboard.logo;
-            url = "https://${subdomain}.skylake.mihaly.codes";
+            url = "https://${subdomain}.${vars.domainName}";
           };
         };
       }
