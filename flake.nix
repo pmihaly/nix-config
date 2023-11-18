@@ -11,9 +11,10 @@
     nur.url = "github:nix-community/NUR";
     img2theme.url = "github:pmihaly/img2theme";
     agenix.url = "github:ryantm/agenix";
+    firefox-darwin-dmg = { url = "https://download.mozilla.org/?product=firefox-latest&os=osx&lang=en-US"; flake = false; };
   };
 
-  outputs = { self, nixpkgs, home-manager, darwin, hyprland, nur, img2theme, agenix }@inputs: {
+  outputs = { self, nixpkgs, home-manager, darwin, hyprland, nur, agenix, ... }@inputs: {
     formatter.aarch64-darwin = nixpkgs.legacyPackages.aarch64-darwin.nixpkgs-fmt;
     formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.nixpkgs-fmt;
 
@@ -26,7 +27,12 @@
       modules = [
         home-manager.darwinModules.home-manager
         { nixpkgs.overlays = [ nur.overlay ]; }
-        (import ./darwin.nix { customflakes = { inherit img2theme; }; })
+        {
+          home-manager.extraSpecialArgs = {
+            inherit inputs;
+          };
+        }
+        ./darwin.nix
       ];
     };
 
@@ -39,8 +45,13 @@
         home-manager.nixosModules.home-manager
         hyprland.nixosModules.default
         { nixpkgs.overlays = [ nur.overlay ]; }
+        {
+          home-manager.extraSpecialArgs = {
+            inherit inputs;
+          };
+        }
         ./pc-hardware.nix
-        (import ./nixos.nix { customflakes = { inherit img2theme; }; })
+        ./nixos.nix
       ];
     };
 
@@ -55,6 +66,11 @@
       modules = [
         home-manager.nixosModules.home-manager
         agenix.nixosModules.default
+        {
+          home-manager.extraSpecialArgs = {
+            inherit inputs;
+          };
+        }
         ./secrets
         ./machines/skylake
       ];

@@ -1,7 +1,4 @@
-{ customflakes }:
-{ config, pkgs, lib, inputs, ... }:
-let utils = import ./utils.nix { inherit lib; };
-in
+{ pkgs, inputs, ... }:
 {
   nixpkgs.config.allowUnfree = true;
   nixpkgs.overlays = import ./overlays;
@@ -15,13 +12,7 @@ in
   ];
 
 
-  home-manager.users."mihaly.papp" =
-    utils.recursiveMerge [
-      (import ./homemanager.nix { inherit pkgs config customflakes; })
-      {
-        home.packages = [ ];
-      }
-    ];
+  home-manager.users."mihaly.papp" = ./homemanager.nix;
 
   homebrew = {
     enable = true;

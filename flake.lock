@@ -62,6 +62,18 @@
         "type": "github"
       }
     },
+    "firefox-darwin-dmg": {
+      "flake": false,
+      "locked": {
+        "narHash": "sha256-jkQnW7p5h2BHN10Ai0PxdtubBCOKn1Xy1fsW+sAwKyI=",
+        "type": "file",
+        "url": "https://download.mozilla.org/?lang=en-US&os=osx&product=firefox-latest"
+      },
+      "original": {
+        "type": "file",
+        "url": "https://download.mozilla.org/?lang=en-US&os=osx&product=firefox-latest"
+      }
+    },
     "flake-compat": {
       "flake": false,
       "locked": {
@@ -380,6 +392,7 @@
       "inputs": {
         "agenix": "agenix",
         "darwin": "darwin_2",
+        "firefox-darwin-dmg": "firefox-darwin-dmg",
         "home-manager": "home-manager_2",
         "hyprland": "hyprland",
         "img2theme": "img2theme",

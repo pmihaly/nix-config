@@ -1,8 +1,3 @@
-# Edit this configuration file to define what should be installed on
-# your system.  Help is available in the configuration.nix(5) man page
-# and in the NixOS manual (accessible by running ‘nixos-help’).
-
-{ customflakes, ... }:
 { config, pkgs, lib, inputs, ... }:
 
 let utils = import ./utils.nix { inherit lib; };
@@ -102,7 +97,7 @@ in
   home-manager.useUserPackages = true;
   home-manager.users."misi" =
     utils.recursiveMerge [
-      (import ./homemanager.nix { inherit pkgs config inputs customflakes; })
+      ./homemanager.nix
       {
         home.packages = with pkgs; [
           swaybg # setting wallpapers in wayland

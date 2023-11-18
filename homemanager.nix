@@ -1,10 +1,9 @@
-{ pkgs, customflakes, ... }:
+{ pkgs, inputs, ... }:
 {
   home.stateVersion = "22.05";
+  imports = [ ./modules ];
 
   nixpkgs.overlays = import ./overlays;
-
-  imports = [ ./modules ];
 
   modules = {
     vscode.enable = true;
@@ -44,8 +43,6 @@
       zathura # pdf reader
       transmission
       anki-bin
-    ])
-    ++ (with customflakes; [
-      img2theme.packages."${pkgs.system}".default
+      inputs.img2theme.packages."${pkgs.system}".default
     ]);
 }
