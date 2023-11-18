@@ -42,9 +42,23 @@ in {
             environment = { TZ = vars.timeZone; };
           };
         };
-
       };
     })
 
+    (mkService {
+      subdomain = "prowlarr";
+      port = 9696;
+      dashboard = {
+        category = "Media";
+        name = "Prowlarr";
+        logo = ./prowlarr.png;
+      };
+      extraConfig = {
+        services.prowlarr = {
+          enable = true;
+          openFirewall = true;
+        };
+      };
+    })
   ]);
 }
