@@ -24,6 +24,7 @@
     jellyfin.enable = true;
     homer.enable = true;
     authelia.enable = true;
+    deluge.enable = true;
   };
 
   boot.loader.grub = {
