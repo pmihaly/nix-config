@@ -84,5 +84,17 @@ in {
         };
       };
     })
+
+    (mkService {
+      subdomain = "jellyseerr";
+      port = 5055;
+      dashboard = {
+        category = "Media";
+        name = "Jellyseerr";
+        logo = ./jellyseerr.svg;
+      };
+      extraConfig.services.jellyseerr.enable = true;
+    })
+
   ]);
 }
