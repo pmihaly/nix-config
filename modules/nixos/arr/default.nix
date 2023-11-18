@@ -46,6 +46,30 @@ in {
     })
 
     (mkService {
+      subdomain = "radarr";
+      port = 7878;
+      dashboard = {
+        category = "Media";
+        name = "Radarr";
+        logo = ./radarr.png;
+      };
+      extraConfig = {
+        virtualisation.oci-containers.containers = {
+          radarr = {
+            image = "lscr.io/linuxserver/radarr:5.1.3.8246-ls193";
+            ports = [ "7878:7878" ];
+            volumes = [
+              "${vars.storage}/Media/Downloads:/downloads"
+              "${vars.storage}/Media/Movies:/Movies"
+              "${vars.serviceConfig}/radarr:/config"
+            ];
+            environment = { TZ = vars.timeZone; };
+          };
+        };
+      };
+    })
+
+    (mkService {
       subdomain = "prowlarr";
       port = 9696;
       dashboard = {
