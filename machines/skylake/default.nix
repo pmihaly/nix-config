@@ -25,6 +25,7 @@
     homer.enable = true;
     authelia.enable = true;
     deluge.enable = true;
+    arr.enable = true;
   };
 
   boot.loader.grub = {

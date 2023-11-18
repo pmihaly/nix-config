@@ -16,6 +16,13 @@
         "https://download.mozilla.org/?product=firefox-latest&os=osx&lang=en-US";
       flake = false;
     };
+    recyclarr-configs = {
+      flake = false;
+      type = "github";
+      owner = "recyclarr";
+      repo = "config-templates";
+      rev = "e0eb683c02c8abfa59cbe7a69b9ccc9e7178112c";
+    };
   };
 
   outputs = { self, nixpkgs, home-manager, darwin, hyprland, nur, agenix, ...

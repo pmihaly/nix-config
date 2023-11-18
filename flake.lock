@@ -388,6 +388,23 @@
         "type": "github"
       }
     },
+    "recyclarr-configs": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1688504126,
+        "narHash": "sha256-d4k6lNcMPGZpuCwN2a+axuLB4iG7NCvLoqzFDYOtwmw=",
+        "owner": "recyclarr",
+        "repo": "config-templates",
+        "rev": "e0eb683c02c8abfa59cbe7a69b9ccc9e7178112c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "recyclarr",
+        "repo": "config-templates",
+        "rev": "e0eb683c02c8abfa59cbe7a69b9ccc9e7178112c",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "agenix": "agenix",
@@ -397,7 +414,8 @@
         "hyprland": "hyprland",
         "img2theme": "img2theme",
         "nixpkgs": "nixpkgs_5",
-        "nur": "nur"
+        "nur": "nur",
+        "recyclarr-configs": "recyclarr-configs"
       }
     },
     "systems": {

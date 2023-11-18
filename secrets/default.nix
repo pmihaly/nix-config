@@ -1,4 +1,5 @@
 { lib, ... }: {
+
   age.secrets."authelia/jwt-secret" = lib.mkDefault {
     file = ./authelia/jwt-secret.age;
     owner = "authelia-skylake";
@@ -23,4 +24,5 @@
     group = "authelia-skylake";
     mode = "640";
   };
+
 }

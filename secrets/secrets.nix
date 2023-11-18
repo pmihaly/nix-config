@@ -5,6 +5,7 @@ let
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJSNGdQWXcMDIJ3LMHfHHPzgroX5QMwZI3cqAi1zExSS skylake";
   allKeys = [ misi skylake ];
 in {
+
   "authelia/jwt-secret.age".publicKeys = allKeys;
   "authelia/storageEncriptionKey.age".publicKeys = allKeys;
   "authelia/sessionSecret.age".publicKeys = allKeys;
