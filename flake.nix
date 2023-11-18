@@ -14,6 +14,8 @@
   };
 
   outputs = { self, nixpkgs, home-manager, darwin, hyprland, nur, img2theme, agenix }@inputs: {
+    formatter.aarch64-darwin = nixpkgs.legacyPackages.aarch64-darwin.nixpkgs-fmt;
+    formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.nixpkgs-fmt;
 
     darwinConfigurations.mac = darwin.lib.darwinSystem {
       specialArgs = {
@@ -44,11 +46,11 @@
 
     nixosConfigurations.skylake = nixpkgs.lib.nixosSystem {
       specialArgs =
-      let vars = import ./machines/skylake/vars.nix;
-      in {
-        inherit inputs vars;
-        lib = nixpkgs.lib.extend (final: prev: (import ./lib/nixos { lib = final; inherit vars; }));
-      };
+        let vars = import ./machines/skylake/vars.nix;
+        in {
+          inherit inputs vars;
+          lib = nixpkgs.lib.extend (final: prev: (import ./lib/nixos { lib = final; inherit vars; }));
+        };
 
       modules = [
         home-manager.nixosModules.home-manager

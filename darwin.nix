@@ -30,11 +30,12 @@ in
       cleanup = "zap";
     };
     casks =
-      let work = [
-        "sequel-ace"
-        "pycharm-ce"
-        "insomnia"
-      ];
+      let
+        work = [
+          "sequel-ace"
+          "pycharm-ce"
+          "insomnia"
+        ];
       in
       work ++ [
         "aerial" # screensaver

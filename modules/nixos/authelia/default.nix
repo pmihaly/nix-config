@@ -45,16 +45,16 @@ in {
           access_control = {
             default_policy = "deny";
             rules = [
-            {
-              policy = "bypass";
-              domain = cfg.bypassDomains ++ [
-                "authelia.${vars.domainName}"
-              ];
-            }
-            {
-              policy = "two_factor";
-              domain = ["*.${vars.domainName}"];
-            }
+              {
+                policy = "bypass";
+                domain = cfg.bypassDomains ++ [
+                  "authelia.${vars.domainName}"
+                ];
+              }
+              {
+                policy = "two_factor";
+                domain = [ "*.${vars.domainName}" ];
+              }
             ];
           };
 
@@ -96,6 +96,6 @@ in {
         unixSocket = "/run/redis-authelia-skylake/redis.sock";
         unixSocketPerm = 600;
       };
-   };
+    };
   });
 }
