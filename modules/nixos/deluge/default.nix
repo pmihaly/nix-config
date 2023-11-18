@@ -25,6 +25,7 @@ in {
           download_location = "${vars.storage}/Media/Downloads";
           share_ratio_limit = "2.0";
           listen_ports = [ 6881 ];
+          enabled_plugins = [ "Label" ];
         };
         authFile = builtins.toFile "auth" ''
           localclient::10
