@@ -6,7 +6,7 @@
   home-manager.useGlobalPkgs = true;
   home-manager.useUserPackages = true;
 
-  home-manager.users.misi = {
+  home-manager.users.${vars.username} = {
     home.stateVersion = "22.05";
     imports = [ ../../modules ];
 
@@ -65,9 +65,9 @@
     LC_TIME = "hu_HU.UTF-8";
   };
 
-  users.users.misi = {
+  users.users.${vars.username} = {
     isNormalUser = true;
-    description = "misi";
+    description = vars.username;
     extraGroups = [ "wheel" ];
     shell = pkgs.zsh;
     openssh.authorizedKeys.keys = [
