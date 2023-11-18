@@ -14,8 +14,8 @@ in {
       type = types.attrs;
     };
     services = mkOption {
-      default = { };
-      type = types.attrs;
+      default = null;
+      type = types.nullOr types.anything;
     };
   };
   config = mkIf cfg.enable (mkService {
