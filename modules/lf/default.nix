@@ -6,10 +6,7 @@ let cfg = config.modules.lf;
 in {
   options.modules.lf = { enable = mkEnableOption "lf"; };
   config = mkIf cfg.enable {
-    home.packages = with pkgs; [
-      massren
-      du-dust
-    ];
+    home.packages = with pkgs; [ massren du-dust ];
     programs.lf = {
       enable = true;
       settings = {
@@ -18,20 +15,19 @@ in {
         smartcase = true;
       };
       commands = {
-        delete =
-          ''
-            ''${{
-              clear; tput cup $(($(tput lines)/3)); tput bold
-                set -f
-                printf "%s\n\t" "$fx"
-                printf "delete? [y/N] "
-                read ans
-                [ "$ans" = "y" ] && echo "$fx" | tr ' ' '\ ' | xargs -I{} rm -rf -- "{}"
-            }}
-          '';
-        mkdirWithParent = '' $mkdir -p "$(echo $* | tr ' ' '\ ')" '';
-        touchWithParent = '' $mkdir -p "$(dirname "$*")" && touch "$*" '';
-        open = '' $$EDITOR $f '';
+        delete = ''
+          ''${{
+            clear; tput cup $(($(tput lines)/3)); tput bold
+              set -f
+              printf "%s\n\t" "$fx"
+              printf "delete? [y/N] "
+              read ans
+              [ "$ans" = "y" ] && echo "$fx" | tr ' ' '\ ' | xargs -I{} rm -rf -- "{}"
+          }}
+        '';
+        mkdirWithParent = ''$mkdir -p "$(echo $* | tr ' ' '\ ')" '';
+        touchWithParent = ''$mkdir -p "$(dirname "$*")" && touch "$*" '';
+        open = "$$EDITOR $f ";
       };
       keybindings = {
         D = "delete";

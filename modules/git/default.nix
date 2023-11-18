@@ -7,16 +7,15 @@ in {
   options.modules.git = { enable = mkEnableOption "git"; };
   config = mkIf cfg.enable {
 
-    home.packages = with pkgs; [
-      tig # prettier git tree
-    ];
+    home.packages = with pkgs;
+      [
+        tig # prettier git tree
+      ];
 
     programs.lazygit = {
       enable = true;
       settings = {
-        services = {
-          "gsh.lensa.com" = "gitlab:gitlab.lensa.com";
-        };
+        services = { "gsh.lensa.com" = "gitlab:gitlab.lensa.com"; };
         notARepository = "quit";
         customCommands = [
           {
@@ -28,7 +27,8 @@ in {
           }
           {
             key = "b";
-            command = "tig blame -- {{.SelectedSubCommit.Sha}} -- {{.SelectedCommitFile.Name}}";
+            command =
+              "tig blame -- {{.SelectedSubCommit.Sha}} -- {{.SelectedCommitFile.Name}}";
             context = "commitFiles";
             description = "blame file at revision";
             subprocess = true;
@@ -42,7 +42,8 @@ in {
           }
           {
             key = "t";
-            command = "tig {{.SelectedSubCommit.Sha}} -- {{.SelectedCommitFile.Name}}";
+            command =
+              "tig {{.SelectedSubCommit.Sha}} -- {{.SelectedCommitFile.Name}}";
             context = "commitFiles";
             description = "tig file (history of commits affecting file)";
             subprocess = true;
@@ -58,12 +59,7 @@ in {
       };
     };
 
-
-    programs.zsh = {
-      shellAliases = {
-        lg = "lazygit";
-      };
-    };
+    programs.zsh = { shellAliases = { lg = "lazygit"; }; };
 
   };
 }

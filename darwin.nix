@@ -1,5 +1,4 @@
-{ pkgs, inputs, ... }:
-{
+{ pkgs, inputs, ... }: {
   nixpkgs.config.allowUnfree = true;
   nixpkgs.overlays = import ./overlays;
   documentation.enable = false;
@@ -7,10 +6,8 @@
   home-manager.useGlobalPkgs = true;
   home-manager.useUserPackages = true;
 
-  environment.systemPackages = [
-    inputs.agenix.packages."${pkgs.system}".default
-  ];
-
+  environment.systemPackages =
+    [ inputs.agenix.packages."${pkgs.system}".default ];
 
   home-manager.users."mihaly.papp" = ./homemanager.nix;
 
@@ -20,25 +17,18 @@
       upgrade = true;
       cleanup = "zap";
     };
-    casks =
-      let
-        work = [
-          "sequel-ace"
-          "pycharm-ce"
-          "insomnia"
-        ];
-      in
-      work ++ [
-        "aerial" # screensaver
-        "raycast" # command+space
-        "docker"
-        "messenger"
-        "signal"
-        "google-chrome"
-        "caffeine" # keep screen alive
-        "utm" # virtual machines
-        "balenaetcher"
-      ];
+    casks = let work = [ "sequel-ace" "pycharm-ce" "insomnia" ];
+    in work ++ [
+      "aerial" # screensaver
+      "raycast" # command+space
+      "docker"
+      "messenger"
+      "signal"
+      "google-chrome"
+      "caffeine" # keep screen alive
+      "utm" # virtual machines
+      "balenaetcher"
+    ];
   };
 
   system.keyboard = {
@@ -81,10 +71,7 @@
 
   fonts = {
     fontDir.enable = true;
-    fonts = [
-      pkgs.nerdfonts-fira-code
-      pkgs.iosevka-custom
-    ];
+    fonts = [ pkgs.nerdfonts-fira-code pkgs.iosevka-custom ];
   };
 
   services.yabai = {
@@ -129,7 +116,10 @@
     settings.auto-optimise-store = true;
     gc = {
       automatic = true;
-      interval = { Hour = 3; Minute = 15; };
+      interval = {
+        Hour = 3;
+        Minute = 15;
+      };
       user = "mihaly.papp";
     };
   };

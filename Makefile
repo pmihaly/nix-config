@@ -6,3 +6,6 @@ switch-pc:
 
 update:
 	nix flake update
+
+fmt:
+	find **/*.nix | xargs nix fmt

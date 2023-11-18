@@ -1,8 +1,7 @@
 { config, pkgs, lib, inputs, ... }:
 
 let utils = import ./utils.nix { inherit lib; };
-in
-{
+in {
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
@@ -37,9 +36,7 @@ in
 
   programs.hyprland = {
     enable = true;
-    xwayland = {
-      enable = true;
-    };
+    xwayland = { enable = true; };
     nvidiaPatches = false;
   };
 
@@ -62,9 +59,7 @@ in
 
   programs.zsh.enable = true;
 
-  fonts.packages = [
-    pkgs.iosevka-custom
-  ];
+  fonts.packages = [ pkgs.iosevka-custom ];
 
   # Workaround for GNOME autologin: https://github.com/NixOS/nixpkgs/issues/103746#issuecomment-945091229
   systemd.services."getty@tty1".enable = false;
@@ -95,38 +90,36 @@ in
 
   home-manager.useGlobalPkgs = true;
   home-manager.useUserPackages = true;
-  home-manager.users."misi" =
-    utils.recursiveMerge [
-      ./homemanager.nix
-      {
-        home.packages = with pkgs; [
-          swaybg # setting wallpapers in wayland
-          wofi # wayland equivalent of rofi
-          ytfzf
-          wl-clipboard # `wl-copy` and `wl-paste`
-        ];
+  home-manager.users."misi" = utils.recursiveMerge [
+    ./homemanager.nix
+    {
+      home.packages = with pkgs; [
+        swaybg # setting wallpapers in wayland
+        wofi # wayland equivalent of rofi
+        ytfzf
+        wl-clipboard # `wl-copy` and `wl-paste`
+      ];
 
-        xdg.configFile = {
-          hypr = {
-            source = ./hypr;
-            recursive = true;
-          };
+      xdg.configFile = {
+        hypr = {
+          source = ./hypr;
+          recursive = true;
         };
+      };
 
-
-        gtk = {
-          enable = true;
-          theme = {
-            package = pkgs.nordic;
-            name = "Nordic";
-          };
-          iconTheme = {
-            package = pkgs.nordzy-icon-theme;
-            name = "Nordzy";
-          };
+      gtk = {
+        enable = true;
+        theme = {
+          package = pkgs.nordic;
+          name = "Nordic";
         };
-      }
-    ];
+        iconTheme = {
+          package = pkgs.nordzy-icon-theme;
+          name = "Nordzy";
+        };
+      };
+    }
+  ];
 
   system.stateVersion = "23.05";
 }

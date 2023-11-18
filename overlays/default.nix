@@ -1,8 +1,6 @@
 [
   (final: prev: {
-    nerdfonts-fira-code = prev.nerdfonts.override {
-      fonts = [ "FiraCode" ];
-    };
+    nerdfonts-fira-code = prev.nerdfonts.override { fonts = [ "FiraCode" ]; };
   })
   (final: prev: {
     iosevka-custom = prev.iosevka.override {

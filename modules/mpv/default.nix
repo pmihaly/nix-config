@@ -14,10 +14,7 @@ in {
         osc = false;
       };
       defaultProfiles = [ "gpu-hq" ];
-      scripts = [
-        pkgs.mpvScripts.sponsorblock
-        pkgs.mpvScripts.thumbnail
-      ];
+      scripts = [ pkgs.mpvScripts.sponsorblock pkgs.mpvScripts.thumbnail ];
       bindings = {
         "l" = "seek 5";
         "h" = "seek -5";

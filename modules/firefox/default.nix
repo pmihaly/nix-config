@@ -21,33 +21,54 @@ let
 
     src = inputs.firefox-darwin-dmg;
   };
-in
-{
+in {
   options.modules.firefox = { enable = mkEnableOption "firefox"; };
   config = mkIf cfg.enable {
 
     programs.firefox = {
       enable = true;
-      package = if pkgs.system == "aarch64-darwin" then firefox-darwin else pkgs.firefox;
+      package = if pkgs.system == "aarch64-darwin" then
+        firefox-darwin
+      else
+        pkgs.firefox;
       profiles = {
         misi = {
           id = 0;
           name = "misi";
-          bookmarks = [
-            {
-              name = "munsik";
-              toolbar = true;
-              bookmarks = [
-                { name = "skeler II"; url = "https://www.youtube.com/watch?v=J4t4pMZBXZg"; }
-                { name = "skeler III"; url = "https://www.youtube.com/watch?v=P4ALDytLAXQ"; }
-                { name = "breakcore to dissociate to"; url = "https://www.youtube.com/watch?v=BhZ0Ky9uqts"; }
-                { name = "breakcore to feel to"; url = "https://www.youtube.com/watch?v=0KaBYaQGwbs"; }
-                { name = "stubbing toe into furniture I"; url = "https://www.youtube.com/watch?v=bgu94ChWTCA"; }
-                { name = "stubbing toe into furniture II"; url = "https://www.youtube.com/watch?v=BhZ0Ky9uqts"; }
-                { name = "dnb"; url = "https://www.youtube.com/watch?v=qNaCzmbaYWI"; }
-              ];
-            }
-          ];
+          bookmarks = [{
+            name = "munsik";
+            toolbar = true;
+            bookmarks = [
+              {
+                name = "skeler II";
+                url = "https://www.youtube.com/watch?v=J4t4pMZBXZg";
+              }
+              {
+                name = "skeler III";
+                url = "https://www.youtube.com/watch?v=P4ALDytLAXQ";
+              }
+              {
+                name = "breakcore to dissociate to";
+                url = "https://www.youtube.com/watch?v=BhZ0Ky9uqts";
+              }
+              {
+                name = "breakcore to feel to";
+                url = "https://www.youtube.com/watch?v=0KaBYaQGwbs";
+              }
+              {
+                name = "stubbing toe into furniture I";
+                url = "https://www.youtube.com/watch?v=bgu94ChWTCA";
+              }
+              {
+                name = "stubbing toe into furniture II";
+                url = "https://www.youtube.com/watch?v=BhZ0Ky9uqts";
+              }
+              {
+                name = "dnb";
+                url = "https://www.youtube.com/watch?v=qNaCzmbaYWI";
+              }
+            ];
+          }];
           search = {
             force = true;
             default = "DuckDuckGo";
@@ -56,8 +77,14 @@ in
                 urls = [{
                   template = "https://search.nixos.org/packages";
                   params = [
-                    { name = "type"; value = "packages"; }
-                    { name = "query"; value = "{searchTerms}"; }
+                    {
+                      name = "type";
+                      value = "packages";
+                    }
+                    {
+                      name = "query";
+                      value = "{searchTerms}";
+                    }
                   ];
                 }];
                 iconUpdateURL = "https://nixos.wiki/favicon.png";
@@ -65,10 +92,12 @@ in
               };
               "Home Manager Option Search" = {
                 urls = [{
-                  template = "https://mipmip.github.io/home-manager-option-search";
-                  params = [
-                    { name = "query"; value = "{searchTerms}"; }
-                  ];
+                  template =
+                    "https://mipmip.github.io/home-manager-option-search";
+                  params = [{
+                    name = "query";
+                    value = "{searchTerms}";
+                  }];
                 }];
                 iconUpdateURL = "https://nixos.wiki/favicon.png";
                 updateInterval = 24 * 60 * 60 * 1000;
@@ -76,23 +105,21 @@ in
               };
             };
           };
-          settings =
-            let
-              tinkeringWithUserChrome = {
-                "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
-                "devtools.debugger.remote-enabled" = true;
-                "devtools.chrome.enabled" = true;
-              };
-            in
-            tinkeringWithUserChrome // {
-              "general.smoothScroll" = true;
-              "browser.tabs.warnOnClose" = false;
-              "browser.tabs.warnOnCloseOtherTabs" = false;
-              "browser.toolbars.bookmarks.visibility" = "newtab";
-              "browser.chrome.toolbar_tips" = false;
-              "media.videocontrols.picture-in-picture.enabled" = false;
-              "browser.newtabpage.pinned" = [ ];
+          settings = let
+            tinkeringWithUserChrome = {
+              "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
+              "devtools.debugger.remote-enabled" = true;
+              "devtools.chrome.enabled" = true;
             };
+          in tinkeringWithUserChrome // {
+            "general.smoothScroll" = true;
+            "browser.tabs.warnOnClose" = false;
+            "browser.tabs.warnOnCloseOtherTabs" = false;
+            "browser.toolbars.bookmarks.visibility" = "newtab";
+            "browser.chrome.toolbar_tips" = false;
+            "media.videocontrols.picture-in-picture.enabled" = false;
+            "browser.newtabpage.pinned" = [ ];
+          };
           extensions = with pkgs.nur.repos.rycee.firefox-addons; [
             ublock-origin
             localcdn

@@ -1,6 +1,6 @@
-{ pkgs, modulesPath, lib, vars, ... }:
-{
-  imports = [ ../../modules/nixos "${modulesPath}/virtualisation/amazon-image.nix" ];
+{ pkgs, modulesPath, lib, vars, ... }: {
+  imports =
+    [ ../../modules/nixos "${modulesPath}/virtualisation/amazon-image.nix" ];
   nixpkgs.overlays = import ../../overlays;
 
   home-manager.useGlobalPkgs = true;
@@ -43,12 +43,10 @@
     openFirewall = true;
     ports = [ 69 ];
     settings.PasswordAuthentication = false;
-    hostKeys = [
-      {
-        path = "/etc/ssh/ssh_host_ed25519_key";
-        type = "ed25519";
-      }
-    ];
+    hostKeys = [{
+      path = "/etc/ssh/ssh_host_ed25519_key";
+      type = "ed25519";
+    }];
   };
 
   time.timeZone = vars.timeZone;
