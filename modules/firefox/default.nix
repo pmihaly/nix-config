@@ -140,11 +140,6 @@ in {
             #star-button-box,
             #unified-extensions-button,
             .unified-extensions-item,
-            #back-button,
-            #forward-button,
-            #stop-reload-button,
-            #reload-button,
-            #PanelUI-menu-button,
             #tabs-newtab-button
             {
               display: none !important;
