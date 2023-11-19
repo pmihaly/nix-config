@@ -67,7 +67,7 @@ in {
       dashboard = {
         category = "Media";
         name = "Jellyseerr";
-        logo = ./jellyseerr.svg;
+        logo = ./jellyseerr.png;
       };
       extraConfig.virtualisation.oci-containers.containers.jellyseerr = {
         image = "fallenbagel/jellyseerr:1.7.0";
