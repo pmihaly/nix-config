@@ -27,6 +27,7 @@
     deluge.enable = true;
     arr.enable = true;
     firefly-iii.enable = true;
+    endlessh.enable = true;
   };
 
   boot.loader.grub = {
