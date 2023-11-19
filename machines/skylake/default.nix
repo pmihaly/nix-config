@@ -29,7 +29,6 @@
     firefly-iii.enable = true;
     endlessh.enable = true;
     monitoring.enable = true;
-    ghostfolio.enable = true;
   };
 
   boot.loader.grub = {

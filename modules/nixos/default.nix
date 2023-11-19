@@ -9,6 +9,5 @@
     ./firefly-iii
     ./endlessh
     ./monitoring
-    ./ghostfolio
   ];
 }

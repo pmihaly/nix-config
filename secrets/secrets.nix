@@ -10,6 +10,4 @@ in {
   "authelia/storageEncriptionKey.age".publicKeys = allKeys;
   "authelia/sessionSecret.age".publicKeys = allKeys;
   "authelia/users.age".publicKeys = allKeys;
-  "ghostfolio/secret-env-vars.age".publicKeys = allKeys;
-  "ghostfolio/redis-pass.age".publicKeys = allKeys;
 }

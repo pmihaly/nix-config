@@ -25,9 +25,4 @@
     mode = "640";
   };
 
-  age.secrets."ghostfolio/secret-env-vars" =
-    lib.mkDefault { file = ./ghostfolio/secret-env-vars.age; };
-
-  age.secrets."ghostfolio/redis-pass" =
-    lib.mkDefault { file = ./ghostfolio/redis-pass.age; };
 }
