@@ -6,7 +6,6 @@
     ./authelia
     ./deluge
     ./arr
-    ./firefly-iii
     ./endlessh
     ./monitoring
   ];

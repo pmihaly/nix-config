@@ -62,18 +62,6 @@
         "type": "github"
       }
     },
-    "firefly-env": {
-      "flake": false,
-      "locked": {
-        "narHash": "sha256-g97+MJxi/B0YEk/rMeoJt7A8/M7S9VOuW+3yxYWgKkw=",
-        "type": "file",
-        "url": "https://raw.githubusercontent.com/firefly-iii/firefly-iii/main/.env.example"
-      },
-      "original": {
-        "type": "file",
-        "url": "https://raw.githubusercontent.com/firefly-iii/firefly-iii/main/.env.example"
-      }
-    },
     "firefox-darwin-dmg": {
       "flake": false,
       "locked": {
@@ -421,7 +409,6 @@
       "inputs": {
         "agenix": "agenix",
         "darwin": "darwin_2",
-        "firefly-env": "firefly-env",
         "firefox-darwin-dmg": "firefox-darwin-dmg",
         "home-manager": "home-manager_2",
         "hyprland": "hyprland",

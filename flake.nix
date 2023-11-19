@@ -23,11 +23,6 @@
       repo = "config-templates";
       rev = "e0eb683c02c8abfa59cbe7a69b9ccc9e7178112c";
     };
-    firefly-env = {
-      url =
-        "https://raw.githubusercontent.com/firefly-iii/firefly-iii/main/.env.example";
-      flake = false;
-    };
   };
 
   outputs = { self, nixpkgs, home-manager, darwin, hyprland, nur, agenix, ...
