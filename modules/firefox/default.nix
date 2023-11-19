@@ -88,7 +88,20 @@ in {
                   ];
                 }];
                 iconUpdateURL = "https://nixos.wiki/favicon.png";
-                definedAliases = [ "ns" ];
+                definedAliases = [ "nps" ];
+              };
+              "NixOs Option Search" = {
+                urls = [{
+                  template =
+                    "https://search.nixos.org/options";
+                  params = [{
+                    name = "query";
+                    value = "{searchTerms}";
+                  }];
+                }];
+                iconUpdateURL = "https://nixos.wiki/favicon.png";
+                updateInterval = 24 * 60 * 60 * 1000;
+                definedAliases = [ "nos" ];
               };
               "Home Manager Option Search" = {
                 urls = [{
@@ -101,7 +114,7 @@ in {
                 }];
                 iconUpdateURL = "https://nixos.wiki/favicon.png";
                 updateInterval = 24 * 60 * 60 * 1000;
-                definedAliases = [ "os" ];
+                definedAliases = [ "hos" ];
               };
             };
           };
