@@ -198,7 +198,7 @@ in {
               max_age = "12h";
               labels = {
                 job = "systemd-journal";
-                host = "pihole";
+                host = "skylake";
               };
             };
             relabel_configs = [{
