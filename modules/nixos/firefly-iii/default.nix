@@ -38,7 +38,6 @@ in {
               ];
               environmentFiles = [ inputs.firefly-env ];
               environment = {
-                # APP_KEY_FILE = config.age.secrets."authelia/jwt-secret".path;
                 TZ = vars.timeZone;
                 DB_CONNECTION = "sqlite";
                 DB_HOST = "";
@@ -48,11 +47,11 @@ in {
                 DB_PASSWORD = "";
                 ENABLE_EXTERNAL_RATES = "true";
                 VALID_URL_PROTOCOLS = "https";
-              } // {
+              } // (mkIf config.modules.authelia.enable {
                 AUTHENTICATION_GUARD = "remote_user_guard";
                 AUTHENTICATION_GUARD_HEADER = "Remote-User";
                 AUTHENTICATION_GUARD_EMAIL = "Remote-Email";
-              };
+              });
             };
 
             # TODO cron
