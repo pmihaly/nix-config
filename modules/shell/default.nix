@@ -118,8 +118,8 @@ in {
         o = "cd ~/Sync/org";
         on = ''o && (fd "^.*.org$" | fzf | xargs nvim)'';
         ld = "lazydocker";
-        ms = "pushd ~/.nix-config ; make switch-mac ; popd";
-        mp = "pushd ~/.nix-config ; sudo make switch-pc ; popd";
+        ms = "darwin-rebuild switch --flake ~/.nix-config#mac";
+        mp = "nixos-rebuild switch --flake ~/.nix-config#pc";
         nr = "sudo nix-store --verify --check-contents --repair";
         ns = "nix search nixpkgs";
         ncg = "nix-collect-garbage --delete-old";
