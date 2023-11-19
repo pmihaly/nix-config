@@ -28,28 +28,60 @@ in {
           users = { allow_sign_up = false; };
           analytics.reporting_enabled = false;
         };
-        provision.datasources.settings = {
-          apiVersion = 1;
-          datasources = [
-            {
-              name = "Prometheus";
-              url =
-                "http://localhost:${toString config.services.prometheus.port}";
-              type = "prometheus";
-            }
-            {
-              name = "Loki";
-              type = "loki";
-              access = "proxy";
-              url = "http://127.0.0.1:${
-                  toString
-                  config.services.loki.configuration.server.http_listen_port
-                }";
-            }
-          ];
+        provision = {
+          enable = true;
+          datasources.settings = {
+            apiVersion = 1;
+            datasources = [
+              {
+                name = "Prometheus";
+                url = "http://localhost:${
+                    toString config.services.prometheus.port
+                  }";
+                type = "prometheus";
+                uid = "000000001";
+              }
+              {
+                name = "Loki";
+                type = "loki";
+                access = "proxy";
+                url = "http://127.0.0.1:${
+                    toString
+                    config.services.loki.configuration.server.http_listen_port
+                  }";
+              }
+            ];
+          };
+          dashboards.settings.providers = [{
+            name = "default";
+            options.path = "/etc/grafana-dashboards";
+          }];
         };
       };
     })
+
+    {
+      environment.etc = {
+        "grafana-dashboards/node-exporter-full.json" = {
+          source = builtins.fetchurl {
+            url =
+              "https://grafana.com/api/dashboards/1860/revisions/33/download";
+            sha256 = "1087z90fr7w1m122pv1cafrmh7znymb90k79lf3psnrvbr2zm94l";
+          };
+          group = "grafana";
+          user = "grafana";
+        };
+        "grafana-dashboards/endlessh.json" = {
+          source = builtins.fetchurl {
+            url =
+              "https://grafana.com/api/dashboards/15156/revisions/10/download";
+            sha256 = "16xmkcqyhg6gi29a7w3887dc3284903v4jpmg8wmphysfdzskbxn";
+          };
+          group = "grafana";
+          user = "grafana";
+        };
+      };
+    }
 
     {
       services.prometheus = {
@@ -58,7 +90,7 @@ in {
         exporters = {
           node = {
             enable = true;
-            enabledCollectors = [ "systemd" ];
+            enabledCollectors = [ "systemd" "processes" ];
             port = 9002;
           };
         };
@@ -149,7 +181,10 @@ in {
       services.promtail = {
         enable = true;
         configuration = {
-          server = { http_listen_port = 3031; grpc_listen_port = 3032; };
+          server = {
+            http_listen_port = 3031;
+            grpc_listen_port = 3032;
+          };
           positions = { filename = "/tmp/positions.yaml"; };
           clients = [{
             url = "http://127.0.0.1:${
