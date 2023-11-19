@@ -26,6 +26,7 @@
     authelia.enable = true;
     deluge.enable = true;
     arr.enable = true;
+    openBudgeteer.enable = true;
   };
 
   boot.loader.grub = {

@@ -1,1 +1,1 @@
-{ ... }: { imports = [ ./nginx ./jellyfin ./homer ./authelia ./deluge ./arr ]; }
+{ ... }: { imports = [ ./nginx ./jellyfin ./homer ./authelia ./deluge ./arr ./openBudgeteer ]; }
