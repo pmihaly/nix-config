@@ -1,7 +1,7 @@
 { lib, vars }:
 let
-
-  mkService = { subdomain, port, dashboard ? null, extraConfig }:
+  mkService = { subdomain, port, dashboard ? null, extraConfig
+    , extraNginxConfigRoot ? { }, extraNginxConfigLocation ? { } }:
     lib.mkMerge [
       {
         services.nginx = {
@@ -62,8 +62,8 @@ let
 
                 error_page 401 =302 https://authelia.${vars.domainName}/?rd=$target_url;
               '';
-            };
-          };
+            } // extraNginxConfigLocation;
+          } // extraNginxConfigRoot;
         };
       }
 

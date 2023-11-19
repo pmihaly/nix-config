@@ -28,6 +28,7 @@
     arr.enable = true;
     firefly-iii.enable = true;
     endlessh.enable = true;
+    monitoring.enable = true;
   };
 
   boot.loader.grub = {

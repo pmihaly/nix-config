@@ -8,5 +8,6 @@
     ./arr
     ./firefly-iii
     ./endlessh
+    ./monitoring
   ];
 }
