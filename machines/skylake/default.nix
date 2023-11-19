@@ -28,6 +28,7 @@
     arr.enable = true;
     endlessh.enable = true;
     monitoring.enable = true;
+    my-fava.enable = true;
   };
 
   boot.loader.grub = {

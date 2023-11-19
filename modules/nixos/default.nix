@@ -8,5 +8,6 @@
     ./arr
     ./endlessh
     ./monitoring
+    ./fava
   ];
 }
