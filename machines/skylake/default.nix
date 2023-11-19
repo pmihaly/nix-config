@@ -26,7 +26,7 @@
     authelia.enable = true;
     deluge.enable = true;
     arr.enable = true;
-    openBudgeteer.enable = true;
+    firefly-iii.enable = true;
   };
 
   boot.loader.grub = {
