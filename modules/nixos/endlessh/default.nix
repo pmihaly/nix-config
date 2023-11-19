@@ -10,6 +10,7 @@ in {
       enable = true;
       openFirewall = true;
       port = 22;
+      prometheus.enable = config.modules.monitoring.enable;
     };
   };
 }
