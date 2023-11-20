@@ -9,5 +9,6 @@
     ./endlessh
     ./monitoring
     ./fava
+    ./hledger
   ];
 }

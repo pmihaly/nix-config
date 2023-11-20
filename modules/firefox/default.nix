@@ -76,14 +76,13 @@ in {
               "Brave search" = {
                 urls = [{
                   template = "https://search.brave.com/search";
-                  params = [
-                    {
-                      name = "q";
-                      value = "{searchTerms}";
-                    }
-                  ];
+                  params = [{
+                    name = "q";
+                    value = "{searchTerms}";
+                  }];
                 }];
-                iconUpdateURL = "https://cdn.search.brave.com/serp/v2/_app/immutable/assets/favicon-32x32.86083f5b.png";
+                iconUpdateURL =
+                  "https://cdn.search.brave.com/serp/v2/_app/immutable/assets/favicon-32x32.86083f5b.png";
               };
               "Nix Packages" = {
                 urls = [{
@@ -104,8 +103,7 @@ in {
               };
               "NixOs Option Search" = {
                 urls = [{
-                  template =
-                    "https://search.nixos.org/options";
+                  template = "https://search.nixos.org/options";
                   params = [{
                     name = "query";
                     value = "{searchTerms}";
