@@ -71,8 +71,20 @@ in {
           }];
           search = {
             force = true;
-            default = "DuckDuckGo";
+            default = "Brave search";
             engines = {
+              "Brave search" = {
+                urls = [{
+                  template = "https://search.brave.com/search";
+                  params = [
+                    {
+                      name = "q";
+                      value = "{searchTerms}";
+                    }
+                  ];
+                }];
+                iconUpdateURL = "https://cdn.search.brave.com/serp/v2/_app/immutable/assets/favicon-32x32.86083f5b.png";
+              };
               "Nix Packages" = {
                 urls = [{
                   template = "https://search.nixos.org/packages";
