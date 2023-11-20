@@ -1,6 +1,6 @@
-{ pkgs, modulesPath, lib, vars, ... }: {
+{ pkgs, lib, vars, ... }: {
   imports =
-    [ ../../modules/nixos "${modulesPath}/virtualisation/amazon-image.nix" ];
+    [ ../../modules/nixos ./hardware.nix ];
   nixpkgs.overlays = import ../../overlays;
 
   home-manager.useGlobalPkgs = true;
@@ -33,10 +33,8 @@
     duckdns.enable = true;
   };
 
-  boot.loader.grub = {
-    enable = true;
-    device = lib.mkForce "/dev/nvme0n1";
-  };
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
 
