@@ -25,4 +25,7 @@
     mode = "640";
   };
 
+  age.secrets."duckdns/token" = lib.mkDefault {
+    file = ./duckdns/token.age;
+  };
 }

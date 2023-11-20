@@ -5,4 +5,5 @@
   serviceConfig = "/persist/opt/skylake-services";
   storage = "/persist/opt/skylake-storage";
   username = "misi";
+  duckdnsDomainName = "mishmesh.duckdns.org";
 }

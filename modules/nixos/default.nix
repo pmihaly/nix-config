@@ -10,5 +10,6 @@
     ./monitoring
     ./fava
     ./hledger
+    ./duckdns
   ];
 }

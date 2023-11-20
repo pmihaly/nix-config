@@ -30,6 +30,7 @@
     monitoring.enable = true;
     my-fava.enable = true;
     hledger.enable = true;
+    duckdns.enable = true;
   };
 
   boot.loader.grub = {
