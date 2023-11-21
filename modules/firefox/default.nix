@@ -40,6 +40,10 @@ in {
             toolbar = true;
             bookmarks = [
               {
+                name = "skeler I";
+                url = "https://www.youtube.com/watch?v=J0y6wM0aAgE";
+              }
+              {
                 name = "skeler II";
                 url = "https://www.youtube.com/watch?v=J4t4pMZBXZg";
               }
