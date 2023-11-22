@@ -20,7 +20,7 @@ return {
   },
   {
     'nvim-telescope/telescope-vimspector.nvim',
-    depends = { 'puremourning/vimspector' },
+    dependencies = { 'puremourning/vimspector' },
     build = function() pcall(require('telescope').load_extension, 'vimspector') end,
     keys = {
       { '<leader>dd', '<cmd>Telescope vimspector configurations<cr>', mode = 'n'},
