@@ -65,7 +65,7 @@
     "firefox-darwin-dmg": {
       "flake": false,
       "locked": {
-        "narHash": "sha256-jkQnW7p5h2BHN10Ai0PxdtubBCOKn1Xy1fsW+sAwKyI=",
+        "narHash": "sha256-/w1QSC79Ujc1LikLefXFmyvjEppdpWe9xOieFO8ttns=",
         "type": "file",
         "url": "https://download.mozilla.org/?lang=en-US&os=osx&product=firefox-latest"
       },
@@ -176,11 +176,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1700419052,
-        "narHash": "sha256-U6a5f9ynbzcp8PMIHULbHPkbwp7YfPKOYmTcLqlalD4=",
+        "lastModified": 1700553346,
+        "narHash": "sha256-kW7uWsCv/lxuA824Ng6EYD9hlVYRyjuFn0xBbYltAeQ=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "993fb02d20760067b8ee19c713d94cee07037759",
+        "rev": "1aabb0a31b25ad83cfaa37c3fe29053417cd9a0f",
         "type": "github"
       },
       "original": {
@@ -198,11 +198,11 @@
         "xdph": "xdph"
       },
       "locked": {
-        "lastModified": 1700397206,
-        "narHash": "sha256-ityVJcy3I/E8soXctwWveg58+cXOSQXhDIcU6YR2gjI=",
+        "lastModified": 1700592218,
+        "narHash": "sha256-vHzDbBrZ5EsfVUMLgjuugf6OqB+iOLjKLO9O5n2occ4=",
         "owner": "hyprwm",
         "repo": "Hyprland",
-        "rev": "646f4bc63861e03b01fed3833bb65d1d014e1bf3",
+        "rev": "472926528428cd714c90f157e639fc0466611c8b",
         "type": "github"
       },
       "original": {
@@ -353,11 +353,11 @@
     },
     "nur": {
       "locked": {
-        "lastModified": 1700473479,
-        "narHash": "sha256-eyGKUhN3ZNLiuHXC19P6/6Jl7mFCSGhemE16pQ3MCLs=",
+        "lastModified": 1700637792,
+        "narHash": "sha256-qWcKTZ3hI9m7D+umudU27hgStMJEar2iyTJNDvWRwOI=",
         "owner": "nix-community",
         "repo": "NUR",
-        "rev": "b042d2a79af823b2271d4c890a837e8c23028507",
+        "rev": "d6378b9db2653ac1854e6de93acc26315cd2f20e",
         "type": "github"
       },
       "original": {
@@ -388,23 +388,6 @@
         "type": "github"
       }
     },
-    "recyclarr-configs": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1688504126,
-        "narHash": "sha256-d4k6lNcMPGZpuCwN2a+axuLB4iG7NCvLoqzFDYOtwmw=",
-        "owner": "recyclarr",
-        "repo": "config-templates",
-        "rev": "e0eb683c02c8abfa59cbe7a69b9ccc9e7178112c",
-        "type": "github"
-      },
-      "original": {
-        "owner": "recyclarr",
-        "repo": "config-templates",
-        "rev": "e0eb683c02c8abfa59cbe7a69b9ccc9e7178112c",
-        "type": "github"
-      }
-    },
     "root": {
       "inputs": {
         "agenix": "agenix",
@@ -414,8 +397,7 @@
         "hyprland": "hyprland",
         "img2theme": "img2theme",
         "nixpkgs": "nixpkgs_5",
-        "nur": "nur",
-        "recyclarr-configs": "recyclarr-configs"
+        "nur": "nur"
       }
     },
     "systems": {
