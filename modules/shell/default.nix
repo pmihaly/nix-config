@@ -155,6 +155,7 @@ in {
         lsblk = "duf";
         http = "curlie";
         wttr = "http wttr.in/budapest";
+        n = "nvim";
       };
     };
 
