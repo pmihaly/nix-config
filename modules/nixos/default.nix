@@ -8,7 +8,6 @@
     ./arr
     ./endlessh
     ./monitoring
-    ./fava
     ./hledger
     ./duckdns
   ];
