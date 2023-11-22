@@ -33,6 +33,12 @@ in {
             host = "127.0.0.1";
             port = 8081;
           };
+          telemetry = {
+            metrics = {
+              enable = config.modules.monitoring.enable;
+              address = "http://localhost:${toString config.services.prometheus.port}";
+            };
+          };
 
           log = {
             level = "debug";
