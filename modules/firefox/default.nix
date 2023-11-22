@@ -71,6 +71,10 @@ in {
                 name = "dnb";
                 url = "https://www.youtube.com/watch?v=qNaCzmbaYWI";
               }
+              {
+                name = "maidcore";
+                url = "https://www.youtube.com/watch?v=T49CG5Qjd1s";
+              }
             ];
           }];
           search = {
