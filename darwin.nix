@@ -17,7 +17,7 @@
       upgrade = true;
       cleanup = "zap";
     };
-    casks = let work = [ "sequel-ace" "pycharm-ce" "insomnia" ];
+    casks = let work = [ "sequel-ace" "pycharm-ce" ];
     in work ++ [
       "aerial" # screensaver
       "raycast" # command+space
