@@ -1,13 +1,10 @@
-{ pkgs, inputs, ... }: {
+{ pkgs, ... }: {
   nixpkgs.config.allowUnfree = true;
   nixpkgs.overlays = import ./overlays;
   documentation.enable = false;
 
   home-manager.useGlobalPkgs = true;
   home-manager.useUserPackages = true;
-
-  environment.systemPackages =
-    [ inputs.agenix.packages."${pkgs.system}".default ];
 
   home-manager.users."mihaly.papp" = ./homemanager.nix;
 
