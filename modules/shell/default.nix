@@ -126,6 +126,8 @@ in {
         nsh = "function _f() { nix-shell -p $* --run zsh }; _f";
         nshr =
           "function _f() { program=$1; shift; nix-shell -p $program --run $@ }; _f";
+        nshrr =
+          "function _f() { program=$1; shift; nix-shell -p $program --run $program }; _f";
         cn = "cd ~/.nix-config && nvim";
         c = "cd ~/.nix-config";
         thokr = "thokr --full-sentences 20";
