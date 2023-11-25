@@ -6,7 +6,6 @@ let cfg = config.modules.lf;
 in {
   options.modules.lf = { enable = mkEnableOption "lf"; };
   config = mkIf cfg.enable {
-    home.packages = with pkgs; [ massren du-dust ];
     programs.lf = {
       enable = true;
       settings = {
@@ -31,8 +30,8 @@ in {
       };
       keybindings = {
         D = "delete";
-        U = "!dust";
-        R = "!massren";
+        U = "!${pkgs.du-dust}/bin/dust";
+        R = "!${pkgs.massren}/bin/massren";
         m = "push :mkdirWithParent<space>";
         t = "push :touchWithParent<space>";
         "<enter>" = "open";
