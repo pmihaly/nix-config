@@ -16,6 +16,10 @@
         "https://download.mozilla.org/?product=firefox-latest&os=osx&lang=en-US";
       flake = false;
     };
+    lf-icons = {
+      url = "https://raw.githubusercontent.com/gokcehan/lf/master/etc/icons.example";
+      flake = false;
+    };
   };
 
   outputs = { self, nixpkgs, home-manager, darwin, hyprland, nur, agenix, ...

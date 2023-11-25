@@ -1,4 +1,4 @@
-{ pkgs, lib, config, ... }:
+{ pkgs, lib, config, inputs, ... }:
 
 with lib;
 let cfg = config.modules.lf;
@@ -6,12 +6,15 @@ let cfg = config.modules.lf;
 in {
   options.modules.lf = { enable = mkEnableOption "lf"; };
   config = mkIf cfg.enable {
+    xdg.configFile."lf/icons".source = inputs.lf-icons;
+
     programs.lf = {
       enable = true;
       settings = {
         scrolloff = 999;
         hidden = true;
         smartcase = true;
+        icons = true;
       };
       commands = {
         delete = ''
