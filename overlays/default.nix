@@ -30,6 +30,11 @@
         menu = 800
         css = 800
 
+        [buildPlans.iosevka-custom.weights.heavy]
+        shape = 900
+        menu = 900
+        css = 900
+
         [buildPlans.iosevka-custom.slopes.upright]
         angle = 0
         shape = "upright"

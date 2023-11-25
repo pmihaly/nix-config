@@ -11,10 +11,10 @@ in {
       theme = "Nord";
       settings = {
         font_size = 11;
-        font_family = "Iosevka Custom Bold Extended";
-        bold_font = "Iosevka Custom Extrabold Extended";
-        italic_font = "Iosevka Custom Bold Extended Italic";
-        bold_italic_font = "Iosevka Custom Extrabold Extended Italic";
+        font_family = "Iosevka Custom Extrabold Extended";
+        bold_font = "Iosevka Custom Heavy Extended";
+        italic_font = "Iosevka Custom Extrabold Extended Italic";
+        bold_italic_font = "Iosevka Custom Heavy Extended Italic";
         window_padding_width = "0 150";
         hide_window_decorations = "titlebar-only";
         macos_option_as_alt = true;
