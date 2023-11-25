@@ -49,38 +49,41 @@ in {
       "/run/current-system/sw/bin/"
     ];
 
+    programs.starship = {
+      enable = true;
+      enableZshIntegration = true;
+      enableNushellIntegration = true;
+      settings = {
+        add_newline = false;
+        format = lib.concatStrings [ " " "$directory" "$character" ];
+        scan_timeout = 10;
+        directory = { truncation_length = 2; };
+        character = {
+          success_symbol = "➜(hidden)";
+          error_symbol = "➜(hidden)";
+          vimcmd_symbol = "➜(hidden)";
+          vimcmd_replace_one_symbol = "➜(hidden)";
+          vimcmd_replace_symbol = "➜(hidden)";
+          vimcmd_visual_symbol = "➜(hidden)";
+        };
+      };
+    };
+
     programs.zsh = {
       enable = true;
-      initExtra = let
-        iglooPrompt = builtins.concatStringsSep "\n" [
-          "export IGLOO_ZSH_PROMPT_THEME_HIDE_TIME=true"
-          (builtins.readFile (builtins.fetchurl {
-            url =
-              "https://raw.githubusercontent.com/git/git/4ca12e10e6fbda68adcb32e78497dc261e94734d/contrib/completion/git-prompt.sh";
-            sha256 = "0rjwxf1vfkynjqns6drhbrfv7358zyhhx5j4zgawm25qwza4xggi";
-          }))
-          (builtins.readFile (builtins.fetchurl {
-            url =
-              "https://raw.githubusercontent.com/arcticicestudio/igloo/18b735009f2baa29e3bbe1323a1fc2082f88b393/snowblocks/zsh/lib/themes/igloo.zsh";
-            sha256 = "17ln78ww66mg1k2yljpap74rf6fjjiw818x4pc2d5l6yjqgv8wfl";
-          }))
-        ];
-      in builtins.concatStringsSep "\n" [
-        ''
-          autoload -U promptinit; promptinit
+      initExtra = ''
+        autoload -U promptinit; promptinit
 
-          set -o vi
+        set -o vi
 
-          zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+        zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 
-          autoload -z edit-command-line
-          zle -N edit-command-line
-          bindkey "^X" edit-command-line
+        autoload -z edit-command-line
+        zle -N edit-command-line
+        bindkey "^X" edit-command-line
 
-          [ -f ~/.zshrc_work ] && . ~/.zshrc_work
-        ''
-        iglooPrompt
-      ];
+        [ -f ~/.zshrc_work ] && . ~/.zshrc_work
+      '';
       enableCompletion = true;
       completionInit = ''
         autoload bashcompinit && bashcompinit
