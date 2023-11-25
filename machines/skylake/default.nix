@@ -1,6 +1,5 @@
 { pkgs, lib, vars, ... }: {
-  imports =
-    [ ../../modules/nixos ./hardware.nix ];
+  imports = [ ../../modules/nixos ./hardware.nix ];
   nixpkgs.overlays = import ../../overlays;
 
   home-manager.useGlobalPkgs = true;

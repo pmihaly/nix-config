@@ -13,24 +13,23 @@ in {
       name = "hledger";
       logo = ./hledger.png;
     };
-    extraConfig =
-      let
+    extraConfig = let
       directories = [ "${vars.storage}/Services/hledger" ];
       files = [ "${vars.storage}/Services/hledger/hledger.journal" ];
-      in {
+    in {
 
-        systemd.tmpfiles.rules =
-          (map (file: "f ${file} 0775 hledger hledger") files)
-          ++ (map (directory: "d ${directory} 0775 hledger hledger") directories);
+      systemd.tmpfiles.rules =
+        (map (file: "f ${file} 0775 hledger hledger") files)
+        ++ (map (directory: "d ${directory} 0775 hledger hledger") directories);
 
-        services.hledger-web = {
-          enable = true;
-          port = 5001;
-          stateDir = "${vars.storage}/Services/hledger";
-          journalFiles = [ "hledger.journal" ];
-          baseUrl = "https://hledger.${vars.domainName}";
-        };
-        networking.firewall.allowedTCPPorts = [ 5001 ];
+      services.hledger-web = {
+        enable = true;
+        port = 5001;
+        stateDir = "${vars.storage}/Services/hledger";
+        journalFiles = [ "hledger.journal" ];
+        baseUrl = "https://hledger.${vars.domainName}";
       };
+      networking.firewall.allowedTCPPorts = [ 5001 ];
+    };
   });
 }

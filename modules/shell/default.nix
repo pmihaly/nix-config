@@ -147,7 +147,8 @@ in {
           "function _f() { revolut.sh ~/Sync/finances.yaml | vipe --suffix yaml | envelopes > ~/Sync/finances.yaml }; _f";
         fin = "$EDITOR ~/Sync/finances.yaml";
         qr = "${pkgs.qrencode}/bin/qrencode -t ansiutf8";
-        sr = ''function _f() { fd --type file --exec ${pkgs.sd}/bin/sd "$1" "$2" }; _f'';
+        sr = ''
+          function _f() { fd --type file --exec ${pkgs.sd}/bin/sd "$1" "$2" }; _f'';
         du = "${pkgs.du-dust}/bin/dust";
         lsblk = "${pkgs.duf}/bin/duf";
         http = "curlie";

@@ -12,16 +12,19 @@ in {
       wantedBy = [ "multi-user.target" ];
       serviceConfig.Type = "oneshot";
       script = ''
-          token=$(cat ${config.age.secrets."duckdns/token".path})
-          ${pkgs.curl}/bin/curl \
-          "https://www.duckdns.org/update?domains=${vars.duckdnsDomainName}&token=$token&verbose=true"
+        token=$(cat ${config.age.secrets."duckdns/token".path})
+        ${pkgs.curl}/bin/curl \
+        "https://www.duckdns.org/update?domains=${vars.duckdnsDomainName}&token=$token&verbose=true"
       '';
     };
 
     systemd.timers.duckdns = {
       wantedBy = [ "timers.target" ];
       partOf = [ "duckdns.service" ];
-      timerConfig = {OnCalendar = "Weekly"; Persistent = true;};
+      timerConfig = {
+        OnCalendar = "Weekly";
+        Persistent = true;
+      };
     };
   };
 }

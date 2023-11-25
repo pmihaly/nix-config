@@ -36,7 +36,8 @@ in {
           telemetry = {
             metrics = {
               enable = config.modules.monitoring.enable;
-              address = "http://localhost:${toString config.services.prometheus.port}";
+              address =
+                "http://localhost:${toString config.services.prometheus.port}";
             };
           };
 
