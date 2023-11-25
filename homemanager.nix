@@ -41,5 +41,6 @@
     transmission
     anki-bin
     inputs.img2theme.packages."${pkgs.system}".default
+    wally-cli # configuring moonlander keyboard
   ]);
 }
