@@ -44,6 +44,7 @@ in {
         i = "push A<a-b><a-b><a-f>"; # before extention
         a = "push A<a-b>"; # after extention
         M = "mark-save";
+        s = "!zsh";
       };
     };
 
