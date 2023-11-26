@@ -59,12 +59,12 @@ in {
         scan_timeout = 10;
         directory = { truncation_length = 2; };
         character = {
-          success_symbol = "➜(hidden)";
-          error_symbol = "➜(hidden)";
-          vimcmd_symbol = "➜(hidden)";
-          vimcmd_replace_one_symbol = "➜(hidden)";
-          vimcmd_replace_symbol = "➜(hidden)";
-          vimcmd_visual_symbol = "➜(hidden)";
+          success_symbol = "🔮(hidden)";
+          error_symbol = "🔮(hidden)";
+          vimcmd_symbol = "🔮(hidden)";
+          vimcmd_replace_one_symbol = "🔮(hidden)";
+          vimcmd_replace_symbol = "🔮(hidden)";
+          vimcmd_visual_symbol = "🔮(hidden)";
         };
       };
     };
