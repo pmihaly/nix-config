@@ -1,5 +1,14 @@
 return {
   {
+    'mrcjkb/haskell-tools.nvim',
+    version = '^3',
+    ft = { 'haskell', 'lhaskell', 'cabal', 'cabalproject' },
+    config = function()
+      local ht = require('haskell-tools')
+      vim.keymap.set('n', '<leader>rr', ht.repl.toggle, opts)
+    end
+  },
+  {
     'VonHeikemen/lsp-zero.nvim',
     branch = 'v2.x',
     lazy = true,
