@@ -1,7 +1,8 @@
 { lib, vars }:
 let
   mkService = { subdomain, port, dashboard ? null, extraConfig
-    , extraNginxConfigRoot ? { }, extraNginxConfigLocation ? { } }:
+    , extraNginxConfigRoot ? { }, extraNginxConfigLocation ? { }
+    , bypassAuth ? false }:
     lib.mkMerge [
       {
         services.nginx = {
@@ -74,6 +75,11 @@ let
             url = "https://${subdomain}.${vars.domainName}";
           };
         };
+      }
+
+      {
+        modules.authelia.bypassDomains =
+          lib.mkIf bypassAuth [ "${subdomain}.${vars.domainName}" ];
       }
 
       extraConfig

@@ -13,6 +13,7 @@ in {
       name = "Jellyfin";
       logo = ./jellyfin.png;
     };
+    bypassAuth = true;
     extraConfig = let
       directories = [
         "${vars.serviceConfig}/jellyfin"
@@ -20,7 +21,6 @@ in {
         "${vars.storage}/Media/Movies"
       ];
     in {
-
       systemd.tmpfiles.rules =
         map (x: "d ${x} 0775 ${vars.username} multimedia - -") directories;
 
@@ -41,9 +41,7 @@ in {
         };
       };
 
-    networking.firewall = {
-      allowedUDPPorts = [ 1900 7359 ];
-    };
+      networking.firewall = { allowedUDPPorts = [ 1900 7359 ]; };
 
       virtualisation.oci-containers = {
         containers = {
