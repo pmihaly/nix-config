@@ -6,6 +6,7 @@ return {
     config = function()
       local ht = require('haskell-tools')
       vim.keymap.set('n', '<leader>rr', ht.repl.toggle, opts)
+      vim.keymap.set('n', '<space>ea', ht.lsp.buf_eval_all, opts)
     end
   },
   {
