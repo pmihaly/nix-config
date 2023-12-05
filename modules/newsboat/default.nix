@@ -12,7 +12,8 @@ in {
       autoReload = true;
       urls = [
         { url = "https://www.daemonology.net/hn-daily/index.rss"; }
-        { url = "https://nitter.net/GergelyOrosz/rss"; }
+        { url = "https://social.notjustbikes.com/@notjustbikes.rss"; }
+        { url = "https://kiszamolo.hu/feed"; }
         { url = "https://feeds.feedburner.com/ThePragmaticEngineer"; }
         { url = "https://www.reddit.com/r/ExperiencedDevs/.rss"; }
         { url = "https://news.ycombinator.com/rss"; }
@@ -30,7 +31,6 @@ in {
         { url = "https://programming.dev/feeds/c/commandline.xml?sort=Active"; }
         { url = "https://beehaw.org/feeds/c/technology.xml?sort=Active"; }
         { url = "https://lobste.rs/rss"; }
-        { url = "https://kiszamolo.hu/feed"; }
       ];
       extraConfig = ''
         #show-read-feeds no
