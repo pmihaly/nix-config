@@ -15,22 +15,8 @@ in {
         { url = "https://social.notjustbikes.com/@notjustbikes.rss"; }
         { url = "https://kiszamolo.hu/feed"; }
         { url = "https://feeds.feedburner.com/ThePragmaticEngineer"; }
-        { url = "https://www.reddit.com/r/ExperiencedDevs/.rss"; }
-        { url = "https://news.ycombinator.com/rss"; }
-        { url = "https://programming.dev/feeds/local.xml?sort=Active"; }
-        {
-          url =
-            "https://programming.dev/feeds/c/functional_programming.xml?sort=Active";
-        }
         { url = "https://programming.dev/feeds/c/linux.xml?sort=Active"; }
-        {
-          url =
-            "https://programming.dev/feeds/c/experienced_devs.xml?sort=Active";
-        }
         { url = "https://programming.dev/feeds/c/nix.xml?sort=Active"; }
-        { url = "https://programming.dev/feeds/c/commandline.xml?sort=Active"; }
-        { url = "https://beehaw.org/feeds/c/technology.xml?sort=Active"; }
-        { url = "https://lobste.rs/rss"; }
       ];
       extraConfig = ''
         #show-read-feeds no
