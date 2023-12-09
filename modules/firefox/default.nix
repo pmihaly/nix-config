@@ -161,6 +161,7 @@ in {
             old-reddit-redirect
             keepassxc-browser
             youtube-nonstop
+            reddit-enhancement-suite
           ];
           userChrome = ''
             .tabbrowser-tab .tab-close-button,
