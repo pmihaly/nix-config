@@ -28,6 +28,7 @@ in {
       choose # frendlier cut
       pup # jq for html
       nushellFull # structured data manipulation - replaces jq, jiq and yq
+      dog # dns client
     ];
 
     programs.bat = {
