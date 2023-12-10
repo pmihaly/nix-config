@@ -17,7 +17,8 @@ in {
     in {
 
       systemd.tmpfiles.rules =
-        (map (directory: "d ${directory} 0775 paperless backup") directories);
+        (map (directory: "d ${directory} 0775 paperless backup") directories)
+        ++ [ "d ${vars.serviceConfig}/paperless/media/.stfolder 0775 paperless backup" ];
 
       services.paperless = {
         enable = true;
