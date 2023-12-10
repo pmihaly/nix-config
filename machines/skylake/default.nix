@@ -79,6 +79,9 @@
   };
 
   users.groups.multimedia = { };
+  users.groups.backup = {
+    members = [ "paperless" "syncthing" ];
+  };
 
   programs.zsh.enable = true;
 

@@ -23,7 +23,7 @@ in {
     in {
 
       systemd.tmpfiles.rules =
-        (map (directory: "d ${directory} 0775 syncthing syncthing")
+        (map (directory: "d ${directory} 0775 syncthing backup")
           directories);
 
       services.syncthing = {
@@ -34,6 +34,7 @@ in {
         overrideFolders = true;
         openDefaultPorts = true;
         guiAddress = "0.0.0.0:8384";
+        group = "backup";
         settings = {
           options.urAccepted = -1;
           devices = {

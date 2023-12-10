@@ -17,7 +17,7 @@ in {
     in {
 
       systemd.tmpfiles.rules =
-        (map (directory: "d ${directory} 0775 paperless paperless")
+        (map (directory: "d ${directory} 0775 paperless backup")
           directories);
 
       services.paperless = {
