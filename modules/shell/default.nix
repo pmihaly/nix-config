@@ -159,6 +159,7 @@ in {
         wttr = "${pkgs.httpie}/bin/http wttr.in/budapest";
         n = "nvim";
         sharedir = "${pkgs.httplz}/bin/httplz";
+        unlockpdf = "${pkgs.pdftk}/bin/pdftk - input_pw $1 output -";
       };
     };
 

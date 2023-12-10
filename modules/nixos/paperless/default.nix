@@ -13,12 +13,12 @@ in {
       name = "Paperless-ngx";
       logo = ./paperless.svg;
     };
-    extraConfig = let
-      directories = [ "${vars.serviceConfig}/paperless" ];
+    extraConfig = let directories = [ "${vars.serviceConfig}/paperless" ];
     in {
 
       systemd.tmpfiles.rules =
-        (map (directory: "d ${directory} 0775 paperless paperless") directories);
+        (map (directory: "d ${directory} 0775 paperless paperless")
+          directories);
 
       services.paperless = {
         enable = true;
@@ -26,7 +26,8 @@ in {
         mediaDir = "${vars.storage}/Services/paperless/media";
         consumptionDir = "${vars.storage}/Services/paperless/consume";
         consumptionDirIsPublic = true;
-        passwordFile = builtins.toFile "paperles-passwordfile" "some-admin-password-i-dont-care-about-because-i-use-authelia";
+        passwordFile = builtins.toFile "paperles-passwordfile"
+          "some-admin-password-i-dont-care-about-because-i-use-authelia";
         extraConfig = {
           PAPERLESS_ADMIN_USER = "🧙";
           PAPERLESS_AUTO_LOGIN_USERNAME = "🧙";

@@ -11,5 +11,6 @@
     ./hledger
     ./duckdns
     ./paperless
+    ./syncthing
   ];
 }
