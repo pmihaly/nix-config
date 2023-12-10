@@ -10,5 +10,6 @@
     ./monitoring
     ./hledger
     ./duckdns
+    ./paperless
   ];
 }

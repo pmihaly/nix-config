@@ -29,6 +29,7 @@
     monitoring.enable = true;
     hledger.enable = true;
     duckdns.enable = true;
+    paperless.enable = true;
   };
 
   boot.loader.systemd-boot.enable = true;
