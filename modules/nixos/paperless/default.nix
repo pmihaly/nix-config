@@ -30,7 +30,7 @@ in {
         extraConfig = {
           PAPERLESS_ADMIN_USER = "🧙";
           PAPERLESS_AUTO_LOGIN_USERNAME = "🧙";
-          PAPERLESS_OCR_LANGUAGE = "eng+hun";
+          PAPERLESS_OCR_LANGUAGE = "hun+eng";
           PAPERLESS_URL = "https://paperless.${vars.domainName}";
         };
       };
