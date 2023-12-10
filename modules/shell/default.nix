@@ -121,7 +121,7 @@ in {
         mp = "nixos-rebuild switch --flake ~/.nix-config#pc";
         nr = "sudo nix-store --verify --check-contents --repair";
         ns = "nix search nixpkgs";
-        ncg = "nix-collect-garbage --delete-old";
+        ncg = "sudo nix-collect-garbage --delete-old";
         nsh = "function _f() { nix-shell -p $* --run zsh }; _f";
         nshr =
           "function _f() { program=$1; shift; nix-shell -p $program --run $@ }; _f";
