@@ -71,17 +71,15 @@
   users.users.${vars.username} = {
     isNormalUser = true;
     description = vars.username;
-    extraGroups = [ "wheel" "multimedia" ];
+    extraGroups = [ "wheel" ];
     shell = pkgs.zsh;
     openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG/9W5fVVxjEIo66iLCDfwxHh0IQ6r9R3J/Fq5b9LWNM mihaly.papp@mihalypapp-MacBook-Pro"
     ];
   };
 
-  users.groups.multimedia = { };
-  users.groups.backup = {
-    members = [ "paperless" "syncthing" ];
-  };
+  users.groups.multimedia.members = [ "${vars.username}" ];
+  users.groups.backup.members = [ "paperless" "syncthing" "${vars.username}" ];
 
   programs.zsh.enable = true;
 

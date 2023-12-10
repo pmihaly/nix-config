@@ -23,8 +23,7 @@ in {
     in {
 
       systemd.tmpfiles.rules =
-        (map (directory: "d ${directory} 0775 syncthing backup")
-          directories);
+        (map (directory: "d ${directory} 0775 syncthing backup") directories);
 
       services.syncthing = {
         enable = true;

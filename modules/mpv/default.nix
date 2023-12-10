@@ -9,9 +9,7 @@ in {
 
     programs.mpv = {
       enable = true;
-      config = {
-        ytdl-format = "bestvideo+bestaudio/best";
-      };
+      config = { ytdl-format = "bestvideo+bestaudio/best"; };
       defaultProfiles = [ "gpu-hq" ];
       scripts = [ pkgs.mpvScripts.sponsorblock ];
       bindings = {
