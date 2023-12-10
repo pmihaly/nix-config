@@ -11,10 +11,9 @@ in {
       enable = true;
       config = {
         ytdl-format = "bestvideo+bestaudio/best";
-        osc = false;
       };
       defaultProfiles = [ "gpu-hq" ];
-      scripts = [ pkgs.mpvScripts.sponsorblock pkgs.mpvScripts.thumbnail ];
+      scripts = [ pkgs.mpvScripts.sponsorblock ];
       bindings = {
         "l" = "seek 5";
         "h" = "seek -5";
