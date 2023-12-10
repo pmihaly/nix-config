@@ -9,8 +9,8 @@ in {
     subdomain = "paperless";
     port = 28981;
     dashboard = {
-      category = "Media";
-      name = "paperless";
+      category = "Documents";
+      name = "Paperless-ngx";
       logo = ./paperless.svg;
     };
     extraConfig = let
