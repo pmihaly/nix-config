@@ -13,12 +13,11 @@ in {
       name = "Paperless-ngx";
       logo = ./paperless.svg;
     };
-    extraConfig = let directories = [ "${vars.serviceConfig}/paperless" ];
+    extraConfig = let directories = [ "${vars.serviceConfig}/paperless" "${vars.serviceConfig}/paperless/media" ];
     in {
 
       systemd.tmpfiles.rules =
-        (map (directory: "d ${directory} 0775 paperless backup") directories)
-        ++ [ "d ${vars.serviceConfig}/paperless/media/.stfolder 0775 paperless backup" ];
+        (map (directory: "d ${directory} 0775 paperless backup") directories);
 
       services.paperless = {
         enable = true;
