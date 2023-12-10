@@ -52,6 +52,12 @@ in {
               path = "${vars.storage}/Services/paperless/consume";
               devices = [ "${macbook}" "${phone}" ];
             };
+            "papers-backup" = {
+              path = "${vars.storage}/Services/paperless/media";
+              devices = [ "${macbook}" "${phone}" ];
+              ignorePerms = false;
+              versioning.type = "staggered";
+            };
           };
         };
       };
