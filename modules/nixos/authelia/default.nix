@@ -37,7 +37,7 @@ in {
             metrics = {
               enabled = config.modules.monitoring.enable;
               address =
-                "tcp://127.0.0.1:${toString config.services.prometheus.port}";
+                "tcp://127.0.0.1:9002";
             };
           };
 
