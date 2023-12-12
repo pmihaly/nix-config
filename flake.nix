@@ -71,5 +71,25 @@
         ./machines/skylake
       ];
     };
+
+    nixosConfigurations.post-office = nixpkgs.lib.nixosSystem {
+      specialArgs = let vars = import ./machines/post-office/vars.nix;
+      in {
+        inherit inputs vars;
+        lib = nixpkgs.lib.extend (final: prev:
+          (import ./lib/nixos {
+            lib = final;
+            inherit vars;
+          }));
+      };
+
+      modules = [
+        home-manager.nixosModules.home-manager
+        inputs.agenix.nixosModules.default
+        { home-manager.extraSpecialArgs = { inherit inputs; }; }
+        ./secrets
+        ./machines/post-office
+      ];
+    };
   };
 }
