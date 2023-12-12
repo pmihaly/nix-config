@@ -11,8 +11,6 @@
     nur.url = "github:nix-community/NUR";
     img2theme.url = "github:pmihaly/img2theme";
     agenix.url = "github:ryantm/agenix";
-    simple-nixos-mailserver.url =
-      "gitlab:simple-nixos-mailserver/nixos-mailserver/nixos-23.05";
     firefox-darwin-dmg = {
       url =
         "https://download.mozilla.org/?product=firefox-latest&os=osx&lang=en-US";
@@ -68,31 +66,9 @@
       modules = [
         home-manager.nixosModules.home-manager
         inputs.agenix.nixosModules.default
-        inputs.simple-nixos-mailserver.nixosModule
         { home-manager.extraSpecialArgs = { inherit inputs; }; }
         ./secrets
         ./machines/skylake
-      ];
-    };
-
-    nixosConfigurations.post-office = nixpkgs.lib.nixosSystem {
-      specialArgs = let vars = import ./machines/post-office/vars.nix;
-      in {
-        inherit inputs vars;
-        lib = nixpkgs.lib.extend (final: prev:
-          (import ./lib/nixos {
-            lib = final;
-            inherit vars;
-          }));
-      };
-
-      modules = [
-        home-manager.nixosModules.home-manager
-        inputs.agenix.nixosModules.default
-        { home-manager.extraSpecialArgs = { inherit inputs; }; }
-        inputs.simple-nixos-mailserver.nixosModule
-        ./secrets
-        ./machines/post-office
       ];
     };
   };
