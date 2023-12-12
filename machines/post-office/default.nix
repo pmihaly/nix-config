@@ -5,7 +5,7 @@
     ../../modules/nixos
   ];
 
-  boot.cleanTmpDir = true;
+  boot.tmp.cleanOnBoot = true;
   zramSwap.enable = true;
   networking.hostName = "post-office";
   networking.domain = "";
