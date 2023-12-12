@@ -21,7 +21,8 @@ in {
       # nix-shell -p mkpasswd --run 'mkpasswd -sm bcrypt'
       loginAccounts = {
         "mihaly@mihaly.codes" = {
-          hashedPasswordFile = config.age.secrets."mailserver/mihaly-password".path;
+          hashedPasswordFile =
+            config.age.secrets."mailserver/mihaly-password".path;
         };
       };
 
@@ -29,5 +30,23 @@ in {
       # down nginx and opens port 80.
       certificateScheme = "acme-nginx";
     };
+
+    services.roundcube = {
+      enable = true;
+      # this is the url of the vhost, not necessarily the same as the fqdn of
+      # the mailserver
+      hostName = "webmail.post-office.${vars.domainName}";
+      extraConfig = ''
+        # starttls needed for authentication, so the fqdn required to match
+        # the certificate
+        $config['smtp_server'] = "tls://${config.mailserver.fqdn}";
+        $config['smtp_user'] = "%u";
+        $config['smtp_pass'] = "%p";
+      '';
+    };
+
+    services.nginx.enable = true;
+
+    networking.firewall.allowedTCPPorts = [ 80 443 ];
   };
 }

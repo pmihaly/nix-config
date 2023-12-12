@@ -26,5 +26,6 @@
   };
 
   age.secrets."duckdns/token" = lib.mkDefault { file = ./duckdns/token.age; };
-  age.secrets."mailserver/mihaly-password" = lib.mkDefault { file = ./mailserver/mihaly-password.age; };
+  age.secrets."mailserver/mihaly-password" =
+    lib.mkDefault { file = ./mailserver/mihaly-password.age; };
 }
