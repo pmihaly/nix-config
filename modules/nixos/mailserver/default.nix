@@ -21,8 +21,9 @@ in {
       # nix-shell -p mkpasswd --run 'mkpasswd -sm bcrypt'
       loginAccounts = {
         "mihaly@mihaly.codes" = {
-          hashedPasswordFile =
-            config.age.secrets."mailserver/mihaly-password".path;
+          # hashedPasswordFile =
+          #   config.age.secrets."mailserver/mihaly-password".path;
+          hashedPassword = "$2b$05$RIwMi30NG5UxDhtANdvjDu2T2ov2hEVlv8/BNjaAFpWjAsb1hQn.K";
         };
       };
 
