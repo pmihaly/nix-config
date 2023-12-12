@@ -21,10 +21,6 @@
     }];
   };
 
-  users.users.root.openssh.authorizedKeys.keys = [
-    "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDGabFdyVQOK8ecT2f8wGN+E/2axFQ+0XlJW2V5gph5vbouTxqol7VLmu5+Sz+ZQzZgeEKrtVK0gAYaNi8NSpTN4b6jS1ElfTo7U3fvoI9NMeqIZjvzlIpekL3sMO4CVpKkFowDv/TH3fBTxqwZQ7PZYBxtuvDdhVUwoK/uuFeOe175PRQVZeXYdn+jchkOfldglp73WbyPIwA05jYNlCi7TaFCjWX4FlvmyC4rEm9Fy4LKo6A3WFR3V9LiFgbN8AvAhyPkfeE/hRQSN7Og4geUOR2DT3tZLWm0Sry8leSWGBGAiasHzD23CHbDnc+x1b3FR3xj0Wejct13x5OqVPpqVm+LudnOZDzty9lvFOR1bDcbi7WzXXg7Es31DtAKguf1SLhEgqP73I6IfKdYJZEXxe1IFshSivjK2FVc0Po4pHZB/SNpQWRC1K5cJR2kBqz7+pY4dkwHseFE4tS/BtvLCZkx6DrKtYv5qbk4CtzcG/WSH1ZoNpL2gqe16xU1w/fti0e/IrnY4DLBPJsP0z5bx9vtEwDAGC/N4S9YSjSh8aTzPsBoZZsB8GR528vrh+p1zuhaPIT+aa3jDJ1nx7j1h06BYLHONsw4PyS6tm6tlszzTIiPggHb7Cm6KegkvvkowAK6t8RRsu5mFj4xC/CM/b2wIyAT6l4pP+le9fV+2w=="
-  ];
-
   users.users.${vars.username} = {
     isNormalUser = true;
     description = vars.username;
