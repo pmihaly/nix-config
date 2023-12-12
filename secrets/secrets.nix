@@ -13,4 +13,5 @@ in {
   "authelia/sessionSecret.age".publicKeys = allKeys;
   "authelia/users.age".publicKeys = allKeys;
   "duckdns/token.age".publicKeys = allKeys;
+  "mailserver/mihaly-password.age".publicKeys = allKeys;
 }

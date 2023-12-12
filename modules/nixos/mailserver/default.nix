@@ -20,9 +20,9 @@ in {
       # A list of all login accounts. To create the password hashes, use
       # nix-shell -p mkpasswd --run 'mkpasswd -sm bcrypt'
       loginAccounts = {
-        # "mihaly@mihaly.codes" = {
-        #   hashedPasswordFile = "/a/file/containing/a/hashed/password";
-        # };
+        "mihaly@mihaly.codes" = {
+          hashedPasswordFile = config.age.secrets."mailserver/mihaly-password".path;
+        };
       };
 
       # Use Let's Encrypt certificates. Note that this needs to set up a stripped
