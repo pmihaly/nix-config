@@ -13,7 +13,11 @@ in {
       name = "Paperless-ngx";
       logo = ./paperless.svg;
     };
-    extraConfig = let directories = [ "${vars.serviceConfig}/paperless" "${vars.serviceConfig}/paperless/media" ];
+    extraConfig = let
+      directories = [
+        "${vars.serviceConfig}/paperless"
+        "${vars.serviceConfig}/paperless/media"
+      ];
     in {
 
       systemd.tmpfiles.rules =

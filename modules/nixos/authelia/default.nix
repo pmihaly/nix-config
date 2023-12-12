@@ -36,8 +36,7 @@ in {
           telemetry = {
             metrics = {
               enabled = config.modules.monitoring.enable;
-              address =
-                "tcp://127.0.0.1:9002";
+              address = "tcp://127.0.0.1:9002";
             };
           };
 
