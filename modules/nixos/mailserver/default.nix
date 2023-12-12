@@ -1,4 +1,4 @@
-{ lib, config, ... }:
+{ lib, config, vars, ... }:
 
 with lib;
 let cfg = config.modules.mailserver;
@@ -6,7 +6,12 @@ let cfg = config.modules.mailserver;
 in {
   options.modules.mailserver = { enable = mkEnableOption "mailserver"; };
   config = mkIf cfg.enable {
-    security.acme.acceptTerms = true;
+
+    security.acme = {
+      acceptTerms = true;
+      defaults.email = "${vars.acmeEmail}";
+    };
+
     mailserver = {
       enable = true;
       fqdn = "mail.mihaly.codes";
