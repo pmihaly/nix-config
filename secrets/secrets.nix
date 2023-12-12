@@ -14,4 +14,5 @@ in {
   "authelia/users.age".publicKeys = allKeys;
   "duckdns/token.age".publicKeys = allKeys;
   "mailserver/mihaly-password.age".publicKeys = allKeys;
+  "mailserver/aws-ses-sasl.age".publicKeys = allKeys;
 }
