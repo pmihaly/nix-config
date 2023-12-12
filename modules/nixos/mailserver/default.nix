@@ -42,7 +42,7 @@ in {
         smtp_sasl_security_options = noanonymous
         smtp_sasl_tls_security_options = noanonymous
         smtp_sasl_mechanism_filter = AUTH LOGIN
-        relayhost = [RELAY_IP]:587
+        relayhost = [smtp.sendgrid.net]:587
       '';
     };
 
