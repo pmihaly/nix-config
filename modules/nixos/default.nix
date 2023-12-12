@@ -12,5 +12,6 @@
     ./duckdns
     ./paperless
     ./syncthing
+    ./mailserver
   ];
 }

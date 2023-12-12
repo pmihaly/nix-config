@@ -21,6 +21,8 @@
     }];
   };
 
+  modules = { mailserver.enable = true; };
+
   users.users.${vars.username} = {
     isNormalUser = true;
     description = vars.username;

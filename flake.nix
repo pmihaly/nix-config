@@ -11,6 +11,8 @@
     nur.url = "github:nix-community/NUR";
     img2theme.url = "github:pmihaly/img2theme";
     agenix.url = "github:ryantm/agenix";
+    simple-nixos-mailserver.url =
+      "gitlab:simple-nixos-mailserver/nixos-mailserver/nixos-23.05";
     firefox-darwin-dmg = {
       url =
         "https://download.mozilla.org/?product=firefox-latest&os=osx&lang=en-US";
@@ -87,6 +89,7 @@
         home-manager.nixosModules.home-manager
         inputs.agenix.nixosModules.default
         { home-manager.extraSpecialArgs = { inherit inputs; }; }
+        inputs.simple-nixos-mailserver.nixosModule
         ./secrets
         ./machines/post-office
       ];
