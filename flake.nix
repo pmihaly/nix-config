@@ -68,6 +68,7 @@
       modules = [
         home-manager.nixosModules.home-manager
         inputs.agenix.nixosModules.default
+        inputs.simple-nixos-mailserver.nixosModule
         { home-manager.extraSpecialArgs = { inherit inputs; }; }
         ./secrets
         ./machines/skylake
