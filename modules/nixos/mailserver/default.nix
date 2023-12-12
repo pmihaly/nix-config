@@ -6,6 +6,7 @@ let cfg = config.modules.mailserver;
 in {
   options.modules.mailserver = { enable = mkEnableOption "mailserver"; };
   config = mkIf cfg.enable {
+    security.acme.acceptTerms = true;
     mailserver = {
       enable = true;
       fqdn = "mail.mihaly.codes";
