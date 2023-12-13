@@ -84,6 +84,10 @@ in {
         bindkey "^X" edit-command-line
 
         [ -f ~/.zshrc_work ] && . ~/.zshrc_work
+
+        function unlockpdf() {
+          ${pkgs.pdftk}/bin/pdftk - input_pw $1 output -
+        }
       '';
       enableCompletion = true;
       completionInit = ''
@@ -159,7 +163,6 @@ in {
         wttr = "${pkgs.httpie}/bin/http wttr.in/budapest";
         n = "nvim";
         sharedir = "${pkgs.httplz}/bin/httplz";
-        unlockpdf = "${pkgs.pdftk}/bin/pdftk - input_pw $1 output -";
       };
     };
 
