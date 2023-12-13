@@ -68,7 +68,7 @@
 
   fonts = {
     fontDir.enable = true;
-    fonts = [ pkgs.nerdfonts-fira-code pkgs.iosevka-custom ];
+    fonts = [ pkgs.nerdfonts-fira-code pkgs.iosevka-custom pkgs.comic-code ];
   };
 
   services.yabai = {
