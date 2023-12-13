@@ -11,14 +11,22 @@ in {
       enableExtensionUpdateCheck = false;
       enableUpdateCheck = false;
       extensions = with pkgs.vscode-extensions; [
-        arcticicestudio.nord-visual-studio-code
+        catppuccin.catppuccin-vsc
+        catppuccin.catppuccin-vsc-icons
         eamodio.gitlens
         asvetliakov.vscode-neovim
         esbenp.prettier-vscode
         dbaeumer.vscode-eslint
       ];
+      keybindings = [{
+        key = "ctrl+t";
+        command = "workbench.action.terminal.toggleTerminal";
+      }];
       userSettings = {
-        "workbench.colorTheme" = "Nord";
+        "workbench.colorTheme" = "Catppuccin Frappé";
+        "workbench.iconTheme" = "catppuccin-frappe";
+        "editor.fontFamily" = "Comic Code Ligatures";
+        "editor.fontLigatures" = true;
         "editor.cursorSmoothCaretAnimation" = "on";
         "editor.smoothScrolling" = true;
         "editor.minimap.enabled" = false;
@@ -36,6 +44,13 @@ in {
         "[javascript]" = {
           "editor.defaultFormatter" = "esbenp.prettier-vscode";
         };
+        "extensions.experimental.affinity" = {
+          "asvetliakov.vscode-neovim" = 1;
+        };
+        "workbench.activityBar.location" = "hidden";
+        "zenMode.showTabs" = "none";
+        "terminal.integrated.defaultProfile.osx" = "tmux";
+        "terminal.integrated.defaultProfile.linux" = "tmux";
       };
     };
   };

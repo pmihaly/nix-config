@@ -8,7 +8,7 @@ in {
   config = mkIf cfg.enable {
     programs.kitty = {
       enable = true;
-      theme = "Nord";
+      theme = "Catppuccin-Frappe";
       settings = {
         font_size = 11;
         font_family = "Comic Code Ligatures Semibold";

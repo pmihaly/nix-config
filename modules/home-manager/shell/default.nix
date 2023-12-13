@@ -33,7 +33,18 @@ in {
 
     programs.bat = {
       enable = true;
-      config = { theme = "Nord"; };
+      config = { theme = "catpuccin-frappe"; };
+      themes = {
+        catpuccin-frappe = {
+          src = pkgs.fetchFromGitHub {
+            owner = "catppuccin";
+            repo = "bat";
+            rev = "ba4d16880d63e656acced2b7d4e034e4a93f74b1";
+            hash = "sha256-6WVKQErGdaqb++oaXnY3i6/GuH2FhTgK0v4TN4Y0Wbw=";
+          };
+          file = "Catppuccin-frappe.tmTheme";
+        };
+      };
     };
 
     programs.fzf = {
@@ -55,10 +66,11 @@ in {
       enableZshIntegration = true;
       enableNushellIntegration = true;
       settings = {
+        palette = "catppuccin_frappe";
         add_newline = false;
         format = lib.concatStrings [ " " "$directory" "$character" ];
         scan_timeout = 10;
-        directory = { truncation_length = 2; };
+        directory = { truncation_length = 2; style = "bold fg:flamingo"; };
         character = {
           success_symbol = "🔮(hidden)";
           error_symbol = "🔮(hidden)";
@@ -67,7 +79,14 @@ in {
           vimcmd_replace_symbol = "🔮(hidden)";
           vimcmd_visual_symbol = "🔮(hidden)";
         };
-      };
+      } // builtins.fromTOML (builtins.readFile
+        (pkgs.fetchFromGitHub
+          {
+            owner = "catppuccin";
+            repo = "starship";
+            rev = "5629d2356f62a9f2f8efad3ff37476c19969bd4f";
+            hash = "sha256-nsRuxQFKbQkyEI4TXgvAjcroVdG+heKX5Pauq/4Ota0=";
+          } + /palettes/frappe.toml));
     };
 
     programs.zsh = {
@@ -185,7 +204,6 @@ in {
       enable = true;
       plugins = with pkgs; [
         tmuxPlugins.sensible
-        tmuxPlugins.nord
         tmuxPlugins.fuzzback
         tmuxPlugins.fzf-tmux-url
       ];

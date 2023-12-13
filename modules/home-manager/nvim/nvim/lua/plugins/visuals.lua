@@ -1,12 +1,14 @@
 return {
   {
-    'shaunsingh/nord.nvim',
-    lazy = false,
+    'catppuccin/nvim',
+    name = 'catppuccin',
     priority = 1000,
-    config = function()
-      vim.g.nord_disable_background = true;
-      vim.g.nord_italic = false;
-      vim.cmd([[colorscheme nord]])
+    opts = {
+      transparent_background = true,
+    },
+    config = function(p, opts)
+      require("catppuccin").setup(opts)
+      vim.cmd([[colorscheme catppuccin-frappe]])
     end,
   },
   {
