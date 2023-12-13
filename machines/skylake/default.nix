@@ -7,7 +7,7 @@
 
   home-manager.users.${vars.username} = {
     home.stateVersion = "22.05";
-    imports = [ ../../modules ];
+    imports = [ ../../modules/home-manager ];
 
     modules = {
       nvim.enable = true;

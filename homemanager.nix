@@ -1,6 +1,6 @@
 { pkgs, inputs, ... }: {
   home.stateVersion = "22.05";
-  imports = [ ./modules ];
+  imports = [ ./modules/home-manager ];
 
   nixpkgs.overlays = import ./overlays;
 

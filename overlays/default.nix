@@ -2,7 +2,7 @@
   (final: prev: {
     nerdfonts-fira-code = prev.nerdfonts.override { fonts = [ "FiraCode" ]; };
 
-    comic-code  = (prev.stdenvNoCC.mkDerivation rec {
+    comic-code = (prev.stdenvNoCC.mkDerivation rec {
       pname = "Comic-Code-Font";
       version = "bb13a9d007b7a102ac86b18889bbf830680aeab1";
 
