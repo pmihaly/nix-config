@@ -37,6 +37,7 @@
     keepass-diff # diffing .kdbx files
     iosevka-custom
     nerdfonts-fira-code
+    comic-code
     zathura # pdf reader
     transmission
     anki-bin
