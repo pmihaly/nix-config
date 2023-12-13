@@ -22,7 +22,7 @@
     nginx.enable = true;
     jellyfin.enable = true;
     homer.enable = true;
-    authelia.enable = false;
+    authelia.enable = true;
     deluge.enable = true;
     arr.enable = true;
     endlessh.enable = true;
