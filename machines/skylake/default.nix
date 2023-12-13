@@ -20,16 +20,16 @@
 
   modules = {
     nginx.enable = true;
-    jellyfin.enable = true;
+    jellyfin.enable = false;
     homer.enable = true;
-    authelia.enable = false;
-    deluge.enable = true;
-    arr.enable = true;
+    authelia.enable = true;
+    deluge.enable = false;
+    arr.enable = false;
     endlessh.enable = true;
-    monitoring.enable = true;
-    hledger.enable = true;
+    monitoring.enable = false;
+    hledger.enable = false;
     duckdns.enable = true;
-    paperless.enable = true;
+    paperless.enable = false;
     syncthing.enable = true;
   };
 
