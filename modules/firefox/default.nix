@@ -172,7 +172,8 @@ in {
             #star-button-box,
             #unified-extensions-button,
             .unified-extensions-item,
-            #tabs-newtab-button
+            #tabs-newtab-button,
+            #TabsToolbar
             {
               display: none !important;
             }
