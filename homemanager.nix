@@ -35,8 +35,6 @@
     discord
     nix-tree # visualisation of nix derivations
     keepass-diff # diffing .kdbx files
-    iosevka-custom
-    nerdfonts-fira-code
     comic-code
     zathura # pdf reader
     transmission
