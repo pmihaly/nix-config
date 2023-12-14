@@ -26,11 +26,11 @@
     deluge.enable = true;
     arr.enable = true;
     endlessh.enable = true;
-    monitoring.enable = true;
-    hledger.enable = true;
+    monitoring.enable = false;
+    hledger.enable = false;
     duckdns.enable = true;
-    paperless.enable = true;
-    syncthing.enable = true;
+    paperless.enable = false;
+    syncthing.enable = false;
   };
 
   boot.loader.systemd-boot.enable = true;
