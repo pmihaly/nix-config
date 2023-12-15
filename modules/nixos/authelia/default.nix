@@ -39,19 +39,7 @@ in {
             format = "text";
           };
 
-          # generate passwords using:
-          # docker run authelia/authelia:latest authelia crypto hash generate argon2
-          # password: test
-          authentication_backend.file.path = builtins.toFile "auth" ''
-            users:
-              test:
-                displayname: "test"
-                password: $6$rounds=50000$h9gWDA1yD/YqUpOW$FYM0Imp3ONcKItczeYxHmllt/Gf.SGVQCqnC4CaL6shHoVtslVwQi7dNbxqpmRPCixiPXvjLfc9wS8Yhklxka1
-                email: misi.g126@gmail.com
-                groups:
-                  - admins
-                  - dev
-          '';
+          authentication_backend.file.path = config.age.secrets."authelia/users".path;
 
           access_control = {
             default_policy = "deny";
