@@ -50,26 +50,23 @@ in {
             footer = false;
           } // cfg.homerConfig;
 
-          style = builtins.fetchurl {
-            url =
-              "https://raw.githubusercontent.com/mrpbennett/catppuccin-homer/main/flavours/catppuccin-mocha.css";
-            sha256 = "1jkj55fqv1wyx71idfbwyfjy66r4hmfxlk1lpxqxhnjwizi037xq";
-          };
-          background = builtins.fetchurl {
-            url =
-              "https://raw.githubusercontent.com/mrpbennett/catppuccin-homer/main/assets/images/backgrounds/romb.png";
-            sha256 = "14yaxr50db4h93cc1i9qhr5g2r33dds64p2yl7pz4w01xxp2qmh7";
-          };
-          logo = builtins.fetchurl {
-            url =
-              "https://raw.githubusercontent.com/mrpbennett/catppuccin-homer/main/assets/logos/dark_circle.png";
-            sha256 = "1amnsl2vs5hc0jklmpn69lyvrnkckz8v9c9r70hdjjkns82p1kh3";
-          };
-          favicons = pkgs.fetchzip {
-            url =
-              "https://raw.githubusercontent.com/mrpbennett/catppuccin-homer/main/assets/favicons/dark_favicon.zip";
-            hash = "sha256-xp9A4sesO1O0u5vwnFSQrhN+PTqo/v0iiHvarwdoPi8";
-            stripRoot = false;
+          catpuccin-homer = (pkgs.fetchFromGitHub {
+            owner = "mrpbennett";
+            repo = "catppuccin-homer";
+            rev = "377dd768acd4e87560db75edc312ddd7b62b3252";
+            hash = "sha256-WvmwnMQOglXtJJPXI/CWuEDTgUylZV9nuILodTPRAY4=";
+          });
+
+          style = catpuccin-homer + /flavours/catppuccin-mocha.css;
+          background = catpuccin-homer + /assets/images/backgrounds/romb.png;
+          logo = catpuccin-homer + /assets/logos/dark_circle.png;
+          favicons = pkgs.stdenv.mkDerivation {
+            name = "favicons";
+            src = catpuccin-homer;
+            phases = [ "unpackPhase" ];
+            nativeBuildInputs = [ pkgs.unzip ];
+            unpackPhase =
+              "unzip -o $src/assets/favicons/dark_favicon.zip -d $out";
           };
 
         in {
