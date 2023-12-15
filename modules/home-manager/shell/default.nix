@@ -9,8 +9,8 @@ in {
 
     home.packages = with pkgs; [
       git
-      # httpie
-      curlie # httpie but with --curl
+      httpie
+      # curlie # httpie but with --curl
       tldr
       yq-go
       jq
@@ -179,7 +179,6 @@ in {
           function _f() { fd --type file --exec ${pkgs.sd}/bin/sd "$1" "$2" }; _f'';
         du = "${pkgs.du-dust}/bin/dust";
         lsblk = "${pkgs.duf}/bin/duf";
-        http = "curlie";
         wttr = "${pkgs.httpie}/bin/http wttr.in/budapest";
         n = "nvim";
         sharedir = "${pkgs.httplz}/bin/httplz";
