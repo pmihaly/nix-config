@@ -33,12 +33,6 @@ in {
             host = "127.0.0.1";
             port = 8081;
           };
-          telemetry = {
-            metrics = {
-              enabled = config.modules.monitoring.enable;
-              address = "tcp://127.0.0.1:9002";
-            };
-          };
 
           log = {
             level = "debug";
