@@ -70,7 +70,10 @@ in {
         add_newline = false;
         format = lib.concatStrings [ " " "$directory" "$character" ];
         scan_timeout = 10;
-        directory = { truncation_length = 2; style = "bold fg:flamingo"; };
+        directory = {
+          truncation_length = 2;
+          style = "bold fg:flamingo";
+        };
         character = {
           success_symbol = "🔮(hidden)";
           error_symbol = "🔮(hidden)";
@@ -79,14 +82,12 @@ in {
           vimcmd_replace_symbol = "🔮(hidden)";
           vimcmd_visual_symbol = "🔮(hidden)";
         };
-      } // builtins.fromTOML (builtins.readFile
-        (pkgs.fetchFromGitHub
-          {
-            owner = "catppuccin";
-            repo = "starship";
-            rev = "5629d2356f62a9f2f8efad3ff37476c19969bd4f";
-            hash = "sha256-nsRuxQFKbQkyEI4TXgvAjcroVdG+heKX5Pauq/4Ota0=";
-          } + /palettes/frappe.toml));
+      } // builtins.fromTOML (builtins.readFile (pkgs.fetchFromGitHub {
+        owner = "catppuccin";
+        repo = "starship";
+        rev = "5629d2356f62a9f2f8efad3ff37476c19969bd4f";
+        hash = "sha256-nsRuxQFKbQkyEI4TXgvAjcroVdG+heKX5Pauq/4Ota0=";
+      } + /palettes/frappe.toml));
     };
 
     programs.zsh = {
