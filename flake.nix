@@ -11,6 +11,7 @@
     nur.url = "github:nix-community/NUR";
     img2theme.url = "github:pmihaly/img2theme";
     agenix.url = "github:ryantm/agenix";
+    deploy-rs.url = "github:serokell/deploy-rs";
     firefox-darwin-dmg = {
       url =
         "https://download.mozilla.org/?product=firefox-latest&os=osx&lang=en-US";
@@ -70,5 +71,21 @@
         ./machines/skylake
       ];
     };
+
+    deploy.nodes = {
+      skylake = {
+        hostname = "skylake.mihaly.codes";
+        profiles.system = {
+          path = inputs.deploy-rs.lib.x86_64-linux.activate.nixos
+            self.nixosConfigurations.skylake;
+          sshUser = "misi";
+          user = "root";
+          sshOpts = [ "-p" "69" "-t" ];
+          magicRollback = false;
+          remoteBuild = true;
+        };
+      };
+    };
+
   };
 }

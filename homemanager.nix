@@ -47,5 +47,6 @@
     inputs.img2theme.packages."${pkgs.system}".default
     wally-cli # configuring moonlander keyboard
     inputs.agenix.packages."${pkgs.system}".default
+    inputs.deploy-rs.packages."${pkgs.system}".default
   ]);
 }
