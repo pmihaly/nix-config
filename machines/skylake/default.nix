@@ -26,8 +26,8 @@
     deluge.enable = true;
     arr.enable = true;
     endlessh.enable = true;
-    monitoring.enable = false;
-    hledger.enable = false;
+    monitoring.enable = true;
+    hledger.enable = true;
     duckdns.enable = true;
     paperless.enable = true;
     syncthing.enable = true;
