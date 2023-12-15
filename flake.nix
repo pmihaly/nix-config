@@ -44,7 +44,6 @@
 
       modules = [
         home-manager.nixosModules.home-manager
-        inputs.hyprland.nixosModules.default
         { nixpkgs.overlays = [ inputs.nur.overlay ]; }
         { home-manager.extraSpecialArgs = { inherit inputs; }; }
         ./pc-hardware.nix

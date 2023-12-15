@@ -1,4 +1,4 @@
 { ... }: {
   imports =
-    [ ./vscode ./firefox ./nvim ./git ./shell ./mpv ./lf ./kitty ./newsboat ];
+    [ ./vscode ./firefox ./nvim ./git ./shell ./mpv ./lf ./kitty ./newsboat ./neomutt ];
 }

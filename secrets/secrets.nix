@@ -11,4 +11,5 @@ in {
   "authelia/sessionSecret.age".publicKeys = allKeys;
   "authelia/users.age".publicKeys = allKeys;
   "duckdns/token.age".publicKeys = allKeys;
+  "email/password/mihaly_mihaly.codes.age".publicKeys = allKeys;
 }

@@ -1,6 +1,10 @@
 { pkgs, inputs, ... }: {
   home.stateVersion = "22.05";
-  imports = [ ./modules/home-manager ];
+  imports = [
+    ./modules/home-manager
+    inputs.agenix.homeManagerModules.default
+    ./secrets/home-manager
+  ];
 
   nixpkgs.overlays = import ./overlays;
 
@@ -14,6 +18,7 @@
     lf.enable = true;
     kitty.enable = true;
     newsboat.enable = true;
+    neomutt.enable = true;
   };
 
   home.packages = let
