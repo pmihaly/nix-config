@@ -67,7 +67,7 @@ in {
                 domain = cfg.bypassDomains ++ [ "authelia.${vars.domainName}" ];
               }
               {
-                policy = "two_factor";
+                policy = "one_factor";
                 domain = [ "*.${vars.domainName}" ];
               }
             ];

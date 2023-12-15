@@ -29,7 +29,7 @@
     monitoring.enable = false;
     hledger.enable = false;
     duckdns.enable = true;
-    paperless.enable = false;
+    paperless.enable = true;
     syncthing.enable = false;
   };
 
