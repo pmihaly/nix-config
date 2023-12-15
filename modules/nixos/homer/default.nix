@@ -45,7 +45,7 @@ in {
             title = "❄️🧙";
             subtitle = "skylake";
             logo = "assets/dark_circle.png";
-            stylesheet = [ "assets/catppuccin-mocha.css" ];
+            stylesheet = [ "assets/catppuccin-frappe.css" ];
             services = mappedServices;
             footer = false;
           } // cfg.homerConfig;
@@ -57,7 +57,7 @@ in {
             hash = "sha256-WvmwnMQOglXtJJPXI/CWuEDTgUylZV9nuILodTPRAY4=";
           });
 
-          style = catpuccin-homer + /flavours/catppuccin-mocha.css;
+          style = catpuccin-homer + /flavours/catppuccin-frappe.css;
           background = catpuccin-homer + /assets/images/backgrounds/romb.png;
           logo = catpuccin-homer + /assets/logos/dark_circle.png;
           favicons = pkgs.stdenv.mkDerivation {
@@ -73,7 +73,7 @@ in {
           image = "b4bz/homer:v23.10.1";
           ports = [ "8080:8080" ];
           volumes = [
-            "${style}:/www/assets/catppuccin-mocha.css"
+            "${style}:/www/assets/catppuccin-frappe.css"
             "${background}:/www/assets/images/romb.png"
             "${logo}:/www/assets/dark_circle.png"
             "${favicons}:/www/assets/icons"
