@@ -48,5 +48,6 @@
     wally-cli # configuring moonlander keyboard
     inputs.agenix.packages."${pkgs.system}".default
     inputs.deploy-rs.packages."${pkgs.system}".default
+    yt-dlp
   ]);
 }
