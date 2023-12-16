@@ -39,7 +39,8 @@ in {
             format = "text";
           };
 
-          authentication_backend.file.path = config.age.secrets."authelia/users".path;
+          authentication_backend.file.path =
+            config.age.secrets."authelia/users".path;
 
           access_control = {
             default_policy = "deny";

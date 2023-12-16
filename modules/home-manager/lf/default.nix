@@ -35,7 +35,7 @@ in {
         #!/bin/sh
 
         set -c -f
-        ifs="$(printf '%b_' '\n')"; ifs="$${ifs%_}"
+        ifs="$(printf '%b_' '\n')"; ifs="$''${ifs%_}"
 
         case "$(file --dereference --brief --mime-type -- "$1")" in
           image/* | audio/* | application/octet-stream | video/*) ${pkgs.mediainfo}/bin/mediainfo "$6" ;;

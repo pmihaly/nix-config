@@ -10,5 +10,6 @@
     ./kitty
     ./newsboat
     ./neomutt
+    ./zathura
   ];
 }

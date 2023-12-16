@@ -19,6 +19,7 @@
     kitty.enable = true;
     newsboat.enable = true;
     neomutt.enable = true;
+    zathura.enable = true;
   };
 
   home.packages = let
@@ -41,7 +42,6 @@
     nix-tree # visualisation of nix derivations
     keepass-diff # diffing .kdbx files
     comic-code
-    zathura # pdf reader
     transmission
     anki-bin
     inputs.img2theme.packages."${pkgs.system}".default
