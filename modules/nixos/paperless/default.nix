@@ -15,19 +15,20 @@ in {
     };
     extraConfig = let
       directories = [
-        "${vars.serviceConfig}/paperless"
-        "${vars.serviceConfig}/paperless/media"
+        "${vars.storage}/Services/paperless"
+        "${vars.storage}/Services/paperless/media"
       ];
     in {
 
       systemd.tmpfiles.rules =
-        (map (directory: "d ${directory} 0775 paperless backup") directories);
+        (map (directory: "d ${directory} 0750 misi backup -") directories);
 
       services.paperless = {
         enable = true;
         dataDir = "${vars.storage}/Services/paperless";
         mediaDir = "${vars.storage}/Services/paperless/media";
         consumptionDir = "${vars.storage}/Services/paperless/consume";
+        user = "misi";
         consumptionDirIsPublic = true;
         passwordFile = builtins.toFile "paperles-passwordfile"
           "some-admin-password-i-dont-care-about-because-i-use-authelia";
@@ -38,6 +39,7 @@ in {
           PAPERLESS_URL = "https://paperless.${vars.domainName}";
         };
       };
+
 
       networking.firewall.allowedTCPPorts = [ 28981 ];
     };

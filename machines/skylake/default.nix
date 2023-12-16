@@ -79,7 +79,7 @@
   };
 
   users.groups.multimedia.members = [ "${vars.username}" ];
-  users.groups.backup.members = [ "paperless" "syncthing" "${vars.username}" ];
+  users.groups.backup.members = [ "${vars.username}" ];
 
   programs.zsh.enable = true;
 

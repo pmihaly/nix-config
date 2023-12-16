@@ -23,7 +23,7 @@ in {
     in {
 
       systemd.tmpfiles.rules =
-        (map (directory: "d ${directory} 0775 syncthing backup") directories);
+        (map (directory: "d ${directory} 0775 misi backup") directories);
 
       services.syncthing = {
         enable = true;
@@ -33,6 +33,7 @@ in {
         overrideFolders = true;
         openDefaultPorts = true;
         guiAddress = "0.0.0.0:8384";
+        user = "misi";
         group = "backup";
         settings = {
           options.urAccepted = -1;
@@ -52,7 +53,7 @@ in {
               devices = [ "${macbook}" "${phone}" ];
             };
             "papers-backup" = {
-              path = "${vars.storage}/Services/paperless/media";
+              path = "${vars.storage}/Services/paperless";
               devices = [ "${macbook}" "${phone}" ];
               ignorePerms = false;
               versioning.type = "staggered";
