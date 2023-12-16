@@ -31,6 +31,22 @@ in {
         touchWithParent = ''$mkdir -p "$(dirname "$*")" && touch "$*" '';
         open = "$$EDITOR $f ";
       };
+      previewer.source = pkgs.writeShellScript "pv.sh" ''
+        #!/bin/sh
+
+        set -c -f
+        ifs="$(printf '%b_' '\n')"; ifs="$${ifs%_}"
+
+        case "$(file --dereference --brief --mime-type -- "$1")" in
+          image/* | audio/* | application/octet-stream | video/*) ${pkgs.mediainfo}/bin/mediainfo "$6" ;;
+          text/html) ${pkgs.lynx}/bin/lynx -width="$4" -display_charset=utf-8 -dump "$1" ;;
+          */pdf) ${pkgs.poppler_utils}/bin/pdftotext "$1" -;;
+          application/*zip) ${pkgs.atool}/bin/atool --list -- "$1" ;;
+          *opendocument*) ${pkgs.odt2txt}/bin/odt2txt "$1" ;;
+          *) bat -p --terminal-width "$(($4-2))" -f "$1" ;;
+        esac
+        exit 1
+      '';
       keybindings = {
         D = "delete";
         U = "!${pkgs.du-dust}/bin/dust";
