@@ -1,4 +1,4 @@
-{ pkgs, lib, config, ... }:
+{ pkgs, inputs, lib, config, ... }:
 
 with lib;
 let cfg = config.modules.homer;
@@ -43,7 +43,7 @@ in {
           homerConfig = {
             documentTitle = "❄️🧙";
             title = "❄️🧙";
-            subtitle = "skylake";
+            subtitle = "skylake build ${inputs.self.lastModifiedDate}";
             logo = "assets/dark_circle.png";
             stylesheet = [ "assets/catppuccin-frappe.css" ];
             services = mappedServices;
