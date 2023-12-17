@@ -1,4 +1,4 @@
-{ lib, config, vars, ... }:
+{ pkgs, lib, inputs, config, vars, ... }:
 
 with lib;
 let cfg = config.modules.hledger;
@@ -13,22 +13,33 @@ in {
       name = "hledger";
       logo = ./hledger.png;
     };
-    extraConfig = let
-      directories = [ "${vars.storage}/Services/hledger" ];
-      files = [ "${vars.storage}/Services/hledger/hledger.journal" ];
+    extraConfig = let stateDir = "${vars.storage}/Services/hledger";
     in {
 
-      systemd.tmpfiles.rules =
-        (map (file: "f ${file} 0775 hledger hledger") files)
-        ++ (map (directory: "d ${directory} 0775 hledger hledger") directories);
+      systemd.tmpfiles.rules = [ "d ${stateDir} 0700 hledger hledger - -" ];
+
+      systemd.services.copy-finances-output = {
+        wantedBy = [ "multi-user.target" ];
+        serviceConfig = {
+          Type = "oneshot";
+          ExecStart = ''
+            ${pkgs.coreutils}/bin/cp -R ${
+              inputs.finances.packages."${pkgs.system}".default.outPath
+            }/. ${stateDir}
+            ${pkgs.coreutils}/bin/chmod -R 0700 ${stateDir}
+            ${pkgs.coreutils}/bin/chown -R hledger:hledger ${stateDir}
+          '';
+        };
+      };
 
       services.hledger-web = {
         enable = true;
         port = 5001;
-        stateDir = "${vars.storage}/Services/hledger";
-        journalFiles = [ "hledger.journal" ];
+        stateDir = stateDir;
+        journalFiles = [ "all.journal" ];
         baseUrl = "https://hledger.${vars.domainName}";
       };
+
       networking.firewall.allowedTCPPorts = [ 5001 ];
     };
   });

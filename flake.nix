@@ -22,6 +22,7 @@
         "https://raw.githubusercontent.com/gokcehan/lf/master/etc/icons.example";
       flake = false;
     };
+    finances.url = "git+ssh://git@github.com/pmihaly/finances";
   };
 
   outputs = { self, nixpkgs, home-manager, ... }@inputs: {
