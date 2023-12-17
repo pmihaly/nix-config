@@ -46,19 +46,41 @@ in {
 
       networking.firewall.allowedTCPPorts = [ 5001 ];
 
-      modules.homer.services.Finances = {
-        "sankey current ${currentYear}-${currentMonth}" = {
+      modules.homer.services = {
+      "Finances ${currentYear}-${currentMonth}" = {
+        "sankey" = {
           logo = ./hledger.png;
           url = "https://hledger.${vars.domainName}/export/${currentYear}-${currentMonth}-sankey-monthly.html";
         };
-        "sankey prev ${currentYear}-${prevMonth}" = {
+        "sunburst" = {
+          logo = ./hledger.png;
+          url = "https://hledger.${vars.domainName}/export/${currentYear}-${currentMonth}-in-ex-sunburst-monthly.html";
+        };
+      };
+      "Finances ${currentYear}-${prevMonth}" = {
+        "sankey" = {
           logo = ./hledger.png;
           url = "https://hledger.${vars.domainName}/export/${currentYear}-${prevMonth}-sankey-monthly.html";
         };
-        "sankey year ${currentYear}" = {
+        "sunburst" = {
+          logo = ./hledger.png;
+          url = "https://hledger.${vars.domainName}/export/${currentYear}-${prevMonth}-in-ex-sunburst-monthly.html";
+        };
+      };
+      "Finances ${currentYear}" = {
+        "pnl" = {
+          logo = ./hledger.png;
+          url = "https://hledger.${vars.domainName}/export/${currentYear}-income-expenses.txt";
+        };
+        "sankey" = {
           logo = ./hledger.png;
           url = "https://hledger.${vars.domainName}/export/${currentYear}-sankey.html";
         };
+        "sunburst" = {
+          logo = ./hledger.png;
+          url = "https://hledger.${vars.domainName}/export/${currentYear}-in-ex-sunburst.html";
+        };
+      };
       };
     };
 

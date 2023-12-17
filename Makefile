@@ -7,5 +7,8 @@ switch-pc:
 update:
 	nix flake update
 
+update-finances:
+	nix flake lock --update-input finances
+
 fmt:
 	find **/*.nix | xargs nix fmt
