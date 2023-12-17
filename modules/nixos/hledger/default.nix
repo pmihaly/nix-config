@@ -46,41 +46,23 @@ in {
 
       networking.firewall.allowedTCPPorts = [ 5001 ];
 
-      modules.homer.services = {
-      "Finances ${currentYear}-${currentMonth}" = {
-        "sankey" = {
+      modules.homer.services.Finances = {
+        "plotlies current ${currentYear}-${currentMonth}" = {
           logo = ./hledger.png;
-          url = "https://hledger.${vars.domainName}/export/${currentYear}-${currentMonth}-sankey-monthly.html";
+          url = "https://hledger.${vars.domainName}/export/${currentYear}-${currentMonth}-plotlies-monthly.html";
         };
-        "sunburst" = {
+        "plotlies prev ${currentYear}-${prevMonth}" = {
           logo = ./hledger.png;
-          url = "https://hledger.${vars.domainName}/export/${currentYear}-${currentMonth}-in-ex-sunburst-monthly.html";
+          url = "https://hledger.${vars.domainName}/export/${currentYear}-${prevMonth}-plotlies-monthly.html";
         };
-      };
-      "Finances ${currentYear}-${prevMonth}" = {
-        "sankey" = {
+        "plotlies year ${currentYear}" = {
           logo = ./hledger.png;
-          url = "https://hledger.${vars.domainName}/export/${currentYear}-${prevMonth}-sankey-monthly.html";
+          url = "https://hledger.${vars.domainName}/export/${currentYear}-plotlies.html";
         };
-        "sunburst" = {
-          logo = ./hledger.png;
-          url = "https://hledger.${vars.domainName}/export/${currentYear}-${prevMonth}-in-ex-sunburst-monthly.html";
-        };
-      };
-      "Finances ${currentYear}" = {
         "pnl" = {
           logo = ./hledger.png;
           url = "https://hledger.${vars.domainName}/export/${currentYear}-income-expenses.txt";
         };
-        "sankey" = {
-          logo = ./hledger.png;
-          url = "https://hledger.${vars.domainName}/export/${currentYear}-sankey.html";
-        };
-        "sunburst" = {
-          logo = ./hledger.png;
-          url = "https://hledger.${vars.domainName}/export/${currentYear}-in-ex-sunburst.html";
-        };
-      };
       };
     };
 
