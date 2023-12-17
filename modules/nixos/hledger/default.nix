@@ -4,6 +4,10 @@ with lib;
 let
   cfg = config.modules.hledger;
   stateDir = "${vars.storage}/Services/hledger";
+  currentDate = builtins.match "(.{4})(.{2})(.{2}).*" inputs.self.lastModifiedDate;
+  currentYear = builtins.head currentDate;
+  currentMonth = trivial.pipe currentDate [(lists.drop 1) builtins.head];
+  prevMonth = trivial.pipe currentMonth [strings.toInt (x: x - 1) toString];
 
 in {
   options.modules.hledger = { enable = mkEnableOption "hledger"; };
@@ -41,6 +45,21 @@ in {
       };
 
       networking.firewall.allowedTCPPorts = [ 5001 ];
+
+      modules.homer.services.Finances = {
+        "sankey current ${currentYear}-${currentMonth}" = {
+          logo = ./hledger.png;
+          url = "https://hledger.${vars.domainName}/export/${currentYear}-${currentMonth}-sankey-monthly.html";
+        };
+        "sankey prev ${currentYear}-${prevMonth}" = {
+          logo = ./hledger.png;
+          url = "https://hledger.${vars.domainName}/export/${currentYear}-${prevMonth}-sankey-monthly.html";
+        };
+        "sankey year ${currentYear}" = {
+          logo = ./hledger.png;
+          url = "https://hledger.${vars.domainName}/export/${currentYear}-sankey.html";
+        };
+      };
     };
 
     extraNginxConfigRoot.locations."/export" = {
