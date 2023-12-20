@@ -21,7 +21,9 @@ jobs:
           fetch-depth: 0
 
       - name: Update lockfile 🔒🔄
-        run: "nix flake update"
+        run: |
+          nix-env -i nushell -f '<nixpkgs>'
+          make update
 
       - name: Commit and push changes ⬆️
         uses: actions-js/push@156f2b10c3aa000c44dbe75ea7018f32ae999772
