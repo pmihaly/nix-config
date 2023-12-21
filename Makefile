@@ -5,7 +5,7 @@ switch-pc:
 	nixos-rebuild switch --flake .#pc
 
 update:
-	nu update.nu
+	./update.nu
 
 update-finances:
 	nix flake lock --update-input finances

@@ -1,3 +1,6 @@
+#! /usr/bin/env nix-shell
+#! nix-shell -i nu -p nushell parallel
+
 def main [] {
   nix flake metadata --json
   | from json
