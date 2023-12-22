@@ -4,10 +4,11 @@ with lib;
 let
   cfg = config.modules.hledger;
   stateDir = "${vars.storage}/Services/hledger";
-  currentDate = builtins.match "(.{4})(.{2})(.{2}).*" inputs.self.lastModifiedDate;
+  currentDate =
+    builtins.match "(.{4})(.{2})(.{2}).*" inputs.self.lastModifiedDate;
   currentYear = builtins.head currentDate;
-  currentMonth = trivial.pipe currentDate [(lists.drop 1) builtins.head];
-  prevMonth = trivial.pipe currentMonth [strings.toInt (x: x - 1) toString];
+  currentMonth = trivial.pipe currentDate [ (lists.drop 1) builtins.head ];
+  prevMonth = trivial.pipe currentMonth [ strings.toInt (x: x - 1) toString ];
 
 in {
   options.modules.hledger = { enable = mkEnableOption "hledger"; };
@@ -49,19 +50,23 @@ in {
       modules.homer.services.Finances = {
         "plotlies current ${currentYear}-${currentMonth}" = {
           logo = ./hledger.png;
-          url = "https://hledger.${vars.domainName}/export/${currentYear}-${currentMonth}-plotlies-monthly.html";
+          url =
+            "https://hledger.${vars.domainName}/export/${currentYear}-${currentMonth}-plotlies-monthly.html";
         };
         "plotlies prev ${currentYear}-${prevMonth}" = {
           logo = ./hledger.png;
-          url = "https://hledger.${vars.domainName}/export/${currentYear}-${prevMonth}-plotlies-monthly.html";
+          url =
+            "https://hledger.${vars.domainName}/export/${currentYear}-${prevMonth}-plotlies-monthly.html";
         };
         "plotlies year ${currentYear}" = {
           logo = ./hledger.png;
-          url = "https://hledger.${vars.domainName}/export/${currentYear}-plotlies.html";
+          url =
+            "https://hledger.${vars.domainName}/export/${currentYear}-plotlies.html";
         };
         "pnl" = {
           logo = ./hledger.png;
-          url = "https://hledger.${vars.domainName}/export/${currentYear}-income-expenses.txt";
+          url =
+            "https://hledger.${vars.domainName}/export/${currentYear}-income-expenses.txt";
         };
       };
     };
