@@ -25,6 +25,7 @@
       "caffeine" # keep screen alive
       "utm" # virtual machines
       "balenaetcher"
+      "linearmouse"
     ];
   };
 
