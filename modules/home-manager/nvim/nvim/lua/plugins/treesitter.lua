@@ -79,6 +79,7 @@ return {
         'vim',
         'yaml',
         'org',
+        'c',
       },
       incremental_selection = {
         enable = true,
