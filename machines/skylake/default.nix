@@ -31,7 +31,6 @@
     duckdns.enable = true;
     paperless.enable = true;
     syncthing.enable = true;
-    tdarr.enable = true;
   };
 
   boot.loader.systemd-boot.enable = true;
