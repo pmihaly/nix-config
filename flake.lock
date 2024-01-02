@@ -88,11 +88,11 @@
         "nixpkgs": "nixpkgs_3"
       },
       "locked": {
-        "lastModified": 1703013946,
-        "narHash": "sha256-PdUBSlA7VnrUWkPaGoZtAZzW/ngk/levhyj99bQKn6I=",
+        "lastModified": 1704018413,
+        "narHash": "sha256-IW3crxhaicHBqOS9fXDFtzIFz1C3Qadjmf+S54TjdWM=",
         "ref": "refs/heads/main",
-        "rev": "f961a15ff685fec5935d23428ff183971404c528",
-        "revCount": 63,
+        "rev": "c9cdc49fa4baad99572074d2aa52bab2994a11b6",
+        "revCount": 69,
         "type": "git",
         "url": "ssh://git@github.com/pmihaly/finances"
       },
