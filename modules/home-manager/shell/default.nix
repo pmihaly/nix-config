@@ -181,7 +181,7 @@ in {
         lsblk = "${pkgs.duf}/bin/duf";
         wttr = "${pkgs.httpie}/bin/http wttr.in/budapest";
         n = "nvim";
-        sharedir = "${pkgs.httplz}/bin/httplz";
+        sharedir = "${pkgs.python3}/bin/python3 -m http.server 9000";
       };
     };
 
