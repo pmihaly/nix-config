@@ -34,12 +34,6 @@ in {
     };
   };
 
-  programs.hyprland = {
-    enable = true;
-    xwayland = { enable = true; };
-    nvidiaPatches = false;
-  };
-
   sound.enable = true;
   hardware.pulseaudio.enable = false;
   security.rtkit.enable = true;
@@ -94,30 +88,8 @@ in {
     ./homemanager.nix
     {
       home.packages = with pkgs; [
-        swaybg # setting wallpapers in wayland
-        wofi # wayland equivalent of rofi
         ytfzf
-        wl-clipboard # `wl-copy` and `wl-paste`
       ];
-
-      xdg.configFile = {
-        hypr = {
-          source = ./hypr;
-          recursive = true;
-        };
-      };
-
-      gtk = {
-        enable = true;
-        theme = {
-          package = pkgs.nordic;
-          name = "Nordic";
-        };
-        iconTheme = {
-          package = pkgs.nordzy-icon-theme;
-          name = "Nordzy";
-        };
-      };
     }
   ];
 

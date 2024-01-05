@@ -11,5 +11,6 @@
     ./newsboat
     ./neomutt
     ./zathura
+    ./hyprland
   ];
 }

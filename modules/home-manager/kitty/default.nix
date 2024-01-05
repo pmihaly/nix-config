@@ -1,4 +1,4 @@
-{ lib, config, ... }:
+{ pkgs, lib, config, ... }:
 
 with lib;
 let cfg = config.modules.kitty;
@@ -6,6 +6,10 @@ let cfg = config.modules.kitty;
 in {
   options.modules.kitty = { enable = mkEnableOption "kitty"; };
   config = mkIf cfg.enable {
+    home.packages = with pkgs; [
+      comic-code
+    ];
+
     programs.kitty = {
       enable = true;
       theme = "Catppuccin-Frappe";
