@@ -29,6 +29,10 @@
       url = "github:serokell/deploy-rs";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nix-gaming = {
+      url = "github:fufexan/nix-gaming";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     firefox-darwin-dmg = {
       url =
         "https://download.mozilla.org/?product=firefox-latest&os=osx&lang=en-US";
