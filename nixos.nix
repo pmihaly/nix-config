@@ -86,11 +86,7 @@ in {
   home-manager.useUserPackages = true;
   home-manager.users."misi" = utils.recursiveMerge [
     ./homemanager.nix
-    {
-      home.packages = with pkgs; [
-        ytfzf
-      ];
-    }
+    { home.packages = with pkgs; [ ytfzf ]; }
   ];
 
   system.stateVersion = "23.05";

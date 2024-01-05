@@ -57,9 +57,8 @@ in {
               TZ = vars.timeZone;
               JELLYFIN_PublishedServerUrl = "jellyfin.${vars.domainName}";
             };
-            extraOptions = [
-              "--device=/dev/dri/renderD128:/dev/dri/renderD128"
-            ];
+            extraOptions =
+              [ "--device=/dev/dri/renderD128:/dev/dri/renderD128" ];
           };
         };
       };
