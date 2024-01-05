@@ -19,7 +19,7 @@
     kitty.enable = true;
     newsboat.enable = true;
     neomutt.enable = true;
-    zathura.enable = true;
+    zathura.enable = false;
   };
 
   home.packages = let
