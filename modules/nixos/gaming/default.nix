@@ -11,7 +11,7 @@ in {
   ];
   config = mkIf cfg.enable {
 
-    environment.systemPackages = [ pkgs.lutris ];
+    environment.systemPackages = [ pkgs.lutris pkgs.wine pkgs.gamescope ];
 
     programs.steam = {
       enable = true;
