@@ -145,6 +145,10 @@ in {
           variant = "frappe";
         };
       };
+      cursorTheme  = {
+        name = "Catppuccin-Frappe-Light-Cursors";
+        package = pkgs.catppuccin-cursors.frappeLight;
+      };
     };
   };
 }
