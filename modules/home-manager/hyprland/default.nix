@@ -79,6 +79,15 @@ in {
 
         "$mainMod" = "SUPER";
 
+        workspace = [
+          "1,monitor:HDMI-A-1"
+          "2,monitor:HDMI-A-1"
+          "3,monitor:HDMI-A-1"
+          "4,monitor:DP-1"
+          "5,monitor:DP-1"
+          "6,monitor:DP-1"
+        ];
+
         bind = [
           "$mainMod, T, exec, kitty"
           "$mainMod, Q, killactive,"
@@ -111,6 +120,7 @@ in {
           "$mainMod CONTROL, l, movetoworkspace, 4"
           "$mainMod CONTROL, u, movetoworkspace, 5"
           "$mainMod CONTROL, y, movetoworkspace, 6"
+
 
           "$mainMod, mouse_down, workspace, e+1"
           "$mainMod, mouse_up, workspace, e-1"
