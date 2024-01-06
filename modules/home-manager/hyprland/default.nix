@@ -16,7 +16,10 @@ in {
       xwayland.enable = true;
 
       settings = {
-        monitor = ",preferred,auto,auto";
+        monitor = [
+          "HDMI-A-1, 2560x1080, 0x0, 1"
+          "DP-1, preferred, 2560x0, 1"
+        ];
         "exec-once" = "${pkgs.swaybg}/bin/swaybg --image ~/.nix-config/wallpaper.png";
         env = "XCURSOR_SIZE,24";
         input = {
