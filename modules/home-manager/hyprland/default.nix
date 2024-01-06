@@ -47,15 +47,16 @@ in {
           rounding = 10;
           blur = {
             enabled = true;
-            size = 3;
-            passes = 1;
+            size = 10;
+            passes = 3;
             new_optimizations = true;
           };
 
           drop_shadow = true;
-          shadow_range = 40;
+          shadow_range = 8;
+          shadow_offset = "4 4";
           shadow_render_power = 3;
-          "col.shadow" = "rgba(1a1a1aee)";
+          "col.shadow" = "rgba(00000066)";
         };
 
         animations = {
