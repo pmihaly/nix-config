@@ -87,6 +87,7 @@
       modules = [
         home-manager.nixosModules.home-manager
         inputs.agenix.nixosModules.default
+        { nixpkgs.overlays = [ inputs.nur.overlay ]; }
         { home-manager.extraSpecialArgs = { inherit inputs; }; }
         ./secrets
         ./machines/skylake

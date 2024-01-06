@@ -15,6 +15,9 @@
       shell.enable = true;
       lf.enable = true;
       newsboat.enable = true;
+      hyprland.enable = true;
+      kitty.enable = true;
+      firefox.enable = true;
     };
   };
 
@@ -31,6 +34,7 @@
     duckdns.enable = true;
     paperless.enable = true;
     syncthing.enable = true;
+    gaming.enable = true;
   };
 
   boot.loader.systemd-boot.enable = true;
@@ -82,6 +86,7 @@
   users.groups.backup.members = [ "${vars.username}" ];
 
   programs.zsh.enable = true;
+  programs.dconf.enable = true;
 
   nixpkgs.config.allowUnfree = true;
 
