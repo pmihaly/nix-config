@@ -6,9 +6,10 @@ let cfg = config.modules.hyprland;
 in {
   options.modules.hyprland = { enable = mkEnableOption "hyprland"; };
   config = mkIf cfg.enable {
-    home.packages = with pkgs; [
-      wl-clipboard # `wl-copy` and `wl-paste`
-    ];
+    home.packages = with pkgs;
+      [
+        wl-clipboard # `wl-copy` and `wl-paste`
+      ];
 
     wayland.windowManager.hyprland = {
       enable = true;
@@ -16,11 +17,10 @@ in {
       xwayland.enable = true;
 
       settings = {
-        monitor = [
-          "HDMI-A-1, 2560x1080, 0x0, 1"
-          "DP-1, preferred, 2560x0, 1"
-        ];
-        "exec-once" = "${pkgs.swaybg}/bin/swaybg --image ~/.nix-config/wallpaper.png";
+        monitor =
+          [ "HDMI-A-1, 2560x1080, 0x0, 1" "DP-1, preferred, 2560x0, 1" ];
+        "exec-once" =
+          "${pkgs.swaybg}/bin/swaybg --image ~/.nix-config/wallpaper.png";
         env = "XCURSOR_SIZE,24";
         input = {
           kb_options = "caps:escape";
@@ -126,12 +126,13 @@ in {
     gtk = {
       enable = true;
       theme = {
-        package = pkgs.nordic;
-        name = "Nordic";
-      };
-      iconTheme = {
-        package = pkgs.nordzy-icon-theme;
-        name = "Nordzy";
+        name = "Catppuccin-Frappe-Standard-Mauve-Dark";
+        package = pkgs.catppuccin-gtk.override {
+          accents = [ "mauve" ];
+          size = "standard";
+          tweaks = [ "rimless" ];
+          variant = "frappe";
+        };
       };
     };
   };
