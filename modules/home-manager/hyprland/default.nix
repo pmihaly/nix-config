@@ -149,6 +149,10 @@ in {
         name = "Catppuccin-Frappe-Light-Cursors";
         package = pkgs.catppuccin-cursors.frappeLight;
       };
+      font = {
+        package = pkgs.noto-fonts;
+        name = "Noto";
+      };
     };
   };
 }
