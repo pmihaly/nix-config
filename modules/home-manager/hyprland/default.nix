@@ -64,10 +64,9 @@ in {
           };
 
           drop_shadow = true;
-          shadow_range = 8;
-          shadow_offset = "4 4";
+          shadow_range = 80;
           shadow_render_power = 3;
-          "col.shadow" = "rgba($crustAlpha66)";
+          "col.shadow" = "rgba($crustAlpha80)";
         };
 
         animations = {
