@@ -15,8 +15,16 @@ in {
       enable = true;
       systemd.enable = true;
       xwayland.enable = true;
+      sourceFirst = true;
 
       settings = {
+        source = (pkgs.fetchFromGitHub {
+          owner = "catppuccin";
+          repo = "hyprland";
+          rev = "fc228737d3d0c12e34a7fa155a0fc3192e5e4017";
+          sha256 = "9BhZq9J1LmHfAPBqOr64chiAEzS+YV6zqe9ma95V3no=";
+        } + /themes/frappe.conf);
+
         monitor =
           [ "HDMI-A-1, 2560x1080, 0x0, 1" "DP-1, preferred, 2560x0, 1" ];
         "exec-once" =
@@ -38,13 +46,15 @@ in {
         general = {
           gaps_in = 10;
           gaps_out = 40;
-          border_size = 0;
+          border_size = 1;
+          "col.active_border" = "$crust";
+          "col.inactive_border" = "$crust";
 
           layout = "dwindle";
         };
 
         decoration = {
-          rounding = 10;
+          rounding = 15;
           blur = {
             enabled = true;
             size = 10;
@@ -56,7 +66,7 @@ in {
           shadow_range = 8;
           shadow_offset = "4 4";
           shadow_render_power = 3;
-          "col.shadow" = "rgba(00000066)";
+          "col.shadow" = "rgba($crustAlpha66)";
         };
 
         animations = {
@@ -66,6 +76,7 @@ in {
             "windows, 1, 0.7, default"
             "workspaces, 1, 0.7, default"
             "fade, 1, 0.7, default"
+            "border, 1, 0.7, default"
           ];
         };
 
@@ -122,7 +133,6 @@ in {
           "$mainMod CONTROL, u, movetoworkspace, 5"
           "$mainMod CONTROL, y, movetoworkspace, 6"
 
-
           "$mainMod, mouse_down, workspace, e+1"
           "$mainMod, mouse_up, workspace, e-1"
         ];
@@ -145,7 +155,7 @@ in {
           variant = "frappe";
         };
       };
-      cursorTheme  = {
+      cursorTheme = {
         name = "Catppuccin-Frappe-Light-Cursors";
         package = pkgs.catppuccin-cursors.frappeLight;
       };
