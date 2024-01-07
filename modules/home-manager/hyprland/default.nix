@@ -107,7 +107,7 @@ in {
           "$mainMod, R, exec, hyprctl reload"
           "$mainMod, F, fullscreen"
           "$mainMod, W, exec, firefox"
-          "$mainMod, A, exec, kitty alsamixer"
+          "$mainMod, A, exec, kitty ${pkgs.pulsemixer}/bin/pulsemixer"
 
           "$mainMod, h, movefocus, l"
           "$mainMod, j, movefocus, d"
