@@ -9,6 +9,7 @@ in {
     home.packages = with pkgs;
       [
         wl-clipboard # `wl-copy` and `wl-paste`
+        cinnamon.nemo
       ];
 
     wayland.windowManager.hyprland = {
@@ -162,6 +163,13 @@ in {
       font = {
         package = pkgs.noto-fonts;
         name = "Noto";
+      };
+      iconTheme = {
+        name = "Papirus";
+        package = pkgs.catppuccin-papirus-folders.override {
+          accent = "mauve";
+          flavor = "frappe";
+        };
       };
     };
   };
