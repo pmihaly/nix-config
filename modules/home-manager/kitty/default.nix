@@ -6,7 +6,7 @@ let cfg = config.modules.kitty;
 in {
   options.modules.kitty = { enable = mkEnableOption "kitty"; };
   config = mkIf cfg.enable {
-    home.packages = with pkgs; [ comic-code noto-fonts-color-emoji ];
+    home.packages = with pkgs; [ comic-code noto-fonts-color-emoji nerdfonts-fira-code ];
 
     programs.kitty = {
       enable = true;
