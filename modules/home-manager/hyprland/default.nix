@@ -133,6 +133,9 @@ in {
           "$mainMod CONTROL, u, movetoworkspace, 5"
           "$mainMod CONTROL, y, movetoworkspace, 6"
 
+          ", XF86AudioRaiseVolume, exec, wpctl set-volume -l 1.4 @DEFAULT_AUDIO_SINK@ 5%+"
+          ", XF86AudioLowerVolume, exec, wpctl set-volume -l 1.4 @DEFAULT_AUDIO_SINK@ 5%-"
+
           "$mainMod, mouse_down, workspace, e+1"
           "$mainMod, mouse_up, workspace, e-1"
         ];
