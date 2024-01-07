@@ -18,6 +18,7 @@
       hyprland.enable = true;
       kitty.enable = true;
       firefox.enable = true;
+      mpv.enable = true;
     };
   };
 
