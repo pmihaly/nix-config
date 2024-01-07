@@ -41,13 +41,13 @@ in {
         };
       };
 
-      networking.firewall = { allowedUDPPorts = [ 1900 7359 ]; };
+      networking.firewall = { allowedUDPPorts = [ 7359 ]; };
 
       virtualisation.oci-containers = {
         containers = {
           jellyfin = {
             image = "lscr.io/linuxserver/jellyfin:10.8.12";
-            ports = [ "8096:8096" "1900:1900/udp" "7359:7359/udp" ];
+            ports = [ "8096:8096" "7359:7359/udp" ];
             volumes = [
               "${vars.storage}/Media/TV:/data/tvshows"
               "${vars.storage}/Media/Movies:/data/movies"
