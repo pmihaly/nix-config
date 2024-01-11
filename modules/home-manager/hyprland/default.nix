@@ -6,11 +6,10 @@ let cfg = config.modules.hyprland;
 in {
   options.modules.hyprland = { enable = mkEnableOption "hyprland"; };
   config = mkIf cfg.enable {
-    home.packages = with pkgs;
-      [
-        wl-clipboard # `wl-copy` and `wl-paste`
-        cinnamon.nemo
-      ];
+    home.packages = with pkgs; [
+      wl-clipboard # `wl-copy` and `wl-paste`
+      cinnamon.nemo
+    ];
 
     wayland.windowManager.hyprland = {
       enable = true;
