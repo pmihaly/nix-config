@@ -33,10 +33,9 @@
       url = "github:fufexan/nix-gaming";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    firefox-darwin-dmg = {
-      url =
-        "https://download.mozilla.org/?product=firefox-latest&os=osx&lang=en-US";
-      flake = false;
+    nixpkgs-firefox-darwin = {
+      url = "github:bandithedoge/nixpkgs-firefox-darwin";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     lf-icons = {
       url =
@@ -55,7 +54,10 @@
       system = "aarch64-darwin";
       modules = [
         home-manager.darwinModules.home-manager
-        { nixpkgs.overlays = [ inputs.nur.overlay ]; }
+        {
+          nixpkgs.overlays =
+            [ inputs.nur.overlay inputs.nixpkgs-firefox-darwin.overlay ];
+        }
         { home-manager.extraSpecialArgs = { inherit inputs; }; }
         ./darwin.nix
       ];

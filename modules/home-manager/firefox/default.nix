@@ -1,36 +1,15 @@
-{ pkgs, lib, config, inputs, ... }:
+{ pkgs, lib, config, ... }:
 
 with lib;
-let
-  cfg = config.modules.firefox;
-  firefox-darwin = pkgs.stdenv.mkDerivation {
-    name = "Firefox";
+let cfg = config.modules.firefox;
 
-    buildInputs = [ pkgs.undmg ];
-    sourceRoot = ".";
-    phases = [ "buildPhase" "installPhase" ];
-
-    buildPhase = ''
-      undmg $src
-    '';
-
-    installPhase = ''
-      mkdir -p "$out/Applications"
-      cp -r Firefox.app "$out/Applications/Firefox.app"
-    '';
-
-    src = inputs.firefox-darwin-dmg;
-  };
 in {
   options.modules.firefox = { enable = mkEnableOption "firefox"; };
   config = mkIf cfg.enable {
 
     programs.firefox = {
       enable = true;
-      package = if pkgs.system == "aarch64-darwin" then
-        firefox-darwin
-      else
-        pkgs.firefox;
+      package = pkgs.firefox-bin;
       profiles = {
         misi = {
           id = 0;

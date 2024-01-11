@@ -67,18 +67,6 @@
         "type": "github"
       }
     },
-    "firefox-darwin-dmg": {
-      "flake": false,
-      "locked": {
-        "narHash": "sha256-9ZtrGOlGDhpir3zAnn90YPm4KvDq1QlGGnZHidXLiOs=",
-        "type": "file",
-        "url": "https://download.mozilla.org/?lang=en-US&os=osx&product=firefox-latest"
-      },
-      "original": {
-        "type": "file",
-        "url": "https://download.mozilla.org/?lang=en-US&os=osx&product=firefox-latest"
-      }
-    },
     "flake-compat": {
       "flake": false,
       "locked": {
@@ -366,6 +354,26 @@
         "type": "github"
       }
     },
+    "nixpkgs-firefox-darwin": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1704933845,
+        "narHash": "sha256-VMEjQJoGmuLqdlQKgxAC1t5WOxcDOUHJFE3oRBRWPLQ=",
+        "owner": "bandithedoge",
+        "repo": "nixpkgs-firefox-darwin",
+        "rev": "82a53e5d8af363ccc35b1987b9b965447e39591b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "bandithedoge",
+        "repo": "nixpkgs-firefox-darwin",
+        "type": "github"
+      }
+    },
     "nixpkgs-lib": {
       "locked": {
         "dir": "lib",
@@ -474,13 +482,13 @@
         "agenix": "agenix",
         "darwin": "darwin",
         "deploy-rs": "deploy-rs",
-        "firefox-darwin-dmg": "firefox-darwin-dmg",
         "home-manager": "home-manager_2",
         "hyprland": "hyprland",
         "img2theme": "img2theme",
         "lf-icons": "lf-icons",
         "nix-gaming": "nix-gaming",
         "nixpkgs": "nixpkgs_3",
+        "nixpkgs-firefox-darwin": "nixpkgs-firefox-darwin",
         "nur": "nur"
       }
     },
