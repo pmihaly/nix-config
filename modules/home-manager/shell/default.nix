@@ -106,7 +106,7 @@ in {
         [ -f ~/.zshrc_work ] && . ~/.zshrc_work
 
         function unlockpdf() {
-          ${pkgs.pdftk}/bin/pdftk - input_pw $1 output -
+          ${pkgs.pdftk}/bin/pdftk $2 input_pw $1 output "unlocked_$2"
         }
       '';
       enableCompletion = true;
