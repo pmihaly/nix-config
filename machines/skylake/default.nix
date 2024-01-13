@@ -15,11 +15,14 @@
       shell.enable = true;
       lf.enable = true;
       newsboat.enable = true;
+
       hyprland.enable = true;
       kitty.enable = true;
       firefox.enable = true;
       mpv.enable = true;
     };
+
+    home.packages = [ pkgs.discord ];
   };
 
   modules = {
@@ -35,6 +38,7 @@
     duckdns.enable = true;
     paperless.enable = true;
     syncthing.enable = true;
+
     gaming.enable = true;
   };
 
