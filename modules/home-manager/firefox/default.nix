@@ -141,6 +141,7 @@ in {
             keepassxc-browser
             youtube-nonstop
             reddit-enhancement-suite
+            theater-mode-for-youtube
           ];
           userChrome = ''
             .tabbrowser-tab .tab-close-button,
