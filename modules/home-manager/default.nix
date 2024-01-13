@@ -12,5 +12,6 @@
     ./neomutt
     ./zathura
     ./hyprland
+    ./discord
   ];
 }

@@ -20,9 +20,8 @@
       kitty.enable = true;
       firefox.enable = true;
       mpv.enable = true;
+      discord.enable = true;
     };
-
-    home.packages = [ pkgs.discord ];
   };
 
   modules = {

@@ -20,6 +20,7 @@
     newsboat.enable = true;
     neomutt.enable = true;
     zathura.enable = false;
+    discord.enable = true;
   };
 
   home.packages = let
@@ -38,7 +39,6 @@
     lazydocker
     syncthing
     act # running github actions locally
-    discord
     nix-tree # visualisation of nix derivations
     keepass-diff # diffing .kdbx files
     comic-code
