@@ -163,7 +163,7 @@ in {
             }
           '';
           extraConfig = ''
-              user_pref("app.normandy.api_url", "");
+            user_pref("app.normandy.api_url", "");
             user_pref("app.normandy.enabled", false);
             user_pref("app.shield.optoutstudies.enabled", false);
             user_pref("app.update.auto", false);
@@ -221,7 +221,6 @@ in {
             user_pref("extensions.shield-recipe-client.api_url", "");
             user_pref("extensions.shield-recipe-client.enabled", false);
             user_pref("extensions.webservice.discoverURL", "");
-            user_pref("general.useragent.override", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36");
             user_pref("media.autoplay.default", 1);
             user_pref("media.autoplay.enabled", false);
             user_pref("media.eme.enabled", false);
