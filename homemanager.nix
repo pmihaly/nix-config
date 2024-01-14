@@ -32,20 +32,15 @@
       obsidian
       jwt-cli
       libossp_uuid # uuid from cli
+      slack
     ];
   in work ++ (with pkgs; [
     keepassxc
-    slack
-    lazydocker
     syncthing
     act # running github actions locally
     nix-tree # visualisation of nix derivations
     keepass-diff # diffing .kdbx files
-    comic-code
-    transmission
-    anki-bin
     inputs.img2theme.packages."${pkgs.system}".default
-    wally-cli # configuring moonlander keyboard
     inputs.agenix.packages."${pkgs.system}".default
     inputs.deploy-rs.packages."${pkgs.system}".default
     yt-dlp

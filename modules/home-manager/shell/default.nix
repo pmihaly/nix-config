@@ -140,7 +140,7 @@ in {
         pn = "p && nvim";
         o = "cd ~/Sync/org";
         on = ''o && (fd "^.*.org$" | fzf | xargs nvim)'';
-        ld = "lazydocker";
+        ld = "${pkgs.lazydocker}/bin/lazydocker";
         ms = "darwin-rebuild switch --flake ~/.nix-config#mac";
         mp = "nixos-rebuild switch --flake ~/.nix-config#pc";
         nr = "sudo nix-store --verify --check-contents --repair";
