@@ -189,7 +189,7 @@ in {
     };
 
     programs.btop = {
-      enable = true;
+      enable = pkgs.stdenv.isLinux;
       settings = {
         theme_background = false;
         true_color = true;

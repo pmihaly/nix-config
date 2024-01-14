@@ -19,7 +19,7 @@
     kitty.enable = true;
     newsboat.enable = true;
     neomutt.enable = true;
-    zathura.enable = false;
+    zathura.enable = true;
     discord.enable = true;
   };
 
