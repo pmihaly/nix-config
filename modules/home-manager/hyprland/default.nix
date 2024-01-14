@@ -46,7 +46,7 @@ in {
         general = {
           gaps_in = 10;
           gaps_out = 40;
-          border_size = 1;
+          border_size = 0;
           "col.active_border" = "$crust";
           "col.inactive_border" = "$crust";
 
