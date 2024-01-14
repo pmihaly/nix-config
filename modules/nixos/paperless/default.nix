@@ -32,7 +32,7 @@ in {
         consumptionDirIsPublic = true;
         passwordFile = builtins.toFile "paperles-passwordfile"
           "some-admin-password-i-dont-care-about-because-i-use-authelia";
-        extraConfig = {
+        settings = {
           PAPERLESS_ADMIN_USER = "🧙";
           PAPERLESS_AUTO_LOGIN_USERNAME = "🧙";
           PAPERLESS_OCR_LANGUAGE = "hun+eng";
