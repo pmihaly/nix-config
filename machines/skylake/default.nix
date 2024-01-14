@@ -40,6 +40,7 @@
     syncthing.enable = true;
 
     gaming.enable = true;
+    qemu.enable = true;
   };
 
   boot.loader.systemd-boot.enable = true;

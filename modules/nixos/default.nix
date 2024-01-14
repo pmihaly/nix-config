@@ -13,5 +13,6 @@
     ./paperless
     ./syncthing
     ./gaming
+    ./qemu
   ];
 }
