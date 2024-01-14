@@ -21,6 +21,7 @@
       firefox.enable = true;
       mpv.enable = true;
       discord.enable = true;
+      minecraft.enable = true;
     };
   };
 

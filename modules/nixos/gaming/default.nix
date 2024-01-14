@@ -36,16 +36,6 @@ in {
 
     security.rtkit.enable = true;
 
-    xdg.portal.enable = true;
-    xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-hyprland ];
-
-    # flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-    # flatpak install flathub org.polymc.PolyMC
-    # ...
-    # flatpak run org.polymc.PolyMC
-
-    services.flatpak.enable = true;
-
     nix.settings = {
       substituters = [ "https://nix-gaming.cachix.org" ];
       trusted-public-keys = [

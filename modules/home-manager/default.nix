@@ -13,5 +13,6 @@
     ./zathura
     ./hyprland
     ./discord
+    ./minecraft
   ];
 }
