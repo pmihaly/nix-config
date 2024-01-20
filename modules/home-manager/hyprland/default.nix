@@ -29,7 +29,7 @@ in {
           [ "HDMI-A-1, 2560x1080, 0x0, 1" "DP-1, preferred, 2560x0, 1" ];
         "exec-once" =
           "${pkgs.swaybg}/bin/swaybg --image ~/.nix-config/wallpaper.png";
-        env = "XCURSOR_SIZE,24";
+        env = [ "XCURSOR_SIZE,24" "WLR_DRM_NO_ATOMIC,1" ];
         input = {
           kb_options = "caps:escape";
 
@@ -49,6 +49,7 @@ in {
           border_size = 0;
           "col.active_border" = "$crust";
           "col.inactive_border" = "$crust";
+          allow_tearing = true;
 
           layout = "dwindle";
         };
@@ -87,6 +88,8 @@ in {
         master = { new_is_master = true; };
 
         misc = { disable_hyprland_logo = true; };
+
+        windowrulev2 = "immediate, class:^(\.gamescope-wrapped|Minecraft\*)$";
 
         "$mainMod" = "SUPER";
 
