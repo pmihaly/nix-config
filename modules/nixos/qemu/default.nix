@@ -16,9 +16,7 @@ in {
       };
     };
 
-    users.users.${vars.username} = {
-      extraGroups = [ "libvirtd" ];
-    };
+    users.users.${vars.username}.extraGroups = [ "libvirtd" ];
 
     virtualisation = {
       libvirtd.enable = true;
