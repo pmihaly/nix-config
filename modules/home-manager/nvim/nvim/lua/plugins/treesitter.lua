@@ -67,7 +67,6 @@ return {
         'json',
         'kotlin',
         'lua',
-        'markdown',
         'markdown_inline',
         'nix',
         'python',
