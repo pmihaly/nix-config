@@ -189,6 +189,7 @@ in {
           wttr = "${pkgs.httpie}/bin/http wttr.in/budapest";
           n = "nvim";
           sharedir = "${pkgs.python3}/bin/python3 -m http.server 9000";
+          yt-dlp = "nix run nixpkgs#yt-dlp --";  # always use the latest yt-dlp to mitigate 403 errors from youtube
         }
       ]);
     };
