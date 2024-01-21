@@ -49,7 +49,10 @@
     formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.nixfmt;
 
     darwinConfigurations.mac = inputs.darwin.lib.darwinSystem {
-      specialArgs = { inherit inputs; };
+      specialArgs = {
+        inherit inputs;
+        vars = (import ./machines/work/vars.nix);
+      };
 
       system = "aarch64-darwin";
       modules = [
@@ -59,7 +62,7 @@
             [ inputs.nur.overlay inputs.nixpkgs-firefox-darwin.overlay ];
         }
         { home-manager.extraSpecialArgs = { inherit inputs; }; }
-        ./darwin.nix
+        ./machines/work
       ];
     };
 

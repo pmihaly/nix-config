@@ -3,8 +3,8 @@
 with lib;
 let
   cfg = config.modules.shell;
-  bookmarksToAliases =
-    attrsets.mapAttrs' (name: value: attrsets.nameValuePair "g${name}" "cd ${value}");
+  bookmarksToAliases = attrsets.mapAttrs'
+    (name: value: attrsets.nameValuePair "g${name}" "cd ${value}");
 
 in {
   options.modules.shell = {

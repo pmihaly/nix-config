@@ -1,12 +1,65 @@
-{ pkgs, ... }: {
+{ pkgs, inputs, vars, ... }: {
   nixpkgs.config.allowUnfree = true;
-  nixpkgs.overlays = import ./overlays;
+  nixpkgs.overlays = import ../../overlays;
   documentation.enable = false;
 
   home-manager.useGlobalPkgs = true;
   home-manager.useUserPackages = true;
 
-  home-manager.users."mihaly.papp" = ./homemanager.nix;
+  home-manager.users.${vars.username} = {
+    home.stateVersion = "22.05";
+    imports = [
+      ../../modules/home-manager
+      inputs.agenix.homeManagerModules.default
+      ../../secrets/home-manager
+    ];
+
+    nixpkgs.overlays = import ../../overlays;
+
+    modules = {
+      vscode.enable = true;
+      firefox.enable = true;
+      nvim.enable = true;
+      git.enable = true;
+      shell = {
+        enable = true;
+        bookmarks = vars.bookmarks;
+      };
+      mpv.enable = true;
+      lf = {
+        enable = true;
+        bookmarks = vars.bookmarks;
+      };
+      kitty.enable = true;
+      newsboat.enable = true;
+      neomutt.enable = true;
+      zathura.enable = true;
+      discord.enable = true;
+    };
+
+    home.packages = let
+      work = with pkgs; [
+        awscli
+        git-lfs
+        saml2aws
+        openssl
+        obsidian
+        jwt-cli
+        libossp_uuid # uuid from cli
+        slack
+      ];
+    in work ++ (with pkgs; [
+      keepassxc
+      syncthing
+      act # running github actions locally
+      nix-tree # visualisation of nix derivations
+      keepass-diff # diffing .kdbx files
+      inputs.img2theme.packages."${pkgs.system}".default
+      inputs.agenix.packages."${pkgs.system}".default
+      inputs.deploy-rs.packages."${pkgs.system}".default
+      yt-dlp
+    ]);
+  };
 
   homebrew = {
     enable = true;
@@ -118,11 +171,11 @@
         Hour = 3;
         Minute = 15;
       };
-      user = "mihaly.papp";
+      user = vars.username;
     };
   };
 
-  users.users."mihaly.papp".home = "/Users/mihaly.papp";
+  users.users.${vars.username}.home = "/Users/mihaly.papp";
 
   system.stateVersion = 4;
 }
