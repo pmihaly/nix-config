@@ -17,9 +17,19 @@ in {
         modules = { hyprland.enable = true; };
       };
 
-      modules = {
-        gaming.enable = true;
-        qemu.enable = true;
+      modules = { qemu.enable = true; };
+
+      services.pipewire = {
+        enable = true;
+        alsa.enable = true;
+        alsa.support32Bit = true;
+        pulse.enable = true;
+
+        lowLatency = {
+          enable = true;
+          quantum = 64;
+          rate = 48000;
+        };
       };
     })
 

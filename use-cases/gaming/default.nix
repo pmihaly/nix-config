@@ -1,10 +1,13 @@
-{ inputs, pkgs, lib, config, ... }:
+{ platform, inputs, pkgs, lib, config, ... }:
 
 with lib;
 let cfg = config.modules.gaming;
 
-in {
-  options.modules.gaming = { enable = mkEnableOption "gaming"; };
+in optionalAttrs platform.isLinux {
+  options.modules.gaming = {
+    enable = mkEnableOption "gaming";
+    username = mkOption { type = types.str; };
+  };
   imports = [
     inputs.nix-gaming.nixosModules.pipewireLowLatency
     inputs.nix-gaming.nixosModules.steamCompat
@@ -21,16 +24,12 @@ in {
         [ inputs.nix-gaming.packages.${pkgs.system}.proton-ge ];
     };
 
-    services.pipewire = {
-      enable = true;
-      alsa.enable = true;
-      alsa.support32Bit = true;
-      pulse.enable = true;
+    home-manager.users.${cfg.username} = {
+      imports = [ ../../modules/home-manager ];
 
-      lowLatency = {
-        enable = true;
-        quantum = 64;
-        rate = 48000;
+      modules = {
+        discord.enable = true;
+        minecraft.enable = true;
       };
     };
 

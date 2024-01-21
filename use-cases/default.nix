@@ -1,1 +1,1 @@
-{ ... }: { imports = [ ./nix ./shell ./gui ./server ./work ]; }
+{ ... }: { imports = [ ./nix ./shell ./gui ./server ./work ./gaming ]; }

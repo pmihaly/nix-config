@@ -12,7 +12,6 @@
     ./duckdns
     ./paperless
     ./syncthing
-    ./gaming
     ./qemu
   ];
 }

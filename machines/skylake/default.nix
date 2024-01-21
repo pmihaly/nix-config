@@ -1,15 +1,7 @@
 { pkgs, lib, vars, ... }: {
   imports = [ ../../use-cases ./hardware.nix ];
 
-  home-manager.users.${vars.username} = {
-    home.stateVersion = "22.05";
-    imports = [ ../../modules/home-manager ];
-
-    modules = {
-      discord.enable = true;
-      minecraft.enable = true;
-    };
-  };
+  home-manager.users.${vars.username}.home.stateVersion = "22.05";
 
   modules = {
 
@@ -37,6 +29,11 @@
     };
 
     server = {
+      enable = true;
+      username = vars.username;
+    };
+
+    gaming = {
       enable = true;
       username = vars.username;
     };
@@ -73,8 +70,6 @@
     LC_TELEPHONE = "hu_HU.UTF-8";
     LC_TIME = "hu_HU.UTF-8";
   };
-
-  programs.dconf.enable = true;
 
   system.stateVersion = "23.05";
 }
