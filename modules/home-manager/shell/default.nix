@@ -154,7 +154,6 @@ in {
           on = ''o && (fd "^.*.org$" | fzf | xargs nvim)'';
           ld = "${pkgs.lazydocker}/bin/lazydocker";
           ms = "darwin-rebuild switch --flake ~/.nix-config#mac";
-          mp = "nixos-rebuild switch --flake ~/.nix-config#pc";
           nr = "sudo nix-store --verify --check-contents --repair";
           ns = "nix search nixpkgs";
           ncg = "sudo nix-collect-garbage --delete-old";
