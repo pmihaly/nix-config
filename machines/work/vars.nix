@@ -1,4 +1,1 @@
-{
-  username = "mihaly.papp";
-  bookmarks = (import ../common/vars.nix).bookmarks;
-}
+{ username = "mihaly.papp"; }

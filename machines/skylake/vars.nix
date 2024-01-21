@@ -6,8 +6,4 @@
   storage = "/persist/opt/skylake-storage";
   username = "misi";
   duckdnsDomainName = "mishmesh.duckdns.org";
-  bookmarks = (import ../common/vars.nix).bookmarks // {
-    t = "/persist/opt/skylake-storage/Media/TV";
-    m = "/persist/opt/skylake-storage/Media/Movies";
-  };
 }

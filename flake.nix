@@ -52,6 +52,10 @@
       specialArgs = {
         inherit inputs;
         vars = (import ./machines/work/vars.nix);
+        platform = {
+          isLinux = false;
+          isDarwin = true;
+        };
       };
 
       system = "aarch64-darwin";
@@ -75,6 +79,10 @@
             lib = final;
             inherit vars;
           }));
+        platform = {
+          isLinux = true;
+          isDarwin = false;
+        };
       };
 
       modules = [
