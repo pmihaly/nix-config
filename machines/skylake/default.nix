@@ -12,8 +12,14 @@
     modules = {
       nvim.enable = true;
       git.enable = true;
-      shell.enable = true;
-      lf.enable = true;
+      shell = {
+        enable = true;
+        bookmarks = vars.bookmarks;
+      };
+      lf = {
+        enable = true;
+        bookmarks = vars.bookmarks;
+      };
       newsboat.enable = true;
 
       hyprland.enable = true;

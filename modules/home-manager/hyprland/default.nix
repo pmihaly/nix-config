@@ -89,7 +89,7 @@ in {
 
         misc = { disable_hyprland_logo = true; };
 
-        windowrulev2 = "immediate, class:^(\.gamescope-wrapped|Minecraft\*)$";
+        windowrulev2 = "immediate, class:^(.gamescope-wrapped|Minecraft*)$";
 
         "$mainMod" = "SUPER";
 

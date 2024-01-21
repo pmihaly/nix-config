@@ -1,10 +1,19 @@
 { pkgs, lib, config, inputs, ... }:
 
 with lib;
-let cfg = config.modules.lf;
+let
+  cfg = config.modules.lf;
+  bookmarksToKeybindings = attrsets.mapAttrs'
+    (name: value: attrsets.nameValuePair "g${name}" "cd ${value}");
 
 in {
-  options.modules.lf = { enable = mkEnableOption "lf"; };
+  options.modules.lf = {
+    enable = mkEnableOption "lf";
+    bookmarks = mkOption {
+      default = { };
+      type = types.attrs;
+    };
+  };
   config = mkIf cfg.enable {
     xdg.configFile."lf/icons".source = inputs.lf-icons;
 
@@ -47,21 +56,24 @@ in {
         esac
         exit 1
       '';
-      keybindings = {
-        D = "delete";
-        U = "!${pkgs.du-dust}/bin/dust";
-        R = "!${pkgs.massren}/bin/massren";
-        m = "push :mkdirWithParent<space>";
-        t = "push :touchWithParent<space>";
-        "<enter>" = "open";
-        A = "rename"; # at the very end
-        c = "push A<c-u>"; # new rename
-        I = "push A<c-a>"; # at the very beginning
-        i = "push A<a-b><a-b><a-f>"; # before extention
-        a = "push A<a-b>"; # after extention
-        M = "mark-save";
-        s = "!zsh";
-      };
+      keybindings = (mkMerge [
+        (bookmarksToKeybindings cfg.bookmarks)
+        {
+          D = "delete";
+          U = "!${pkgs.du-dust}/bin/dust";
+          R = "!${pkgs.massren}/bin/massren";
+          m = "push :mkdirWithParent<space>";
+          t = "push :touchWithParent<space>";
+          "<enter>" = "open";
+          A = "rename"; # at the very end
+          c = "push A<c-u>"; # new rename
+          I = "push A<c-a>"; # at the very beginning
+          i = "push A<a-b><a-b><a-f>"; # before extention
+          a = "push A<a-b>"; # after extention
+          M = "mark-save";
+          s = "!zsh";
+        }
+      ]);
     };
 
   };

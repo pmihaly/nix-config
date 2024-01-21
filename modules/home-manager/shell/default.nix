@@ -1,10 +1,19 @@
 { pkgs, lib, config, ... }:
 
 with lib;
-let cfg = config.modules.shell;
+let
+  cfg = config.modules.shell;
+  bookmarksToAliases =
+    attrsets.mapAttrs' (name: value: attrsets.nameValuePair "g${name}" "cd ${value}");
 
 in {
-  options.modules.shell = { enable = mkEnableOption "shell"; };
+  options.modules.shell = {
+    enable = mkEnableOption "shell";
+    bookmarks = mkOption {
+      default = { };
+      type = types.attrs;
+    };
+  };
   config = mkIf cfg.enable {
 
     home.packages = with pkgs; [
@@ -131,55 +140,59 @@ in {
       enableAutosuggestions = true;
       autocd = true;
       history = { ignoreDups = true; };
-      shellAliases = {
-        ls = "${pkgs.eza}/bin/eza -lah --icons $([ -d .git ] && echo '--git')";
-        cat = "bat";
-        d = "cd $(find ~/lensadev -maxdepth 1 -type d | fzf)";
-        dn = "d && nvim";
-        p = "cd $(find ~/personaldev -maxdepth 1 -type d | fzf)";
-        pn = "p && nvim";
-        o = "cd ~/Sync/org";
-        on = ''o && (fd "^.*.org$" | fzf | xargs nvim)'';
-        ld = "${pkgs.lazydocker}/bin/lazydocker";
-        ms = "darwin-rebuild switch --flake ~/.nix-config#mac";
-        mp = "nixos-rebuild switch --flake ~/.nix-config#pc";
-        nr = "sudo nix-store --verify --check-contents --repair";
-        ns = "nix search nixpkgs";
-        ncg = "sudo nix-collect-garbage --delete-old";
-        nsh = "function _f() { nix-shell -p $* --run zsh }; _f";
-        nshr =
-          "function _f() { program=$1; shift; nix-shell -p $program --run $@ }; _f";
-        nshrr =
-          "function _f() { program=$1; shift; nix-shell -p $program --run $program }; _f";
-        cn = "cd ~/.nix-config && nvim";
-        c = "cd ~/.nix-config";
-        thokr = "${pkgs.thokr}/bin/thokr --full-sentences 20";
-        kbp = ''
-          sudo touch /dev/null ; ${pkgs.lsof}/bin/lsof -iTCP -sTCP:LISTEN -n -P +c0 | awk 'NR>1{gsub(/.*:/,"",$9); print $9, $1, $2}' | fzf --multi --with-nth=1,2 --header='Select processes to be killed' | cut -d' ' -f3 | xargs kill -9'';
-        kaf = "kubectl apply -f";
-        kak = ''
-          function _kak() { kubectl kustomize --enable-helm "$1" | kubectl apply -f -; }; _kak'';
-        pis = ''
-          function _pis() { kubectl kustomize --enable-helm "$1" | kubectl delete -f -; }; _pis'';
-        urlencode = "${pkgs.jq}/bin/jq -sRr @uri";
-        dselect =
-          "docker ps --format '{{.ID}}	{{.Image}}' | fzf --with-nth 2 | cut -f1";
-        dim = ''
-          dselect | tee >(tr -d '
-          ' | pbcopy)'';
-        dl = "dselect | xargs docker logs -f";
-        dex =
-          ''container=$(dselect); docker exec -it "$container" "''${@:-bash}"'';
-        ticket = ''git branch --show-current | grep -oE "[A-Z]+-[0-9]+"'';
-        qr = "${pkgs.qrencode}/bin/qrencode -t ansiutf8";
-        sr = ''
-          function _f() { fd --type file --exec ${pkgs.sd}/bin/sd "$1" "$2" }; _f'';
-        du = "${pkgs.du-dust}/bin/dust";
-        lsblk = "${pkgs.duf}/bin/duf";
-        wttr = "${pkgs.httpie}/bin/http wttr.in/budapest";
-        n = "nvim";
-        sharedir = "${pkgs.python3}/bin/python3 -m http.server 9000";
-      };
+      shellAliases = (mkMerge [
+        (bookmarksToAliases cfg.bookmarks)
+        {
+          ls =
+            "${pkgs.eza}/bin/eza -lah --icons $([ -d .git ] && echo '--git')";
+          cat = "bat";
+          d = "cd $(find ~/lensadev -maxdepth 1 -type d | fzf)";
+          dn = "d && nvim";
+          p = "cd $(find ~/personaldev -maxdepth 1 -type d | fzf)";
+          pn = "p && nvim";
+          o = "cd ~/Sync/org";
+          on = ''o && (fd "^.*.org$" | fzf | xargs nvim)'';
+          ld = "${pkgs.lazydocker}/bin/lazydocker";
+          ms = "darwin-rebuild switch --flake ~/.nix-config#mac";
+          mp = "nixos-rebuild switch --flake ~/.nix-config#pc";
+          nr = "sudo nix-store --verify --check-contents --repair";
+          ns = "nix search nixpkgs";
+          ncg = "sudo nix-collect-garbage --delete-old";
+          nsh = "function _f() { nix-shell -p $* --run zsh }; _f";
+          nshr =
+            "function _f() { program=$1; shift; nix-shell -p $program --run $@ }; _f";
+          nshrr =
+            "function _f() { program=$1; shift; nix-shell -p $program --run $program }; _f";
+          cn = "cd ~/.nix-config && nvim";
+          c = "cd ~/.nix-config";
+          thokr = "${pkgs.thokr}/bin/thokr --full-sentences 20";
+          kbp = ''
+            sudo touch /dev/null ; ${pkgs.lsof}/bin/lsof -iTCP -sTCP:LISTEN -n -P +c0 | awk 'NR>1{gsub(/.*:/,"",$9); print $9, $1, $2}' | fzf --multi --with-nth=1,2 --header='Select processes to be killed' | cut -d' ' -f3 | xargs kill -9'';
+          kaf = "kubectl apply -f";
+          kak = ''
+            function _kak() { kubectl kustomize --enable-helm "$1" | kubectl apply -f -; }; _kak'';
+          pis = ''
+            function _pis() { kubectl kustomize --enable-helm "$1" | kubectl delete -f -; }; _pis'';
+          urlencode = "${pkgs.jq}/bin/jq -sRr @uri";
+          dselect =
+            "docker ps --format '{{.ID}}	{{.Image}}' | fzf --with-nth 2 | cut -f1";
+          dim = ''
+            dselect | tee >(tr -d '
+            ' | pbcopy)'';
+          dl = "dselect | xargs docker logs -f";
+          dex = ''
+            container=$(dselect); docker exec -it "$container" "''${@:-bash}"'';
+          ticket = ''git branch --show-current | grep -oE "[A-Z]+-[0-9]+"'';
+          qr = "${pkgs.qrencode}/bin/qrencode -t ansiutf8";
+          sr = ''
+            function _f() { fd --type file --exec ${pkgs.sd}/bin/sd "$1" "$2" }; _f'';
+          du = "${pkgs.du-dust}/bin/dust";
+          lsblk = "${pkgs.duf}/bin/duf";
+          wttr = "${pkgs.httpie}/bin/http wttr.in/budapest";
+          n = "nvim";
+          sharedir = "${pkgs.python3}/bin/python3 -m http.server 9000";
+        }
+      ]);
     };
 
     programs.direnv = {

@@ -8,14 +8,32 @@
 
   nixpkgs.overlays = import ./overlays;
 
-  modules = {
+  modules = let
+    bookmarks = rec {
+      h = "~";
+      d = "~/Downloads";
+      p = "~/personaldev";
+      w = "~/lensadev";
+      o = "~/Sync/org";
+      n = "~/.nix-config";
+      fio = p + "/finances/import/otp/in";
+      fir = p + "/finances/import/revolut/in";
+      fiw = p + "/finances/import/wise/in";
+    };
+  in {
     vscode.enable = true;
     firefox.enable = true;
     nvim.enable = true;
     git.enable = true;
-    shell.enable = true;
+    shell = {
+      enable = true;
+      inherit bookmarks;
+    };
     mpv.enable = true;
-    lf.enable = true;
+    lf = {
+      enable = true;
+      inherit bookmarks;
+    };
     kitty.enable = true;
     newsboat.enable = true;
     neomutt.enable = true;
