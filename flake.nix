@@ -66,18 +66,6 @@
       ];
     };
 
-    nixosConfigurations.pc = nixpkgs.lib.nixosSystem {
-      specialArgs = { inherit inputs; };
-
-      modules = [
-        home-manager.nixosModules.home-manager
-        { nixpkgs.overlays = [ inputs.nur.overlay ]; }
-        { home-manager.extraSpecialArgs = { inherit inputs; }; }
-        ./pc-hardware.nix
-        ./nixos.nix
-      ];
-    };
-
     nixosConfigurations.skylake = nixpkgs.lib.nixosSystem {
       specialArgs = let vars = import ./machines/skylake/vars.nix;
       in {
