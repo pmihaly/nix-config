@@ -123,9 +123,8 @@ in {
         autoload bashcompinit && bashcompinit
         autoload -Uz compinit && compinit
 
-        hash kubectl 2>/dev/null && . <(kubectl completion zsh)
-        hash k3d 2>/dev/null && . <(k3d completion zsh)
-        hash yq 2>/dev/null && . <(yq shell-completion zsh)
+        . <(${pkgs.kubectl}/bin/kubectl completion zsh)
+        . <(${pkgs.k3d}/bin/k3d completion zsh)
 
         complete -C 'aws_completer' aws
       '';
@@ -167,11 +166,11 @@ in {
           thokr = "${pkgs.thokr}/bin/thokr --full-sentences 20";
           kbp = ''
             sudo touch /dev/null ; ${pkgs.lsof}/bin/lsof -iTCP -sTCP:LISTEN -n -P +c0 | awk 'NR>1{gsub(/.*:/,"",$9); print $9, $1, $2}' | fzf --multi --with-nth=1,2 --header='Select processes to be killed' | cut -d' ' -f3 | xargs kill -9'';
-          kaf = "kubectl apply -f";
+          kaf = "${pkgs.kubectl}/bin/kubectl apply -f";
           kak = ''
-            function _kak() { kubectl kustomize --enable-helm "$1" | kubectl apply -f -; }; _kak'';
+            function _kak() { ${pkgs.kubectl}/bin/kubectl kustomize --enable-helm "$1" | ${pkgs.kubectl}/bin/kubectl apply -f -; }; _kak'';
           pis = ''
-            function _pis() { kubectl kustomize --enable-helm "$1" | kubectl delete -f -; }; _pis'';
+            function _pis() { ${pkgs.kubectl}/bin/kubectl kustomize --enable-helm "$1" | ${pkgs.kubectl}/bin/kubectl delete -f -; }; _pis'';
           urlencode = "${pkgs.jq}/bin/jq -sRr @uri";
           dselect =
             "docker ps --format '{{.ID}}	{{.Image}}' | fzf --with-nth 2 | cut -f1";
