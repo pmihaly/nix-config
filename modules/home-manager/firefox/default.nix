@@ -51,8 +51,8 @@ in {
                 url = "https://www.youtube.com/watch?v=qNaCzmbaYWI";
               }
               {
-                name = "maidcore";
-                url = "https://www.youtube.com/watch?v=T49CG5Qjd1s";
+                name = "garage";
+                url = "https://www.youtube.com/watch?v=e1w7R1hEvCs";
               }
             ];
           }];
