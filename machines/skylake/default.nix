@@ -54,7 +54,10 @@
 
   networking = {
     hostName = "skylake";
-    dhcpcd.enable = true;
+    interfaces.enp5s0.ipv4.addresses = [{
+      address = "192.168.0.30";
+      prefixLength = 24;
+    }];
   };
 
   time.timeZone = vars.timeZone;
