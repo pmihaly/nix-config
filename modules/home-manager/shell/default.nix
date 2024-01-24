@@ -207,6 +207,8 @@ in {
         theme_background = false;
         true_color = true;
         update_ms = 200;
+        vim_keys = true;
+        proc_tree = true;
       };
     };
 
