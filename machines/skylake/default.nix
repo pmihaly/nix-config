@@ -1,10 +1,7 @@
 { pkgs, lib, vars, ... }: {
   imports = [ ../../use-cases ./hardware.nix ];
 
-  home-manager.users.${vars.username}.home.stateVersion = "22.05";
-
   modules = {
-
     nix = {
       enable = true;
       username = vars.username;
@@ -37,8 +34,9 @@
       enable = true;
       username = vars.username;
     };
-
   };
+
+  home-manager.users.${vars.username}.home.stateVersion = "22.05";
 
   users.users.${vars.username} = {
     isNormalUser = true;

@@ -1,4 +1,4 @@
-{ platform, inputs, lib, config, ... }:
+{ platform, inputs, pkgs, lib, config, ... }:
 
 with lib;
 let cfg = config.modules.nix;
@@ -9,24 +9,38 @@ in {
     username = mkOption { type = types.str; };
   };
   config = mkIf cfg.enable (mkMerge [
-
-    (optionalAttrs platform.isDarwin { services.nix-daemon.enable = true; })
-
     {
+      nixpkgs.overlays = import ../../overlays;
+
+      nixpkgs.config.allowUnfree = true;
+      documentation.enable = false;
+
+      nix = {
+        settings.experimental-features = "nix-command flakes";
+        settings.auto-optimise-store = true;
+        gc.automatic = true;
+      };
+
       home-manager.useGlobalPkgs = true;
       home-manager.useUserPackages = true;
-    }
 
-    {
       home-manager.users.${cfg.username} = {
         imports = [
           inputs.agenix.homeManagerModules.default
           ../../secrets/home-manager
         ];
+
+        home.packages = [
+          inputs.agenix.packages."${pkgs.system}".default
+          inputs.deploy-rs.packages."${pkgs.system}".default
+        ];
       };
     }
 
+    (optionalAttrs platform.isLinux { nix.gc.dates = "weekly"; })
+
     (optionalAttrs platform.isDarwin {
+      services.nix-daemon.enable = true;
       homebrew = {
         enable = true;
         onActivation = {
@@ -43,22 +57,6 @@ in {
         user = cfg.username;
       };
     })
-
-    (optionalAttrs platform.isLinux { nix.gc.dates = "weekly"; })
-
-    {
-      nixpkgs.config.allowUnfree = true;
-      documentation.enable = false;
-
-      nixpkgs.overlays = import ../../overlays;
-
-      nix = {
-        settings.experimental-features = "nix-command flakes";
-        settings.auto-optimise-store = true;
-        gc.automatic = true;
-      };
-    }
-
   ]);
 }
 
