@@ -24,6 +24,7 @@ in {
         { url = "https://old.reddit.com/r/escapehungary.rss"; }
         { url = "https://old.reddit.com/r/kiszamolo.rss"; }
         { url = "https://old.reddit.com/r/programminghungary.rss"; }
+        { url = "https://openrss.org/github.com/nix-community/home-manager/pull/4936"; }
       ];
       extraConfig = builtins.concatStringsSep "\n" [
         ''
