@@ -14,6 +14,11 @@ in {
     set searchurls.nos https://search.nixos.org/options?channel=unstable&sort=relevance&type=packages&query=
     set searchurls.hos https://mipmip.github.io/home-manager-option-search/?query=
 
+    set searchurls.ys  https://youtube.com/results?search_query=
+    set searchurls.y   https://youtube.com/feed/subscriptions
+
+    set searchurls.g   https://google.com/search?q=
+
     setnull searchurls.amazon
     setnull searchurls.amazonuk
     setnull searchurls.bing
