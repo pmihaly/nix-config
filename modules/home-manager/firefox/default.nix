@@ -7,6 +7,35 @@ in {
   options.modules.firefox = { enable = mkEnableOption "firefox"; };
   config = mkIf cfg.enable {
 
+  home.file.".config/tridactyl/tridactylrc".text = ''
+    bind gd tabdetach
+
+    set searchurls.nps https://search.nixos.org/packages?channel=unstable&sort=relevance&type=packages&query=
+    set searchurls.nos https://search.nixos.org/options?channel=unstable&sort=relevance&type=packages&query=
+    set searchurls.hos https://mipmip.github.io/home-manager-option-search/?query=
+
+    setnull searchurls.amazon
+    setnull searchurls.amazonuk
+    setnull searchurls.bing
+    setnull searchurls.cnrtl
+    setnull searchurls.duckduckgo
+    setnull searchurls.gentoo_wiki
+    setnull searchurls.github
+    setnull searchurls.google
+    setnull searchurls.googlelucky
+    setnull searchurls.googleuk
+    setnull searchurls.mdn
+    setnull searchurls.osm
+    setnull searchurls.qwant
+    setnull searchurls.scholar
+    setnull searchurls.searx
+    setnull searchurls.startpage
+    setnull searchurls.twitter
+    setnull searchurls.wikipedia
+    setnull searchurls.yahoo
+    setnull searchurls.youtube
+  '';
+
     programs.firefox = {
       enable = true;
       package = pkgs.firefox-bin;
@@ -64,48 +93,6 @@ in {
                 iconUpdateURL =
                   "https://cdn.search.brave.com/serp/v2/_app/immutable/assets/favicon-32x32.86083f5b.png";
               };
-              "Nix Packages" = {
-                urls = [{
-                  template = "https://search.nixos.org/packages";
-                  params = [
-                    {
-                      name = "type";
-                      value = "packages";
-                    }
-                    {
-                      name = "query";
-                      value = "{searchTerms}";
-                    }
-                  ];
-                }];
-                iconUpdateURL = "https://nixos.wiki/favicon.png";
-                definedAliases = [ "nps" ];
-              };
-              "NixOs Option Search" = {
-                urls = [{
-                  template = "https://search.nixos.org/options";
-                  params = [{
-                    name = "query";
-                    value = "{searchTerms}";
-                  }];
-                }];
-                iconUpdateURL = "https://nixos.wiki/favicon.png";
-                updateInterval = 24 * 60 * 60 * 1000;
-                definedAliases = [ "nos" ];
-              };
-              "Home Manager Option Search" = {
-                urls = [{
-                  template =
-                    "https://mipmip.github.io/home-manager-option-search";
-                  params = [{
-                    name = "query";
-                    value = "{searchTerms}";
-                  }];
-                }];
-                iconUpdateURL = "https://nixos.wiki/favicon.png";
-                updateInterval = 24 * 60 * 60 * 1000;
-                definedAliases = [ "hos" ];
-              };
             };
           };
           settings = let
@@ -145,9 +132,15 @@ in {
             #unified-extensions-button,
             .unified-extensions-item,
             #tabs-newtab-button,
-            #TabsToolbar
+            #idbar
             {
               display: none !important;
+            }
+
+            #TabsToolbar,
+            #navigator-toolbox
+            {
+              visibility: collapse !important;
             }
 
             #tabbrowser-tabs {
