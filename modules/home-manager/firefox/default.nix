@@ -10,6 +10,7 @@ in {
     programs.firefox = {
       enable = true;
       package = pkgs.firefox-bin;
+      nativeMessagingHosts = [ pkgs.tridactyl-native ];
       profiles = {
         misi = {
           id = 0;
@@ -133,7 +134,6 @@ in {
             keepassxc-browser
             youtube-nonstop
             reddit-enhancement-suite
-            theater-mode-for-youtube
           ];
           userChrome = ''
             .tabbrowser-tab .tab-close-button,
