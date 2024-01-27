@@ -83,6 +83,10 @@ in {
                 name = "dnb";
                 url = "https://www.youtube.com/watch?v=qNaCzmbaYWI";
               }
+              {
+                name = "focus lofi🍯";
+                url = "https://www.youtube.com/watch?v=Xf3-4A-uEc8";
+              }
             ];
           }];
           search = {
