@@ -149,11 +149,14 @@ in {
               display: none !important;
             }
 
-            #titlebar {
+            #titlebar,
+            #PersonalToolbar
+            {
               visibility: collapse !important;
             }
             #nav-bar {
               min-height: 0px !important;
+              max-height: 0px !important;
             }
             toolbar {
               height: 0px !important;
