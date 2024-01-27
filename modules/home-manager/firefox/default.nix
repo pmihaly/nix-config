@@ -7,41 +7,41 @@ in {
   options.modules.firefox = { enable = mkEnableOption "firefox"; };
   config = mkIf cfg.enable {
 
-  home.file.".config/tridactyl/tridactylrc".text = ''
-    bind gd tabdetach
+    home.file.".config/tridactyl/tridactylrc".text = ''
+      bind gd tabdetach
 
-    set modeindicator false
+      set modeindicator false
 
-    set searchurls.nps https://search.nixos.org/packages?channel=unstable&sort=relevance&type=packages&query=
-    set searchurls.nos https://search.nixos.org/options?channel=unstable&sort=relevance&type=packages&query=
-    set searchurls.hos https://mipmip.github.io/home-manager-option-search/?query=
+      set searchurls.nps https://search.nixos.org/packages?channel=unstable&sort=relevance&type=packages&query=
+      set searchurls.nos https://search.nixos.org/options?channel=unstable&sort=relevance&type=packages&query=
+      set searchurls.hos https://mipmip.github.io/home-manager-option-search/?query=
 
-    set searchurls.ys  https://youtube.com/results?search_query=
-    set searchurls.y   https://youtube.com/feed/subscriptions
+      set searchurls.ys  https://youtube.com/results?search_query=
+      set searchurls.y   https://youtube.com/feed/subscriptions
 
-    set searchurls.g   https://google.com/search?q=
+      set searchurls.g   https://google.com/search?q=
 
-    setnull searchurls.amazon
-    setnull searchurls.amazonuk
-    setnull searchurls.bing
-    setnull searchurls.cnrtl
-    setnull searchurls.duckduckgo
-    setnull searchurls.gentoo_wiki
-    setnull searchurls.github
-    setnull searchurls.google
-    setnull searchurls.googlelucky
-    setnull searchurls.googleuk
-    setnull searchurls.mdn
-    setnull searchurls.osm
-    setnull searchurls.qwant
-    setnull searchurls.scholar
-    setnull searchurls.searx
-    setnull searchurls.startpage
-    setnull searchurls.twitter
-    setnull searchurls.wikipedia
-    setnull searchurls.yahoo
-    setnull searchurls.youtube
-  '';
+      setnull searchurls.amazon
+      setnull searchurls.amazonuk
+      setnull searchurls.bing
+      setnull searchurls.cnrtl
+      setnull searchurls.duckduckgo
+      setnull searchurls.gentoo_wiki
+      setnull searchurls.github
+      setnull searchurls.google
+      setnull searchurls.googlelucky
+      setnull searchurls.googleuk
+      setnull searchurls.mdn
+      setnull searchurls.osm
+      setnull searchurls.qwant
+      setnull searchurls.scholar
+      setnull searchurls.searx
+      setnull searchurls.startpage
+      setnull searchurls.twitter
+      setnull searchurls.wikipedia
+      setnull searchurls.yahoo
+      setnull searchurls.youtube
+    '';
 
     programs.firefox = {
       enable = true;

@@ -7,15 +7,19 @@ in {
   options.modules.git = { enable = mkEnableOption "git"; };
   config = mkIf cfg.enable {
 
-    home.packages = with pkgs;
-      [
-        tig # prettier git tree
-      ];
+    home.packages = with pkgs; [
+      git
+      tig # prettier git tree
+    ];
+
+    programs.git = {
+      userName = "pmihaly";
+      userEmail = "misi@pappmihaly.com";
+    };
 
     programs.lazygit = {
       enable = true;
       settings = {
-        services = { "gsh.lensa.com" = "gitlab:gitlab.lensa.com"; };
         notARepository = "quit";
         customCommands = [
           {

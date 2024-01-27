@@ -17,7 +17,6 @@ in {
   config = mkIf cfg.enable {
 
     home.packages = with pkgs; [
-      git
       httpie
       # curlie # httpie but with --curl
       tldr
@@ -145,8 +144,6 @@ in {
           ls =
             "${pkgs.eza}/bin/eza -lah --icons $([ -d .git ] && echo '--git')";
           cat = "bat";
-          d = "cd $(find ~/lensadev -maxdepth 1 -type d | fzf)";
-          dn = "d && nvim";
           p = "cd $(find ~/personaldev -maxdepth 1 -type d | fzf)";
           pn = "p && nvim";
           o = "cd ~/Sync/org";

@@ -24,8 +24,14 @@ in {
         { url = "https://old.reddit.com/r/escapehungary.rss"; }
         { url = "https://old.reddit.com/r/kiszamolo.rss"; }
         { url = "https://old.reddit.com/r/programminghungary.rss"; }
-        { url = "https://openrss.org/github.com/nix-community/home-manager/pull/4952"; }
-        { url = "https://openrss.org/github.com/nix-community/home-manager/pull/4957"; }
+        {
+          url =
+            "https://openrss.org/github.com/nix-community/home-manager/pull/4952";
+        }
+        {
+          url =
+            "https://openrss.org/github.com/nix-community/home-manager/pull/4957";
+        }
       ];
       extraConfig = builtins.concatStringsSep "\n" [
         ''
