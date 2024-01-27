@@ -149,10 +149,14 @@ in {
               display: none !important;
             }
 
-            #TabsToolbar,
-            #navigator-toolbox
-            {
+            #titlebar {
               visibility: collapse !important;
+            }
+            #nav-bar {
+              min-height: 0px !important;
+            }
+            toolbar {
+              height: 0px !important;
             }
 
             #tabbrowser-tabs {
