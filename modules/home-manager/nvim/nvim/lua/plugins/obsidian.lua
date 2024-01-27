@@ -4,6 +4,13 @@ return {
     version = '*',
     lazy = true,
     ft = 'markdown',
+    keys = {
+      { '<leader>oo', function() vim.api.nvim_command('ObsidianOpen') end, mode = 'n'},
+      { '<leader>os', function() vim.api.nvim_command('ObsidianSearch') end, mode = 'n'},
+      { '<leader>on', function() vim.api.nvim_command('ObsidianLinkNew') end, mode = 'n'},
+      { '<leader>on', function() vim.api.nvim_command('ObsidianLinkNew') end, mode = 'v'},
+      { '<leader>or', function() vim.api.nvim_command('ObsidianRename') end, mode = 'n'},
+    },
     dependencies = {
       'nvim-lua/plenary.nvim',
       'hrsh7th/nvim-cmp',
@@ -13,12 +20,11 @@ return {
     opts = {
       workspaces = {
         {
-          name = 'personal',
-          path = '~/vaults/personal',
-        },
-        {
-          name = 'work',
-          path = '~/vaults/work',
+          name = 'tech-notes',
+          path = '~/personaldev/tech-notes',
+          overrides = {
+            notes_subdir = "notes",
+          },
         },
       },
     },
