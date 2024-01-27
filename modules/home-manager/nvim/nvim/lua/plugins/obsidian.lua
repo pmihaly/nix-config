@@ -10,6 +10,7 @@ return {
       { '<leader>on', function() vim.api.nvim_command('ObsidianLinkNew') end, mode = 'n'},
       { '<leader>on', function() vim.api.nvim_command('ObsidianLinkNew') end, mode = 'v'},
       { '<leader>or', function() vim.api.nvim_command('ObsidianRename') end, mode = 'n'},
+      { '<leader>ol', function() vim.api.nvim_command('ObsidianLink') end, mode = 'v'},
     },
     dependencies = {
       'nvim-lua/plenary.nvim',
