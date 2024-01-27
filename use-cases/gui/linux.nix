@@ -52,6 +52,7 @@ in optionalAttrs platform.isLinux {
       TTYVTDisallocate = true;
     };
 
+    programs.ssh.startAgent = true;
   };
 }
 
