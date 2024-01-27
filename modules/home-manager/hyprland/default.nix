@@ -1,7 +1,8 @@
 { pkgs, lib, config, ... }:
 
 with lib;
-let cfg = config.modules.hyprland;
+let
+  cfg = config.modules.hyprland;
 
 in {
   options.modules.hyprland = { enable = mkEnableOption "hyprland"; };
@@ -10,6 +11,34 @@ in {
       wl-clipboard # `wl-copy` and `wl-paste`
       cinnamon.nemo
     ];
+
+    programs.rofi = {
+      enable = true;
+      package = pkgs.rofi-wayland;
+      plugins = with pkgs; [ rofi-emoji rofi-calc ];
+      extraConfig = {
+        icon-theme = "Papirus";
+        show-icons = true;
+        terminal = "alacritty";
+        drun-display-format = "{icon} {name}";
+        location = 0;
+        disable-history = false;
+        hide-scrollbar = true;
+        display-drun = "   Apps ";
+        display-run = "   Run ";
+        display-window = "   Window";
+        display-Network = " 󰤨  Network";
+        sidebar-mode = true;
+      };
+
+      theme = (pkgs.fetchFromGitHub {
+    owner = "catppuccin";
+    repo = "rofi";
+    rev = "5350da41a11814f950c3354f090b90d4674a95ce";
+    hash = "sha256-DNorfyl3C4RBclF2KDgwvQQwixpTwSRu7fIvihPN8JY=";
+  }
+        + /basic/.local/share/rofi/themes/catppuccin-frappe.rasi);
+    };
 
     wayland.windowManager.hyprland = {
       enable = true;
@@ -108,7 +137,9 @@ in {
         bind = [
           "$mainMod, T, exec, kitty"
           "$mainMod, Q, killactive,"
-          "$mainMod, SPACE, exec, ${pkgs.wofi}/bin/wofi --show drun"
+          "$mainMod, SPACE, exec, rofi -show drun"
+          "$mainMod, c, exec, rofi -show calc -modi calc -no-show-match -no-sort"
+          "$mainMod, x, exec, rofi -modi emoji -show emoji"
           "$mainMod, R, exec, hyprctl reload"
           "$mainMod, F, fullscreen"
           "$mainMod, W, exec, firefox"
