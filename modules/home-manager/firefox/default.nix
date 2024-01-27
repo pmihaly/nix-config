@@ -116,6 +116,7 @@ in {
             "browser.chrome.toolbar_tips" = false;
             "media.videocontrols.picture-in-picture.enabled" = false;
             "browser.newtabpage.pinned" = [ ];
+            "browser.startup.homepage" = "https://search.brave.com/search";
           };
           extensions = with pkgs.nur.repos.rycee.firefox-addons; [
             ublock-origin
