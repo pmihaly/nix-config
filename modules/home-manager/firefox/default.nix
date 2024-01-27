@@ -116,6 +116,8 @@ in {
             "browser.chrome.toolbar_tips" = false;
             "media.videocontrols.picture-in-picture.enabled" = false;
             "browser.newtabpage.pinned" = [ ];
+            "browser.startup.homepage" =
+              "moz-extension://3681afba-e21c-4310-bda9-a9c7ee3459a4/static/newtab.html";
           };
           extensions = with pkgs.nur.repos.rycee.firefox-addons; [
             ublock-origin
