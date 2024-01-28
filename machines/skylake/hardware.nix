@@ -30,7 +30,7 @@
     device = "/dev/disk/by-uuid/d92735a3-e405-4c78-8514-0db0a1ff8fcb";
     fsType = "btrfs";
     neededForBoot = true;
-    options = [ "subvol=@/nix" ];
+    options = [ "subvol=@nix" ];
   };
 
   fileSystems."/home" = {
