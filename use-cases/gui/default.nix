@@ -34,6 +34,7 @@ in {
           keepass-diff # diffing .kdbx files
           inputs.img2theme.packages."${pkgs.system}".default
           yt-dlp
+          feh
         ];
       };
     }
