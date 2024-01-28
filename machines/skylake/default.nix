@@ -58,6 +58,19 @@
     }];
   };
 
+  services.snapper = {
+    snapshotInterval = "hourly";
+    cleanupInterval = "daily";
+    configs = {
+      root = {
+        SUBVOLUME = "/";
+        ALLOW_USERS = [ vars.username ];
+        TIMELINE_CREATE = true;
+        TIMELINE_CLEANUP = true;
+      };
+    };
+  };
+
   time.timeZone = vars.timeZone;
   i18n.defaultLocale = "en_US.UTF-8";
   i18n.extraLocaleSettings = {
