@@ -11,9 +11,7 @@
       url = "github:lnl7/nix-darwin";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    impermanence = {
-      url = "github:nix-community/impermanence";
-    };
+    impermanence = { url = "github:nix-community/impermanence"; };
     nur.url = "github:nix-community/NUR";
     img2theme = {
       url = "github:pmihaly/img2theme";
@@ -85,10 +83,10 @@
       };
 
       modules = [
-      home-manager.nixosModules.home-manager
-      inputs.agenix.nixosModules.default
-      inputs.impermanence.nixosModules.impermanence
-      { nixpkgs.overlays = [ inputs.nur.overlay ]; }
+        home-manager.nixosModules.home-manager
+        inputs.agenix.nixosModules.default
+        inputs.impermanence.nixosModules.impermanence
+        { nixpkgs.overlays = [ inputs.nur.overlay ]; }
         { home-manager.extraSpecialArgs = { inherit inputs; }; }
         ./secrets
         ./machines/skylake
