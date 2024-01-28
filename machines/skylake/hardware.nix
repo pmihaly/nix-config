@@ -21,9 +21,22 @@
   boot.extraModulePackages = [ ];
 
   fileSystems."/" = {
+    device = "none";
+    fsType = "tmpfs";
+    options = [ "defaults" "size=25%" "mode=755" ];
+  };
+
+  fileSystems."/nix" = {
     device = "/dev/disk/by-uuid/d92735a3-e405-4c78-8514-0db0a1ff8fcb";
     fsType = "btrfs";
-    options = [ "subvol=@" ];
+    options = [ "subvol=@/nix" ];
+  };
+
+  fileSystems."/home" = {
+    device = "/dev/disk/by-uuid/d92735a3-e405-4c78-8514-0db0a1ff8fcb";
+    fsType = "btrfs";
+    neededForBoot = true;
+    options = [ "subvol=@home" ];
   };
 
   fileSystems."/boot" = {
@@ -34,6 +47,7 @@
   fileSystems."/persist" = {
     device = "/dev/disk/by-uuid/719a17cf-a271-4888-8ffe-22b6b4183152";
     fsType = "ext4";
+    neededForBoot = true;
   };
 
   swapDevices =
