@@ -100,6 +100,7 @@ in {
 
     programs.zsh = {
       enable = true;
+      dotDir = ".config/zsh";
       initExtra = ''
         autoload -U promptinit; promptinit
 
@@ -137,7 +138,10 @@ in {
       };
       enableAutosuggestions = true;
       autocd = true;
-      history = { ignoreDups = true; };
+      history = {
+        path = "${config.xdg.dataHome}/zsh";
+        ignoreDups = true;
+      };
       shellAliases = (mkMerge [
         (bookmarksToAliases cfg.bookmarks)
         {
@@ -190,6 +194,34 @@ in {
             "nix run nixpkgs#yt-dlp --"; # always use the latest yt-dlp to mitigate 403 errors from youtube
         }
       ]);
+
+      localVariables = {
+        AWS_CONFIG_FILE = "${config.xdg.configHome}/aws/config";
+        AWS_SHARED_CREDENTIALS_FILE =
+          "${config.xdg.configHome}/aws/credentials";
+        CARGO_HOME = "${config.xdg.dataHome}/cargo";
+        DOCKER_CONFIG = "${config.xdg.configHome}/docker";
+        GNUPGHOME = "${config.xdg.dataHome}/gnupg";
+        GOPATH = "${config.xdg.dataHome}/go";
+        GRADLE_USER_HOME = "${config.xdg.dataHome}/gradle";
+        GTK2_RC_FILES = "${config.xdg.configHome}/gtk-2.0/gtkrc";
+        IPYTHONDIR = "${config.xdg.configHome}/ipython";
+        JUPYTER_CONFIG_DIR = "${config.xdg.configHome}/jupyter";
+        LEDGER_FILE = "${config.xdg.dataHome}/hledger.journal";
+        LESSHISTFILE = "${config.xdg.cacheHome}/less/history";
+        NODE_REPL_HISTORY = "${config.xdg.dataHome}/node_repl_history";
+        NPM_CONFIG_USERCONFIG = "${config.xdg.configHome}/npm/npmrc";
+        PARALLEL_HOME = "${config.xdg.configHome}/parallel";
+        PYLINTHOME = "${config.xdg.cacheHome}/pylint";
+        PYTHONSTARTUP = "${config.xdg.configHome}/python/pythonrc";
+        REDISCLI_HISTFILE = "${config.xdg.dataHome}/redis/rediscli_history";
+        STACK_ROOT = "${config.xdg.dataHome}/stack";
+        WINEPREFIX = "${config.xdg.dataHome}/wine";
+        XCOMPOSECACHE = "${config.xdg.cacheHome}/X11/xcompose";
+        ZDOTDIR = "${config.home.homeDirectory}/.config/zsh";
+        _JAVA_OPTIONS =
+          ''-Djava.util.prefs.userRoot="${config.xdg.configHome}"/java'';
+      };
     };
 
     programs.direnv = {
