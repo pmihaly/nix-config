@@ -61,20 +61,6 @@
     }];
   };
 
-  services.snapper = {
-    snapshotInterval = "hourly";
-    cleanupInterval = "daily";
-    configs = {
-      root = {
-        SUBVOLUME = "/";
-        ALLOW_USERS = [ vars.username ];
-        TIMELINE_CREATE = true;
-        TIMELINE_CLEANUP = true;
-      };
-    };
-  };
-
-
   environment.persistence."/persist" = {
     hideMounts = true;
     directories = [
