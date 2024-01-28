@@ -15,6 +15,7 @@ in {
     programs.git = {
       userName = "pmihaly";
       userEmail = "misi@pappmihaly.com";
+      extraConfig = { pull.rebase = true; };
     };
 
     programs.lazygit = {
