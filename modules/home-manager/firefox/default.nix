@@ -46,7 +46,7 @@ in {
     programs.firefox = {
       enable = true;
       package = pkgs.firefox-bin;
-      nativeMessagingHosts = [ pkgs.tridactyl-native ];
+      nativeMessagingHosts = [ pkgs.tridactyl-native pkgs.keepassxc ];
       profiles = {
         misi = {
           id = 0;
