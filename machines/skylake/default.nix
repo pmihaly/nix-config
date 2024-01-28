@@ -15,7 +15,7 @@
         m = "/persist/opt/skylake-storage/Media/Movies";
       };
       sshServer.hostKeys = [{
-        path = "/etc/ssh/ssh_host_ed25519_key";
+        path = "/persist/etc/ssh/ssh_host_ed25519_key";
         type = "ed25519";
       }];
     };
@@ -65,37 +65,39 @@
     hideMounts = true;
     directories = [
       "/var/log"
-      # "/var/lib/bluetooth"
       "/var/lib/nixos"
       "/var/lib/systemd/coredump"
-      # "/etc/NetworkManager/system-connections"
-      # { directory = "/var/lib/colord"; user = "colord"; group = "colord"; mode = "u=rwx,g=rx,o="; }
     ];
     files = [
       "/etc/machine-id"
-      {
-        file = "/etc/ssh/ssh_host_ed25519_key";
-        parentDirectory = { mode = "u=rw,g=,o="; };
-      }
+      # {
+      #   file = "/etc/ssh/ssh_host_ed25519_key";
+      #   parentDirectory = { mode = "u=rw,g=,o="; };
+      # }
     ];
-    # users.talyz = {
-    #   directories = [
-    #     "Downloads"
-    #     "Music"
-    #     "Pictures"
-    #     "Documents"
-    #     "Videos"
-    #     "VirtualBox VMs"
-    #     { directory = ".gnupg"; mode = "0700"; }
-    #     { directory = ".ssh"; mode = "0700"; }
-    #     { directory = ".nixops"; mode = "0700"; }
-    #     { directory = ".local/share/keyrings"; mode = "0700"; }
-    #     ".local/share/direnv"
-    #   ];
-    #   files = [
-    #     ".screenrc"
-    #   ];
-    # };
+    users.${vars.username} = {
+      directories = [
+        "Downloads"
+        "Music"
+        "Pictures"
+        "Documents"
+        "Videos"
+        "Sync"
+        { directory = ".gnupg"; mode = "0700"; }
+        { directory = ".ssh"; mode = "0700"; }
+        { directory = ".local/share/keyrings"; mode = "0700"; }
+        ".local/share/direnv"
+        ".mozilla"
+        ".nix-config"
+        ".steam"
+        ".wine"
+        "personaldev"
+
+        # WIP - needs to be refined
+        ".local"
+        ".config"
+      ];
+    };
   };
 
   time.timeZone = vars.timeZone;
