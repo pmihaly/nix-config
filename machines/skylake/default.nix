@@ -94,7 +94,6 @@
           directory = ".local/share/keyrings";
           mode = "0700";
         }
-        ".local/share/direnv"
         ".mozilla"
         ".nix-config"
         ".steam"
@@ -104,8 +103,11 @@
         ".cache/appimage-run"
         ".local/share/PolyMC"
 
-        # WIP - needs to be refined
-        ".local"
+        ".local/share/direnv"
+        ".config/discord" # discord state
+        ".local/share/lutris"
+        ".local/share/newsboat"
+        ".local/share/nvim"
       ];
     };
   };
