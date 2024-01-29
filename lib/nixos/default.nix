@@ -9,7 +9,7 @@ let
           virtualHosts."${subdomain}.${vars.domainName}" = lib.mkMerge [
             {
               forceSSL = true;
-              enableACME = true;
+              useACMEHost = vars.domainName;
               extraConfig = ''
                 set $upstream_authelia http://localhost:8081/api/verify;
 

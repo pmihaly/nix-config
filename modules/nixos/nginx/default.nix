@@ -11,7 +11,7 @@ in {
 
       virtualHosts."${vars.domainName}" = {
         forceSSL = true;
-        enableACME = true;
+        useACMEHost = vars.domainName;
         root = "${pkgs.nix.doc}/share/doc/nix/manual";
       };
 
@@ -23,9 +23,22 @@ in {
       recommendedBrotliSettings = true;
     };
 
+    users.users.nginx.extraGroups = [ "acme" ];
+
     security.acme = {
       acceptTerms = true;
       defaults.email = "${vars.acmeEmail}";
+
+      certs.${vars.domainName} = {
+        extraDomainNames = [ "*.${vars.domainName}" ];
+
+        dnsProvider = "porkbun";
+        dnsPropagationCheck = true;
+        credentialFiles = {
+          PORKBUN_API_KEY_FILE = config.age.secrets."acme/porkbun-api-key".path;
+          PORKBUN_SECRET_API_KEY_FILE = config.age.secrets."acme/porkbun-secret-key".path;
+        };
+      };
     };
 
     networking.firewall = {

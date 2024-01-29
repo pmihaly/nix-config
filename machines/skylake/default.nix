@@ -1,4 +1,4 @@
-{ pkgs, lib, vars, ... }: {
+{ pkgs, config, lib, vars, ... }: {
   imports = [ ../../use-cases ./hardware.nix ];
 
   modules = {
@@ -63,17 +63,9 @@
 
   environment.persistence."/persist" = {
     hideMounts = true;
-    directories = [
-      "/var/log"
-      "/var/lib/nixos"
-      "/var/lib/systemd/coredump"
-    ];
+    directories = [ "/var/log" "/var/lib/nixos" "/var/lib/acme" "/var/lib/systemd/coredump" ];
     files = [
       "/etc/machine-id"
-      # {
-      #   file = "/etc/ssh/ssh_host_ed25519_key";
-      #   parentDirectory = { mode = "u=rw,g=,o="; };
-      # }
     ];
     users.${vars.username} = {
       directories = [
@@ -83,9 +75,18 @@
         "Documents"
         "Videos"
         "Sync"
-        { directory = ".gnupg"; mode = "0700"; }
-        { directory = ".ssh"; mode = "0700"; }
-        { directory = ".local/share/keyrings"; mode = "0700"; }
+        {
+          directory = ".gnupg";
+          mode = "0700";
+        }
+        {
+          directory = ".ssh";
+          mode = "0700";
+        }
+        {
+          directory = ".local/share/keyrings";
+          mode = "0700";
+        }
         ".local/share/direnv"
         ".mozilla"
         ".nix-config"
