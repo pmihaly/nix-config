@@ -36,7 +36,8 @@ in {
         dnsPropagationCheck = true;
         credentialFiles = {
           PORKBUN_API_KEY_FILE = config.age.secrets."acme/porkbun-api-key".path;
-          PORKBUN_SECRET_API_KEY_FILE = config.age.secrets."acme/porkbun-secret-key".path;
+          PORKBUN_SECRET_API_KEY_FILE =
+            config.age.secrets."acme/porkbun-secret-key".path;
         };
       };
     };
