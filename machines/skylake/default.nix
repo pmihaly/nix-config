@@ -65,10 +65,13 @@
 
   environment.persistence."/persist" = {
     hideMounts = true;
-    directories = [ "/var/log" "/var/lib/nixos" "/var/lib/acme" "/var/lib/systemd/coredump" ];
-    files = [
-      "/etc/machine-id"
+    directories = [
+      "/var/log"
+      "/var/lib/nixos"
+      "/var/lib/acme"
+      "/var/lib/systemd/coredump"
     ];
+    files = [ "/etc/machine-id" ];
     users.${vars.username} = {
       directories = [
         "Downloads"
@@ -78,6 +81,7 @@
         "Videos"
         "Sync"
         "Maildir"
+        "personaldev"
         {
           directory = ".gnupg";
           mode = "0700";
@@ -95,7 +99,10 @@
         ".nix-config"
         ".steam"
         ".wine"
-        "personaldev"
+
+        # minecraft
+        ".cache/appimage-run"
+        ".local/share/PolyMC"
 
         # WIP - needs to be refined
         ".local"
