@@ -33,12 +33,6 @@
     options = [ "subvol=@nix" ];
   };
 
-  fileSystems."/home" = {
-    device = "none";
-    fsType = "tmpfs";
-    options = [ "defaults" "size=25%" "mode=755" ];
-  };
-
   fileSystems."/boot" = {
     device = "/dev/disk/by-uuid/1CEA-D961";
     fsType = "vfat";

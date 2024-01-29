@@ -61,6 +61,8 @@
     }];
   };
 
+  programs.fuse.userAllowOther = true;
+
   environment.persistence."/persist" = {
     hideMounts = true;
     directories = [ "/var/log" "/var/lib/nixos" "/var/lib/acme" "/var/lib/systemd/coredump" ];
@@ -75,6 +77,7 @@
         "Documents"
         "Videos"
         "Sync"
+        "Maildir"
         {
           directory = ".gnupg";
           mode = "0700";
@@ -96,7 +99,6 @@
 
         # WIP - needs to be refined
         ".local"
-        ".config"
       ];
     };
   };
