@@ -103,9 +103,11 @@
         ".cache/appimage-run"
         ".local/share/PolyMC"
 
+        ".config/lutris"
+        ".local/share/lutris"
+
         ".local/share/direnv"
         ".config/discord" # discord state
-        ".local/share/lutris"
         ".local/share/newsboat"
         ".local/share/nvim"
       ];
