@@ -35,7 +35,7 @@ in optionalAttrs platform.isLinux {
         endlessh.enable = true;
         monitoring.enable = true;
         hledger.enable = false;
-        duckdns.enable = true;
+        duckdns.enable = false;
         paperless.enable = true;
         syncthing.enable = true;
       };
