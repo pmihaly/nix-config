@@ -27,6 +27,7 @@ in {
       home-manager.users.${cfg.username} = {
         imports = [
           inputs.agenix.homeManagerModules.default
+          inputs.nix-index-database.hmModules.nix-index
           ../../secrets/home-manager
         ];
 
@@ -34,6 +35,8 @@ in {
           inputs.agenix.packages."${pkgs.system}".default
           inputs.deploy-rs.packages."${pkgs.system}".default
         ];
+
+        programs.nix-index-database.comma.enable = true;
       };
     }
 
