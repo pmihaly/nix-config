@@ -97,7 +97,6 @@
         ".mozilla"
         ".nix-config"
         ".steam"
-        ".wine"
 
         # minecraft
         ".cache/appimage-run"
