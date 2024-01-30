@@ -45,6 +45,10 @@ in {
 
     { users.users.${cfg.username}.shell = pkgs.zsh; }
 
+    (optionalAttrs platform.isLinux {
+      home-manager.users.${cfg.username}.xdg.userDirs.enable = true;
+    })
+
     {
       home-manager.users.${cfg.username} = {
         imports = [ ../../modules/home-manager ];
