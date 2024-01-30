@@ -73,6 +73,9 @@
     ];
     files = [ "/etc/machine-id" ];
     users.${vars.username} = {
+      files = [
+        ".local/share/zsh"
+      ];
       directories = [
         "Downloads"
         "Music"
