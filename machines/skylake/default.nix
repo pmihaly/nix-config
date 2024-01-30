@@ -70,12 +70,11 @@
       "/var/lib/nixos"
       "/var/lib/acme"
       "/var/lib/systemd/coredump"
+      "/var/lib/authelia-skylake"
     ];
     files = [ "/etc/machine-id" ];
     users.${vars.username} = {
-      files = [
-        ".local/share/zsh"
-      ];
+      files = [ ".local/share/zsh" ];
       directories = [
         "Downloads"
         "Music"
