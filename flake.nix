@@ -90,7 +90,7 @@
         home-manager.nixosModules.home-manager
         inputs.agenix.nixosModules.default
         inputs.impermanence.nixosModules.impermanence
-        inputs.nix-index-database.nixosModules.nix-index-database
+        inputs.nix-index-database.nixosModules.nix-index
         { nixpkgs.overlays = [ inputs.nur.overlay ]; }
         { home-manager.extraSpecialArgs = { inherit inputs; }; }
         ./secrets

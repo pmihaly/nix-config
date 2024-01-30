@@ -34,6 +34,10 @@ in {
 
     (optionalAttrs platform.isLinux {
       programs.zsh.enable = true;
+
+      programs.nix-index.enableBashIntegration = false;
+      programs.command-not-found.enable = false;
+
       services.openssh = {
         enable = true;
         openFirewall = true;
