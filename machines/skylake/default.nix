@@ -44,7 +44,7 @@
     description = vars.username;
     extraGroups = [ "wheel" ];
     initialPassword = vars.username;
-    hashedPasswordFile = "/persist/${vars.username}-password";
+    hashedPasswordFile = config.age.secrets."login/${vars.username}-password".path;
   };
 
   boot.loader.systemd-boot.enable = true;
