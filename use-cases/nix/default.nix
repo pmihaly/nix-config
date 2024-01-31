@@ -1,13 +1,10 @@
-{ platform, inputs, pkgs, lib, config, ... }:
+{ platform, inputs, pkgs, vars, lib, config, ... }:
 
 with lib;
 let cfg = config.modules.nix;
 
 in {
-  options.modules.nix = {
-    enable = mkEnableOption "nix";
-    username = mkOption { type = types.str; };
-  };
+  options.modules.nix = { enable = mkEnableOption "nix"; };
   config = mkIf cfg.enable (mkMerge [
     {
       nixpkgs.overlays = import ../../overlays;
@@ -24,7 +21,7 @@ in {
       home-manager.useGlobalPkgs = true;
       home-manager.useUserPackages = true;
 
-      home-manager.users.${cfg.username} = {
+      home-manager.users.${vars.username} = {
         imports = [
           inputs.agenix.homeManagerModules.default
           inputs.nix-index-database.hmModules.nix-index
@@ -57,7 +54,7 @@ in {
           Hour = 3;
           Minute = 15;
         };
-        user = cfg.username;
+        user = vars.username;
       };
     })
   ]);

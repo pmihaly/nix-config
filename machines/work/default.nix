@@ -2,21 +2,14 @@
   imports = [ ../../use-cases ];
 
   modules = {
-    nix = {
-      enable = true;
-      username = vars.username;
-    };
+    nix.enable = true;
 
     shell = {
       enable = true;
-      username = vars.username;
       extraBookmarks = { w = "~/lensadev"; };
     };
 
-    gui = {
-      enable = true;
-      username = vars.username;
-    };
+    gui.enable = true;
   };
 
   home-manager.users.${vars.username} = {

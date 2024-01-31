@@ -1,4 +1,4 @@
-{ platform, pkgs, lib, config, ... }:
+{ platform, pkgs, lib, vars,config, ... }:
 
 with lib;
 let cfg = config.modules.linux;
@@ -10,7 +10,7 @@ in optionalAttrs platform.isLinux {
   };
 
   config = mkIf cfg.enable {
-    home-manager.users.${cfg.username} = {
+    home-manager.users.${vars.username} = {
       imports = [ ../../modules/home-manager ];
 
       modules = { hyprland.enable = true; };

@@ -1,4 +1,4 @@
-{ platform, pkgs, lib, config, ... }:
+{ platform, pkgs, vars, lib, config, ... }:
 
 with lib;
 let
@@ -18,7 +18,6 @@ let
 in {
   options.modules.shell = {
     enable = mkEnableOption "shell";
-    username = mkOption { type = types.str; };
     extraBookmarks = mkOption {
       default = { };
       type = types.attrs;
@@ -47,14 +46,14 @@ in {
       };
     })
 
-    { users.users.${cfg.username}.shell = pkgs.zsh; }
+    { users.users.${vars.username}.shell = pkgs.zsh; }
 
     (optionalAttrs platform.isLinux {
-      home-manager.users.${cfg.username}.xdg.userDirs.enable = true;
+      home-manager.users.${vars.username}.xdg.userDirs.enable = true;
     })
 
     {
-      home-manager.users.${cfg.username} = {
+      home-manager.users.${vars.username} = {
         imports = [ ../../modules/home-manager ];
 
         modules = {

@@ -2,14 +2,10 @@
   imports = [ ../../use-cases ./hardware.nix ];
 
   modules = {
-    nix = {
-      enable = true;
-      username = vars.username;
-    };
+    nix.enable = true;
 
     shell = {
       enable = true;
-      username = vars.username;
       extraBookmarks = {
         t = "/persist/opt/skylake-storage/Media/TV";
         m = "/persist/opt/skylake-storage/Media/Movies";
@@ -20,20 +16,11 @@
       }];
     };
 
-    gui = {
-      enable = true;
-      username = vars.username;
-    };
+    gui.enable = true;
 
-    server = {
-      enable = true;
-      username = vars.username;
-    };
+    server.enable = true;
 
-    gaming = {
-      enable = true;
-      username = vars.username;
-    };
+    gaming.enable = true;
   };
 
   home-manager.users.${vars.username}.home.stateVersion = "22.05";
@@ -44,7 +31,8 @@
     description = vars.username;
     extraGroups = [ "wheel" ];
     initialPassword = vars.username;
-    hashedPasswordFile = config.age.secrets."login/${vars.username}-password".path;
+    hashedPasswordFile =
+      config.age.secrets."login/${vars.username}-password".path;
   };
 
   boot.loader.systemd-boot.enable = true;

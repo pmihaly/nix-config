@@ -1,20 +1,17 @@
-{ inputs, platform, pkgs, lib, config, ... }:
+{ inputs, platform, pkgs, vars, lib, config, ... }:
 
 with lib;
 let cfg = config.modules.gui;
 
 in {
-  options.modules.gui = {
-    enable = mkEnableOption "gui";
-    username = mkOption { type = types.str; };
-  };
+  options.modules.gui = { enable = mkEnableOption "gui"; };
 
   imports = [ ./darwin.nix ./linux.nix ];
 
   config = mkIf cfg.enable (mkMerge [
 
     {
-      home-manager.users.${cfg.username} = {
+      home-manager.users.${vars.username} = {
         imports = [ ../../modules/home-manager ];
 
         modules = {
@@ -42,7 +39,7 @@ in {
     (optionalAttrs platform.isLinux {
       modules.linux = {
         enable = true;
-        username = cfg.username;
+        username = vars.username;
       };
     })
 

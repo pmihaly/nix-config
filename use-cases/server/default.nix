@@ -1,18 +1,15 @@
-{ platform, lib, config, ... }:
+{ platform, lib, vars, config, ... }:
 
 with lib;
 let cfg = config.modules.server;
 
 in optionalAttrs platform.isLinux {
-  options.modules.server = {
-    enable = mkEnableOption "server";
-    username = mkOption { type = types.str; };
-  };
+  options.modules.server = { enable = mkEnableOption "server"; };
   imports = [ ../../modules/nixos ];
   config = mkIf cfg.enable (mkMerge [
 
     {
-      users.users.${cfg.username} = {
+      users.users.${vars.username} = {
         openssh.authorizedKeys.keys = [
           "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG/9W5fVVxjEIo66iLCDfwxHh0IQ6r9R3J/Fq5b9LWNM mihaly.papp@mihalypapp-MacBook-Pro"
         ];
@@ -20,8 +17,8 @@ in optionalAttrs platform.isLinux {
     }
 
     {
-      users.groups.multimedia.members = [ "${cfg.username}" ];
-      users.groups.backup.members = [ "${cfg.username}" ];
+      users.groups.multimedia.members = [ "${vars.username}" ];
+      users.groups.backup.members = [ "${vars.username}" ];
     }
 
     {
