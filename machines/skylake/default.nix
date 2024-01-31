@@ -39,12 +39,12 @@
   home-manager.users.${vars.username}.home.stateVersion = "22.05";
 
   users.mutableUsers = false;
-  users.users.root.initialPassword = "root";
   users.users.${vars.username} = {
     isNormalUser = true;
     description = vars.username;
     extraGroups = [ "wheel" ];
     initialPassword = vars.username;
+    hashedPasswordFile = "/persist/${vars.username}-password";
   };
 
   boot.loader.systemd-boot.enable = true;
