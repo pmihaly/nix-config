@@ -22,6 +22,7 @@ in {
       enable = true;
       settings = {
         notARepository = "quit";
+        disableStartupPopups = true;
         customCommands = [
           {
             key = "b";
