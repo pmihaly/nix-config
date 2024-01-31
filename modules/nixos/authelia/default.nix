@@ -20,6 +20,10 @@ in {
       logo = ./authelia.png;
     };
     extraConfig = {
+
+      environment.persistence.${vars.persistDir}.directories =
+        [ "/var/lib/authelia-skylake" ];
+
       services.authelia.instances.skylake = {
         enable = true;
         secrets = {

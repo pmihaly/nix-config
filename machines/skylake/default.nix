@@ -7,11 +7,11 @@
     shell = {
       enable = true;
       extraBookmarks = {
-        t = "/persist/opt/skylake-storage/Media/TV";
-        m = "/persist/opt/skylake-storage/Media/Movies";
+        t = "${vars.persistDir}/opt/skylake-storage/Media/TV";
+        m = "${vars.persistDir}/opt/skylake-storage/Media/Movies";
       };
       sshServer.hostKeys = [{
-        path = "/persist/etc/ssh/ssh_host_ed25519_key";
+        path = "${vars.persistDir}/etc/ssh/ssh_host_ed25519_key";
         type = "ed25519";
       }];
     };
@@ -51,15 +51,9 @@
 
   programs.fuse.userAllowOther = true;
 
-  environment.persistence."/persist" = {
+  environment.persistence.${vars.persistDir} = {
     hideMounts = true;
-    directories = [
-      "/var/log"
-      "/var/lib/nixos"
-      "/var/lib/acme"
-      "/var/lib/systemd/coredump"
-      "/var/lib/authelia-skylake"
-    ];
+    directories = [ "/var/log" "/var/lib/nixos" "/var/lib/systemd/coredump" ];
     files = [ "/etc/machine-id" ];
     users.${vars.username} = {
       files = [ ".local/share/zsh" ];

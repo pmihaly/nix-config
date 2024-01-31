@@ -6,6 +6,10 @@ let cfg = config.modules.nginx;
 in {
   options.modules.nginx = { enable = mkEnableOption "nginx"; };
   config = mkIf cfg.enable {
+
+    environment.persistence.${vars.persistDir}.directories =
+      [ "/var/lib/acme" ];
+
     services.nginx = {
       enable = true;
 
