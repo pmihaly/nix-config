@@ -14,5 +14,6 @@
     ./hyprland
     ./discord
     ./minecraft
+    ./keepassxc
   ];
 }

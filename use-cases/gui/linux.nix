@@ -1,4 +1,4 @@
-{ platform, pkgs, lib, vars,config, ... }:
+{ platform, pkgs, lib, vars, config, ... }:
 
 with lib;
 let cfg = config.modules.linux;

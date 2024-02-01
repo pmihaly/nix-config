@@ -11,7 +11,8 @@ in optionalAttrs platform.isLinux {
   ];
   config = mkIf cfg.enable {
 
-    environment.persistence.${vars.persistDir}.users.${vars.username}.directories = [
+    environment.persistence.${vars.persistDir}.users.${vars.username}.directories =
+      [
         # minecraft
         ".cache/appimage-run"
         ".local/share/PolyMC"
@@ -22,7 +23,7 @@ in optionalAttrs platform.isLinux {
         ".local/share/lutris"
 
         ".steam"
-    ];
+      ];
 
     environment.systemPackages =
       [ pkgs.lutris pkgs.wine pkgs.gamescope pkgs.gamemode ];

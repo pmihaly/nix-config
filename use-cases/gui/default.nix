@@ -21,10 +21,10 @@ in {
           newsboat.enable = true;
           neomutt.enable = true;
           zathura.enable = true;
+          keepassxc.enable = true;
         };
 
         home.packages = with pkgs; [
-          keepassxc
           syncthing
           act # running github actions locally
           nix-tree # visualisation of nix derivations
