@@ -88,6 +88,10 @@ in {
                 name = "focus lofi🍯";
                 url = "https://www.youtube.com/watch?v=Xf3-4A-uEc8";
               }
+              {
+                name = "ethereal breaks *:･ﾟ✧";
+                url = "https://www.youtube.com/watch?v=tdceTb3vsmk";
+              }
             ];
           }];
           search = {
