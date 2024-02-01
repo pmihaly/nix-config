@@ -92,6 +92,10 @@ in {
                 name = "ethereal breaks *:･ﾟ✧";
                 url = "https://www.youtube.com/watch?v=tdceTb3vsmk";
               }
+              {
+                name = "cartoon tripping minimal techo";
+                url = "https://www.youtube.com/watch?v=WddpRmmAYkg";
+              }
             ];
           }];
           search = {
