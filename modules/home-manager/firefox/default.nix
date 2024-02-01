@@ -15,6 +15,7 @@ in {
       set searchurls.nps https://search.nixos.org/packages?channel=unstable&sort=relevance&type=packages&query=
       set searchurls.nos https://search.nixos.org/options?channel=unstable&sort=relevance&type=packages&query=
       set searchurls.hos https://mipmip.github.io/home-manager-option-search/?query=
+      set searchurls.nog https://noogle.dev/q?term=
 
       set searchurls.ys  https://youtube.com/results?search_query=
       set searchurls.y   https://youtube.com/feed/subscriptions
