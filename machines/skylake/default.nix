@@ -79,6 +79,7 @@
         ".local/share/direnv"
         ".local/share/newsboat"
         ".local/share/nvim"
+        ".local/share/icons"
       ];
     };
   };
