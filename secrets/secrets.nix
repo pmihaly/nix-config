@@ -14,5 +14,4 @@ in {
   "email/password/mihaly_mihaly.codes.age".publicKeys = allKeys;
   "acme/porkbun-api-key.age".publicKeys = allKeys;
   "acme/porkbun-secret-key.age".publicKeys = allKeys;
-  "login/misi-password.age".publicKeys = allKeys;
 }

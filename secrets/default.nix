@@ -32,7 +32,4 @@
 
   age.secrets."acme/porkbun-secret-key" =
     lib.mkDefault { file = ./acme/porkbun-secret-key.age; };
-
-  age.secrets."login/misi-password" =
-    lib.mkDefault { file = ./login/misi-password.age; };
 }
