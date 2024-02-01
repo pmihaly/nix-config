@@ -76,17 +76,8 @@
         }
         ".mozilla"
         ".nix-config"
-        ".steam"
-
-        # minecraft
-        ".cache/appimage-run"
-        ".local/share/PolyMC"
-
-        ".config/lutris"
-        ".local/share/lutris"
 
         ".local/share/direnv"
-        ".config/discord" # discord state
         ".local/share/newsboat"
         ".local/share/nvim"
       ];
