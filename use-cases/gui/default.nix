@@ -15,6 +15,8 @@ in {
         imports = [ ../../modules/home-manager ];
 
         modules = {
+          persistence.directories =
+            [ "Downloads" "Music" "Pictures" "Documents" "Videos" ];
           firefox.enable = true;
           mpv.enable = true;
           kitty.enable = true;

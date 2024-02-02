@@ -17,7 +17,8 @@ in {
   options.modules.minecraft = { enable = mkEnableOption "minecraft"; };
   config = mkIf cfg.enable {
 
-    modules.persistence.directories = [ ".cache/appimage-run" ".local/share/PolyMC" ];
+    modules.persistence.directories =
+      [ ".cache/appimage-run" ".local/share/PolyMC" ];
 
     home.packages = [ pkgs.temurin-jre-bin-17 ];
 

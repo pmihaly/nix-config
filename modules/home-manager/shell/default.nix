@@ -16,6 +16,11 @@ in {
   };
   config = mkIf cfg.enable {
 
+    modules.persistence = {
+      files = [ ".local/share/zsh" ];
+      directories = [ ".local/share/direnv" ];
+    };
+
     home.packages = with pkgs; [
       httpie
       # curlie # httpie but with --curl

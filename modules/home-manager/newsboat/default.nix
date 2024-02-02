@@ -7,6 +7,8 @@ in {
   options.modules.newsboat = { enable = mkEnableOption "newsboat"; };
   config = mkIf cfg.enable {
 
+    modules.persistence.directories = [ ".local/share/newsboat" ];
+
     programs.newsboat = {
       enable = true;
       autoReload = true;

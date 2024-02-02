@@ -55,33 +55,9 @@
     directories = [ "/var/log" "/var/lib/nixos" "/var/lib/systemd/coredump" ];
     files = [ "/etc/machine-id" ];
     users.${vars.username} = {
-      files = [ ".local/share/zsh" ]
-        ++ config.home-manager.users.${vars.username}.modules.persistence.files;
-      directories = [
-        "Downloads"
-        "Music"
-        "Pictures"
-        "Documents"
-        "Videos"
-        "Sync"
-        "Maildir"
-        "personaldev"
-        {
-          directory = ".ssh";
-          mode = "0700";
-        }
-        {
-          directory = ".local/share/keyrings";
-          mode = "0700";
-        }
-        ".mozilla"
-        ".nix-config"
-
-        ".local/share/direnv"
-        ".local/share/newsboat"
-        ".local/share/nvim"
-        ".local/share/icons"
-      ]
+      files =
+        config.home-manager.users.${vars.username}.modules.persistence.files;
+      directories = [ "Sync" ".nix-config" ]
         ++ config.home-manager.users.${vars.username}.modules.persistence.directories;
     };
   };

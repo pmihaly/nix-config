@@ -30,6 +30,7 @@ in optionalAttrs platform.isLinux {
         persistence.directories = [
           ".config/lutris"
           ".local/share/lutris"
+          ".local/share/icons"
 
           ".steam"
         ];

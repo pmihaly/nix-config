@@ -7,6 +7,8 @@ in {
   options.modules.firefox = { enable = mkEnableOption "firefox"; };
   config = mkIf cfg.enable {
 
+    modules.persistence.directories = [ ".mozilla" ];
+
     xdg.configFile."tridactyl/tridactylrc".text = ''
       bind gd tabdetach
 
