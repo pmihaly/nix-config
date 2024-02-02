@@ -9,7 +9,7 @@ in {
 
     home.packages = [ pkgs.keepassxc ];
 
-    home.file.".config/keepassxc/keepassxc.ini".text = (generators.toINI { } {
+    xdg.configFile."keepassxc/keepassxc.ini".text = (generators.toINI { } {
       General.ConfigVersion = 2;
       Browser.CustomProxyLocation = "";
       GUI.TrayIconAppearance = "monochrome-light";

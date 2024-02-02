@@ -7,7 +7,7 @@ in {
   options.modules.firefox = { enable = mkEnableOption "firefox"; };
   config = mkIf cfg.enable {
 
-    home.file.".config/tridactyl/tridactylrc".text = ''
+    xdg.configFile."tridactyl/tridactylrc".text = ''
       bind gd tabdetach
 
       set modeindicator false
