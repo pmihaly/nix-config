@@ -11,20 +11,6 @@ in optionalAttrs platform.isLinux {
   ];
   config = mkIf cfg.enable {
 
-    environment.persistence.${vars.persistDir}.users.${vars.username}.directories =
-      [
-        # minecraft
-        ".cache/appimage-run"
-        ".local/share/PolyMC"
-
-        ".config/discord"
-
-        ".config/lutris"
-        ".local/share/lutris"
-
-        ".steam"
-      ];
-
     environment.systemPackages =
       [ pkgs.lutris pkgs.wine pkgs.gamescope pkgs.gamemode ];
 
@@ -41,6 +27,13 @@ in optionalAttrs platform.isLinux {
       modules = {
         discord.enable = true;
         minecraft.enable = true;
+        persistence.directories = [
+          ".config/lutris"
+          ".local/share/lutris"
+
+          ".steam"
+        ];
+
       };
     };
 

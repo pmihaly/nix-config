@@ -55,7 +55,8 @@
     directories = [ "/var/log" "/var/lib/nixos" "/var/lib/systemd/coredump" ];
     files = [ "/etc/machine-id" ];
     users.${vars.username} = {
-      files = [ ".local/share/zsh" ];
+      files = [ ".local/share/zsh" ]
+        ++ config.home-manager.users.${vars.username}.modules.persistence.files;
       directories = [
         "Downloads"
         "Music"
@@ -80,7 +81,8 @@
         ".local/share/newsboat"
         ".local/share/nvim"
         ".local/share/icons"
-      ];
+      ]
+        ++ config.home-manager.users.${vars.username}.modules.persistence.directories;
     };
   };
 

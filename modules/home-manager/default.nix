@@ -15,5 +15,6 @@
     ./discord
     ./minecraft
     ./keepassxc
+    ./persistence
   ];
 }
