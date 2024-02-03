@@ -57,10 +57,13 @@ in {
         imports = [ ../../modules/home-manager ];
 
         modules = {
-          persistence.directories = [{
-            directory = ".ssh";
-            mode = "0700";
-          }];
+          persistence.directories = [
+            "personaldev"
+            {
+              directory = ".ssh";
+              mode = "0700";
+            }
+          ];
           shell = {
             enable = true;
             bookmarks = bookmarks // cfg.extraBookmarks;
