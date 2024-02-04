@@ -50,6 +50,9 @@ in {
       enable = true;
       package = pkgs.firefox-bin;
       nativeMessagingHosts = [ pkgs.tridactyl-native pkgs.keepassxc ];
+      policies = {
+        DisableAppUpdate = true;
+      };
       profiles = {
         misi = {
           id = 0;
