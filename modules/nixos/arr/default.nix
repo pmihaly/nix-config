@@ -20,6 +20,9 @@ in {
     {
       systemd.tmpfiles.rules =
         map (x: "d ${x} 0775 ${vars.username} multimedia - -") directories;
+
+    environment.persistence.${vars.persistDir}.directories =
+      [ { directory = "/var/lib/private/prowlarr"; mode = "0700"; }];
     }
 
     (mkService {
