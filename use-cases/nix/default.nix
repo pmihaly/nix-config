@@ -30,7 +30,7 @@ in {
 
         home.packages = [
           inputs.agenix.packages."${pkgs.system}".default
-          inputs.deploy-rs.packages."${pkgs.system}".default
+          pkgs.deploy-rs
         ];
 
         programs.nix-index-database.comma.enable = true;
