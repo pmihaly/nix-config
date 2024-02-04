@@ -69,6 +69,7 @@ in {
         name = "Jellyseerr";
         logo = ./jellyseerr.png;
       };
+      bypassAuth = true;
       extraConfig.virtualisation.oci-containers.containers.jellyseerr = {
         image = "fallenbagel/jellyseerr:1.7.0";
         ports = [ "5055:5055" ];
