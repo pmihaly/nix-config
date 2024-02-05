@@ -28,10 +28,8 @@ in {
           ../../secrets/home-manager
         ];
 
-        home.packages = [
-          inputs.agenix.packages."${pkgs.system}".default
-          pkgs.deploy-rs
-        ];
+        home.packages =
+          [ inputs.agenix.packages."${pkgs.system}".default pkgs.deploy-rs ];
 
         programs.nix-index-database.comma.enable = true;
       };
