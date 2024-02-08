@@ -103,6 +103,10 @@ in {
                 name = "breakcore to vibe to";
                 url = "https://www.youtube.com/watch?v=5nVLLll-CKs";
               }
+              {
+                name = "heaven.exe breakcore";
+                url = "https://www.youtube.com/watch?v=z9e8CPULjW4";
+              }
             ];
           }];
           search = {
