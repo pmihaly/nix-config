@@ -99,6 +99,10 @@ in {
                 name = "cartoon tripping minimal techo";
                 url = "https://www.youtube.com/watch?v=WddpRmmAYkg";
               }
+              {
+                name = "breakcore to vibe to";
+                url = "https://www.youtube.com/watch?v=5nVLLll-CKs";
+              }
             ];
           }];
           search = {
