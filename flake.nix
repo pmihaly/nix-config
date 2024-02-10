@@ -38,6 +38,10 @@
       url = "github:bandithedoge/nixpkgs-firefox-darwin";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    disko = {
+      url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     lf-icons = {
       url =
         "https://raw.githubusercontent.com/gokcehan/lf/master/etc/icons.example";
@@ -91,6 +95,7 @@
         inputs.agenix.nixosModules.default
         inputs.impermanence.nixosModules.impermanence
         inputs.nix-index-database.nixosModules.nix-index
+        inputs.disko.nixosModules.disko
         { nixpkgs.overlays = [ inputs.nur.overlay ]; }
         { home-manager.extraSpecialArgs = { inherit inputs; }; }
         ./secrets
@@ -118,6 +123,7 @@
         inputs.agenix.nixosModules.default
         inputs.impermanence.nixosModules.impermanence
         inputs.nix-index-database.nixosModules.nix-index
+        inputs.disko.nixosModules.disko
         { nixpkgs.overlays = [ inputs.nur.overlay ]; }
         { home-manager.extraSpecialArgs = { inherit inputs; }; }
         ./secrets
