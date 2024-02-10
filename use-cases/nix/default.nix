@@ -32,6 +32,8 @@ in {
           [ inputs.agenix.packages."${pkgs.system}".default pkgs.deploy-rs ];
 
         programs.nix-index-database.comma.enable = true;
+
+        modules.persistence.directories = [ ".nix-config" ];
       };
     }
 

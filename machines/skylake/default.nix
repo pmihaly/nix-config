@@ -57,7 +57,7 @@
     users.${vars.username} = {
       files =
         config.home-manager.users.${vars.username}.modules.persistence.files;
-      directories = [ "Sync" ".nix-config" ]
+      directories = [ "Sync" ]
         ++ config.home-manager.users.${vars.username}.modules.persistence.directories;
     };
   };
