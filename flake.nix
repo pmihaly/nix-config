@@ -71,6 +71,33 @@
       ];
     };
 
+    nixosConfigurations.fable = nixpkgs.lib.nixosSystem {
+      specialArgs = let vars = import ./machines/fable/vars.nix;
+      in {
+        inherit inputs vars;
+        lib = nixpkgs.lib.extend (final: prev:
+          (import ./lib/nixos {
+            lib = final;
+            inherit vars;
+          }));
+        platform = {
+          isLinux = true;
+          isDarwin = false;
+        };
+      };
+
+      modules = [
+        home-manager.nixosModules.home-manager
+        inputs.agenix.nixosModules.default
+        inputs.impermanence.nixosModules.impermanence
+        inputs.nix-index-database.nixosModules.nix-index
+        { nixpkgs.overlays = [ inputs.nur.overlay ]; }
+        { home-manager.extraSpecialArgs = { inherit inputs; }; }
+        ./secrets
+        ./machines/fable
+      ];
+    };
+
     nixosConfigurations.skylake = nixpkgs.lib.nixosSystem {
       specialArgs = let vars = import ./machines/skylake/vars.nix;
       in {
