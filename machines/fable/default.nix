@@ -71,5 +71,18 @@
     LC_TIME = "en_US.UTF-8";
   };
 
+  services.snapper = {
+    snapshotInterval = "hourly";
+    cleanupInterval = "weekly";
+    configs = {
+      persist = {
+        SUBVOLUME = "/persist";
+        ALLOW_USERS = [ vars.username ];
+        TIMELINE_CREATE = true;
+        TIMELINE_CLEANUP = true;
+      };
+    };
+  };
+
   system.stateVersion = "23.05";
 }

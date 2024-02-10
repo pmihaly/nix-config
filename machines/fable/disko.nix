@@ -43,6 +43,9 @@
                     mountOptions = [ "compress-force=zstd:1" "noatime" ];
                     mountpoint = "/persist";
                   };
+
+                  "persist/.snapshots" = { };
+
                 };
               };
             };
