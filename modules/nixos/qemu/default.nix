@@ -7,6 +7,10 @@ in {
   options.modules.qemu = { enable = mkEnableOption "qemu"; };
   config = mkIf cfg.enable {
 
+    environment.persistence.${vars.persistDir} = {
+      directories = [ "/var/lib/libvirt" ];
+    };
+
     home-manager.users.${vars.username} = {
       dconf.settings = {
         "org/virt-manager/virt-manager/connections" = {
