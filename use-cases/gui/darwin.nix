@@ -91,7 +91,6 @@ in optionalAttrs platform.isDarwin {
     homebrew.casks = [
       "aerial" # screensaver
       "raycast" # command+space
-      "docker"
       "messenger"
       "signal"
       "google-chrome"

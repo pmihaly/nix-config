@@ -41,7 +41,7 @@
     ];
   };
 
-  homebrew.casks = [ "sequel-ace" "pycharm-ce" ];
+  homebrew.casks = [ "docker" "sequel-ace" "pycharm-ce" ];
 
   users.users.${vars.username}.home = "/Users/${vars.username}";
 
