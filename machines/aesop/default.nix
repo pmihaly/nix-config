@@ -36,7 +36,7 @@
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
 
   networking = {
-    hostName = "fable";
+    hostName = "aesop";
     interfaces.enp5s0.ipv4.addresses = [{
       address = "192.168.0.35";
       prefixLength = 24;

@@ -75,8 +75,8 @@
       ];
     };
 
-    nixosConfigurations.fable = nixpkgs.lib.nixosSystem {
-      specialArgs = let vars = import ./machines/fable/vars.nix;
+    nixosConfigurations.aesop = nixpkgs.lib.nixosSystem {
+      specialArgs = let vars = import ./machines/aesop/vars.nix;
       in {
         inherit inputs vars;
         lib = nixpkgs.lib.extend (final: prev:
@@ -99,7 +99,7 @@
         { nixpkgs.overlays = [ inputs.nur.overlay ]; }
         { home-manager.extraSpecialArgs = { inherit inputs; }; }
         ./secrets
-        ./machines/fable
+        ./machines/aesop
       ];
     };
 
