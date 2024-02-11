@@ -163,10 +163,6 @@ in {
           ns = "nix search nixpkgs";
           ncg = "sudo nix-collect-garbage --delete-old";
           nsh = "function _f() { nix-shell -p $* --run zsh }; _f";
-          nshr =
-            "function _f() { program=$1; shift; nix-shell -p $program --run $@ }; _f";
-          nshrr =
-            "function _f() { program=$1; shift; nix-shell -p $program --run $program }; _f";
           cn = "cd ~/.nix-config && nvim";
           c = "cd ~/.nix-config";
           thokr = "${pkgs.thokr}/bin/thokr --full-sentences 20";
