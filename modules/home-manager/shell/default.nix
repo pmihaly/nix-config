@@ -201,6 +201,11 @@ in {
       ]);
 
       localVariables = {
+        XDG_DATA_HOME = config.xdg.dataHome;
+        XDG_CONFIG_HOME = config.xdg.configHome;
+        XDG_STATE_HOME = config.xdg.stateHome;
+        XDG_CACHE_HOME = config.xdg.cacheHome;
+
         AWS_CONFIG_FILE = "${config.xdg.configHome}/aws/config";
         AWS_SHARED_CREDENTIALS_FILE =
           "${config.xdg.configHome}/aws/credentials";
