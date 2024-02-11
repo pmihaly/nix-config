@@ -12,11 +12,14 @@ in {
       tig # prettier git tree
     ];
 
-    programs.git = {
-      userName = "pmihaly";
-      userEmail = "misi@pappmihaly.com";
-      extraConfig = { pull.rebase = true; };
-    };
+    home.file."${config.xdg.configHome}/git/config".text =
+      generators.toINI { } {
+        user = {
+          name = "pmihaly";
+          email = "misi@pappmihaly.com";
+        };
+        pull.rebase = true;
+      };
 
     programs.lazygit = {
       enable = true;
