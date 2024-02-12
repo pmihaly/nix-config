@@ -1,4 +1,4 @@
-{ pkgs, lib, config, ... }:
+{ pkgs, lib, config, inputs, ... }:
 
 with lib;
 let
@@ -197,6 +197,8 @@ in {
       ]);
 
       localVariables = {
+        COMMA_NIXPKGS_FLAKE = "nixos/nixpkgs/${inputs.nixpkgs.rev}";
+
         XDG_DATA_HOME = config.xdg.dataHome;
         XDG_CONFIG_HOME = config.xdg.configHome;
         XDG_STATE_HOME = config.xdg.stateHome;
