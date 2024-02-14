@@ -11,8 +11,7 @@ in optionalAttrs platform.isLinux {
   ];
   config = mkIf cfg.enable {
 
-    environment.systemPackages =
-      [ pkgs.lutris pkgs.wine pkgs.gamescope pkgs.gamemode ];
+    environment.systemPackages = with pkgs; [ lutris wine gamescope gamemode ];
 
     programs.steam = {
       enable = true;
@@ -24,6 +23,8 @@ in optionalAttrs platform.isLinux {
     home-manager.users.${vars.username} = {
       imports = [ ../../modules/home-manager ];
 
+      home.packages = [ pkgs.transmission_4-gtk ];
+
       modules = {
         discord.enable = true;
         minecraft.enable = true;
@@ -33,6 +34,8 @@ in optionalAttrs platform.isLinux {
           ".local/share/icons"
 
           ".steam"
+
+          ".config/transmission"
         ];
 
       };
