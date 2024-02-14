@@ -1,7 +1,7 @@
 { config, lib, pkgs, modulesPath, ... }:
 
 {
-  imports = [ (modulesPath + "/profiles/qemu-guest.nix") ./disko.nix ];
+  imports = [ (modulesPath + "/installer/scan/not-detected.nix") ./disko.nix ];
 
   boot.initrd.availableKernelModules = [
     "ahci"

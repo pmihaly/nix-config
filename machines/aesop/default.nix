@@ -13,9 +13,9 @@
       }];
     };
 
-    gui.enable = false;
+    gui.enable = true;
 
-    gaming.enable = false;
+    gaming.enable = true;
   };
 
   home-manager.users.${vars.username}.home.stateVersion = "22.05";
