@@ -37,7 +37,7 @@
 
   networking = {
     hostName = "aesop";
-    interfaces.enp5s0.ipv4.addresses = [{
+    interfaces.enp9s0.ipv4.addresses = [{
       address = "192.168.0.35";
       prefixLength = 24;
     }];
