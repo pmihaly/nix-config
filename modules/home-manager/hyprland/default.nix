@@ -53,7 +53,7 @@ in {
         } + /themes/frappe.conf);
 
         monitor =
-          [ "HDMI-A-1, 2560x1080, 0x0, 1" "DP-1, preferred, 2560x0, 1" ];
+          [ "DP-1, 2560x1440@144, 0x0, 1" "HDMI-A-1, 1920x1080, 2560x0, 1" ];
         "exec-once" =
           "${pkgs.swaybg}/bin/swaybg --image ~/.nix-config/wallpaper.png";
         env = [ "XCURSOR_SIZE,24" "WLR_DRM_NO_ATOMIC,1" ];
@@ -121,15 +121,15 @@ in {
         "$mainMod" = "SUPER";
 
         workspace = [
-          "1,monitor:HDMI-A-1"
-          "2,monitor:HDMI-A-1"
-          "3,monitor:HDMI-A-1"
-          "4,monitor:HDMI-A-1"
-          "5,monitor:HDMI-A-1"
-          "6,monitor:DP-1"
-          "7,monitor:DP-1"
-          "8,monitor:DP-1"
-          "9,monitor:DP-1"
+          "1,monitor:DP-1"
+          "2,monitor:DP-1"
+          "3,monitor:DP-1"
+          "4,monitor:DP-1"
+          "5,monitor:DP-1"
+          "6,monitor:HDMI-A-1"
+          "7,monitor:HDMI-A-1"
+          "8,monitor:HDMI-A-1"
+          "9,monitor:HDMI-A-1"
         ];
 
         bind = [
