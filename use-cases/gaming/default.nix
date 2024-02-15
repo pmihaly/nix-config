@@ -34,6 +34,7 @@ in optionalAttrs platform.isLinux {
           ".local/share/icons"
 
           ".steam"
+          ".local/share/Steam"
 
           ".config/transmission"
         ];
