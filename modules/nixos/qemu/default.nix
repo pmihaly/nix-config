@@ -1,4 +1,4 @@
-{ lib, config, vars, ... }:
+{ pkgs, lib, config, vars, ... }:
 
 with lib;
 let cfg = config.modules.qemu;
@@ -12,6 +12,7 @@ in {
     };
 
     home-manager.users.${vars.username} = {
+      home.packages = [ pkgs.quickemu ];
       dconf.settings = {
         "org/virt-manager/virt-manager/connections" = {
           autoconnect = [ "qemu:///system" ];
