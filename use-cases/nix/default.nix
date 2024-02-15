@@ -13,6 +13,7 @@ in {
       documentation.enable = false;
 
       nix = {
+        nixPath = [];
         settings.experimental-features = "nix-command flakes";
         settings.auto-optimise-store = true;
         gc.automatic = true;
