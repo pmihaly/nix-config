@@ -11,7 +11,7 @@ in optionalAttrs platform.isLinux {
   ];
   config = mkIf cfg.enable {
 
-    environment.systemPackages = with pkgs; [ lutris wine gamescope gamemode winetricks ];
+    environment.systemPackages = with pkgs; [ lutris wine gamescope gamemode ];
 
     programs.steam = {
       enable = true;
