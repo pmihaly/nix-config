@@ -24,7 +24,7 @@
   users.users.${vars.username} = {
     isNormalUser = true;
     description = vars.username;
-    extraGroups = [ "wheel" ];
+    extraGroups = [ "wheel" "video" "render" ];
     initialPassword = vars.username;
     hashedPasswordFile = "${vars.persistDir}/${vars.username}-password";
   };
@@ -56,6 +56,10 @@
         ++ config.home-manager.users.${vars.username}.modules.persistence.directories;
     };
   };
+
+  systemd.tmpfiles.rules = [
+    "L+    /opt/rocm/hip   -    -    -     -    ${pkgs.rocmPackages.clr}"
+  ];
 
   time.timeZone = vars.timeZone;
   i18n.defaultLocale = "en_US.UTF-8";
