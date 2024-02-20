@@ -23,6 +23,7 @@ in {
       set searchurls.y   https://youtube.com/feed/subscriptions
 
       set searchurls.g   https://google.com/search?q=
+      set searchurls.ddg https://duckduckgo.com/?q=
 
       setnull searchurls.amazon
       setnull searchurls.amazonuk
