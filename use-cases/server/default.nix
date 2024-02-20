@@ -30,7 +30,7 @@ in optionalAttrs platform.isLinux {
         deluge.enable = true;
         arr.enable = true;
         endlessh.enable = true;
-        monitoring.enable = true;
+        monitoring.enable = false;
         hledger.enable = false;
         duckdns.enable = true;
         paperless.enable = true;
