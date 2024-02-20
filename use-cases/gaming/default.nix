@@ -32,6 +32,7 @@ in optionalAttrs platform.isLinux {
           ".config/lutris"
           ".local/share/lutris"
           ".local/share/icons"
+          ".local/share/applications" # lutris application menu shortcuts
 
           ".steam"
           ".local/share/Steam"
