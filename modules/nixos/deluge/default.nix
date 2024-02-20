@@ -15,6 +15,10 @@ in {
     };
     extraConfig = {
 
+      environment.persistence.${vars.persistDir} = {
+        directories = [ "/var/lib/deluge" ];
+      };
+
       services.deluge = {
         enable = true;
         declarative = true;
