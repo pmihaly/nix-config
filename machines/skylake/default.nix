@@ -51,10 +51,10 @@
     directories = [ "/var/log" "/var/lib/nixos" "/var/lib/systemd/coredump" ];
     files = [ "/etc/machine-id" ];
     users.${vars.username} = {
-      files =
+      files = lib.lists.unique
         config.home-manager.users.${vars.username}.modules.persistence.files;
-      directories = [ "Sync" ]
-        ++ config.home-manager.users.${vars.username}.modules.persistence.directories;
+      directories = [ "Sync" ] ++ lib.lists.unique
+        config.home-manager.users.${vars.username}.modules.persistence.directories;
     };
   };
 

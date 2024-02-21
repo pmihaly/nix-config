@@ -16,6 +16,8 @@
     gui.enable = true;
 
     gaming.enable = true;
+
+    music-production.enable = true;
   };
 
   home-manager.users.${vars.username}.home.stateVersion = "22.05";
@@ -50,16 +52,15 @@
     directories = [ "/var/log" "/var/lib/nixos" "/var/lib/systemd/coredump" ];
     files = [ "/etc/machine-id" ];
     users.${vars.username} = {
-      files =
+      files = lib.lists.unique
         config.home-manager.users.${vars.username}.modules.persistence.files;
-      directories = [ "Sync" ]
-        ++ config.home-manager.users.${vars.username}.modules.persistence.directories;
+      directories = [ "Sync" ] ++ lib.lists.unique
+        config.home-manager.users.${vars.username}.modules.persistence.directories;
     };
   };
 
-  systemd.tmpfiles.rules = [
-    "L+    /opt/rocm/hip   -    -    -     -    ${pkgs.rocmPackages.clr}"
-  ];
+  systemd.tmpfiles.rules =
+    [ "L+    /opt/rocm/hip   -    -    -     -    ${pkgs.rocmPackages.clr}" ];
 
   time.timeZone = vars.timeZone;
   i18n.defaultLocale = "en_US.UTF-8";

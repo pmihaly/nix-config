@@ -11,8 +11,6 @@ in optionalAttrs platform.isLinux {
   ];
   config = mkIf cfg.enable {
 
-    environment.systemPackages = with pkgs; [ lutris wine gamescope gamemode mangohud ];
-
     programs.steam = {
       enable = true;
 
@@ -23,7 +21,14 @@ in optionalAttrs platform.isLinux {
     home-manager.users.${vars.username} = {
       imports = [ ../../modules/home-manager ];
 
-      home.packages = [ pkgs.transmission_4-gtk ];
+      home.packages = with pkgs; [
+        transmission_4-gtk
+        lutris
+        wine
+        gamescope
+        gamemode
+        mangohud
+      ];
 
       modules = {
         discord.enable = true;
