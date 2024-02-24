@@ -165,7 +165,8 @@ in {
             #unified-extensions-button,
             .unified-extensions-item,
             #tabs-newtab-button,
-            #idbar
+            #idbar,
+            #appMenu-update-available-notification
             {
               display: none !important;
             }
