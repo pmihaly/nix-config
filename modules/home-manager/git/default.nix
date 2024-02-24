@@ -19,6 +19,17 @@ in {
           email = "misi@pappmihaly.com";
         };
         pull.rebase = true;
+        merge.conflictstyle = "zdiff3";
+        rebase.autosquash = true;
+        rebase.autostash = true;
+        push.default = "current";
+        push.autoSetupRemote = true;
+        rerere.enabled = true;
+        diff.algorithm = "histogram";
+        transfer.fsckobjects = true;
+        fetch.fsckobjects = true;
+        receive.fsckObjects = true;
+        branch.sort = "-committerdate";
       };
 
     programs.lazygit = {
