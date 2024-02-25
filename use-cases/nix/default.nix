@@ -13,11 +13,14 @@ in {
       documentation.enable = false;
 
       nix = {
-        nixPath = [ ];
+        nixPath = [ "nixpkgs=/etc/channels/nixpkgs" ];
         settings.experimental-features = "nix-command flakes";
         settings.auto-optimise-store = true;
         gc.automatic = true;
       };
+
+      nix.registry.nixpkgs.flake = inputs.nixpkgs;
+      environment.etc."channels/nixpkgs".source = inputs.nixpkgs.outPath;
 
       home-manager.useGlobalPkgs = true;
       home-manager.useUserPackages = true;
