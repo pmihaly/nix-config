@@ -89,5 +89,11 @@
     };
   };
 
+  services.btrfs.autoScrub = {
+    enable = true;
+    interval = "weekly";
+    fileSystems = [ "/persist" ];
+  };
+
   system.stateVersion = "23.05";
 }
