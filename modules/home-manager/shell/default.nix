@@ -197,7 +197,7 @@ in {
       ]);
 
       localVariables = {
-        COMMA_NIXPKGS_FLAKE = "nixos/nixpkgs/${inputs.nixpkgs.rev}";
+        COMMA_NIXPKGS_FLAKE = "nixpkgs/${inputs.nixpkgs.rev}";
         NIX_PATH = "";
 
         XDG_DATA_HOME = config.xdg.dataHome;
