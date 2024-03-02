@@ -69,7 +69,7 @@ in {
             bookmarks = bookmarks // cfg.extraBookmarks;
           };
 
-          lf = {
+          yazi = {
             enable = true;
             bookmarks = bookmarks // cfg.extraBookmarks;
           };

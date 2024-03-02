@@ -273,18 +273,6 @@
         "type": "github"
       }
     },
-    "lf-icons": {
-      "flake": false,
-      "locked": {
-        "narHash": "sha256-huCezig50vS1924wqipNDmG9B99sr0h79dXZ7CH/yi8=",
-        "type": "file",
-        "url": "https://raw.githubusercontent.com/gokcehan/lf/master/etc/icons.example"
-      },
-      "original": {
-        "type": "file",
-        "url": "https://raw.githubusercontent.com/gokcehan/lf/master/etc/icons.example"
-      }
-    },
     "nix-gaming": {
       "inputs": {
         "flake-parts": "flake-parts",
@@ -458,7 +446,6 @@
         "home-manager": "home-manager_2",
         "img2theme": "img2theme",
         "impermanence": "impermanence",
-        "lf-icons": "lf-icons",
         "nix-gaming": "nix-gaming",
         "nix-index-database": "nix-index-database",
         "nixpkgs": "nixpkgs_2",

@@ -6,7 +6,7 @@
     ./git
     ./shell
     ./mpv
-    ./lf
+    ./yazi
     ./kitty
     ./newsboat
     ./neomutt

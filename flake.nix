@@ -42,11 +42,6 @@
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    lf-icons = {
-      url =
-        "https://raw.githubusercontent.com/gokcehan/lf/master/etc/icons.example";
-      flake = false;
-    };
   };
 
   outputs = { self, nixpkgs, home-manager, ... }@inputs: {
