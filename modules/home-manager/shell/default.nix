@@ -40,9 +40,14 @@ in {
       sd # more intuitive search and replace
       choose # frendlier cut
       pup # jq for html
-      nushellFull # structured data manipulation - replaces jq, jiq and yq
       dog # dns client
     ];
+
+    programs.nushell = {
+      enable = true;
+      package = pkgs.nushellFull;
+      shellAliases = (mkMerge [ (bookmarksToAliases cfg.bookmarks) ]);
+    };
 
     programs.bat = {
       enable = true;
@@ -81,19 +86,17 @@ in {
       settings = {
         palette = "catppuccin_frappe";
         add_newline = false;
-        format = lib.concatStrings [ " " "$directory" "$character" ];
+        format = lib.concatStrings [ " " "$directory" "$shell" ];
         scan_timeout = 10;
         directory = {
           truncation_length = 2;
           style = "bold fg:flamingo";
         };
-        character = {
-          success_symbol = "🔮(hidden)";
-          error_symbol = "🔮(hidden)";
-          vimcmd_symbol = "🔮(hidden)";
-          vimcmd_replace_one_symbol = "🔮(hidden)";
-          vimcmd_replace_symbol = "🔮(hidden)";
-          vimcmd_visual_symbol = "🔮(hidden)";
+        shell = {
+          disabled = false;
+          zsh_indicator = "🔮";
+          nu_indicator = "🧮";
+          style = "bold fg:flamingo";
         };
       } // builtins.fromTOML (builtins.readFile (pkgs.fetchFromGitHub {
         owner = "catppuccin";
@@ -234,6 +237,7 @@ in {
       enable = true;
       nix-direnv.enable = true;
       enableZshIntegration = true;
+      enableNushellIntegration = true;
     };
 
     programs.btop = {
