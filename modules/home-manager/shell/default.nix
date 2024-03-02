@@ -48,6 +48,9 @@ in {
       package = pkgs.nushellFull;
       shellAliases = (mkMerge [ (bookmarksToAliases cfg.bookmarks) ]);
     };
+    programs.starship.enableNushellIntegration = true;
+    programs.yazi.enableNushellIntegration = true;
+    programs.direnv.enableNushellIntegration = true;
 
     programs.bat = {
       enable = true;
@@ -68,7 +71,6 @@ in {
     programs.fzf = {
       enable = true;
       tmux.enableShellIntegration = true;
-      enableZshIntegration = true;
     };
 
     home.sessionPath = [
@@ -82,7 +84,6 @@ in {
     programs.starship = {
       enable = true;
       enableZshIntegration = true;
-      enableNushellIntegration = true;
       settings = {
         palette = "catppuccin_frappe";
         add_newline = false;
@@ -232,12 +233,13 @@ in {
           ''-Djava.util.prefs.userRoot="${config.xdg.configHome}"/java'';
       };
     };
+    programs.yazi.enableZshIntegration = true;
+    programs.fzf.enableZshIntegration = true;
+    programs.direnv.enableZshIntegration = true;
 
     programs.direnv = {
       enable = true;
       nix-direnv.enable = true;
-      enableZshIntegration = true;
-      enableNushellIntegration = true;
     };
 
     programs.btop = {

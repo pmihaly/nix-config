@@ -3,8 +3,12 @@
 with lib;
 let
   cfg = config.modules.lf;
-  bookmarksToKeybindings = attrsets.mapAttrs'
+  bookmarksToLfKeybindings = attrsets.mapAttrs'
     (name: value: attrsets.nameValuePair "g${name}" "cd ${value}");
+  bookmarksToYaziKeybindings = attrsets.mapAttrsToList (name: value: {
+    on = [ "g" ] ++ (strings.stringToCharacters name);
+    exec = "cd ${value}";
+  });
 
 in {
   options.modules.lf = {
@@ -15,6 +19,19 @@ in {
     };
   };
   config = mkIf cfg.enable {
+    programs.yazi = {
+      enable = true;
+      settings = {
+        manager = {
+          scrolloff = 200;
+          show_hidden = true;
+          show_symlink = false;
+        };
+      };
+      keymap.manager.prepend_keymap = bookmarksToYaziKeybindings cfg.bookmarks;
+      theme = { };
+    };
+
     xdg.configFile."lf/icons".source = inputs.lf-icons;
 
     programs.lf = {
@@ -57,7 +74,7 @@ in {
         exit 1
       '';
       keybindings = (mkMerge [
-        (bookmarksToKeybindings cfg.bookmarks)
+        (bookmarksToLfKeybindings cfg.bookmarks)
         {
           D = "delete";
           U = "!${pkgs.du-dust}/bin/dust";
