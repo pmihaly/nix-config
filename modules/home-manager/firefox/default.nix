@@ -24,6 +24,7 @@ in {
 
       set searchurls.g   https://google.com/search?q=
       set searchurls.ddg https://duckduckgo.com/?q=
+      set searchurls.r   https://old.reddit.com/r/
 
       setnull searchurls.amazon
       setnull searchurls.amazonuk
