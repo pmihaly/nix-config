@@ -28,6 +28,7 @@ in optionalAttrs platform.isLinux {
         gamescope
         gamemode
         mangohud
+        protontricks
       ];
 
       modules = {
