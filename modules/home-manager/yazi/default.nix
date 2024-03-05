@@ -24,6 +24,7 @@ in {
           scrolloff = 200;
           show_hidden = true;
           show_symlink = false;
+          sort_dir_first = true;
         };
       };
       keymap.manager.prepend_keymap = bookmarksToYaziKeybindings cfg.bookmarks;
