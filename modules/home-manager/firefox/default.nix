@@ -109,6 +109,10 @@ in {
                 name = "heaven.exe breakcore";
                 url = "https://www.youtube.com/watch?v=z9e8CPULjW4";
               }
+              {
+                name = "abyss darksynth";
+                url = "https://www.youtube.com/watch?v=aA9GhsYt2O0";
+              }
             ];
           }];
           search = {
