@@ -7,7 +7,6 @@ in optionalAttrs platform.isLinux {
   options.modules.gaming = { enable = mkEnableOption "gaming"; };
   imports = [
     inputs.nix-gaming.nixosModules.pipewireLowLatency
-    inputs.nix-gaming.nixosModules.steamCompat
   ];
   config = mkIf cfg.enable {
 
