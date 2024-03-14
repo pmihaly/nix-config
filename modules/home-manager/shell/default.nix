@@ -167,6 +167,7 @@ in {
           ns = "nix search nixpkgs";
           ncg = "sudo nix-collect-garbage --delete-old";
           nsh = "function _f() { nix-shell -p $* --run zsh }; _f";
+          ndiff = "nix profile diff-closures --profile /nix/var/nix/profiles/system";
           cn = "cd ~/.nix-config && nvim";
           c = "cd ~/.nix-config";
           thokr = "${pkgs.thokr}/bin/thokr --full-sentences 20";
