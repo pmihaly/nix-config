@@ -1,6 +1,3 @@
-switch-mac:
-	darwin-rebuild switch --flake .#mac
-
 update:
 	./update.nu
 

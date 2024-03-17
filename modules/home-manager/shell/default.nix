@@ -13,6 +13,9 @@ in {
       default = { };
       type = types.attrs;
     };
+    rebuildSwitch = mkOption {
+      type = types.str;
+    };
   };
   config = mkIf cfg.enable {
 
@@ -162,9 +165,8 @@ in {
           o = "cd ~/Sync/org";
           on = ''o && (fd "^.*.org$" | fzf | xargs nvim)'';
           ld = "${pkgs.lazydocker}/bin/lazydocker";
-          ms = "darwin-rebuild switch --flake ~/.nix-config#mac";
+          ns = cfg.rebuildSwitch;
           nr = "sudo nix-store --verify --check-contents --repair";
-          ns = "nix search nixpkgs";
           ncg = "sudo nix-collect-garbage --delete-old";
           nsh = "function _f() { nix-shell -p $* --run zsh }; _f";
           ndiff = "nix profile diff-closures --profile /nix/var/nix/profiles/system";

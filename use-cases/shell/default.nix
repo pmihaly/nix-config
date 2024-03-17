@@ -67,6 +67,7 @@ in {
           shell = {
             enable = true;
             bookmarks = bookmarks // cfg.extraBookmarks;
+            rebuildSwitch = vars.rebuildSwitch;
           };
 
           yazi = {

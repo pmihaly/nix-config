@@ -7,4 +7,5 @@ rec {
   storage = "${persistDir}/opt/skylake-storage";
   username = "misi";
   duckdnsDomainName = "mishmesh.duckdns.org";
+  rebuildSwitch = "nixos-rebuild switch --flake ~/.nix-config#skylake";
 }
