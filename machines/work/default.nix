@@ -38,6 +38,7 @@
       jwt-cli
       libossp_uuid # uuid from cli
       slack
+      gnumake
     ];
   };
 

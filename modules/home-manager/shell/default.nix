@@ -37,7 +37,6 @@ in {
       fd # alternative to find
       parallel # xargs but with multiprocessing
       watch # run a command periodically
-      gnumake
       ripgrep # basically grep
       killall
       sd # more intuitive search and replace
