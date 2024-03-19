@@ -1,4 +1,4 @@
 {
   username = "mihaly.papp";
-  rebuildSwitch = "darwin-rebuild switch --flake ~/.nix-config#mac";
+  rebuildSwitch = "sudo darwin-rebuild switch --flake ~/.nix-config#mac";
 }
