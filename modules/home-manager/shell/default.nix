@@ -249,7 +249,7 @@ in {
       settings = {
         theme_background = false;
         true_color = true;
-        update_ms = 200;
+        update_ms = 100;
         vim_keys = true;
       };
     };
