@@ -273,6 +273,22 @@
         "type": "github"
       }
     },
+    "lazygit": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1711092736,
+        "narHash": "sha256-arPjgEeJhWyFayU+qeb2gPGpW4o0lp9s1LX20gA+z2c=",
+        "owner": "jesseduffield",
+        "repo": "lazygit",
+        "rev": "28dd7f946752d31487b207ab05338dbf4898042f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "jesseduffield",
+        "repo": "lazygit",
+        "type": "github"
+      }
+    },
     "nix-gaming": {
       "inputs": {
         "flake-parts": "flake-parts",
@@ -446,6 +462,7 @@
         "home-manager": "home-manager_2",
         "img2theme": "img2theme",
         "impermanence": "impermanence",
+        "lazygit": "lazygit",
         "nix-gaming": "nix-gaming",
         "nix-index-database": "nix-index-database",
         "nixpkgs": "nixpkgs_2",

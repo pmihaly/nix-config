@@ -1,7 +1,9 @@
-{ pkgs, lib, config, ... }:
+{ pkgs, inputs, lib, config, ... }:
 
 with lib;
-let cfg = config.modules.git;
+let
+  cfg = config.modules.git;
+  lazygit = pkgs.lazygit.overrideAttrs (old: { src = inputs.lazygit; });
 
 in {
   options.modules.git = { enable = mkEnableOption "git"; };
@@ -25,18 +27,27 @@ in {
         push.default = "current";
         push.autoSetupRemote = true;
         rerere.enabled = true;
-        diff.algorithm = "histogram";
         transfer.fsckobjects = true;
         fetch.fsckobjects = true;
         receive.fsckObjects = true;
         branch.sort = "-committerdate";
+
+        diff.tool = "difftastic";
+        difftool.prompt = false;
+        "difftool \"difftastic\"".cmd =
+          ''${pkgs.difftastic}/bin/difft "$LOCAL" "$REMOTE"'';
+        pager.difftool = true;
+        diff.external = "${pkgs.difftastic}/bin/difft";
       };
 
     programs.lazygit = {
       enable = true;
+      package = lazygit;
       settings = {
         notARepository = "quit";
         disableStartupPopups = true;
+        git.paging.externalDiffCommand =
+          "${pkgs.difftastic}/bin/difft --color=always --tab-width=2 --display=inline";
         customCommands = [
           {
             key = "b";
