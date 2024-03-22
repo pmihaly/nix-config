@@ -5,9 +5,7 @@ let cfg = config.modules.gaming;
 
 in optionalAttrs platform.isLinux {
   options.modules.gaming = { enable = mkEnableOption "gaming"; };
-  imports = [
-    inputs.nix-gaming.nixosModules.pipewireLowLatency
-  ];
+  imports = [ inputs.nix-gaming.nixosModules.pipewireLowLatency ];
   config = mkIf cfg.enable {
 
     programs.steam = {

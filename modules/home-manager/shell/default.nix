@@ -13,9 +13,7 @@ in {
       default = { };
       type = types.attrs;
     };
-    rebuildSwitch = mkOption {
-      type = types.str;
-    };
+    rebuildSwitch = mkOption { type = types.str; };
   };
   config = mkIf cfg.enable {
 
@@ -168,7 +166,8 @@ in {
           nr = "sudo nix-store --verify --check-contents --repair";
           ncg = "sudo nix-collect-garbage --delete-old";
           nsh = "function _f() { nix-shell -p $* --run zsh }; _f";
-          ndiff = "nix profile diff-closures --profile /nix/var/nix/profiles/system";
+          ndiff =
+            "nix profile diff-closures --profile /nix/var/nix/profiles/system";
           cn = "cd ~/.nix-config && nvim";
           c = "cd ~/.nix-config";
           thokr = "${pkgs.thokr}/bin/thokr --full-sentences 20";
