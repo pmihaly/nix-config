@@ -47,7 +47,7 @@ in {
         notARepository = "quit";
         disableStartupPopups = true;
         git.paging.externalDiffCommand =
-          "${pkgs.difftastic}/bin/difft --color=always --tab-width=2 --display=inline";
+          "${pkgs.difftastic}/bin/difft --color=always --tab-width=2";
         customCommands = [
           {
             key = "b";
