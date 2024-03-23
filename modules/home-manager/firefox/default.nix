@@ -25,6 +25,8 @@ in {
       set searchurls.g   https://google.com/search?q=
       set searchurls.ddg https://duckduckgo.com/?q=
       set searchurls.r   https://old.reddit.com/r/
+      set searchurls.r   https://old.reddit.com/r/
+      set searchurls.dh  https://hub.docker.com/search?q=
 
       setnull searchurls.amazon
       setnull searchurls.amazonuk
