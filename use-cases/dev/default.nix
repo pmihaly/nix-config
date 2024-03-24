@@ -10,7 +10,6 @@ in optionalAttrs platform.isLinux {
 
     virtualisation.docker = {
       enable = true;
-      storageDriver = "btrfs";
       rootless = {
         enable = true;
         setSocketVariable = true;
