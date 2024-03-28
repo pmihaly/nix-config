@@ -28,6 +28,8 @@ in {
       set searchurls.r   https://old.reddit.com/r/
       set searchurls.dh  https://hub.docker.com/search?q=
 
+      blacklistadd excalidraw.com
+
       setnull searchurls.amazon
       setnull searchurls.amazonuk
       setnull searchurls.bing
