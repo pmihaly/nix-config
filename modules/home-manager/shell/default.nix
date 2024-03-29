@@ -145,7 +145,7 @@ in {
           brackets = "";
         };
       };
-      enableAutosuggestions = true;
+      autosuggestion.enable = true;
       autocd = true;
       history = {
         path = "${config.xdg.dataHome}/zsh";

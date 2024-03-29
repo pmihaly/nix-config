@@ -5,7 +5,7 @@ let
   cfg = config.modules.yazi;
   bookmarksToYaziKeybindings = attrsets.mapAttrsToList (name: value: {
     on = [ "g" ] ++ (strings.stringToCharacters name);
-    exec = "cd ${value}";
+    run = "cd ${value}";
   });
 
 in {
