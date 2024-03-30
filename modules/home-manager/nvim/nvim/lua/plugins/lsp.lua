@@ -111,6 +111,7 @@ return {
         'nil_ls', -- nix
         'nginx-language-server',
         'gopls',
+        'emmet_language_server',
       })
 
       require'lspconfig'.pylsp.setup{
