@@ -61,7 +61,27 @@ return {
     cmd = 'Copilot',
     event = 'InsertEnter',
     config = function()
-      vim.g.copilot_filetypes = { VimspectorPrompt = false }
+      vim.g.copilot_filetypes = {
+        VimspectorPrompt = false,
+        markdown = true,
+        yaml = true
+      }
     end,
-  }
+  },
+  {
+    'michaelb/sniprun',
+    branch = 'master',
+    keys = {
+      { '<leader>r', function() require'sniprun'.run('n') end, mode = 'n'},
+      { '<leader>r', function() require'sniprun'.run('v') end, mode = 'v'},
+    },
+
+    build = 'sh install.sh',
+
+    config = function()
+      require('sniprun').setup({
+      -- your options
+      })
+    end,
+  },
 }
