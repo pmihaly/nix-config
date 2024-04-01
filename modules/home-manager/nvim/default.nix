@@ -7,7 +7,8 @@ in {
   options.modules.nvim = { enable = mkEnableOption "nvim"; };
   config = mkIf cfg.enable {
 
-    modules.persistence.directories = [ ".local/share/nvim" ];
+    modules.persistence.directories =
+      [ ".local/share/nvim" ".config/github-copilot" ];
 
     programs.neovim = {
       enable = true;
