@@ -26,6 +26,7 @@ in {
         { url = "https://old.reddit.com/r/escapehungary.rss"; }
         { url = "https://old.reddit.com/r/kiszamolo.rss"; }
         { url = "https://old.reddit.com/r/programminghungary.rss"; }
+        { url = "https://old.reddit.com/r/Ultrakill/search.xml?sort=new&restrict_sr=on&q=flair%3ANews"; }
       ];
       extraConfig = builtins.concatStringsSep "\n" [
         ''
