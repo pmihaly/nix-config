@@ -134,15 +134,16 @@
 
     deploy.nodes = {
       skylake = {
-        hostname = "skylake.mihaly.codes";
+        hostname = "192.168.0.30";
         profiles.system = {
           path = inputs.deploy-rs.lib.x86_64-linux.activate.nixos
             self.nixosConfigurations.skylake;
           sshUser = "misi";
           user = "root";
-          sshOpts = [ "-p" "69" "-t" ];
+          sshOpts =
+            [ "-p" "69" "-t" "-i" "/persist/etc/ssh/ssh_host_ed25519_key" ];
           magicRollback = false;
-          remoteBuild = true;
+          remoteBuild = false;
         };
       };
     };
