@@ -12,7 +12,7 @@ in optionalAttrs platform.isLinux {
       enable = true;
 
       extraCompatPackages =
-        [ inputs.nix-gaming.packages.${pkgs.system}.proton-ge ];
+        [ pkgs.proton-ge-bin ];
     };
 
     home-manager.users.${vars.username} = {
