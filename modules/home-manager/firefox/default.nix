@@ -117,6 +117,10 @@ in {
                 name = "abyss darksynth";
                 url = "https://www.youtube.com/watch?v=aA9GhsYt2O0";
               }
+              {
+                name = "smooooth deep house";
+                url = "https://www.youtube.com/watch?v=PYfhbYIxBxE";
+              }
             ];
           }];
           search = {
