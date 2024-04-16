@@ -121,6 +121,10 @@ in {
                 name = "smooooth deep house";
                 url = "https://www.youtube.com/watch?v=PYfhbYIxBxE";
               }
+              {
+                name = "another smooooooooooooooooooooooth mix";
+                url = "https://www.youtube.com/watch?v=4nvewes8Inc";
+              }
             ];
           }];
           search = {
