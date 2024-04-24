@@ -1,10 +1,21 @@
-{ platform, inputs, pkgs, vars, lib, config, ... }:
+{
+  platform,
+  inputs,
+  pkgs,
+  vars,
+  lib,
+  config,
+  ...
+}:
 
 with lib;
-let cfg = config.modules.nix;
-
-in {
-  options.modules.nix = { enable = mkEnableOption "nix"; };
+let
+  cfg = config.modules.nix;
+in
+{
+  options.modules.nix = {
+    enable = mkEnableOption "nix";
+  };
   config = mkIf cfg.enable (mkMerge [
     {
       nixpkgs.overlays = import ../../overlays;
@@ -17,6 +28,7 @@ in {
         settings.experimental-features = "nix-command flakes";
         settings.auto-optimise-store = true;
         gc.automatic = true;
+        trustedUsers = [ vars.username ];
       };
 
       nix.registry.nixpkgs.flake = inputs.nixpkgs;
@@ -32,8 +44,10 @@ in {
           ../../secrets/home-manager
         ];
 
-        home.packages =
-          [ inputs.agenix.packages."${pkgs.system}".default pkgs.deploy-rs ];
+        home.packages = [
+          inputs.agenix.packages."${pkgs.system}".default
+          pkgs.deploy-rs
+        ];
 
         programs.nix-index-database.comma.enable = true;
 
@@ -63,4 +77,3 @@ in {
     })
   ]);
 }
-

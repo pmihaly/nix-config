@@ -1,10 +1,18 @@
-{ pkgs, lib, config, ... }:
+{
+  pkgs,
+  lib,
+  config,
+  ...
+}:
 
 with lib;
-let cfg = config.modules.firefox;
-
-in {
-  options.modules.firefox = { enable = mkEnableOption "firefox"; };
+let
+  cfg = config.modules.firefox;
+in
+{
+  options.modules.firefox = {
+    enable = mkEnableOption "firefox";
+  };
   config = mkIf cfg.enable {
 
     modules.persistence.directories = [ ".mozilla" ];
@@ -55,111 +63,124 @@ in {
     programs.firefox = {
       enable = true;
       package = pkgs.firefox-bin;
-      nativeMessagingHosts = [ pkgs.tridactyl-native pkgs.keepassxc ];
-      policies = { DisableAppUpdate = true; };
+      nativeMessagingHosts = [
+        pkgs.tridactyl-native
+        pkgs.keepassxc
+      ];
+      policies = {
+        DisableAppUpdate = true;
+      };
       profiles = {
         misi = {
           id = 0;
           name = "misi";
-          bookmarks = [{
-            name = "munsik";
-            toolbar = true;
-            bookmarks = [
-              {
-                name = "skeler I";
-                url = "https://www.youtube.com/watch?v=J0y6wM0aAgE";
-              }
-              {
-                name = "skeler II";
-                url = "https://www.youtube.com/watch?v=J4t4pMZBXZg";
-              }
-              {
-                name = "skeler III";
-                url = "https://www.youtube.com/watch?v=P4ALDytLAXQ";
-              }
-              {
-                name = "garage";
-                url = "https://www.youtube.com/watch?v=e1w7R1hEvCs";
-              }
-              {
-                name = "breakcore to dissociate to";
-                url = "https://www.youtube.com/watch?v=BhZ0Ky9uqts";
-              }
-              {
-                name = "breakcore to feel to";
-                url = "https://www.youtube.com/watch?v=0KaBYaQGwbs";
-              }
-              {
-                name = "dnb";
-                url = "https://www.youtube.com/watch?v=qNaCzmbaYWI";
-              }
-              {
-                name = "focus lofi🍯";
-                url = "https://www.youtube.com/watch?v=Xf3-4A-uEc8";
-              }
-              {
-                name = "ethereal breaks *:･ﾟ✧";
-                url = "https://www.youtube.com/watch?v=tdceTb3vsmk";
-              }
-              {
-                name = "cartoon tripping minimal techo";
-                url = "https://www.youtube.com/watch?v=WddpRmmAYkg";
-              }
-              {
-                name = "breakcore to vibe to";
-                url = "https://www.youtube.com/watch?v=5nVLLll-CKs";
-              }
-              {
-                name = "heaven.exe breakcore";
-                url = "https://www.youtube.com/watch?v=z9e8CPULjW4";
-              }
-              {
-                name = "abyss darksynth";
-                url = "https://www.youtube.com/watch?v=aA9GhsYt2O0";
-              }
-              {
-                name = "smooooth deep house";
-                url = "https://www.youtube.com/watch?v=PYfhbYIxBxE";
-              }
-              {
-                name = "another smooooooooooooooooooooooth mix";
-                url = "https://www.youtube.com/watch?v=4nvewes8Inc";
-              }
-            ];
-          }];
+          bookmarks = [
+            {
+              name = "munsik";
+              toolbar = true;
+              bookmarks = [
+                {
+                  name = "skeler I";
+                  url = "https://www.youtube.com/watch?v=J0y6wM0aAgE";
+                }
+                {
+                  name = "skeler II";
+                  url = "https://www.youtube.com/watch?v=J4t4pMZBXZg";
+                }
+                {
+                  name = "skeler III";
+                  url = "https://www.youtube.com/watch?v=P4ALDytLAXQ";
+                }
+                {
+                  name = "garage";
+                  url = "https://www.youtube.com/watch?v=e1w7R1hEvCs";
+                }
+                {
+                  name = "breakcore to dissociate to";
+                  url = "https://www.youtube.com/watch?v=BhZ0Ky9uqts";
+                }
+                {
+                  name = "breakcore to feel to";
+                  url = "https://www.youtube.com/watch?v=0KaBYaQGwbs";
+                }
+                {
+                  name = "dnb";
+                  url = "https://www.youtube.com/watch?v=qNaCzmbaYWI";
+                }
+                {
+                  name = "focus lofi🍯";
+                  url = "https://www.youtube.com/watch?v=Xf3-4A-uEc8";
+                }
+                {
+                  name = "ethereal breaks *:･ﾟ✧";
+                  url = "https://www.youtube.com/watch?v=tdceTb3vsmk";
+                }
+                {
+                  name = "cartoon tripping minimal techo";
+                  url = "https://www.youtube.com/watch?v=WddpRmmAYkg";
+                }
+                {
+                  name = "breakcore to vibe to";
+                  url = "https://www.youtube.com/watch?v=5nVLLll-CKs";
+                }
+                {
+                  name = "heaven.exe breakcore";
+                  url = "https://www.youtube.com/watch?v=z9e8CPULjW4";
+                }
+                {
+                  name = "abyss darksynth";
+                  url = "https://www.youtube.com/watch?v=aA9GhsYt2O0";
+                }
+                {
+                  name = "smooooth deep house";
+                  url = "https://www.youtube.com/watch?v=PYfhbYIxBxE";
+                }
+                {
+                  name = "another smooooooooooooooooooooooth mix";
+                  url = "https://www.youtube.com/watch?v=4nvewes8Inc";
+                }
+              ];
+            }
+          ];
           search = {
             force = true;
             default = "Brave search";
             engines = {
               "Brave search" = {
-                urls = [{
-                  template = "https://search.brave.com/search";
-                  params = [{
-                    name = "q";
-                    value = "{searchTerms}";
-                  }];
-                }];
-                iconUpdateURL =
-                  "https://cdn.search.brave.com/serp/v2/_app/immutable/assets/favicon-32x32.86083f5b.png";
+                urls = [
+                  {
+                    template = "https://search.brave.com/search";
+                    params = [
+                      {
+                        name = "q";
+                        value = "{searchTerms}";
+                      }
+                    ];
+                  }
+                ];
+                iconUpdateURL = "https://cdn.search.brave.com/serp/v2/_app/immutable/assets/favicon-32x32.86083f5b.png";
               };
             };
           };
-          settings = let
-            tinkeringWithUserChrome = {
-              "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
-              "devtools.debugger.remote-enabled" = true;
-              "devtools.chrome.enabled" = true;
+          settings =
+            let
+              tinkeringWithUserChrome = {
+                "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
+                "devtools.debugger.remote-enabled" = true;
+                "devtools.chrome.enabled" = true;
+              };
+            in
+            tinkeringWithUserChrome
+            // {
+              "general.smoothScroll" = true;
+              "browser.tabs.warnOnClose" = false;
+              "browser.tabs.warnOnCloseOtherTabs" = false;
+              "browser.toolbars.bookmarks.visibility" = "newtab";
+              "browser.chrome.toolbar_tips" = false;
+              "media.videocontrols.picture-in-picture.enabled" = false;
+              "browser.newtabpage.pinned" = [ ];
+              "browser.startup.homepage" = "https://search.brave.com/search";
             };
-          in tinkeringWithUserChrome // {
-            "general.smoothScroll" = true;
-            "browser.tabs.warnOnClose" = false;
-            "browser.tabs.warnOnCloseOtherTabs" = false;
-            "browser.toolbars.bookmarks.visibility" = "newtab";
-            "browser.chrome.toolbar_tips" = false;
-            "media.videocontrols.picture-in-picture.enabled" = false;
-            "browser.newtabpage.pinned" = [ ];
-            "browser.startup.homepage" = "https://search.brave.com/search";
-          };
           extensions = with pkgs.nur.repos.rycee.firefox-addons; [
             ublock-origin
             localcdn

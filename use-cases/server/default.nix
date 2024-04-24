@@ -1,10 +1,19 @@
-{ platform, lib, vars, config, ... }:
+{
+  platform,
+  lib,
+  vars,
+  config,
+  ...
+}:
 
 with lib;
-let cfg = config.modules.server;
-
-in optionalAttrs platform.isLinux {
-  options.modules.server = { enable = mkEnableOption "server"; };
+let
+  cfg = config.modules.server;
+in
+optionalAttrs platform.isLinux {
+  options.modules.server = {
+    enable = mkEnableOption "server";
+  };
   imports = [ ../../modules/nixos ];
   config = mkIf cfg.enable (mkMerge [
 
@@ -40,4 +49,3 @@ in optionalAttrs platform.isLinux {
     }
   ]);
 }
-

@@ -1,10 +1,18 @@
-{ pkgs, lib, config, ... }:
+{
+  pkgs,
+  lib,
+  config,
+  ...
+}:
 
 with lib;
-let cfg = config.modules.hyprland;
-
-in {
-  options.modules.hyprland = { enable = mkEnableOption "hyprland"; };
+let
+  cfg = config.modules.hyprland;
+in
+{
+  options.modules.hyprland = {
+    enable = mkEnableOption "hyprland";
+  };
   config = mkIf cfg.enable {
     home.packages = with pkgs; [
       wl-clipboard # `wl-copy` and `wl-paste`
@@ -14,7 +22,10 @@ in {
     programs.rofi = {
       enable = true;
       package = pkgs.rofi-wayland;
-      plugins = with pkgs; [ rofi-emoji rofi-calc ];
+      plugins = with pkgs; [
+        rofi-emoji
+        rofi-calc
+      ];
       extraConfig = {
         icon-theme = "Papirus";
         show-icons = true;
@@ -30,12 +41,15 @@ in {
         sidebar-mode = true;
       };
 
-      theme = (pkgs.fetchFromGitHub {
-        owner = "catppuccin";
-        repo = "rofi";
-        rev = "5350da41a11814f950c3354f090b90d4674a95ce";
-        hash = "sha256-DNorfyl3C4RBclF2KDgwvQQwixpTwSRu7fIvihPN8JY=";
-      } + /basic/.local/share/rofi/themes/catppuccin-frappe.rasi);
+      theme = (
+        pkgs.fetchFromGitHub {
+          owner = "catppuccin";
+          repo = "rofi";
+          rev = "5350da41a11814f950c3354f090b90d4674a95ce";
+          hash = "sha256-DNorfyl3C4RBclF2KDgwvQQwixpTwSRu7fIvihPN8JY=";
+        }
+        + /basic/.local/share/rofi/themes/catppuccin-frappe.rasi
+      );
     };
 
     wayland.windowManager.hyprland = {
@@ -45,24 +59,33 @@ in {
       sourceFirst = true;
 
       settings = {
-        source = (pkgs.fetchFromGitHub {
-          owner = "catppuccin";
-          repo = "hyprland";
-          rev = "fc228737d3d0c12e34a7fa155a0fc3192e5e4017";
-          sha256 = "9BhZq9J1LmHfAPBqOr64chiAEzS+YV6zqe9ma95V3no=";
-        } + /themes/frappe.conf);
+        source = (
+          pkgs.fetchFromGitHub {
+            owner = "catppuccin";
+            repo = "hyprland";
+            rev = "fc228737d3d0c12e34a7fa155a0fc3192e5e4017";
+            sha256 = "9BhZq9J1LmHfAPBqOr64chiAEzS+YV6zqe9ma95V3no=";
+          }
+          + /themes/frappe.conf
+        );
 
-        monitor =
-          [ "DP-1, 2560x1440@144, 0x0, 1" "HDMI-A-1, 1920x1080, 2560x0, 1" ];
-        "exec-once" =
-          "${pkgs.swaybg}/bin/swaybg --image ~/.nix-config/wallpaper.png";
-        env = [ "XCURSOR_SIZE,24" "WLR_DRM_NO_ATOMIC,1" ];
+        monitor = [
+          "DP-1, 2560x1440@144, 0x0, 1"
+          "HDMI-A-1, 1920x1080, 2560x0, 1"
+        ];
+        "exec-once" = "${pkgs.swaybg}/bin/swaybg --image ~/.nix-config/wallpaper.png";
+        env = [
+          "XCURSOR_SIZE,24"
+          "WLR_DRM_NO_ATOMIC,1"
+        ];
         input = {
           kb_options = "caps:escape";
 
           follow_mouse = 1;
 
-          touchpad = { natural_scroll = false; };
+          touchpad = {
+            natural_scroll = false;
+          };
 
           sensitivity = 0;
           repeat_rate = 100;
@@ -112,9 +135,13 @@ in {
           preserve_split = true;
         };
 
-        master = { new_is_master = true; };
+        master = {
+          new_is_master = true;
+        };
 
-        misc = { disable_hyprland_logo = true; };
+        misc = {
+          disable_hyprland_logo = true;
+        };
 
         windowrulev2 = "immediate, class:^(.gamescope-wrapped|Minecraft*)$";
 

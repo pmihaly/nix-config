@@ -1,4 +1,5 @@
-{ lib, ... }: {
+{ lib, ... }:
+{
 
   age.secrets."authelia/jwt-secret" = lib.mkDefault {
     file = ./authelia/jwt-secret.age;
@@ -27,9 +28,7 @@
 
   age.secrets."duckdns/token" = lib.mkDefault { file = ./duckdns/token.age; };
 
-  age.secrets."acme/porkbun-api-key" =
-    lib.mkDefault { file = ./acme/porkbun-api-key.age; };
+  age.secrets."acme/porkbun-api-key" = lib.mkDefault { file = ./acme/porkbun-api-key.age; };
 
-  age.secrets."acme/porkbun-secret-key" =
-    lib.mkDefault { file = ./acme/porkbun-secret-key.age; };
+  age.secrets."acme/porkbun-secret-key" = lib.mkDefault { file = ./acme/porkbun-secret-key.age; };
 }

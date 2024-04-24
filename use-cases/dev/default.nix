@@ -1,10 +1,20 @@
-{ platform, pkgs, lib, vars, config, ... }:
+{
+  platform,
+  pkgs,
+  lib,
+  vars,
+  config,
+  ...
+}:
 
 with lib;
-let cfg = config.modules.dev;
-
-in optionalAttrs platform.isLinux {
-  options.modules.dev = { enable = mkEnableOption "dev"; };
+let
+  cfg = config.modules.dev;
+in
+optionalAttrs platform.isLinux {
+  options.modules.dev = {
+    enable = mkEnableOption "dev";
+  };
   imports = [ ../../modules/nixos ];
   config = mkIf cfg.enable {
 
@@ -21,7 +31,5 @@ in optionalAttrs platform.isLinux {
 
       modules.persistence.directories = [ ".config/aws" ];
     };
-
   };
 }
-

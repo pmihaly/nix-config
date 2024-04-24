@@ -1,7 +1,16 @@
-{ config, lib, pkgs, modulesPath, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  modulesPath,
+  ...
+}:
 
 {
-  imports = [ (modulesPath + "/installer/scan/not-detected.nix") ./disko.nix ];
+  imports = [
+    (modulesPath + "/installer/scan/not-detected.nix")
+    ./disko.nix
+  ];
 
   boot.initrd.availableKernelModules = [
     "ahci"
@@ -21,6 +30,5 @@
   networking.interfaces.enp9s0.useDHCP = lib.mkDefault true;
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
-  hardware.cpu.amd.updateMicrocode =
-    lib.mkDefault config.hardware.enableRedistributableFirmware;
+  hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
 }

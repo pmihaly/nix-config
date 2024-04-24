@@ -1,10 +1,18 @@
-{ pkgs, lib, config, ... }:
+{
+  pkgs,
+  lib,
+  config,
+  ...
+}:
 
 with lib;
-let cfg = config.modules.vscode;
-
-in {
-  options.modules.vscode = { enable = mkEnableOption "vscode"; };
+let
+  cfg = config.modules.vscode;
+in
+{
+  options.modules.vscode = {
+    enable = mkEnableOption "vscode";
+  };
   config = mkIf cfg.enable {
     programs.vscode = {
       enable = true;
@@ -18,10 +26,12 @@ in {
         esbenp.prettier-vscode
         dbaeumer.vscode-eslint
       ];
-      keybindings = [{
-        key = "ctrl+t";
-        command = "workbench.action.terminal.toggleTerminal";
-      }];
+      keybindings = [
+        {
+          key = "ctrl+t";
+          command = "workbench.action.terminal.toggleTerminal";
+        }
+      ];
       userSettings = {
         "workbench.colorTheme" = "Catppuccin Frappé";
         "workbench.iconTheme" = "catppuccin-frappe";

@@ -1,15 +1,25 @@
-{ pkgs, lib, config, ... }:
+{
+  pkgs,
+  lib,
+  config,
+  ...
+}:
 
 with lib;
-let cfg = config.modules.mpv;
-
-in {
-  options.modules.mpv = { enable = mkEnableOption "mpv"; };
+let
+  cfg = config.modules.mpv;
+in
+{
+  options.modules.mpv = {
+    enable = mkEnableOption "mpv";
+  };
   config = mkIf cfg.enable {
 
     programs.mpv = {
       enable = true;
-      config = { ytdl-format = "bestvideo+bestaudio/best"; };
+      config = {
+        ytdl-format = "bestvideo+bestaudio/best";
+      };
       defaultProfiles = [ "gpu-hq" ];
       scripts = [ pkgs.mpvScripts.sponsorblock ];
       bindings = {

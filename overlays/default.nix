@@ -2,27 +2,29 @@
   (final: prev: {
     nerdfonts-fira-code = prev.nerdfonts.override { fonts = [ "FiraCode" ]; };
 
-    comic-code = (prev.stdenvNoCC.mkDerivation rec {
-      pname = "Comic-Code-Font";
-      version = "bb13a9d007b7a102ac86b18889bbf830680aeab1";
+    comic-code = (
+      prev.stdenvNoCC.mkDerivation rec {
+        pname = "Comic-Code-Font";
+        version = "bb13a9d007b7a102ac86b18889bbf830680aeab1";
 
-      src = prev.fetchFromGitHub {
-        owner = "Mr-Coxall";
-        repo = pname;
-        rev = version;
-        hash = "sha256-ODp7Kl/F7lWeaQpReMLwuJKGd4YxXLb4+5XL2BtU6t0=";
-      };
+        src = prev.fetchFromGitHub {
+          owner = "Mr-Coxall";
+          repo = pname;
+          rev = version;
+          hash = "sha256-ODp7Kl/F7lWeaQpReMLwuJKGd4YxXLb4+5XL2BtU6t0=";
+        };
 
-      installPhase = ''
-        runHook preInstall
+        installPhase = ''
+          runHook preInstall
 
-        mkdir -p $out/share/fonts
+          mkdir -p $out/share/fonts
 
-        mv *.otf $out/share/fonts
+          mv *.otf $out/share/fonts
 
-        runHook postInstall
-      '';
-    });
+          runHook postInstall
+        '';
+      }
+    );
 
     iosevka-custom = prev.iosevka.override {
       privateBuildPlan = ''
@@ -71,16 +73,17 @@
       set = "custom";
     };
 
-    keepassxc = if !prev.stdenv.isDarwin then
-      prev.keepassxc
-    else
-      prev.keepassxc.overrideAttrs (prevAttrs: finalAttrs: {
-        postInstall = ''
-          mkdir -p "$out/lib/mozilla/native-messaging-hosts"
-          substituteAll "${
-            ./keepassxc-darwin-firefox-native-messaging-host.json
-          }" "$out/lib/mozilla/native-messaging-hosts/org.keepassxc.keepassxc_browser.json"
-        '';
-      });
+    keepassxc =
+      if !prev.stdenv.isDarwin then
+        prev.keepassxc
+      else
+        prev.keepassxc.overrideAttrs (
+          prevAttrs: finalAttrs: {
+            postInstall = ''
+              mkdir -p "$out/lib/mozilla/native-messaging-hosts"
+              substituteAll "${./keepassxc-darwin-firefox-native-messaging-host.json}" "$out/lib/mozilla/native-messaging-hosts/org.keepassxc.keepassxc_browser.json"
+            '';
+          }
+        );
   })
 ]

@@ -1,10 +1,19 @@
-{ pkgs, lib, config, vars, ... }:
+{
+  pkgs,
+  lib,
+  config,
+  vars,
+  ...
+}:
 
 with lib;
-let cfg = config.modules.qemu;
-
-in {
-  options.modules.qemu = { enable = mkEnableOption "qemu"; };
+let
+  cfg = config.modules.qemu;
+in
+{
+  options.modules.qemu = {
+    enable = mkEnableOption "qemu";
+  };
   config = mkIf cfg.enable {
 
     environment.persistence.${vars.persistDir} = {
@@ -29,6 +38,5 @@ in {
     };
 
     programs.virt-manager.enable = true;
-
   };
 }

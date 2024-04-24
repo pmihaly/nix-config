@@ -1,4 +1,5 @@
-{ pkgs, vars, ... }: {
+{ pkgs, vars, ... }:
+{
   imports = [ ../../use-cases ];
 
   modules = {
@@ -6,7 +7,9 @@
 
     shell = {
       enable = true;
-      extraBookmarks = { w = "~/lensadev"; };
+      extraBookmarks = {
+        w = "~/lensadev";
+      };
     };
 
     gui.enable = true;
@@ -42,10 +45,14 @@
     ];
   };
 
-  homebrew.casks = [ "docker" "sequel-ace" "tableplus" "pycharm-ce" ];
+  homebrew.casks = [
+    "docker"
+    "sequel-ace"
+    "tableplus"
+    "pycharm-ce"
+  ];
 
   users.users.${vars.username}.home = "/Users/${vars.username}";
 
   system.stateVersion = 4;
 }
-

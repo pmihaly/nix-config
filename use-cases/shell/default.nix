@@ -1,4 +1,11 @@
-{ platform, pkgs, vars, lib, config, ... }:
+{
+  platform,
+  pkgs,
+  vars,
+  lib,
+  config,
+  ...
+}:
 
 with lib;
 let
@@ -14,8 +21,8 @@ let
     fir = p + "/finances/import/revolut/in";
     fiw = p + "/finances/import/wise/in";
   };
-
-in {
+in
+{
   options.modules.shell = {
     enable = mkEnableOption "shell";
     extraBookmarks = mkOption {
@@ -48,9 +55,7 @@ in {
 
     { users.users.${vars.username}.shell = pkgs.zsh; }
 
-    (optionalAttrs platform.isLinux {
-      home-manager.users.${vars.username}.xdg.userDirs.enable = true;
-    })
+    (optionalAttrs platform.isLinux { home-manager.users.${vars.username}.xdg.userDirs.enable = true; })
 
     {
       home-manager.users.${vars.username} = {
@@ -80,7 +85,5 @@ in {
         };
       };
     }
-
   ]);
 }
-

@@ -3,12 +3,14 @@
 with lib;
 let
   cfg = config.modules.yazi;
-  bookmarksToYaziKeybindings = attrsets.mapAttrsToList (name: value: {
-    on = [ "g" ] ++ (strings.stringToCharacters name);
-    run = "cd ${value}";
-  });
-
-in {
+  bookmarksToYaziKeybindings = attrsets.mapAttrsToList (
+    name: value: {
+      on = [ "g" ] ++ (strings.stringToCharacters name);
+      run = "cd ${value}";
+    }
+  );
+in
+{
   options.modules.yazi = {
     enable = mkEnableOption "yazi";
     bookmarks = mkOption {

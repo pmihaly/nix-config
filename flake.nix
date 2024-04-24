@@ -15,7 +15,9 @@
       url = "github:Mic92/nix-index-database";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    impermanence = { url = "github:nix-community/impermanence"; };
+    impermanence = {
+      url = "github:nix-community/impermanence";
+    };
     nur.url = "github:nix-community/NUR";
     img2theme = {
       url = "github:pmihaly/img2theme";
@@ -50,103 +52,137 @@
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, ... }@inputs: {
-    formatter.aarch64-darwin = nixpkgs.legacyPackages.aarch64-darwin.nixfmt;
-    formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.nixfmt;
+  outputs =
+    {
+      self,
+      nixpkgs,
+      home-manager,
+      ...
+    }@inputs:
+    {
+      formatter.aarch64-darwin = nixpkgs.legacyPackages.aarch64-darwin.nixfmt-rfc-style;
+      formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.nixfmt-rfc-style;
 
-    darwinConfigurations.mac = inputs.darwin.lib.darwinSystem {
-      specialArgs = {
-        inherit inputs;
-        vars = (import ./machines/work/vars.nix);
-        platform = {
-          isLinux = false;
-          isDarwin = true;
+      darwinConfigurations.mac = inputs.darwin.lib.darwinSystem {
+        specialArgs = {
+          inherit inputs;
+          vars = (import ./machines/work/vars.nix);
+          platform = {
+            isLinux = false;
+            isDarwin = true;
+          };
         };
+
+        system = "aarch64-darwin";
+        modules = [
+          home-manager.darwinModules.home-manager
+          {
+            nixpkgs.overlays = [
+              inputs.nur.overlay
+              inputs.nixpkgs-firefox-darwin.overlay
+            ];
+          }
+          {
+            home-manager.extraSpecialArgs = {
+              inherit inputs;
+            };
+          }
+          ./machines/work
+        ];
       };
 
-      system = "aarch64-darwin";
-      modules = [
-        home-manager.darwinModules.home-manager
-        {
-          nixpkgs.overlays =
-            [ inputs.nur.overlay inputs.nixpkgs-firefox-darwin.overlay ];
-        }
-        { home-manager.extraSpecialArgs = { inherit inputs; }; }
-        ./machines/work
-      ];
-    };
+      nixosConfigurations.aesop = nixpkgs.lib.nixosSystem {
+        specialArgs =
+          let
+            vars = import ./machines/aesop/vars.nix;
+          in
+          {
+            inherit inputs vars;
+            lib = nixpkgs.lib.extend (
+              final: prev:
+              (import ./lib/nixos {
+                lib = final;
+                inherit vars;
+              })
+            );
+            platform = {
+              isLinux = true;
+              isDarwin = false;
+            };
+          };
 
-    nixosConfigurations.aesop = nixpkgs.lib.nixosSystem {
-      specialArgs = let vars = import ./machines/aesop/vars.nix;
-      in {
-        inherit inputs vars;
-        lib = nixpkgs.lib.extend (final: prev:
-          (import ./lib/nixos {
-            lib = final;
-            inherit vars;
-          }));
-        platform = {
-          isLinux = true;
-          isDarwin = false;
-        };
+        modules = [
+          home-manager.nixosModules.home-manager
+          inputs.agenix.nixosModules.default
+          inputs.impermanence.nixosModules.impermanence
+          inputs.nix-index-database.nixosModules.nix-index
+          inputs.disko.nixosModules.disko
+          { nixpkgs.overlays = [ inputs.nur.overlay ]; }
+          {
+            home-manager.extraSpecialArgs = {
+              inherit inputs;
+            };
+          }
+          ./secrets
+          ./machines/aesop
+        ];
       };
 
-      modules = [
-        home-manager.nixosModules.home-manager
-        inputs.agenix.nixosModules.default
-        inputs.impermanence.nixosModules.impermanence
-        inputs.nix-index-database.nixosModules.nix-index
-        inputs.disko.nixosModules.disko
-        { nixpkgs.overlays = [ inputs.nur.overlay ]; }
-        { home-manager.extraSpecialArgs = { inherit inputs; }; }
-        ./secrets
-        ./machines/aesop
-      ];
-    };
+      nixosConfigurations.skylake = nixpkgs.lib.nixosSystem {
+        specialArgs =
+          let
+            vars = import ./machines/skylake/vars.nix;
+          in
+          {
+            inherit inputs vars;
+            lib = nixpkgs.lib.extend (
+              final: prev:
+              (import ./lib/nixos {
+                lib = final;
+                inherit vars;
+              })
+            );
+            platform = {
+              isLinux = true;
+              isDarwin = false;
+            };
+          };
 
-    nixosConfigurations.skylake = nixpkgs.lib.nixosSystem {
-      specialArgs = let vars = import ./machines/skylake/vars.nix;
-      in {
-        inherit inputs vars;
-        lib = nixpkgs.lib.extend (final: prev:
-          (import ./lib/nixos {
-            lib = final;
-            inherit vars;
-          }));
-        platform = {
-          isLinux = true;
-          isDarwin = false;
-        };
+        modules = [
+          home-manager.nixosModules.home-manager
+          inputs.agenix.nixosModules.default
+          inputs.impermanence.nixosModules.impermanence
+          inputs.nix-index-database.nixosModules.nix-index
+          inputs.disko.nixosModules.disko
+          { nixpkgs.overlays = [ inputs.nur.overlay ]; }
+          {
+            home-manager.extraSpecialArgs = {
+              inherit inputs;
+            };
+          }
+          ./secrets
+          ./machines/skylake
+        ];
       };
 
-      modules = [
-        home-manager.nixosModules.home-manager
-        inputs.agenix.nixosModules.default
-        inputs.impermanence.nixosModules.impermanence
-        inputs.nix-index-database.nixosModules.nix-index
-        inputs.disko.nixosModules.disko
-        { nixpkgs.overlays = [ inputs.nur.overlay ]; }
-        { home-manager.extraSpecialArgs = { inherit inputs; }; }
-        ./secrets
-        ./machines/skylake
-      ];
-    };
-
-    deploy.nodes = {
-      skylake = {
-        hostname = "192.168.0.30";
-        profiles.system = {
-          path = inputs.deploy-rs.lib.x86_64-linux.activate.nixos
-            self.nixosConfigurations.skylake;
-          sshUser = "misi";
-          user = "root";
-          sshOpts =
-            [ "-p" "69" "-t" "-i" "/persist/etc/ssh/ssh_host_ed25519_key" ];
-          magicRollback = false;
-          remoteBuild = false;
+      deploy.nodes = {
+        skylake = {
+          hostname = "192.168.0.30";
+          profiles.system = {
+            path = inputs.deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.skylake;
+            sshUser = "misi";
+            user = "root";
+            sshOpts = [
+              "-t"
+              "-p"
+              "69"
+              "-i"
+              "/persist/etc/ssh/ssh_host_ed25519_key"
+            ];
+            magicRollback = false;
+            remoteBuild = false;
+          };
         };
       };
     };
-
-  };
 }

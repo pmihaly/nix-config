@@ -1,10 +1,18 @@
-{ pkgs, lib, config, ... }:
+{
+  pkgs,
+  lib,
+  config,
+  ...
+}:
 
 with lib;
-let cfg = config.modules.newsboat;
-
-in {
-  options.modules.newsboat = { enable = mkEnableOption "newsboat"; };
+let
+  cfg = config.modules.newsboat;
+in
+{
+  options.modules.newsboat = {
+    enable = mkEnableOption "newsboat";
+  };
   config = mkIf cfg.enable {
 
     modules.persistence.directories = [ ".local/share/newsboat" ];
@@ -12,10 +20,11 @@ in {
     programs.newsboat = {
       enable = true;
       autoReload = true;
-      browser = if pkgs.stdenv.isDarwin then
-        "${pkgs.firefox-bin}/Applications/Firefox.app/Contents/MacOS/firefox"
-      else
-        "${pkgs.xdg-utils}/bin/xdg-open";
+      browser =
+        if pkgs.stdenv.isDarwin then
+          "${pkgs.firefox-bin}/Applications/Firefox.app/Contents/MacOS/firefox"
+        else
+          "${pkgs.xdg-utils}/bin/xdg-open";
       urls = [
         { url = "https://www.daemonology.net/hn-daily/index.rss"; }
         { url = "https://social.notjustbikes.com/@notjustbikes.rss"; }
@@ -26,10 +35,7 @@ in {
         { url = "https://old.reddit.com/r/escapehungary.rss"; }
         { url = "https://old.reddit.com/r/kiszamolo.rss"; }
         { url = "https://old.reddit.com/r/programminghungary.rss"; }
-        {
-          url =
-            "https://old.reddit.com/r/Ultrakill/search.xml?sort=new&restrict_sr=on&q=flair%3ANews";
-        }
+        { url = "https://old.reddit.com/r/Ultrakill/search.xml?sort=new&restrict_sr=on&q=flair%3ANews"; }
       ];
       extraConfig = builtins.concatStringsSep "\n" [
         ''
@@ -61,12 +67,15 @@ in {
 
           macro , open-in-browser
         ''
-        (builtins.readFile (pkgs.fetchFromGitHub {
-          owner = "catppuccin";
-          repo = "newsboat";
-          rev = "be3d0ee1ba0fc26baf7a47c2aa7032b7541deb0f";
-          hash = "sha256-czvR3bVZ0NfBmuu0JixalS7B1vf1uEGSTSUVVTclKxI=";
-        } + /themes/dark))
+        (builtins.readFile (
+          pkgs.fetchFromGitHub {
+            owner = "catppuccin";
+            repo = "newsboat";
+            rev = "be3d0ee1ba0fc26baf7a47c2aa7032b7541deb0f";
+            hash = "sha256-czvR3bVZ0NfBmuu0JixalS7B1vf1uEGSTSUVVTclKxI=";
+          }
+          + /themes/dark
+        ))
       ];
     };
 

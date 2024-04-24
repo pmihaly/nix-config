@@ -1,10 +1,18 @@
-{ lib, config, vars, ... }:
+{
+  lib,
+  config,
+  vars,
+  ...
+}:
 
 with lib;
-let cfg = config.modules.deluge;
-
-in {
-  options.modules.deluge = { enable = mkEnableOption "deluge"; };
+let
+  cfg = config.modules.deluge;
+in
+{
+  options.modules.deluge = {
+    enable = mkEnableOption "deluge";
+  };
   config = mkIf cfg.enable (mkService {
     subdomain = "deluge";
     port = 8112;
@@ -40,7 +48,6 @@ in {
           port = 8112;
         };
       };
-
     };
   });
 }

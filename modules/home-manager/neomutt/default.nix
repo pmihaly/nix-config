@@ -1,10 +1,18 @@
-{ pkgs, lib, config, ... }:
+{
+  pkgs,
+  lib,
+  config,
+  ...
+}:
 
 with lib;
-let cfg = config.modules.neomutt;
-
-in {
-  options.modules.neomutt = { enable = mkEnableOption "neomutt"; };
+let
+  cfg = config.modules.neomutt;
+in
+{
+  options.modules.neomutt = {
+    enable = mkEnableOption "neomutt";
+  };
   imports = [ ../../../secrets/home-manager ];
   config = mkIf cfg.enable {
 
@@ -15,8 +23,7 @@ in {
         address = "mihaly@mihaly.codes";
         userName = address;
         realName = "Mihaly Papp";
-        passwordCommand =
-          "cat ${config.age.secrets."email/password/mihaly_mihaly.codes".path}";
+        passwordCommand = "cat ${config.age.secrets."email/password/mihaly_mihaly.codes".path}";
         primary = true;
         imap.host = "imap.mailbox.org";
         smtp.host = "smtp.mailbox.org";
@@ -34,12 +41,15 @@ in {
       enable = true;
       vimKeys = true;
       extraConfig = builtins.concatStringsSep "\n" [
-        (builtins.readFile (pkgs.fetchFromGitHub {
-          owner = "catppuccin";
-          repo = "neomutt";
-          rev = "f6ce83da47cc36d5639b0d54e7f5f63cdaf69f11";
-          hash = "sha256-ye16nP2DL4VytDKB+JdMkBXU+Y9Z4dHmY+DsPcR2EG0=";
-        } + /neomuttrc))
+        (builtins.readFile (
+          pkgs.fetchFromGitHub {
+            owner = "catppuccin";
+            repo = "neomutt";
+            rev = "f6ce83da47cc36d5639b0d54e7f5f63cdaf69f11";
+            hash = "sha256-ye16nP2DL4VytDKB+JdMkBXU+Y9Z4dHmY+DsPcR2EG0=";
+          }
+          + /neomuttrc
+        ))
       ];
     };
 
@@ -47,8 +57,9 @@ in {
     programs.msmtp.enable = true;
     programs.notmuch = {
       enable = true;
-      hooks = { preNew = "mbsync --all"; };
+      hooks = {
+        preNew = "mbsync --all";
+      };
     };
-
   };
 }

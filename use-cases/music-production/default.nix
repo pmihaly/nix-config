@@ -1,9 +1,17 @@
-{ platform, pkgs, lib, vars, config, ... }:
+{
+  platform,
+  pkgs,
+  lib,
+  vars,
+  config,
+  ...
+}:
 
 with lib;
-let cfg = config.modules.music-production;
-
-in optionalAttrs platform.isLinux {
+let
+  cfg = config.modules.music-production;
+in
+optionalAttrs platform.isLinux {
   options.modules.music-production = {
     enable = mkEnableOption "music-production";
   };
@@ -12,7 +20,10 @@ in optionalAttrs platform.isLinux {
     home-manager.users.${vars.username} = {
       imports = [ ../../modules/home-manager ];
 
-      home.packages = with pkgs; [ wine bottles ];
+      home.packages = with pkgs; [
+        wine
+        bottles
+      ];
 
       modules = {
         persistence.directories = [
@@ -24,4 +35,3 @@ in optionalAttrs platform.isLinux {
     };
   };
 }
-

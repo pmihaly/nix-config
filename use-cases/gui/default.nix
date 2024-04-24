@@ -1,12 +1,26 @@
-{ inputs, platform, pkgs, vars, lib, config, ... }:
+{
+  inputs,
+  platform,
+  pkgs,
+  vars,
+  lib,
+  config,
+  ...
+}:
 
 with lib;
-let cfg = config.modules.gui;
+let
+  cfg = config.modules.gui;
+in
+{
+  options.modules.gui = {
+    enable = mkEnableOption "gui";
+  };
 
-in {
-  options.modules.gui = { enable = mkEnableOption "gui"; };
-
-  imports = [ ./darwin.nix ./linux.nix ];
+  imports = [
+    ./darwin.nix
+    ./linux.nix
+  ];
 
   config = mkIf cfg.enable (mkMerge [
 
@@ -15,8 +29,13 @@ in {
         imports = [ ../../modules/home-manager ];
 
         modules = {
-          persistence.directories =
-            [ "Downloads" "Music" "Pictures" "Documents" "Videos" ];
+          persistence.directories = [
+            "Downloads"
+            "Music"
+            "Pictures"
+            "Documents"
+            "Videos"
+          ];
           firefox.enable = true;
           mpv.enable = true;
           kitty.enable = true;
@@ -48,4 +67,3 @@ in {
     (optionalAttrs platform.isDarwin { modules.darwin.enable = true; })
   ]);
 }
-

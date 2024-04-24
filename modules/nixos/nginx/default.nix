@@ -1,14 +1,22 @@
-{ pkgs, lib, config, vars, ... }:
+{
+  pkgs,
+  lib,
+  config,
+  vars,
+  ...
+}:
 
 with lib;
-let cfg = config.modules.nginx;
-
-in {
-  options.modules.nginx = { enable = mkEnableOption "nginx"; };
+let
+  cfg = config.modules.nginx;
+in
+{
+  options.modules.nginx = {
+    enable = mkEnableOption "nginx";
+  };
   config = mkIf cfg.enable {
 
-    environment.persistence.${vars.persistDir}.directories =
-      [ "/var/lib/acme" ];
+    environment.persistence.${vars.persistDir}.directories = [ "/var/lib/acme" ];
 
     services.nginx = {
       enable = true;
@@ -40,15 +48,17 @@ in {
         dnsPropagationCheck = true;
         credentialFiles = {
           PORKBUN_API_KEY_FILE = config.age.secrets."acme/porkbun-api-key".path;
-          PORKBUN_SECRET_API_KEY_FILE =
-            config.age.secrets."acme/porkbun-secret-key".path;
+          PORKBUN_SECRET_API_KEY_FILE = config.age.secrets."acme/porkbun-secret-key".path;
         };
       };
     };
 
     networking.firewall = {
       enable = true;
-      allowedTCPPorts = [ 80 443 ];
+      allowedTCPPorts = [
+        80
+        443
+      ];
     };
 
     modules.authelia.bypassDomains = [ vars.domainName ];

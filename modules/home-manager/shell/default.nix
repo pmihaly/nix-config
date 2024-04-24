@@ -1,12 +1,19 @@
-{ pkgs, lib, config, inputs, ... }:
+{
+  pkgs,
+  lib,
+  config,
+  inputs,
+  ...
+}:
 
 with lib;
 let
   cfg = config.modules.shell;
-  bookmarksToAliases = attrsets.mapAttrs'
-    (name: value: attrsets.nameValuePair "g${name}" "cd ${value}");
-
-in {
+  bookmarksToAliases = attrsets.mapAttrs' (
+    name: value: attrsets.nameValuePair "g${name}" "cd ${value}"
+  );
+in
+{
   options.modules.shell = {
     enable = mkEnableOption "shell";
     bookmarks = mkOption {
@@ -54,7 +61,9 @@ in {
 
     programs.bat = {
       enable = true;
-      config = { theme = "catpuccin-frappe"; };
+      config = {
+        theme = "catpuccin-frappe";
+      };
       themes = {
         catpuccin-frappe = {
           src = pkgs.fetchFromGitHub {
@@ -84,27 +93,38 @@ in {
     programs.starship = {
       enable = true;
       enableZshIntegration = true;
-      settings = {
-        palette = "catppuccin_frappe";
-        add_newline = false;
-        format = lib.concatStrings [ " " "$directory" "$shell" ];
-        scan_timeout = 10;
-        directory = {
-          truncation_length = 2;
-          style = "bold fg:flamingo";
-        };
-        shell = {
-          disabled = false;
-          zsh_indicator = "🔮";
-          nu_indicator = "🧮";
-          style = "bold fg:flamingo";
-        };
-      } // builtins.fromTOML (builtins.readFile (pkgs.fetchFromGitHub {
-        owner = "catppuccin";
-        repo = "starship";
-        rev = "5629d2356f62a9f2f8efad3ff37476c19969bd4f";
-        hash = "sha256-nsRuxQFKbQkyEI4TXgvAjcroVdG+heKX5Pauq/4Ota0=";
-      } + /palettes/frappe.toml));
+      settings =
+        {
+          palette = "catppuccin_frappe";
+          add_newline = false;
+          format = lib.concatStrings [
+            " "
+            "$directory"
+            "$shell"
+          ];
+          scan_timeout = 10;
+          directory = {
+            truncation_length = 2;
+            style = "bold fg:flamingo";
+          };
+          shell = {
+            disabled = false;
+            zsh_indicator = "🔮";
+            nu_indicator = "🧮";
+            style = "bold fg:flamingo";
+          };
+        }
+        // builtins.fromTOML (
+          builtins.readFile (
+            pkgs.fetchFromGitHub {
+              owner = "catppuccin";
+              repo = "starship";
+              rev = "5629d2356f62a9f2f8efad3ff37476c19969bd4f";
+              hash = "sha256-nsRuxQFKbQkyEI4TXgvAjcroVdG+heKX5Pauq/4Ota0=";
+            }
+            + /palettes/frappe.toml
+          )
+        );
     };
 
     programs.zsh = {
@@ -151,55 +171,48 @@ in {
         path = "${config.xdg.dataHome}/zsh";
         ignoreDups = true;
       };
-      shellAliases = (mkMerge [
-        (bookmarksToAliases cfg.bookmarks)
-        {
-          ls =
-            "${pkgs.eza}/bin/eza -lah --icons $([ -d .git ] && echo '--git')";
-          cat = "bat";
-          p = "cd $(find ~/personaldev -maxdepth 1 -type d | fzf)";
-          pn = "p && nvim";
-          o = "cd ~/Sync/org";
-          on = ''o && (fd "^.*.org$" | fzf | xargs nvim)'';
-          ld = "${pkgs.lazydocker}/bin/lazydocker";
-          ns = cfg.rebuildSwitch;
-          nr = "sudo nix-store --verify --check-contents --repair";
-          ncg = "sudo nix-collect-garbage --delete-old";
-          nsh = "function _f() { nix-shell -p $* --run zsh }; _f";
-          ndiff =
-            "nix profile diff-closures --profile /nix/var/nix/profiles/system";
-          cn = "cd ~/.nix-config && nvim";
-          c = "cd ~/.nix-config";
-          thokr = "${pkgs.thokr}/bin/thokr --full-sentences 20";
-          kbp = ''
-            sudo touch /dev/null ; ${pkgs.lsof}/bin/lsof -iTCP -sTCP:LISTEN -n -P +c0 | awk 'NR>1{gsub(/.*:/,"",$9); print $9, $1, $2}' | fzf --multi --with-nth=1,2 --header='Select processes to be killed' | cut -d' ' -f3 | xargs kill -9'';
-          kaf = "${pkgs.kubectl}/bin/kubectl apply -f";
-          kak = ''
-            function _kak() { ${pkgs.kubectl}/bin/kubectl kustomize --enable-helm "$1" | ${pkgs.kubectl}/bin/kubectl apply -f -; }; _kak'';
-          pis = ''
-            function _pis() { ${pkgs.kubectl}/bin/kubectl kustomize --enable-helm "$1" | ${pkgs.kubectl}/bin/kubectl delete -f -; }; _pis'';
-          urlencode = "${pkgs.jq}/bin/jq -sRr @uri";
-          dselect =
-            "docker ps --format '{{.ID}}	{{.Image}}' | fzf --with-nth 2 | cut -f1";
-          dim = ''
-            dselect | tee >(tr -d '
-            ' | pbcopy)'';
-          dl = "dselect | xargs docker logs -f";
-          dex = ''
-            container=$(dselect); docker exec -it "$container" "''${@:-bash}"'';
-          ticket = ''git branch --show-current | grep -oE "[A-Z]+-[0-9]+"'';
-          qr = "${pkgs.qrencode}/bin/qrencode -t ansiutf8";
-          sr = ''
-            function _f() { fd --type file --exec ${pkgs.sd}/bin/sd "$1" "$2" }; _f'';
-          du = "${pkgs.du-dust}/bin/dust";
-          lsblk = "${pkgs.duf}/bin/duf";
-          wttr = "${pkgs.httpie}/bin/http wttr.in/budapest";
-          n = "nvim";
-          sharedir = "${pkgs.python3}/bin/python3 -m http.server 9000";
-          yt-dlp =
-            "nix run nixpkgs#yt-dlp --"; # always use the latest yt-dlp to mitigate 403 errors from youtube
-        }
-      ]);
+      shellAliases = (
+        mkMerge [
+          (bookmarksToAliases cfg.bookmarks)
+          {
+            ls = "${pkgs.eza}/bin/eza -lah --icons $([ -d .git ] && echo '--git')";
+            cat = "bat";
+            p = "cd $(find ~/personaldev -maxdepth 1 -type d | fzf)";
+            pn = "p && nvim";
+            o = "cd ~/Sync/org";
+            on = ''o && (fd "^.*.org$" | fzf | xargs nvim)'';
+            ld = "${pkgs.lazydocker}/bin/lazydocker";
+            ns = cfg.rebuildSwitch;
+            nr = "sudo nix-store --verify --check-contents --repair";
+            ncg = "sudo nix-collect-garbage --delete-old";
+            nsh = "function _f() { nix-shell -p $* --run zsh }; _f";
+            ndiff = "nix profile diff-closures --profile /nix/var/nix/profiles/system";
+            cn = "cd ~/.nix-config && nvim";
+            c = "cd ~/.nix-config";
+            thokr = "${pkgs.thokr}/bin/thokr --full-sentences 20";
+            kbp = ''sudo touch /dev/null ; ${pkgs.lsof}/bin/lsof -iTCP -sTCP:LISTEN -n -P +c0 | awk 'NR>1{gsub(/.*:/,"",$9); print $9, $1, $2}' | fzf --multi --with-nth=1,2 --header='Select processes to be killed' | cut -d' ' -f3 | xargs kill -9'';
+            kaf = "${pkgs.kubectl}/bin/kubectl apply -f";
+            kak = ''function _kak() { ${pkgs.kubectl}/bin/kubectl kustomize --enable-helm "$1" | ${pkgs.kubectl}/bin/kubectl apply -f -; }; _kak'';
+            pis = ''function _pis() { ${pkgs.kubectl}/bin/kubectl kustomize --enable-helm "$1" | ${pkgs.kubectl}/bin/kubectl delete -f -; }; _pis'';
+            urlencode = "${pkgs.jq}/bin/jq -sRr @uri";
+            dselect = "docker ps --format '{{.ID}}	{{.Image}}' | fzf --with-nth 2 | cut -f1";
+            dim = ''
+              dselect | tee >(tr -d '
+              ' | pbcopy)'';
+            dl = "dselect | xargs docker logs -f";
+            dex = ''container=$(dselect); docker exec -it "$container" "''${@:-bash}"'';
+            ticket = ''git branch --show-current | grep -oE "[A-Z]+-[0-9]+"'';
+            qr = "${pkgs.qrencode}/bin/qrencode -t ansiutf8";
+            sr = ''function _f() { fd --type file --exec ${pkgs.sd}/bin/sd "$1" "$2" }; _f'';
+            du = "${pkgs.du-dust}/bin/dust";
+            lsblk = "${pkgs.duf}/bin/duf";
+            wttr = "${pkgs.httpie}/bin/http wttr.in/budapest";
+            n = "nvim";
+            sharedir = "${pkgs.python3}/bin/python3 -m http.server 9000";
+            yt-dlp = "nix run nixpkgs#yt-dlp --"; # always use the latest yt-dlp to mitigate 403 errors from youtube
+          }
+        ]
+      );
 
       localVariables = {
         XDG_DATA_HOME = config.xdg.dataHome;
@@ -208,8 +221,7 @@ in {
         XDG_CACHE_HOME = config.xdg.cacheHome;
 
         AWS_CONFIG_FILE = "${config.xdg.configHome}/aws/config";
-        AWS_SHARED_CREDENTIALS_FILE =
-          "${config.xdg.configHome}/aws/credentials";
+        AWS_SHARED_CREDENTIALS_FILE = "${config.xdg.configHome}/aws/credentials";
         CARGO_HOME = "${config.xdg.dataHome}/cargo";
         DOCKER_CONFIG = "${config.xdg.configHome}/docker";
         GNUPGHOME = "${config.xdg.dataHome}/gnupg";
@@ -230,8 +242,7 @@ in {
         WINEPREFIX = "${config.xdg.dataHome}/wine";
         XCOMPOSECACHE = "${config.xdg.cacheHome}/X11/xcompose";
         ZDOTDIR = "${config.home.homeDirectory}/.config/zsh";
-        _JAVA_OPTIONS =
-          ''-Djava.util.prefs.userRoot="${config.xdg.configHome}"/java'';
+        _JAVA_OPTIONS = ''-Djava.util.prefs.userRoot="${config.xdg.configHome}"/java'';
       };
     };
     programs.yazi.enableZshIntegration = true;

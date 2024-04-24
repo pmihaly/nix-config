@@ -1,10 +1,19 @@
-{ pkgs, lib, config, vars, ... }:
+{
+  pkgs,
+  lib,
+  config,
+  vars,
+  ...
+}:
 
 with lib;
-let cfg = config.modules.duckdns;
-
-in {
-  options.modules.duckdns = { enable = mkEnableOption "duckdns"; };
+let
+  cfg = config.modules.duckdns;
+in
+{
+  options.modules.duckdns = {
+    enable = mkEnableOption "duckdns";
+  };
   config = mkIf cfg.enable {
     systemd.services.duckdns = {
       after = [ "network.target" ];

@@ -1,10 +1,18 @@
-{ lib, config, vars, ... }:
+{
+  lib,
+  config,
+  vars,
+  ...
+}:
 
 with lib;
-let cfg = config.modules.monitoring;
-
-in {
-  options.modules.monitoring = { enable = mkEnableOption "monitoring"; };
+let
+  cfg = config.modules.monitoring;
+in
+{
+  options.modules.monitoring = {
+    enable = mkEnableOption "monitoring";
+  };
   config = mkIf cfg.enable (mkMerge [
 
     (mkService {
@@ -25,7 +33,9 @@ in {
             enable_gzip = true;
             enforce_domain = true;
           };
-          users = { allow_sign_up = false; };
+          users = {
+            allow_sign_up = false;
+          };
           analytics.reporting_enabled = false;
         };
         provision = {
@@ -35,9 +45,7 @@ in {
             datasources = [
               {
                 name = "Prometheus";
-                url = "http://localhost:${
-                    toString config.services.prometheus.port
-                  }";
+                url = "http://localhost:${toString config.services.prometheus.port}";
                 type = "prometheus";
                 uid = "000000001";
               }
@@ -45,17 +53,16 @@ in {
                 name = "Loki";
                 type = "loki";
                 access = "proxy";
-                url = "http://127.0.0.1:${
-                    toString
-                    config.services.loki.configuration.server.http_listen_port
-                  }";
+                url = "http://127.0.0.1:${toString config.services.loki.configuration.server.http_listen_port}";
               }
             ];
           };
-          dashboards.settings.providers = [{
-            name = "default";
-            options.path = "/etc/grafana-dashboards";
-          }];
+          dashboards.settings.providers = [
+            {
+              name = "default";
+              options.path = "/etc/grafana-dashboards";
+            }
+          ];
         };
       };
     })
@@ -64,8 +71,7 @@ in {
       environment.etc = {
         "grafana-dashboards/node-exporter-full.json" = {
           source = builtins.fetchurl {
-            url =
-              "https://grafana.com/api/dashboards/1860/revisions/33/download";
+            url = "https://grafana.com/api/dashboards/1860/revisions/33/download";
             sha256 = "1087z90fr7w1m122pv1cafrmh7znymb90k79lf3psnrvbr2zm94l";
           };
           group = "grafana";
@@ -73,8 +79,7 @@ in {
         };
         "grafana-dashboards/endlessh.json" = {
           source = builtins.fetchurl {
-            url =
-              "https://grafana.com/api/dashboards/15156/revisions/10/download";
+            url = "https://grafana.com/api/dashboards/15156/revisions/10/download";
             sha256 = "16xmkcqyhg6gi29a7w3887dc3284903v4jpmg8wmphysfdzskbxn";
           };
           group = "grafana";
@@ -90,23 +95,26 @@ in {
         exporters = {
           node = {
             enable = true;
-            enabledCollectors = [ "systemd" "processes" ];
+            enabledCollectors = [
+              "systemd"
+              "processes"
+            ];
             port = 9002;
           };
         };
-        scrapeConfigs = [{
-          job_name = "skylake";
-          static_configs = [{
-            targets = [
-              "127.0.0.1:${
-                toString config.services.prometheus.exporters.node.port
-              }"
-              "127.0.0.1:${
-                toString config.services.endlessh-go.prometheus.port
-              }"
+        scrapeConfigs = [
+          {
+            job_name = "skylake";
+            static_configs = [
+              {
+                targets = [
+                  "127.0.0.1:${toString config.services.prometheus.exporters.node.port}"
+                  "127.0.0.1:${toString config.services.endlessh-go.prometheus.port}"
+                ];
+              }
             ];
-          }];
-        }];
+          }
+        ];
       };
     }
 
@@ -121,7 +129,9 @@ in {
             lifecycler = {
               address = "127.0.0.1";
               ring = {
-                kvstore = { store = "inmemory"; };
+                kvstore = {
+                  store = "inmemory";
+                };
                 replication_factor = 1;
               };
             };
@@ -133,16 +143,18 @@ in {
           };
 
           schema_config = {
-            configs = [{
-              from = "2022-06-06";
-              store = "boltdb-shipper";
-              object_store = "filesystem";
-              schema = "v11";
-              index = {
-                prefix = "index_";
-                period = "24h";
-              };
-            }];
+            configs = [
+              {
+                from = "2022-06-06";
+                store = "boltdb-shipper";
+                object_store = "filesystem";
+                schema = "v11";
+                index = {
+                  prefix = "index_";
+                  period = "24h";
+                };
+              }
+            ];
           };
 
           storage_config = {
@@ -153,7 +165,9 @@ in {
               shared_store = "filesystem";
             };
 
-            filesystem = { directory = "/var/lib/loki/chunks"; };
+            filesystem = {
+              directory = "/var/lib/loki/chunks";
+            };
           };
 
           limits_config = {
@@ -161,7 +175,9 @@ in {
             reject_old_samples_max_age = "168h";
           };
 
-          chunk_store_config = { max_look_back_period = "0s"; };
+          chunk_store_config = {
+            max_look_back_period = "0s";
+          };
 
           table_manager = {
             retention_deletes_enabled = false;
@@ -171,7 +187,11 @@ in {
           compactor = {
             working_directory = "/var/lib/loki";
             shared_store = "filesystem";
-            compactor_ring = { kvstore = { store = "inmemory"; }; };
+            compactor_ring = {
+              kvstore = {
+                store = "inmemory";
+              };
+            };
           };
         };
       };
@@ -185,30 +205,34 @@ in {
             http_listen_port = 3031;
             grpc_listen_port = 3032;
           };
-          positions = { filename = "/tmp/positions.yaml"; };
-          clients = [{
-            url = "http://127.0.0.1:${
-                toString
-                config.services.loki.configuration.server.http_listen_port
-              }/loki/api/v1/push";
-          }];
-          scrape_configs = [{
-            job_name = "journal";
-            journal = {
-              max_age = "12h";
-              labels = {
-                job = "systemd-journal";
-                host = "skylake";
+          positions = {
+            filename = "/tmp/positions.yaml";
+          };
+          clients = [
+            {
+              url = "http://127.0.0.1:${toString config.services.loki.configuration.server.http_listen_port}/loki/api/v1/push";
+            }
+          ];
+          scrape_configs = [
+            {
+              job_name = "journal";
+              journal = {
+                max_age = "12h";
+                labels = {
+                  job = "systemd-journal";
+                  host = "skylake";
+                };
               };
-            };
-            relabel_configs = [{
-              source_labels = [ "__journal__systemd_unit" ];
-              target_label = "unit";
-            }];
-          }];
+              relabel_configs = [
+                {
+                  source_labels = [ "__journal__systemd_unit" ];
+                  target_label = "unit";
+                }
+              ];
+            }
+          ];
         };
       };
     }
-
   ]);
 }

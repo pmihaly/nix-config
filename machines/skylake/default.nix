@@ -1,5 +1,15 @@
-{ pkgs, config, lib, vars, ... }: {
-  imports = [ ../../use-cases ./hardware.nix ];
+{
+  pkgs,
+  config,
+  lib,
+  vars,
+  ...
+}:
+{
+  imports = [
+    ../../use-cases
+    ./hardware.nix
+  ];
 
   modules = {
     nix.enable = true;
@@ -10,10 +20,12 @@
         t = "${vars.persistDir}/opt/skylake-storage/Media/TV";
         m = "${vars.persistDir}/opt/skylake-storage/Media/Movies";
       };
-      sshServer.hostKeys = [{
-        path = "${vars.persistDir}/etc/ssh/ssh_host_ed25519_key";
-        type = "ed25519";
-      }];
+      sshServer.hostKeys = [
+        {
+          path = "${vars.persistDir}/etc/ssh/ssh_host_ed25519_key";
+          type = "ed25519";
+        }
+      ];
     };
 
     server.enable = true;
@@ -38,23 +50,29 @@
 
   networking = {
     hostName = "skylake";
-    interfaces.enp5s0.ipv4.addresses = [{
-      address = "192.168.0.30";
-      prefixLength = 24;
-    }];
+    interfaces.enp5s0.ipv4.addresses = [
+      {
+        address = "192.168.0.30";
+        prefixLength = 24;
+      }
+    ];
   };
 
   programs.fuse.userAllowOther = true;
 
   environment.persistence.${vars.persistDir} = {
     hideMounts = true;
-    directories = [ "/var/log" "/var/lib/nixos" "/var/lib/systemd/coredump" ];
+    directories = [
+      "/var/log"
+      "/var/lib/nixos"
+      "/var/lib/systemd/coredump"
+    ];
     files = [ "/etc/machine-id" ];
     users.${vars.username} = {
-      files = lib.lists.unique
-        config.home-manager.users.${vars.username}.modules.persistence.files;
-      directories = [ "Sync" ] ++ lib.lists.unique
-        config.home-manager.users.${vars.username}.modules.persistence.directories;
+      files = lib.lists.unique config.home-manager.users.${vars.username}.modules.persistence.files;
+      directories = [
+        "Sync"
+      ] ++ lib.lists.unique config.home-manager.users.${vars.username}.modules.persistence.directories;
     };
   };
 

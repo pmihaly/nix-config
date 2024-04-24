@@ -6,7 +6,11 @@
     nodev = {
       "/" = {
         fsType = "tmpfs";
-        mountOptions = [ "defaults" "size=50%" "mode=755" ];
+        mountOptions = [
+          "defaults"
+          "size=50%"
+          "mode=755"
+        ];
       };
     };
     disk = {
@@ -35,17 +39,22 @@
 
                 subvolumes = {
                   "nix" = {
-                    mountOptions = [ "compress-force=zstd:1" "noatime" ];
+                    mountOptions = [
+                      "compress-force=zstd:1"
+                      "noatime"
+                    ];
                     mountpoint = "/nix";
                   };
 
                   "persist" = {
-                    mountOptions = [ "compress-force=zstd:1" "noatime" ];
+                    mountOptions = [
+                      "compress-force=zstd:1"
+                      "noatime"
+                    ];
                     mountpoint = "/persist";
                   };
 
                   "persist/.snapshots" = { };
-
                 };
               };
             };

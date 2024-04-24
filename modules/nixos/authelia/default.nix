@@ -1,9 +1,15 @@
-{ lib, config, vars, ... }:
+{
+  lib,
+  config,
+  vars,
+  ...
+}:
 
 with lib;
-let cfg = config.modules.authelia;
-
-in {
+let
+  cfg = config.modules.authelia;
+in
+{
   options.modules.authelia = {
     enable = mkEnableOption "authelia";
     bypassDomains = mkOption {
@@ -21,15 +27,13 @@ in {
     };
     extraConfig = {
 
-      environment.persistence.${vars.persistDir}.directories =
-        [ "/var/lib/authelia-skylake" ];
+      environment.persistence.${vars.persistDir}.directories = [ "/var/lib/authelia-skylake" ];
 
       services.authelia.instances.skylake = {
         enable = true;
         secrets = {
           jwtSecretFile = config.age.secrets."authelia/jwt-secret".path;
-          storageEncryptionKeyFile =
-            config.age.secrets."authelia/storageEncriptionKey".path;
+          storageEncryptionKeyFile = config.age.secrets."authelia/storageEncriptionKey".path;
           sessionSecretFile = config.age.secrets."authelia/sessionSecret".path;
         };
         settings = {
@@ -43,8 +47,7 @@ in {
             format = "text";
           };
 
-          authentication_backend.file.path =
-            config.age.secrets."authelia/users".path;
+          authentication_backend.file.path = config.age.secrets."authelia/users".path;
 
           access_control = {
             default_policy = "deny";
@@ -78,7 +81,9 @@ in {
           };
 
           storage = {
-            local = { path = "/var/lib/authelia-skylake/db.sqlite3"; };
+            local = {
+              path = "/var/lib/authelia-skylake/db.sqlite3";
+            };
           };
 
           notifier = {

@@ -1,9 +1,15 @@
-{ platform, lib, config, ... }:
+{
+  platform,
+  lib,
+  config,
+  ...
+}:
 
 with lib;
-let cfg = config.modules.darwin;
-
-in optionalAttrs platform.isDarwin {
+let
+  cfg = config.modules.darwin;
+in
+optionalAttrs platform.isDarwin {
   options.modules.darwin = {
     enable = mkEnableOption "darwin";
     username = mkOption { type = types.str; };
@@ -101,4 +107,3 @@ in optionalAttrs platform.isDarwin {
     ];
   };
 }
-

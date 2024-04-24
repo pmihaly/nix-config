@@ -1,10 +1,21 @@
-{ platform, inputs, pkgs, vars, lib, config, ... }:
+{
+  platform,
+  inputs,
+  pkgs,
+  vars,
+  lib,
+  config,
+  ...
+}:
 
 with lib;
-let cfg = config.modules.gaming;
-
-in optionalAttrs platform.isLinux {
-  options.modules.gaming = { enable = mkEnableOption "gaming"; };
+let
+  cfg = config.modules.gaming;
+in
+optionalAttrs platform.isLinux {
+  options.modules.gaming = {
+    enable = mkEnableOption "gaming";
+  };
   imports = [ inputs.nix-gaming.nixosModules.pipewireLowLatency ];
   config = mkIf cfg.enable {
 
@@ -41,7 +52,6 @@ in optionalAttrs platform.isLinux {
 
           ".config/transmission"
         ];
-
       };
     };
 
@@ -49,10 +59,7 @@ in optionalAttrs platform.isLinux {
 
     nix.settings = {
       substituters = [ "https://nix-gaming.cachix.org" ];
-      trusted-public-keys = [
-        "nix-gaming.cachix.org-1:nbjlureqMbRAxR1gJ/f3hxemL9svXaZF/Ees8vCUUs4="
-      ];
+      trusted-public-keys = [ "nix-gaming.cachix.org-1:nbjlureqMbRAxR1gJ/f3hxemL9svXaZF/Ees8vCUUs4=" ];
     };
-
   };
 }

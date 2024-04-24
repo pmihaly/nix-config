@@ -1,4 +1,9 @@
-{ lib, config, vars, ... }:
+{
+  lib,
+  config,
+  vars,
+  ...
+}:
 
 with lib;
 let
@@ -13,13 +18,14 @@ let
     "${vars.storage}/Media/Movies"
     "${vars.storage}/Media/Audiobooks"
   ];
-
-in {
-  options.modules.arr = { enable = mkEnableOption "arr"; };
+in
+{
+  options.modules.arr = {
+    enable = mkEnableOption "arr";
+  };
   config = mkIf cfg.enable (mkMerge [
     {
-      systemd.tmpfiles.rules =
-        map (x: "d ${x} 0775 ${vars.username} multimedia - -") directories;
+      systemd.tmpfiles.rules = map (x: "d ${x} 0775 ${vars.username} multimedia - -") directories;
 
       environment.persistence.${vars.persistDir}.directories = [
         {
@@ -89,6 +95,5 @@ in {
         volumes = [ "${vars.serviceConfig}/jellyseerr:/app/config" ];
       };
     })
-
   ]);
 }
