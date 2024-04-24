@@ -1,5 +1,5 @@
 { pkgs, config, lib, vars, ... }: {
-  imports = [ ../../use-cases ./hardware.nix ];
+  imports = [ ../../use-cases ../../modules/nixos ./hardware.nix ];
 
   modules = {
     nix.enable = true;

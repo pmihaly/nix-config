@@ -11,8 +11,7 @@ in optionalAttrs platform.isLinux {
     programs.steam = {
       enable = true;
 
-      extraCompatPackages =
-        [ pkgs.proton-ge-bin ];
+      extraCompatPackages = [ pkgs.proton-ge-bin ];
     };
 
     home-manager.users.${vars.username} = {

@@ -35,6 +35,7 @@ in optionalAttrs platform.isLinux {
         duckdns.enable = true;
         paperless.enable = true;
         syncthing.enable = true;
+        immich.enable = true;
       };
     }
   ]);
