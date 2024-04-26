@@ -25,7 +25,7 @@ in
       let
         directories = [
           "${vars.storage}/Media/Pictures"
-          "${vars.storage}/Services/Immich/postgres"
+          "${vars.storage}/Services/immich/postgres"
         ];
         environment = {
           TZ = vars.timeZone;
@@ -42,9 +42,7 @@ in
         systemd.tmpfiles.rules = (map (directory: "d ${directory} 0775 misi backup") directories);
 
         virtualisation.podman.defaultNetwork.settings.dns_enabled = true;
-        environment.persistence.${vars.persistDir} = {
-          directories = [ "/var/lib/containers" ];
-        };
+        environment.persistence.${vars.persistDir}.directories = [ "/var/lib/containers" ];
         services.nginx.clientMaxBodySize = "1G";
 
         virtualisation.oci-containers.containers = {
@@ -103,7 +101,7 @@ in
               POSTGRES_USER = environment.DB_USERNAME;
               POSTGRES_DB = environment.DB_DATABASE_NAME;
             };
-            volumes = [ "${vars.storage}/Services/Immich/postgres:/var/lib/postgres/data" ];
+            volumes = [ "${vars.storage}/Services/immich/postgres:/var/lib/postgresql/data" ];
           };
         };
       };

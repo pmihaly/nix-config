@@ -33,8 +33,6 @@
     music-production.enable = true;
 
     dev.enable = true;
-
-    immich.enable = true;
   };
 
   home-manager.users.${vars.username}.home.stateVersion = "22.05";
