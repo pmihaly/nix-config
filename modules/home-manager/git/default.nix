@@ -60,6 +60,12 @@ in
         gui.nerdFontsVersion = 3;
         customCommands = [
           {
+            key = "P";
+            command = "git push --force-with-lease";
+            context = "global";
+            description = "push with force-with-lease";
+          }
+          {
             key = "b";
             command = "tig blame -- {{.SelectedFile.Name}}";
             context = "files";
