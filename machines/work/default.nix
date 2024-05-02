@@ -50,6 +50,7 @@
     "sequel-ace"
     "tableplus"
     "pycharm-ce"
+    "insomnia"
   ];
 
   users.users.${vars.username}.home = "/Users/${vars.username}";
