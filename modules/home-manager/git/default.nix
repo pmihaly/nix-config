@@ -107,6 +107,7 @@ in
     programs.zsh = {
       shellAliases = {
         lg = "lazygit";
+        dm = "git diff origin/master HEAD";
       };
     };
   };
