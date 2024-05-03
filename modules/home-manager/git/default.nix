@@ -54,7 +54,7 @@ in
       settings = {
         notARepository = "quit";
         disableStartupPopups = true;
-        promptToReturnFromSubprocess = true;
+        promptToReturnFromSubprocess = false;
         git.paging.externalDiffCommand = "${pkgs.difftastic}/bin/difft --color=always --tab-width=2";
         os.editPreset = "nvim-remote";
         gui.nerdFontsVersion = 3;
