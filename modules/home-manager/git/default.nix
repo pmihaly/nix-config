@@ -59,11 +59,12 @@ in
         os.editPreset = "nvim-remote";
         gui.nerdFontsVersion = 3;
         customCommands = [
-          {
+          rec {
             key = "P";
             command = "git push --force-with-lease";
             context = "global";
-            description = "push with force-with-lease";
+            description = command;
+            loadingText = "${description}...";
           }
           {
             key = "b";
