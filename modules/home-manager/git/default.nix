@@ -22,6 +22,7 @@ in
     home.packages = with pkgs; [
       git
       tig # prettier git tree
+      difftastic
     ];
 
     home.file."${config.xdg.configHome}/git/config".text = generators.toINI { } {
