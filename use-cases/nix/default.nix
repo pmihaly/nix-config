@@ -25,10 +25,12 @@ in
 
       nix = {
         nixPath = [ "nixpkgs=/etc/channels/nixpkgs" ];
-        settings.experimental-features = "nix-command flakes";
-        settings.auto-optimise-store = true;
+        settings = {
+          experimental-features = "nix-command flakes";
+          auto-optimise-store = true;
+          trusted-users = [ vars.username ];
+        };
         gc.automatic = true;
-        trustedUsers = [ vars.username ];
       };
 
       nix.registry.nixpkgs.flake = inputs.nixpkgs;
