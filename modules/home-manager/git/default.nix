@@ -1,6 +1,5 @@
 {
   pkgs,
-  inputs,
   lib,
   config,
   ...
@@ -9,9 +8,6 @@
 with lib;
 let
   cfg = config.modules.git;
-  lazygit = pkgs.lazygit.overrideAttrs (old: {
-    src = inputs.lazygit;
-  });
 in
 {
   options.modules.git = {
@@ -51,7 +47,6 @@ in
 
     programs.lazygit = {
       enable = true;
-      package = lazygit;
       settings = {
         notARepository = "quit";
         disableStartupPopups = true;

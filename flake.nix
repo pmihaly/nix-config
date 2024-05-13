@@ -44,12 +44,6 @@
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    lazygit = {
-      type = "github";
-      owner = "jesseduffield";
-      repo = "lazygit";
-      flake = false;
-    };
   };
 
   outputs =
