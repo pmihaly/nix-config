@@ -231,7 +231,7 @@ in
             user_pref("app.normandy.enabled", false);
             user_pref("app.shield.optoutstudies.enabled", false);
             user_pref("app.update.auto", false);
-            user_pref("beacon.enabled", false);
+            // user_pref("beacon.enabled", false); // breaks leetcode
             user_pref("breakpad.reportURL", "");
             user_pref("browser.aboutConfig.showWarning", false);
             user_pref("browser.cache.offline.enable", false);
