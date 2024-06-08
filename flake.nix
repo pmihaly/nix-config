@@ -44,6 +44,11 @@
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    aerospace-zip = {
+      url = "https://github.com/nikitabobko/AeroSpace/releases/download/v0.11.1-Beta/AeroSpace-v0.11.1-Beta.zip";
+      flake = false;
+    };
+    nix-std.url = "github:chessai/nix-std";
   };
 
   outputs =

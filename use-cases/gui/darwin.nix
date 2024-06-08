@@ -1,13 +1,27 @@
 {
+  pkgs,
+  inputs,
   platform,
   lib,
   config,
+  vars,
   ...
 }:
 
 with lib;
 let
   cfg = config.modules.darwin;
+  aerospace = pkgs.stdenvNoCC.mkDerivation {
+    name = "aerospace";
+    src = inputs.aerospace-zip;
+    unpackPhase = ''
+      mkdir -p $out/Applications
+      cp -r $src/AeroSpace.app $out/Applications
+
+      mkdir -p $out/bin
+      cp $src/bin/aerospace $out/bin
+    '';
+  };
 in
 optionalAttrs platform.isDarwin {
   options.modules.darwin = {
@@ -34,6 +48,8 @@ optionalAttrs platform.isDarwin {
         NSAutomaticSpellingCorrectionEnabled = false;
         NSNavPanelExpandedStateForSaveMode = true;
         NSNavPanelExpandedStateForSaveMode2 = true;
+        NSAutomaticWindowAnimationsEnabled = false;
+        NSWindowShouldDragOnGesture = true; # drag windows from anywhere with cmd+ctrl
         AppleFontSmoothing = 2;
         AppleShowAllFiles = true;
         AppleShowAllExtensions = true;
@@ -59,39 +75,98 @@ optionalAttrs platform.isDarwin {
       fonts = [ ];
     };
 
-    services.yabai = {
-      enable = true;
-      config = {
-        focus_follows_mouse = "autoraise";
-        mouse_follows_focus = "off";
-        window_placement = "second_child";
-        top_padding = 40;
-        bottom_padding = 40;
-        left_padding = 40;
-        right_padding = 40;
-        window_gap = 10;
-        layout = "bsp";
-        split_ratio = 0.55;
-      };
-      extraConfig = ''
-        yabai -m rule --add label="Finder" app="^Finder$" title="(Co(py|nnect)|Move|Info|Pref)" manage=off
-        yabai -m rule --add label="Safari" app="^Safari$" title="^(General|(Tab|Password|Website|Extension)s|AutoFill|Se(arch|curity)|Privacy|Advance)$" manage=off
-        yabai -m rule --add label="macfeh" app="^macfeh$" manage=off
-        yabai -m rule --add label="System Settings" app="^System Settings$" title=".*" manage=off
-        yabai -m rule --add label="App Store" app="^App Store$" manage=off
-        yabai -m rule --add label="Activity Monitor" app="^Activity Monitor$" manage=off
-        yabai -m rule --add label="KeePassXC" app="^KeePassXC$" manage=off
-        yabai -m rule --add label="Calculator" app="^Calculator$" manage=off
-        yabai -m rule --add label="Dictionary" app="^Dictionary$" manage=off
-        yabai -m rule --add label="mpv" app="^mpv$" manage=off
-        yabai -m rule --add label="Software Update" title="Software Update" manage=off
-        yabai -m rule --add label="About This Mac" app="System Information" title="About This Mac" manage=off
-      '';
-    };
+    home-manager.users.${vars.username} = {
+      imports = [ ../../modules/home-manager ];
 
-    services.skhd = {
-      enable = true;
-      skhdConfig = "";
+      home.packages = [ aerospace ];
+
+      home.file.".config/aerospace/aerospace.toml".text = inputs.nix-std.lib.serde.toTOML {
+        after-login-command = [ ];
+        after-startup-command = [ ];
+        start-at-login = true;
+        enable-normalization-flatten-containers = true;
+        enable-normalization-opposite-orientation-for-nested-containers = true;
+        accordion-padding = 30;
+        default-root-container-layout = "tiles";
+        default-root-container-orientation = "auto";
+        key-mapping.preset = "qwerty";
+
+        gaps = {
+          inner.horizontal = 0;
+          inner.vertical = 0;
+          outer.left = 0;
+          outer.bottom = 0;
+          outer.top = 0;
+          outer.right = 0;
+        };
+
+        mode.service.binding = {
+          esc = [
+            "reload-config"
+            "mode main"
+          ];
+        };
+
+        workspace-to-monitor-force-assignment =
+          {
+            "u" = "secondary";
+            "i" = "secondary";
+            "o" = "secondary";
+            "p" = "secondary";
+
+            "j" = "main";
+            "k" = "main";
+            "l" = "main";
+            "semicolon" = "main";
+          };
+
+        mode.main.binding =
+          let
+            workspaceBinds =
+              trivial.pipe
+                [
+                  "j"
+                  "k"
+                  "l"
+                  "semicolon"
+
+                  "u"
+                  "i"
+                  "o"
+                  "p"
+                ]
+                [
+                  (builtins.map (workspace: {
+                    name = workspace;
+                    value = null;
+                  }))
+                  builtins.listToAttrs
+                  (lib.concatMapAttrs (
+                    workspace: _: {
+                      "alt-${workspace}" = "workspace ${workspace}";
+                      "alt-shift-${workspace}" = "move-node-to-workspace ${workspace}";
+                    }
+                  ))
+                ];
+          in
+          workspaceBinds
+          // {
+            "alt-enter" = "exec-and-forget open -n /System/Applications/Utilities/Terminal.app";
+            "alt-slash" = "mode service";
+
+            "alt-left" = "focus left";
+            "alt-down" = "focus down";
+            "alt-up" = "focus up";
+            "alt-right" = "focus right";
+            "alt-shift-left" = "move left";
+            "alt-shift-down" = "move down";
+            "alt-shift-up" = "move up";
+            "alt-shift-right" = "move right";
+
+            "alt-shift-minus" = "resize smart -50";
+            "alt-shift-equal" = "resize smart +50";
+          };
+      };
     };
 
     homebrew.casks = [

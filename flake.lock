@@ -1,5 +1,18 @@
 {
   "nodes": {
+    "aerospace-zip": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1717275839,
+        "narHash": "sha256-LhCv0w2WSPDCb5YiEu863S2uekkYdJA3FysyEx9+qCw=",
+        "type": "tarball",
+        "url": "https://github.com/nikitabobko/AeroSpace/releases/download/v0.11.1-Beta/AeroSpace-v0.11.1-Beta.zip"
+      },
+      "original": {
+        "type": "tarball",
+        "url": "https://github.com/nikitabobko/AeroSpace/releases/download/v0.11.1-Beta/AeroSpace-v0.11.1-Beta.zip"
+      }
+    },
     "agenix": {
       "inputs": {
         "darwin": [
@@ -314,6 +327,21 @@
         "type": "github"
       }
     },
+    "nix-std": {
+      "locked": {
+        "lastModified": 1710870712,
+        "narHash": "sha256-e+7MJF2gsgTBuOWv4mCimSP0D9+naeFSw9a7N3yEmv4=",
+        "owner": "chessai",
+        "repo": "nix-std",
+        "rev": "31bbc925750cc9d8f828fe55cee1a2bd985e0c00",
+        "type": "github"
+      },
+      "original": {
+        "owner": "chessai",
+        "repo": "nix-std",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1689261696,
@@ -433,6 +461,7 @@
     },
     "root": {
       "inputs": {
+        "aerospace-zip": "aerospace-zip",
         "agenix": "agenix",
         "darwin": "darwin",
         "deploy-rs": "deploy-rs",
@@ -442,6 +471,7 @@
         "impermanence": "impermanence",
         "nix-gaming": "nix-gaming",
         "nix-index-database": "nix-index-database",
+        "nix-std": "nix-std",
         "nixpkgs": "nixpkgs_2",
         "nixpkgs-firefox-darwin": "nixpkgs-firefox-darwin",
         "nur": "nur"
