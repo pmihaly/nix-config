@@ -29,7 +29,7 @@ in
       extraConfig = {
         icon-theme = "Papirus";
         show-icons = true;
-        terminal = "kitty";
+        terminal = "alacritty";
         drun-display-format = "{icon} {name}";
         location = 0;
         disable-history = false;
@@ -160,7 +160,7 @@ in
         ];
 
         bind = [
-          "$mainMod, T, exec, kitty"
+          "$mainMod, T, exec, alacritty"
           "$mainMod, Q, killactive,"
           "$mainMod, SPACE, exec, rofi -show drun"
           "$mainMod, c, exec, rofi -show calc -modi calc -no-show-match -no-sort"
@@ -168,7 +168,7 @@ in
           "$mainMod, R, exec, hyprctl reload"
           "$mainMod, F, fullscreen"
           "$mainMod, W, exec, firefox"
-          "$mainMod, A, exec, kitty ${pkgs.pulsemixer}/bin/pulsemixer"
+          "$mainMod, A, exec, alacritty ${pkgs.pulsemixer}/bin/pulsemixer"
 
           "$mainMod, h, movefocus, l"
           "$mainMod, j, movefocus, d"

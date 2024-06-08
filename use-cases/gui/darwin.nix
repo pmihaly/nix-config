@@ -77,7 +77,6 @@ optionalAttrs platform.isDarwin {
 
     home-manager.users.${vars.username} = {
       imports = [ ../../modules/home-manager ];
-
       home.packages = [ aerospace ];
 
       home.file.".config/aerospace/aerospace.toml".text = inputs.nix-std.lib.serde.toTOML {
@@ -107,18 +106,17 @@ optionalAttrs platform.isDarwin {
           ];
         };
 
-        workspace-to-monitor-force-assignment =
-          {
-            "u" = "secondary";
-            "i" = "secondary";
-            "o" = "secondary";
-            "p" = "secondary";
+        workspace-to-monitor-force-assignment = {
+          "u" = "secondary";
+          "i" = "secondary";
+          "o" = "secondary";
+          "p" = "secondary";
 
-            "j" = "main";
-            "k" = "main";
-            "l" = "main";
-            "semicolon" = "main";
-          };
+          "j" = "main";
+          "k" = "main";
+          "l" = "main";
+          "semicolon" = "main";
+        };
 
         mode.main.binding =
           let
@@ -151,7 +149,7 @@ optionalAttrs platform.isDarwin {
           in
           workspaceBinds
           // {
-            "alt-enter" = "exec-and-forget open -n /System/Applications/Utilities/Terminal.app";
+            "alt-enter" = "exec-and-forget open -n alacritty";
             "alt-slash" = "mode service";
 
             "alt-left" = "focus left";

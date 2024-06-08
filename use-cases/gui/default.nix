@@ -38,7 +38,7 @@ in
           ];
           firefox.enable = true;
           mpv.enable = true;
-          kitty.enable = true;
+          terminal-emulator.enable = true;
           newsboat.enable = true;
           neomutt.enable = true;
           zathura.enable = true;

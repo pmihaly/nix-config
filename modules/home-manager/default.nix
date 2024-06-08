@@ -8,7 +8,7 @@
     ./shell
     ./mpv
     ./yazi
-    ./kitty
+    ./terminal-emulator
     ./newsboat
     ./neomutt
     ./zathura
