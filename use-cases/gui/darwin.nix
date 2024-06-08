@@ -142,7 +142,10 @@ optionalAttrs platform.isDarwin {
                   (lib.concatMapAttrs (
                     workspace: _: {
                       "alt-${workspace}" = "workspace ${workspace}";
-                      "alt-shift-${workspace}" = "move-node-to-workspace ${workspace}";
+                      "alt-shift-${workspace}" = [
+                        "move-node-to-workspace ${workspace}"
+                        "workspace ${workspace}"
+                      ];
                     }
                   ))
                 ];
