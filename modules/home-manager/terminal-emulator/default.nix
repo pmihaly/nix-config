@@ -21,32 +21,31 @@ in
       nerdfonts-fira-code
     ];
 
-
     programs.wezterm = {
       enable = true;
       enableZshIntegration = true;
       extraConfig = ''
-local wezterm = require 'wezterm'
+        local wezterm = require 'wezterm'
 
-local config = wezterm.config_builder()
+        local config = wezterm.config_builder()
 
-config.color_scheme = 'Catppuccin Frappe'
-config.enable_tab_bar = false
-config.window_close_confirmation = 'NeverPrompt'
-config.window_decorations = 'RESIZE'
-config.window_padding = {
-  left = 150,
-  right = 150,
-  top = 0,
-  bottom = 0,
-}
+        config.color_scheme = 'Catppuccin Frappe'
+        config.enable_tab_bar = false
+        config.window_close_confirmation = 'NeverPrompt'
+        config.window_decorations = 'RESIZE'
+        config.window_padding = {
+          left = 150,
+          right = 150,
+          top = 0,
+          bottom = 0,
+        }
 
-config.font = wezterm.font_with_fallback({
-  { family = "Comic Code Ligatures", weight = "DemiBold" },
-  "Noto Color Emoji",
-})
+        config.font = wezterm.font_with_fallback({
+          { family = "Comic Code Ligatures", weight = "DemiBold" },
+          "Noto Color Emoji",
+        })
 
-return config
+        return config
       '';
       colorSchemes = {
         catppuccin = (
