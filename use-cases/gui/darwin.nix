@@ -155,6 +155,11 @@ optionalAttrs platform.isDarwin {
             "alt-enter" = "exec-and-forget ${pkgs.wezterm}/bin/wezterm";
             "alt-slash" = "mode service";
 
+            "alt-n" = "focus left";
+            "alt-shift-n" = "move left";
+            "alt-m" = "focus right";
+            "alt-shift-m" = "move right";
+
             "alt-left" = "focus left";
             "alt-down" = "focus down";
             "alt-up" = "focus up";
