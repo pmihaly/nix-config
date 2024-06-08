@@ -152,7 +152,7 @@ optionalAttrs platform.isDarwin {
           in
           workspaceBinds
           // {
-            "alt-enter" = "exec-and-forget open -n alacritty";
+            "alt-enter" = "exec-and-forget ${pkgs.wezterm}/bin/wezterm";
             "alt-slash" = "mode service";
 
             "alt-left" = "focus left";

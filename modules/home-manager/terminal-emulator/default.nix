@@ -12,10 +12,7 @@ in
 {
   options.modules.terminal-emulator = {
     enable = mkEnableOption "terminal-emulator";
-    binary = mkOption {
-      type = types.str;
-      default = "${pkgs.alacritty}/bin/alacritty";
-    };
+    binary = mkOption { type = types.str; };
   };
   config = mkIf cfg.enable {
     home.packages = with pkgs; [
@@ -24,47 +21,48 @@ in
       nerdfonts-fira-code
     ];
 
-    programs.alacritty = {
+
+    programs.wezterm = {
       enable = true;
-      settings =
-        {
-          font = {
-            normal = {
-              family = "Comic Code Ligatures";
-              style = "Semibold";
-            };
-            italic = {
-              family = "Comic Code Ligatures";
-              style = "Semibold Italic";
-            };
-          };
-          window = {
-            padding = {
-              x = 150;
-              y = 0;
-            };
-            dynamic_padding = true;
-            decorations = "none";
-          };
-          shell = {
-            program = "zsh";
-            args = [
-              "-c"
-              "tmux attach || zsh"
-            ];
-          };
-        }
-        // (builtins.fromTOML (
-          builtins.readFile (
-            pkgs.fetchFromGitHub {
-              owner = "catppuccin";
-              repo = "alacritty";
-              rev = "94800165c13998b600a9da9d29c330de9f28618e";
-              hash = "sha256-Pi1Hicv3wPALGgqurdTzXEzJNx7vVh+8B9tlqhRpR2Y=";
-            }
-            + /catppuccin-frappe.toml
+      enableZshIntegration = true;
+      extraConfig = ''
+local wezterm = require 'wezterm'
+
+local config = wezterm.config_builder()
+
+config.color_scheme = 'Catppuccin Frappe'
+config.enable_tab_bar = false
+config.window_close_confirmation = 'NeverPrompt'
+config.window_decorations = 'RESIZE'
+config.window_padding = {
+  left = 150,
+  right = 150,
+  top = 0,
+  bottom = 0,
+}
+
+config.font = wezterm.font_with_fallback({
+  { family = "Comic Code Ligatures", weight = "DemiBold" },
+  "Noto Color Emoji",
+})
+
+return config
+      '';
+      colorSchemes = {
+        catppuccin = (
+          builtins.fromTOML (
+            builtins.readFile (
+              pkgs.fetchFromGitHub {
+                owner = "catppuccin";
+                repo = "wezterm";
+                rev = "b1a81bae74d66eaae16457f2d8f151b5bd4fe5da";
+                sha256 = "sha256-McSWoZaJeK+oqdK/0vjiRxZGuLBpEB10Zg4+7p5dIGY=";
+              }
+              + /dist/catppuccin-frappe.toml
+            )
           )
-        ));
+        );
+      };
     };
   };
 }
