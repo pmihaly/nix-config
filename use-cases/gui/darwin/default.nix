@@ -76,7 +76,7 @@ optionalAttrs platform.isDarwin {
     };
 
     home-manager.users.${vars.username} = {
-      imports = [ ../../modules/home-manager ];
+      imports = [ ../../../modules/home-manager ];
       home.packages = [ aerospace ];
 
       home.file.".config/aerospace/aerospace.toml".text = inputs.nix-std.lib.serde.toTOML {
@@ -173,6 +173,12 @@ optionalAttrs platform.isDarwin {
             "alt-shift-equal" = "resize smart +50";
           };
       };
+
+      xdg.configFile = {
+        "karabiner/karabiner.json" = {
+          source = ./karabiner.json;
+        };
+      };
     };
 
     homebrew.casks = [
@@ -185,6 +191,7 @@ optionalAttrs platform.isDarwin {
       "utm" # virtual machines
       "balenaetcher"
       "linearmouse"
+      "karabiner-elements"
     ];
   };
 }

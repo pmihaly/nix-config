@@ -18,7 +18,7 @@ in
   };
 
   imports = [
-    ./darwin.nix
+    ./darwin
     ./linux.nix
   ];
 
