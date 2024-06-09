@@ -53,6 +53,10 @@
       url = "github:nix-community/nixvim";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    stylix = {
+      url = "github:danth/stylix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -80,6 +84,7 @@
         modules = [
           home-manager.darwinModules.home-manager
           inputs.nixvim.nixDarwinModules.nixvim
+          inputs.stylix.darwinModules.stylix
           {
             nixpkgs.overlays = [
               inputs.nur.overlay
@@ -122,6 +127,7 @@
           inputs.nix-index-database.nixosModules.nix-index
           inputs.disko.nixosModules.disko
           inputs.nixvim.nixosModules.nixvim
+          inputs.stylix.nixosModules.stylix
           { nixpkgs.overlays = [ inputs.nur.overlay ]; }
           {
             home-manager.extraSpecialArgs = {
@@ -160,6 +166,7 @@
           inputs.nix-index-database.nixosModules.nix-index
           inputs.disko.nixosModules.disko
           inputs.nixvim.nixosModules.nixvim
+          inputs.stylix.nixosModules.stylix
           { nixpkgs.overlays = [ inputs.nur.overlay ]; }
           {
             home-manager.extraSpecialArgs = {

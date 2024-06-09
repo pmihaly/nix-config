@@ -14,7 +14,6 @@
 
   modules = {
     nix.enable = true;
-
     shell = {
       enable = true;
       extraBookmarks = { };
@@ -25,14 +24,11 @@
         }
       ];
     };
-
     gui.enable = true;
-
     gaming.enable = true;
-
     music-production.enable = true;
-
     dev.enable = true;
+    style.enable = true;
   };
 
   home-manager.users.${vars.username}.home.stateVersion = "22.05";

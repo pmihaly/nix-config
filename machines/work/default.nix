@@ -13,6 +13,7 @@
     };
 
     gui.enable = true;
+    style.enable = true;
   };
 
   home-manager.users.${vars.username} = {

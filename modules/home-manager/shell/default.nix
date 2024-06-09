@@ -2,7 +2,6 @@
   pkgs,
   lib,
   config,
-  inputs,
   ...
 }:
 
@@ -52,30 +51,13 @@ in
 
     programs.nushell = {
       enable = true;
-      package = pkgs.nushellFull;
-      shellAliases = (mkMerge [ (bookmarksToAliases cfg.bookmarks) ]);
+      shellAliases = (bookmarksToAliases cfg.bookmarks);
     };
     programs.starship.enableNushellIntegration = true;
     programs.yazi.enableNushellIntegration = true;
     programs.direnv.enableNushellIntegration = true;
 
-    programs.bat = {
-      enable = true;
-      config = {
-        theme = "catpuccin-frappe";
-      };
-      themes = {
-        catpuccin-frappe = {
-          src = pkgs.fetchFromGitHub {
-            owner = "catppuccin";
-            repo = "bat";
-            rev = "ba4d16880d63e656acced2b7d4e034e4a93f74b1";
-            hash = "sha256-6WVKQErGdaqb++oaXnY3i6/GuH2FhTgK0v4TN4Y0Wbw=";
-          };
-          file = "Catppuccin-frappe.tmTheme";
-        };
-      };
-    };
+    programs.bat.enable = true;
 
     programs.fzf = {
       enable = true;
@@ -279,6 +261,7 @@ in
         set-option -g automatic-rename-format '#{b:pane_current_path} #{pane_current_command}'
         set-option -g status off
         set-option -g default-command zsh
+        set-option -g terminal-overrides ",xterm-256color:Tc"
 
         set-option -g prefix C-Space
         bind-key C-Space send-prefix

@@ -1,9 +1,4 @@
-{
-  pkgs,
-  lib,
-  config,
-  ...
-}:
+{ lib, config, ... }:
 
 with lib;
 let
@@ -15,12 +10,6 @@ in
     binary = mkOption { type = types.str; };
   };
   config = mkIf cfg.enable {
-    home.packages = with pkgs; [
-      comic-code
-      noto-fonts-color-emoji
-      nerdfonts-fira-code
-    ];
-
     programs.wezterm = {
       enable = true;
       enableZshIntegration = true;
@@ -29,16 +18,16 @@ in
 
         local config = wezterm.config_builder()
 
-        config.color_scheme = 'Catppuccin Frappe'
         config.enable_tab_bar = false
         config.window_close_confirmation = 'NeverPrompt'
         config.window_decorations = 'RESIZE'
         config.audible_bell = 'Disabled'
+        config.enable_wayland = false
         config.window_padding = {
           left = 150,
           right = 150,
-          top = 0,
-          bottom = 0,
+          top = 5,
+          bottom = 5,
         }
 
         config.font = wezterm.font_with_fallback({
@@ -48,21 +37,6 @@ in
 
         return config
       '';
-      colorSchemes = {
-        catppuccin = (
-          builtins.fromTOML (
-            builtins.readFile (
-              pkgs.fetchFromGitHub {
-                owner = "catppuccin";
-                repo = "wezterm";
-                rev = "b1a81bae74d66eaae16457f2d8f151b5bd4fe5da";
-                sha256 = "sha256-McSWoZaJeK+oqdK/0vjiRxZGuLBpEB10Zg4+7p5dIGY=";
-              }
-              + /dist/catppuccin-frappe.toml
-            )
-          )
-        );
-      };
     };
   };
 }

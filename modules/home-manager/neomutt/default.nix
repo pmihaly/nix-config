@@ -40,17 +40,17 @@ in
     programs.neomutt = {
       enable = true;
       vimKeys = true;
-      extraConfig = builtins.concatStringsSep "\n" [
-        (builtins.readFile (
-          pkgs.fetchFromGitHub {
-            owner = "catppuccin";
-            repo = "neomutt";
-            rev = "f6ce83da47cc36d5639b0d54e7f5f63cdaf69f11";
-            hash = "sha256-ye16nP2DL4VytDKB+JdMkBXU+Y9Z4dHmY+DsPcR2EG0=";
-          }
-          + /neomuttrc
-        ))
-      ];
+      # extraConfig = builtins.concatStringsSep "\n" [
+      #   (builtins.readFile (
+      #     pkgs.fetchFromGitHub {
+      #       owner = "catppuccin";
+      #       repo = "neomutt";
+      #       rev = "f6ce83da47cc36d5639b0d54e7f5f63cdaf69f11";
+      #       hash = "sha256-ye16nP2DL4VytDKB+JdMkBXU+Y9Z4dHmY+DsPcR2EG0=";
+      #     }
+      #     + /neomuttrc
+      #   ))
+      # ];
     };
 
     programs.mbsync.enable = true;

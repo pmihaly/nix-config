@@ -23,14 +23,6 @@ in
     programs.nixvim = {
       enable = true;
 
-      colorschemes.catppuccin = {
-        enable = true;
-        settings = {
-          flavour = "frappe";
-          transparent_background = true;
-        };
-      };
-
       extraConfigLua = ''
           -- remove trailing whitespace on save
           vim.api.nvim_create_autocmd({ 'BufWritePre' }, {
@@ -109,7 +101,7 @@ in
           opener = "edit";
         };
         harpoon = {
-          enable = true;
+          enable = false;
           enableTelescope = true;
           enterOnSendcmd = true;
           keymapsSilent = true;
@@ -590,7 +582,7 @@ in
         clipboard = "unnamedplus";
 
         # Set prettier colors
-        termguicolors = true;
+        # termguicolors = true;
 
         # Set completeopt to have a better completion experience
         completeopt = "menuone,noselect";

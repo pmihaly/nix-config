@@ -40,16 +40,6 @@ in
         display-Network = " 󰤨  Network";
         sidebar-mode = true;
       };
-
-      theme = (
-        pkgs.fetchFromGitHub {
-          owner = "catppuccin";
-          repo = "rofi";
-          rev = "5350da41a11814f950c3354f090b90d4674a95ce";
-          hash = "sha256-DNorfyl3C4RBclF2KDgwvQQwixpTwSRu7fIvihPN8JY=";
-        }
-        + /basic/.local/share/rofi/themes/catppuccin-frappe.rasi
-      );
     };
 
     wayland.windowManager.hyprland = {
@@ -59,16 +49,6 @@ in
       sourceFirst = true;
 
       settings = {
-        source = (
-          pkgs.fetchFromGitHub {
-            owner = "catppuccin";
-            repo = "hyprland";
-            rev = "fc228737d3d0c12e34a7fa155a0fc3192e5e4017";
-            sha256 = "9BhZq9J1LmHfAPBqOr64chiAEzS+YV6zqe9ma95V3no=";
-          }
-          + /themes/frappe.conf
-        );
-
         monitor = [
           "DP-1, 2560x1440@144, 0x0, 1"
           "HDMI-A-1, 1920x1080, 2560x0, 1"
@@ -97,8 +77,8 @@ in
           gaps_in = 10;
           gaps_out = 40;
           border_size = 0;
-          "col.active_border" = "$crust";
-          "col.inactive_border" = "$crust";
+          # "col.active_border" = "$crust";
+          # "col.inactive_border" = "$crust";
           allow_tearing = true;
 
           layout = "dwindle";
@@ -116,7 +96,7 @@ in
           drop_shadow = true;
           shadow_range = 80;
           shadow_render_power = 3;
-          "col.shadow" = "rgba($crustAlpha80)";
+          # "col.shadow" = "rgba($crustAlpha80)";
         };
 
         animations = {
@@ -214,32 +194,5 @@ in
       };
     };
 
-    gtk = {
-      enable = true;
-      theme = {
-        name = "Catppuccin-Frappe-Standard-Mauve-Dark";
-        package = pkgs.catppuccin-gtk.override {
-          accents = [ "mauve" ];
-          size = "standard";
-          tweaks = [ "rimless" ];
-          variant = "frappe";
-        };
-      };
-      cursorTheme = {
-        name = "Catppuccin-Frappe-Light-Cursors";
-        package = pkgs.catppuccin-cursors.frappeLight;
-      };
-      font = {
-        package = pkgs.noto-fonts;
-        name = "Noto";
-      };
-      iconTheme = {
-        name = "Papirus";
-        package = pkgs.catppuccin-papirus-folders.override {
-          accent = "mauve";
-          flavor = "frappe";
-        };
-      };
-    };
   };
 }

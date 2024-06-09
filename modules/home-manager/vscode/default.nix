@@ -33,9 +33,7 @@ in
         }
       ];
       userSettings = {
-        "workbench.colorTheme" = "Catppuccin Frappé";
         "workbench.iconTheme" = "catppuccin-frappe";
-        "editor.fontFamily" = "Comic Code Ligatures";
         "editor.fontLigatures" = true;
         "editor.cursorSmoothCaretAnimation" = "on";
         "editor.smoothScrolling" = true;
