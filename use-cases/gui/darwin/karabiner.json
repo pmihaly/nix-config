@@ -85,6 +85,75 @@
                                 ]
                             }
                         ]
+                    },
+                    {
+                        "description": "Press J and K together to act as Option",
+                        "manipulators": [
+                            {
+                                "type": "basic",
+                                "from": {
+                                    "simultaneous": [
+                                        {"key_code": "j"},
+                                        {"key_code": "k"}
+                                    ],
+                                    "simultaneous_options": {
+                                        "detect_key_down_uninterruptedly": true,
+                                        "key_down_order": "insensitive",
+                                        "key_up_order": "insensitive",
+                                        "to_after_key_up": []
+                                    }
+                                },
+                                "to": [
+                                    {"key_code": "left_option"}
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "description": "Press J and L together to act as Control",
+                        "manipulators": [
+                            {
+                                "type": "basic",
+                                "from": {
+                                    "simultaneous": [
+                                        {"key_code": "j"},
+                                        {"key_code": "l"}
+                                    ],
+                                    "simultaneous_options": {
+                                        "detect_key_down_uninterruptedly": true,
+                                        "key_down_order": "insensitive",
+                                        "key_up_order": "insensitive",
+                                        "to_after_key_up": []
+                                    }
+                                },
+                                "to": [
+                                    {"key_code": "left_control"}
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "description": "Press J and ; together to act as Shift",
+                        "manipulators": [
+                            {
+                                "type": "basic",
+                                "from": {
+                                    "simultaneous": [
+                                        {"key_code": "j"},
+                                        {"key_code": "semicolon"}
+                                    ],
+                                    "simultaneous_options": {
+                                        "detect_key_down_uninterruptedly": true,
+                                        "key_down_order": "insensitive",
+                                        "key_up_order": "insensitive",
+                                        "to_after_key_up": []
+                                    }
+                                },
+                                "to": [
+                                    {"key_code": "left_shift"}
+                                ]
+                            }
+                        ]
                     }
                 ]
             },
