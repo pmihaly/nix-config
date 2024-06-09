@@ -49,6 +49,10 @@
       flake = false;
     };
     nix-std.url = "github:chessai/nix-std";
+    nixvim = {
+      url = "github:nix-community/nixvim";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -75,6 +79,7 @@
         system = "aarch64-darwin";
         modules = [
           home-manager.darwinModules.home-manager
+          inputs.nixvim.nixDarwinModules.nixvim
           {
             nixpkgs.overlays = [
               inputs.nur.overlay
@@ -116,6 +121,7 @@
           inputs.impermanence.nixosModules.impermanence
           inputs.nix-index-database.nixosModules.nix-index
           inputs.disko.nixosModules.disko
+          inputs.nixvim.nixosModules.nixvim
           { nixpkgs.overlays = [ inputs.nur.overlay ]; }
           {
             home-manager.extraSpecialArgs = {
@@ -153,6 +159,7 @@
           inputs.impermanence.nixosModules.impermanence
           inputs.nix-index-database.nixosModules.nix-index
           inputs.disko.nixosModules.disko
+          inputs.nixvim.nixosModules.nixvim
           { nixpkgs.overlays = [ inputs.nur.overlay ]; }
           {
             home-manager.extraSpecialArgs = {
