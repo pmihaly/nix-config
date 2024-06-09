@@ -10,7 +10,7 @@
         {
             "complex_modifications": {
                 "parameters": {
-                    "basic.simultaneous_threshold_milliseconds": 50,
+                    "basic.simultaneous_threshold_milliseconds": 100,
                     "basic.to_delayed_action_delay_milliseconds": 500,
                     "basic.to_if_alone_timeout_milliseconds": 1000,
                     "basic.to_if_held_down_threshold_milliseconds": 100,
@@ -18,157 +18,71 @@
                 },
                 "rules": [
                     {
-                        "description": "Home row mods - command, ctrl, shift, opt",
+                        "description": "Press F and D together to act as Option",
                         "manipulators": [
                             {
+                                "type": "basic",
                                 "from": {
                                     "simultaneous": [
-                                        {
-                                            "key_code": "a"
-                                        },
-                                        {
-                                            "key_code": "s"
-                                        },
-                                        {
-                                            "key_code": "d"
-                                        },
-                                        {
-                                            "key_code": "f"
-                                        }
-                                    ]
-                                },
-                                "to_if_held_down": [
-                                    {
-                                        "key_code": "left_shift",
-                                        "modifiers": [
-                                            "left_command",
-                                            "left_option",
-                                            "left_control"
-                                        ]
-                                    }
-                                ],
-                                "type": "basic"
-                            },
-                            {
-                                "from": {
-                                    "key_code": "a"
-                                },
-                                "to_delayed_action": {
-                                    "to_if_canceled": [
-                                        {
-                                            "key_code": "a"
-                                        }
+                                        {"key_code": "f"},
+                                        {"key_code": "d"}
                                     ],
-                                    "to_if_invoked": [
-                                        {
-                                            "key_code": "vk_none"
-                                        }
-                                    ]
+                                    "simultaneous_options": {
+                                        "detect_key_down_uninterruptedly": true,
+                                        "key_down_order": "insensitive",
+                                        "key_up_order": "insensitive",
+                                        "to_after_key_up": []
+                                    }
                                 },
-                                "to_if_alone": [
-                                    {
-                                        "halt": true,
-                                        "key_code": "a"
-                                    }
-                                ],
-                                "to_if_held_down": [
-                                    {
-                                        "halt": true,
-                                        "key_code": "left_command"
-                                    }
-                                ],
-                                "type": "basic"
-                            },
+                                "to": [
+                                    {"key_code": "left_option"}
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "description": "Press F and S together to act as Control",
+                        "manipulators": [
                             {
+                                "type": "basic",
                                 "from": {
-                                    "key_code": "s"
-                                },
-                                "to_delayed_action": {
-                                    "to_if_canceled": [
-                                        {
-                                            "key_code": "s"
-                                        }
+                                    "simultaneous": [
+                                        {"key_code": "f"},
+                                        {"key_code": "s"}
                                     ],
-                                    "to_if_invoked": [
-                                        {
-                                            "key_code": "vk_none"
-                                        }
-                                    ]
+                                    "simultaneous_options": {
+                                        "detect_key_down_uninterruptedly": true,
+                                        "key_down_order": "insensitive",
+                                        "key_up_order": "insensitive",
+                                        "to_after_key_up": []
+                                    }
                                 },
-                                "to_if_alone": [
-                                    {
-                                        "halt": true,
-                                        "key_code": "s"
-                                    }
-                                ],
-                                "to_if_held_down": [
-                                    {
-                                        "halt": true,
-                                        "key_code": "left_control"
-                                    }
-                                ],
-                                "type": "basic"
-                            },
+                                "to": [
+                                    {"key_code": "left_control"}
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "description": "Press F and A together to act as Shift",
+                        "manipulators": [
                             {
+                                "type": "basic",
                                 "from": {
-                                    "key_code": "d"
-                                },
-                                "to_delayed_action": {
-                                    "to_if_canceled": [
-                                        {
-                                            "key_code": "d"
-                                        }
+                                    "simultaneous": [
+                                        {"key_code": "f"},
+                                        {"key_code": "a"}
                                     ],
-                                    "to_if_invoked": [
-                                        {
-                                            "key_code": "vk_none"
-                                        }
-                                    ]
+                                    "simultaneous_options": {
+                                        "detect_key_down_uninterruptedly": true,
+                                        "key_down_order": "insensitive",
+                                        "key_up_order": "insensitive",
+                                        "to_after_key_up": []
+                                    }
                                 },
-                                "to_if_alone": [
-                                    {
-                                        "halt": true,
-                                        "key_code": "d"
-                                    }
-                                ],
-                                "to_if_held_down": [
-                                    {
-                                        "halt": true,
-                                        "key_code": "left_shift"
-                                    }
-                                ],
-                                "type": "basic"
-                            },
-                            {
-                                "from": {
-                                    "key_code": "f"
-                                },
-                                "to_delayed_action": {
-                                    "to_if_canceled": [
-                                        {
-                                            "halt": true,
-                                            "key_code": "f"
-                                        }
-                                    ],
-                                    "to_if_invoked": [
-                                        {
-                                            "key_code": "vk_none"
-                                        }
-                                    ]
-                                },
-                                "to_if_alone": [
-                                    {
-                                        "halt": true,
-                                        "key_code": "f"
-                                    }
-                                ],
-                                "to_if_held_down": [
-                                    {
-                                        "halt": true,
-                                        "key_code": "left_option"
-                                    }
-                                ],
-                                "type": "basic"
+                                "to": [
+                                    {"key_code": "left_shift"}
+                                ]
                             }
                         ]
                     }
