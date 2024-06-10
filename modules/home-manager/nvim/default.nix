@@ -30,6 +30,11 @@ in
             command = [[%s/\s\+$//e]],
           })
 
+          vim.api.nvim_create_autocmd({ 'FileType' }, {
+            pattern = { 'help' },
+            command = [[wincmd L]],
+          })
+
           -- highlight yanked stuff
           local highlight_group = vim.api.nvim_create_augroup('YankHighlight', { clear = true })
           vim.api.nvim_create_autocmd('TextYankPost', {
