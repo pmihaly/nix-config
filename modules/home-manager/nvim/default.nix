@@ -101,7 +101,7 @@ in
           opener = "edit";
         };
         harpoon = {
-          enable = false;
+          enable = true;
           enableTelescope = true;
           enterOnSendcmd = true;
           keymapsSilent = true;
@@ -582,7 +582,7 @@ in
         clipboard = "unnamedplus";
 
         # Set prettier colors
-        # termguicolors = true;
+        termguicolors = true;
 
         # Set completeopt to have a better completion experience
         completeopt = "menuone,noselect";
