@@ -263,6 +263,10 @@ in
         set-option -g default-command zsh
         set-option -g terminal-overrides ",xterm-256color:Tc"
 
+        set-option -g allow-passthrough on
+        set-option -ga update-environment TERM
+        set-option -ga update-environment TERM_PROGRAM
+
         set-option -g prefix C-Space
         bind-key C-Space send-prefix
 
