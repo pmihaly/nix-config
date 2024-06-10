@@ -139,6 +139,10 @@ in
                   name = "another smooooooooooooooooooooooth mix";
                   url = "https://www.youtube.com/watch?v=4nvewes8Inc";
                 }
+                {
+                  name = "smooooth III";
+                  url = "https://www.youtube.com/watch?v=DjDWKh2bBzs";
+                }
               ];
             }
           ];
