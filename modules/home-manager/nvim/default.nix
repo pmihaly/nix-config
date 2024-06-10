@@ -262,6 +262,14 @@ in
             };
           };
         };
+        oil = {
+          enable = true;
+          settings = {
+            columns = [ "icon" ];
+            view_options.hidden = true;
+            win_options.signcolumn = "yes";
+          };
+        };
       };
 
       extraPlugins = with pkgs.vimPlugins; [
@@ -441,18 +449,6 @@ in
 
         {
           mode = [ "n" ];
-          key = "<leader>f";
-          action = "<cmd>FloatermNew --autoclose=2 yazi<cr>";
-        }
-
-        {
-          mode = [ "n" ];
-          key = "<leader>f";
-          action = "<cmd>FloatermNew --autoclose=2 yazi<cr>";
-        }
-
-        {
-          mode = [ "n" ];
           key = "<leader>n";
           action = "<cmd>lua require('harpoon.mark').add_file()<cr>";
         }
@@ -531,6 +527,11 @@ in
           mode = [ "n" ];
           key = "<leader>dq";
           action = "<cmd>lua require('dap').terminate()<cr>";
+        }
+        {
+          mode = [ "n" ];
+          key = "<leader>f";
+          action = "<cmd>Oil<cr>";
         }
       ];
 
