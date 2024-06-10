@@ -107,10 +107,10 @@ optionalAttrs platform.isDarwin {
         };
 
         workspace-to-monitor-force-assignment = {
-          "u" = "secondary";
-          "i" = "secondary";
-          "o" = "secondary";
-          "p" = "secondary";
+          "u" = "main";
+          "i" = "main";
+          "o" = "main";
+          "p" = "main";
 
           "j" = "main";
           "k" = "main";
