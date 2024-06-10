@@ -150,7 +150,7 @@ in
               K = "hover";
               gr = "references";
               gd = "definition";
-              gi = "implementation";
+              # gi = "implementation";
               gt = "type_definition";
               gR = "rename";
             };
@@ -168,6 +168,7 @@ in
             emmet-ls.enable = true;
           };
         };
+        cmp-nvim-lsp.enable = true;
 
         treesitter = {
           enable = true;
@@ -293,6 +294,16 @@ in
             repo = "telescope-dap.nvim";
             rev = "8c88d9716c91eaef1cdea13cb9390d8ef447dbfe";
             sha256 = "sha256-P+ioBtupRvB3wcGKm77Tf/51k6tXKxJd176uupeW6v0=";
+          };
+        })
+        (pkgs.vimUtils.buildVimPlugin {
+          pname = "nvim-lspimport";
+          version = "2024-03-10";
+          src = pkgs.fetchFromGitHub {
+            owner = "stevanmilic";
+            repo = "nvim-lspimport";
+            rev = "9c1c61a5020faeb1863bb66eb4b2a9107e641876";
+            sha256 = "sha256-GIeuvGltgilFkYnKvsVYSogqQhDo1xcORy5jVtTz2cE=";
           };
         })
       ];
@@ -532,6 +543,12 @@ in
           mode = [ "n" ];
           key = "<leader>f";
           action = "<cmd>Oil<cr>";
+        }
+        {
+
+          mode = [ "n" ];
+          key = "<leader>gi";
+          action = "<cmd>lua require('lspimport').import()<cr>";
         }
       ];
 
