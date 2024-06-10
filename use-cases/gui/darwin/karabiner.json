@@ -87,6 +87,29 @@
                         ]
                     },
                     {
+                        "description": "Press F and E together to act as Shift+Option",
+                        "manipulators": [
+                            {
+                                "type": "basic",
+                                "from": {
+                                    "simultaneous": [
+                                        {"key_code": "f"},
+                                        {"key_code": "e"}
+                                    ],
+                                    "simultaneous_options": {
+                                        "detect_key_down_uninterruptedly": true,
+                                        "key_down_order": "insensitive",
+                                        "key_up_order": "insensitive",
+                                        "to_after_key_up": []
+                                    }
+                                },
+                                "to": [
+                                    { "modifiers": [ "left_shift" ], "key_code": "left_option"}
+                                ]
+                            }
+                        ]
+                    },
+                    {
                         "description": "Press J and K together to act as Option",
                         "manipulators": [
                             {
@@ -151,6 +174,29 @@
                                 },
                                 "to": [
                                     {"key_code": "left_shift"}
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "description": "Press J and I together to act as Shift+Option",
+                        "manipulators": [
+                            {
+                                "type": "basic",
+                                "from": {
+                                    "simultaneous": [
+                                        {"key_code": "j"},
+                                        {"key_code": "i"}
+                                    ],
+                                    "simultaneous_options": {
+                                        "detect_key_down_uninterruptedly": true,
+                                        "key_down_order": "insensitive",
+                                        "key_up_order": "insensitive",
+                                        "to_after_key_up": []
+                                    }
+                                },
+                                "to": [
+                                    { "modifiers": [ "left_shift" ], "key_code": "left_option"}
                                 ]
                             }
                         ]
