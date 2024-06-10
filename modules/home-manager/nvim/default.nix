@@ -259,7 +259,7 @@ in
                     }
                   ];
                   position = "right";
-                  size = 60;
+                  size = 75;
                 }
               ];
             };
