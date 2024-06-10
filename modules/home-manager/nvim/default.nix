@@ -513,8 +513,13 @@ in
 
         {
           mode = [ "n" ];
-          key = "<leader>dr";
+          key = "<leader>dd";
           action = "<cmd>Telescope dap configurations<cr>";
+        }
+        {
+          mode = [ "n" ];
+          key = "<leader>dr";
+          action = "<cmd>lua require('dap').run_last()<cr>";
         }
         {
           mode = [ "n" ];
