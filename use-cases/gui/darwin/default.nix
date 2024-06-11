@@ -110,7 +110,7 @@ optionalAttrs platform.isDarwin {
           "u" = "main";
           "i" = "main";
           "o" = "main";
-          "p" = "main";
+          "p" = "secondary";
 
           "j" = "main";
           "k" = "main";
