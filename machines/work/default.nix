@@ -43,6 +43,7 @@
       libossp_uuid # uuid from cli
       slack
       gnumake
+      bruno
     ];
   };
 
@@ -51,7 +52,6 @@
     "sequel-ace"
     "tableplus"
     "pycharm-ce"
-    "insomnia"
   ];
 
   users.users.${vars.username}.home = "/Users/${vars.username}";
