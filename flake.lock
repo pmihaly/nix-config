@@ -4,7 +4,7 @@
       "flake": false,
       "locked": {
         "lastModified": 1717275839,
-        "narHash": "sha256-LhCv0w2WSPDCb5YiEu863S2uekkYdJA3FysyEx9+qCw=",
+        "narHash": "sha256-a0u5cNnv7Al9GvCZDyawTaIEp8ZshX65o+Zgtb5ZNaY=",
         "type": "tarball",
         "url": "https://github.com/nikitabobko/AeroSpace/releases/download/v0.11.1-Beta/AeroSpace-v0.11.1-Beta.zip"
       },

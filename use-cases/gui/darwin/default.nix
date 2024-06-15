@@ -17,9 +17,11 @@ let
     unpackPhase = ''
       mkdir -p $out/Applications
       cp -r $src/AeroSpace.app $out/Applications
+      chmod +x $out/Applications/AeroSpace.app/Contents/MacOS/AeroSpace
 
       mkdir -p $out/bin
       cp $src/bin/aerospace $out/bin
+      chmod +x $out/bin/aerospace
     '';
   };
 in
