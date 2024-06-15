@@ -132,15 +132,15 @@ in
                   url = "https://www.youtube.com/watch?v=aA9GhsYt2O0";
                 }
                 {
-                  name = "smooooth deep house";
+                  name = "smooooth sonic dj";
                   url = "https://www.youtube.com/watch?v=PYfhbYIxBxE";
                 }
                 {
-                  name = "another smooooooooooooooooooooooth mix";
+                  name = "smooooth disco mix";
                   url = "https://www.youtube.com/watch?v=4nvewes8Inc";
                 }
                 {
-                  name = "smooooth III";
+                  name = "smooooth ukg cat fight";
                   url = "https://www.youtube.com/watch?v=DjDWKh2bBzs";
                 }
               ];
