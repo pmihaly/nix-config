@@ -272,8 +272,10 @@ in
           enable = true;
           settings = {
             columns = [ "icon" ];
-            view_options.hidden = true;
+            view_options.show_hidden = true;
             win_options.signcolumn = "yes";
+            skip_confirm_for_simple_edits = true;
+            prompt_save_on_select_new_entry = false;
           };
         };
       };
