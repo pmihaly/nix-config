@@ -56,16 +56,20 @@ in
           };
         };
 
-        programs.newsboat.extraConfig = builtins.readFile (
-          pkgs.fetchFromGitHub {
-            owner = "catppuccin";
-            repo = "newsboat";
-            rev = "be3d0ee1ba0fc26baf7a47c2aa7032b7541deb0f";
-            hash = "sha256-czvR3bVZ0NfBmuu0JixalS7B1vf1uEGSTSUVVTclKxI=";
-          }
-          + /themes/dark
-        );
-
+        programs.newsboat.extraConfig =
+          (builtins.readFile (
+            pkgs.fetchFromGitHub {
+              owner = "catppuccin";
+              repo = "newsboat";
+              rev = "be3d0ee1ba0fc26baf7a47c2aa7032b7541deb0f";
+              hash = "sha256-czvR3bVZ0NfBmuu0JixalS7B1vf1uEGSTSUVVTclKxI=";
+            }
+            + /themes/dark
+          ))
+          + ''
+            color listfocus          default color0 bold
+            color listfocus_unread   color2  color0 bold
+          '';
       }
 
     ];
