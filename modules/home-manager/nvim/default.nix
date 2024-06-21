@@ -155,7 +155,7 @@ in
               K = "hover";
               gr = "references";
               gd = "definition";
-              # gi = "implementation";
+              gi = "implementation";
               gt = "type_definition";
               gR = "rename";
             };
