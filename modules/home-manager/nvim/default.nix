@@ -167,7 +167,6 @@ in
             docker-compose-language-service.enable = true;
             yamlls.enable = true;
             jsonls.enable = true;
-            marksman.enable = true;
             nil-ls.enable = true;
             gopls.enable = true;
             emmet-ls.enable = true;
