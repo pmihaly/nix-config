@@ -18,6 +18,7 @@
       enable = true;
       extraBookmarks = {
         t = "${vars.persistDir}/opt/skylake-storage/Media/TV";
+        y = "${vars.persistDir}/opt/skylake-storage/Media/TV/Youtube";
         m = "${vars.persistDir}/opt/skylake-storage/Media/Movies";
       };
       sshServer.hostKeys = [
