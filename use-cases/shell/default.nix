@@ -14,7 +14,6 @@ let
     h = "~";
     d = "~/Downloads";
     p = "~/personaldev";
-    o = "~/Sync/org";
     s = "~/Sync";
     n = "~/.nix-config";
     fio = p + "/finances/import/otp/in";
