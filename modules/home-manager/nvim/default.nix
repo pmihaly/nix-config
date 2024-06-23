@@ -155,7 +155,6 @@ in
               K = "hover";
               gr = "references";
               gd = "definition";
-              gi = "implementation";
               gt = "type_definition";
               gR = "rename";
             };
@@ -558,7 +557,7 @@ in
         {
 
           mode = [ "n" ];
-          key = "<leader>gi";
+          key = "gi";
           action = "<cmd>lua require('lspimport').import()<cr>";
         }
       ];
