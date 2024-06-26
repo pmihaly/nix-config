@@ -97,7 +97,11 @@ in
           };
         };
         which-key.enable = true;
-        copilot-vim.enable = true;
+        copilot-lua = {
+          enable = true;
+          panel.enabled = false;
+          suggestion.enabled = false;
+        };
         floaterm = {
           enable = true;
           width = 150;
@@ -112,6 +116,7 @@ in
           keymapsSilent = true;
         };
 
+        copilot-cmp.enable = true;
         cmp = {
           enable = true;
           settings = {
@@ -124,6 +129,12 @@ in
               "<S-Tab>" = "cmp.mapping(cmp.mapping.select_prev_item(), {'i', 's'})";
               "<Tab>" = "cmp.mapping(cmp.mapping.select_next_item(), {'i', 's'})";
             };
+            sources = [
+              { name = "copilot"; }
+              { name = "nvim_lsp"; }
+              { name = "nvim_lsp_signature_help"; }
+              { name = "buffer"; }
+            ];
           };
         };
 
