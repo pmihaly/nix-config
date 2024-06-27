@@ -28,6 +28,20 @@ in
           show_symlink = false;
           sort_dir_first = true;
         };
+        opener = {
+          edit = [
+            {
+              run = "${config.programs.zsh.localVariables.EDITOR} \"$@\"";
+              block = true;
+            }
+          ];
+          play = [
+            {
+              run = "mpv \"$@\"";
+              orphan = true;
+            }
+          ];
+        };
       };
       keymap.manager.prepend_keymap = bookmarksToYaziKeybindings cfg.bookmarks;
       theme = { };
