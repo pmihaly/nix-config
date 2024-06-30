@@ -228,9 +228,8 @@ in
             };
           };
           extensions = {
-            dap-python = {
-              enable = true;
-            };
+            dap-python.enable = true;
+            dap-go.enable = true;
             dap-ui = {
               enable = true;
               floating.mappings = {
