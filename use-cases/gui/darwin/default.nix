@@ -72,6 +72,11 @@ optionalAttrs platform.isDarwin {
       finder.FXEnableExtensionChangeWarning = false;
     };
 
+    fonts = {
+      fontDir.enable = true;
+      fonts = [ ];
+    };
+
     home-manager.users.${vars.username} = {
       imports = [ ../../../modules/home-manager ];
       home.packages = [ aerospace ];

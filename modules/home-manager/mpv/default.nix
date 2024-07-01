@@ -1,4 +1,5 @@
 {
+  pkgs,
   lib,
   config,
   ...
@@ -20,6 +21,7 @@ in
         ytdl-format = "bestvideo+bestaudio/best";
       };
       defaultProfiles = [ "gpu-hq" ];
+      scripts = [ pkgs.mpvScripts.sponsorblock ];
       bindings = {
         "l" = "seek 5";
         "h" = "seek -5";
