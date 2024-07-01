@@ -545,6 +545,11 @@ in
         }
         {
           mode = [ "n" ];
+          key = "<leader>dT";
+          action.__raw = ''function() require('dap').toggle_breakpoint(vim.fn.input("Breakpoint condition: ", "", "condition")) end'';
+        }
+        {
+          mode = [ "n" ];
           key = "<leader>de";
           action = "<cmd>lua require('dap').repl.open()<cr>";
         }
