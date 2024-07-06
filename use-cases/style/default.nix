@@ -20,21 +20,8 @@ in
     home-manager.users.${vars.username} = mkMerge [
 
       (optionalAttrs platform.isLinux {
-        gtk = lib.mkForce {
+        gtk = {
           enable = true;
-          theme = {
-            name = "Catppuccin-Frappe-Standard-Mauve-Dark";
-            package = pkgs.catppuccin-gtk.override {
-              accents = [ "mauve" ];
-              size = "standard";
-              tweaks = [ "rimless" ];
-              variant = "frappe";
-            };
-          };
-          cursorTheme = {
-            name = "Catppuccin-Frappe-Light-Cursors";
-            package = pkgs.catppuccin-cursors.frappeLight;
-          };
           iconTheme = {
             name = "Papirus";
             package = pkgs.catppuccin-papirus-folders.override {
@@ -43,7 +30,6 @@ in
             };
           };
         };
-
       })
 
       {
@@ -74,40 +60,46 @@ in
 
     ];
 
-    stylix = {
-      image = ../../wallpaper.png;
-      base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-frappe.yaml";
+    stylix = mkMerge [
+      {
+        enable = true;
+        autoEnable = true;
+        image = ../../wallpaper.png;
+        base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-frappe.yaml";
 
-      targets = (
-        mkMerge [
-          (optionalAttrs platform.isLinux { grub.enable = true; })
-
-          { nixvim.enable = false; }
-        ]
-      );
-
-      fonts = {
-        emoji = {
-          name = "Noto Color Emoji";
-          package = pkgs.noto-fonts-color-emoji;
+        targets = {
+          nixvim.enable = false;
         };
 
-        monospace = {
-          name = "Comic Code Ligatures";
-          package = pkgs.comic-code;
-        };
+        fonts = {
+          emoji = {
+            name = "Noto Color Emoji";
+            package = pkgs.noto-fonts-color-emoji;
+          };
 
-        sansSerif = {
-          name = "Noto";
-          package = pkgs.noto-fonts;
-        };
+          monospace = {
+            name = "Comic Code Ligatures";
+            package = pkgs.comic-code;
+          };
 
-        serif = {
-          name = "Noto Serif";
-          package = pkgs.noto-fonts;
-        };
-      };
+          sansSerif = {
+            name = "Noto";
+            package = pkgs.noto-fonts;
+          };
 
-    };
+          serif = {
+            name = "Noto Serif";
+            package = pkgs.noto-fonts;
+          };
+        };
+      }
+
+      (optionalAttrs platform.isLinux {
+        cursor = {
+          name = "Catppuccin-Frappe-Light-Cursors";
+          package = pkgs.catppuccin-cursors.frappeLight;
+        };
+      })
+    ];
   };
 }
