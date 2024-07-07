@@ -542,6 +542,21 @@ in
         }
         {
           mode = [ "n" ];
+          key = "<leader>dn";
+          action = "<cmd>lua require('dap').step_over()<cr>";
+        }
+        {
+          mode = [ "n" ];
+          key = "<leader>di";
+          action = "<cmd>lua require('dap').step_into()<cr>";
+        }
+        {
+          mode = [ "n" ];
+          key = "<leader>do";
+          action = "<cmd>lua require('dap').step_out()<cr>";
+        }
+        {
+          mode = [ "n" ];
           key = "<leader>dt";
           action = "<cmd>lua require('dap').toggle_breakpoint()<cr>";
         }
