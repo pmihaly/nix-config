@@ -2,6 +2,7 @@
   pkgs,
   lib,
   config,
+  inputs,
   ...
 }:
 
@@ -69,6 +70,8 @@ in
         dap.listeners.before.event_exited.dapui_config = function()
           dapui.close()
         end
+
+        require('harpoon').setup()
       '';
 
       editorconfig.enable = true;
@@ -110,12 +113,6 @@ in
           height = 40;
           title = "";
           opener = "edit";
-        };
-        harpoon = {
-          enable = true;
-          enableTelescope = true;
-          enterOnSendcmd = true;
-          keymapsSilent = true;
         };
 
         copilot-cmp.enable = true;
@@ -323,6 +320,11 @@ in
             sha256 = "sha256-GIeuvGltgilFkYnKvsVYSogqQhDo1xcORy5jVtTz2cE=";
           };
         })
+        (pkgs.vimUtils.buildVimPlugin {
+          pname = "harpoon";
+          version = "2024-04-09";
+          src = inputs.harpoon;
+        })
       ];
 
       keymaps = [
@@ -478,32 +480,32 @@ in
         {
           mode = [ "n" ];
           key = "<leader>n";
-          action = "<cmd>lua require('harpoon.mark').add_file()<cr>";
+          action = "<cmd>lua require('harpoon'):list():add()<cr>";
         }
         {
           mode = [ "n" ];
           key = "<leader>i";
-          action = "<cmd>lua require('harpoon.ui').toggle_quick_menu()<cr>";
+          action = "<cmd>lua require('harpoon').ui:toggle_quick_menu(require('harpoon'):list())<cr>";
         }
         {
           mode = [ "n" ];
           key = "<leader>h";
-          action = "<cmd>lua require('harpoon.ui').nav_file(1)<cr>";
+          action = "<cmd>lua require('harpoon'):list():select(1)<cr>";
         }
         {
           mode = [ "n" ];
           key = "<leader>j";
-          action = "<cmd>lua require('harpoon.ui').nav_file(2)<cr>";
+          action = "<cmd>lua require('harpoon'):list():select(2)<cr>";
         }
         {
           mode = [ "n" ];
           key = "<leader>k";
-          action = "<cmd>lua require('harpoon.ui').nav_file(3)<cr>";
+          action = "<cmd>lua require('harpoon'):list():select(3)<cr>";
         }
         {
           mode = [ "n" ];
           key = "<leader>l";
-          action = "<cmd>lua require('harpoon.ui').nav_file(4)<cr>";
+          action = "<cmd>lua require('harpoon'):list():select(4)<cr>";
         }
 
         {
