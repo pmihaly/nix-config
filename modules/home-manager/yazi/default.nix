@@ -1,4 +1,9 @@
-{ lib, config, ... }:
+{
+  pkgs,
+  lib,
+  config,
+  ...
+}:
 
 with lib;
 let
@@ -19,6 +24,7 @@ in
     };
   };
   config = mkIf cfg.enable {
+    programs.zsh.shellAliases.ya = "${pkgs.yazi}/bin/yazi";
     programs.yazi = {
       enable = true;
       settings = {
