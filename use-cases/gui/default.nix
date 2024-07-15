@@ -37,7 +37,7 @@ in
             "Videos"
           ];
           firefox.enable = true;
-          mpv.enable = true;
+          mpv.enable = lib.warn "TODO enable mpv when it no longer uses a broken version of swift" false;
           terminal-emulator.enable = true;
           newsboat.enable = true;
           neomutt.enable = true;
