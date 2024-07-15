@@ -26,6 +26,29 @@
       }
     );
 
+    hanken-grotesk = (
+      prev.stdenvNoCC.mkDerivation rec {
+        pname = "hanken-grotesk";
+        version = "1ab416e82130b2d3ddb7710abf7ceabf07156a13";
+
+        src = prev.fetchFromGitHub {
+          owner = "marcologous";
+          repo = pname;
+          rev = version;
+          hash = "sha256-CgxqC+4QrjdsB7VdAMneP8ND9AsWPVI8d8UOn4kytxs=";
+        };
+
+        installPhase = ''
+          runHook preInstall
+
+          mkdir -p $out/share/fonts
+          cp fonts/otf/*.otf $out/share/fonts
+
+          runHook postInstall
+        '';
+      }
+    );
+
     iosevka-custom = prev.iosevka.override {
       privateBuildPlan = ''
         [buildPlans.iosevka-custom]

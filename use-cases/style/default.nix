@@ -83,13 +83,13 @@ in
           };
 
           sansSerif = {
-            name = "Noto";
-            package = pkgs.noto-fonts;
+            name = "Hanken Grotesk";
+            package = pkgs.hanken-grotesk;
           };
 
           serif = {
-            name = "Noto Serif";
-            package = pkgs.noto-fonts;
+            name = "Hanken Grotesk";
+            package = pkgs.hanken-grotesk;
           };
         };
       }
