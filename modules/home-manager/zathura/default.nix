@@ -28,7 +28,6 @@ in
           + /src/catppuccin-frappe
         ))
 
-        "set recolor"
       ]
     );
 
