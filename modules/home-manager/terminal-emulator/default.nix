@@ -12,7 +12,7 @@ in
   config = mkIf cfg.enable {
     programs.wezterm = {
       enable = true;
-      enableZshIntegration = true;
+      enableZshIntegration = false; # adds weird env vars into terminal inside nvim
       extraConfig = ''
         local wezterm = require 'wezterm'
 
