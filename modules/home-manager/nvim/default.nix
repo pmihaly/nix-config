@@ -179,6 +179,7 @@ in
             nil-ls.enable = true;
             gopls.enable = true;
             emmet-ls.enable = true;
+            nushell.enable = true;
           };
         };
         cmp-nvim-lsp.enable = true;
@@ -324,6 +325,16 @@ in
           pname = "harpoon";
           version = "2024-04-09";
           src = inputs.harpoon;
+        })
+        (pkgs.vimUtils.buildVimPlugin {
+          pname = "nushell-syntax-vim";
+          version = "2024-05-16";
+          src = pkgs.fetchFromGitHub {
+            owner = "elkasztano";
+            repo = "nushell-syntax-vim";
+            rev = "bf44e8c769a9ee966908bd3f2e8437dce28f6c8e";
+            sha256 = "sha256-8xQVLdbswW85Zi55PG0Q+2AGFOIiJJFoUn/2SqU1LEc=";
+          };
         })
       ];
 
