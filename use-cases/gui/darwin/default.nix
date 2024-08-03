@@ -72,6 +72,25 @@ optionalAttrs platform.isDarwin {
       finder.FXEnableExtensionChangeWarning = false;
     };
 
+    services.tailscale = {
+      enable = true;
+    };
+
+    networking.dns = [
+      "100.100.100.100" # tailscale dns
+      "8.8.8.8"
+      "8.8.4.4"
+    ];
+
+    networking.knownNetworkServices = [
+      "LG Monitor Controls 2"
+      "LG Monitor Controls"
+      "USB Controls"
+      "AX88179A"
+      "Wi-Fi"
+      "Thunderbolt Bridge"
+    ];
+
     home-manager.users.${vars.username} = {
       imports = [ ../../../modules/home-manager ];
       home.packages = [ aerospace ];

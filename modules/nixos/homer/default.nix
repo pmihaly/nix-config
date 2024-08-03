@@ -90,6 +90,7 @@ in
             ] ++ logoVolumes;
             environment = {
               INIT_ASSETS = "0";
+              SUBFOLDER = "/homer";
             };
           };
       };

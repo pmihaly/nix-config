@@ -35,16 +35,15 @@ optionalAttrs platform.isLinux {
         nginx.enable = true;
         jellyfin.enable = true;
         homer.enable = true;
-        authelia.enable = true;
         deluge.enable = true;
         arr.enable = true;
         endlessh.enable = true;
         monitoring.enable = false;
         hledger.enable = false;
-        duckdns.enable = true;
         paperless.enable = true;
         syncthing.enable = true;
         immich.enable = true;
+        tailscale.enable = true;
       };
     }
   ]);

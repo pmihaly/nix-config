@@ -1,10 +1,4 @@
-{
-  pkgs,
-  lib,
-  config,
-  vars,
-  ...
-}:
+{ lib, config, ... }:
 
 with lib;
 let
@@ -16,16 +10,10 @@ in
   };
   config = mkIf cfg.enable {
 
-    environment.persistence.${vars.persistDir}.directories = [ "/var/lib/acme" ];
-
     services.nginx = {
       enable = true;
 
-      virtualHosts."${vars.domainName}" = {
-        forceSSL = true;
-        useACMEHost = vars.domainName;
-        root = "${pkgs.nix.doc}/share/doc/nix/manual";
-      };
+      # virtualHosts."${vars.domainName}".globalRedirect = "${vars.domainName}/homer";
 
       recommendedZstdSettings = true;
       recommendedTlsSettings = true;
@@ -35,24 +23,6 @@ in
       recommendedBrotliSettings = true;
     };
 
-    users.users.nginx.extraGroups = [ "acme" ];
-
-    security.acme = {
-      acceptTerms = true;
-      defaults.email = "${vars.acmeEmail}";
-
-      certs.${vars.domainName} = {
-        extraDomainNames = [ "*.${vars.domainName}" ];
-
-        dnsProvider = "porkbun";
-        dnsPropagationCheck = true;
-        credentialFiles = {
-          PORKBUN_API_KEY_FILE = config.age.secrets."acme/porkbun-api-key".path;
-          PORKBUN_SECRET_API_KEY_FILE = config.age.secrets."acme/porkbun-secret-key".path;
-        };
-      };
-    };
-
     networking.firewall = {
       enable = true;
       allowedTCPPorts = [
@@ -60,7 +30,5 @@ in
         443
       ];
     };
-
-    modules.authelia.bypassDomains = [ vars.domainName ];
   };
 }

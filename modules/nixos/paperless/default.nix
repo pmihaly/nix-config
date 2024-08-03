@@ -34,6 +34,7 @@ in
 
         services.paperless = {
           enable = true;
+          address = "0.0.0.0";
           dataDir = "${vars.storage}/Services/paperless";
           mediaDir = "${vars.storage}/Services/paperless/media";
           consumptionDir = "${vars.storage}/Services/paperless/consume";

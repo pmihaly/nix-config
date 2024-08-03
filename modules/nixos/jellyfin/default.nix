@@ -33,22 +33,7 @@ in
       {
         systemd.tmpfiles.rules = map (x: "d ${x} 0775 ${vars.username} multimedia - -") directories;
 
-        services.nginx.virtualHosts."jellyfin.${vars.domainName}".locations = {
-          "/socket" = {
-            extraConfig = ''
-              proxy_pass http://localhost:8096;
-              proxy_http_version 1.1;
-              proxy_set_header Upgrade $http_upgrade;
-              proxy_set_header Connection "upgrade";
-              proxy_set_header Host $host;
-              proxy_set_header X-Real-IP $remote_addr;
-              proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-              proxy_set_header X-Forwarded-Proto $scheme;
-              proxy_set_header X-Forwarded-Protocol $scheme;
-              proxy_set_header X-Forwarded-Host $http_host;
-            '';
-          };
-        };
+        # TODO check jellyfin
 
         networking.firewall = {
           allowedUDPPorts = [ 7359 ];
@@ -69,7 +54,7 @@ in
               ];
               environment = {
                 TZ = vars.timeZone;
-                JELLYFIN_PublishedServerUrl = "jellyfin.${vars.domainName}";
+                JELLYFIN_PublishedServerUrl = "${vars.domainName}/jellyfin";
               };
               extraOptions = [ "--device=/dev/dri/renderD128:/dev/dri/renderD128" ];
             };

@@ -194,10 +194,10 @@
               "-p"
               "69"
               "-i"
-              "/persist/etc/ssh/ssh_host_ed25519_key"
+              "~/.ssh/skylake"
             ];
             magicRollback = false;
-            remoteBuild = false;
+            remoteBuild = true;
           };
         };
       };
