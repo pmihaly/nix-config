@@ -18,14 +18,13 @@ let
         };
 
         services.nginx.virtualHosts."${vars.domainName}".locations."/${subdomain}" = {
-          recommendedProxySettings = true;
-          proxyPass = "http://127.0.0.1:${toString port}/$1";
+          return = "301 http://${vars.domainName}:${toString port}";
         };
 
         modules.homer.services = lib.mkIf (builtins.isAttrs dashboard) {
           "${dashboard.category}"."${dashboard.name}" = {
             logo = dashboard.logo;
-            url = "http://${vars.domainName}/${subdomain}";
+            url = "http://${vars.domainName}:${toString port}";
           };
         };
       }

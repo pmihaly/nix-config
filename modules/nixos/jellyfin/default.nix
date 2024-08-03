@@ -42,7 +42,7 @@ in
         virtualisation.oci-containers = {
           containers = {
             jellyfin = {
-              image = "lscr.io/linuxserver/jellyfin:10.8.12";
+              image = "lscr.io/linuxserver/jellyfin:10.9.8";
               ports = [
                 "8096:8096"
                 "7359:7359/udp"
