@@ -1,4 +1,4 @@
-{ lib, config, ... }:
+{ lib, config, vars, ... }:
 
 with lib;
 let
@@ -13,7 +13,7 @@ in
     services.nginx = {
       enable = true;
 
-      # virtualHosts."${vars.domainName}".globalRedirect = "${vars.domainName}/homer";
+      virtualHosts."${vars.domainName}".globalRedirect = "${vars.domainName}/homer";
 
       recommendedZstdSettings = true;
       recommendedTlsSettings = true;

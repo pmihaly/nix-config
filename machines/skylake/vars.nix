@@ -1,5 +1,5 @@
 rec {
-  domainName = "skylake";
+  domainName = "skylake.anaconda-snapper.ts.net";
   timeZone = "Europe/Budapest";
   persistDir = "/persist";
   serviceConfig = "${persistDir}/opt/skylake-services";
