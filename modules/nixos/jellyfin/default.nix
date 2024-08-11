@@ -33,8 +33,6 @@ in
       {
         systemd.tmpfiles.rules = map (x: "d ${x} 0775 ${vars.username} multimedia - -") directories;
 
-        # TODO check jellyfin
-
         networking.firewall = {
           allowedUDPPorts = [ 7359 ];
         };
