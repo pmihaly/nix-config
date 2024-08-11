@@ -29,7 +29,7 @@ in
         ];
         environment = {
           TZ = vars.timeZone;
-          IMMICH_VERSION = "v1.102.3";
+          IMMICH_VERSION = "v1.111.0";
           DB_HOSTNAME = "immich-database";
           DB_USERNAME = "postgres";
           DB_PASSWORD = "postgres";
