@@ -21,12 +21,6 @@
         y = "${vars.persistDir}/opt/skylake-storage/Media/TV/Youtube";
         m = "${vars.persistDir}/opt/skylake-storage/Media/Movies";
       };
-      sshServer.hostKeys = [
-        {
-          path = "${vars.persistDir}/etc/ssh/ssh_host_ed25519_key";
-          type = "ed25519";
-        }
-      ];
     };
 
     server.enable = true;

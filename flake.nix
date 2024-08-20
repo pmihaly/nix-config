@@ -193,8 +193,6 @@
               "-t"
               "-p"
               "69"
-              "-i"
-              "~/.ssh/skylake"
             ];
             magicRollback = false;
             remoteBuild = true;
