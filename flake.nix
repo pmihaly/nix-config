@@ -184,7 +184,7 @@
 
       deploy.nodes = {
         skylake = {
-          hostname = "192.168.0.30";
+          hostname = "skylake";
           profiles.system = {
             path = inputs.deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.skylake;
             sshUser = "misi";
@@ -197,7 +197,10 @@
               "~/.ssh/skylake"
             ];
             magicRollback = false;
+            autoRollback = false;
             remoteBuild = true;
+            interactiveSudo = true;
+            skipChecks = true;
           };
         };
       };

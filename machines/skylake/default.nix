@@ -8,6 +8,7 @@
 {
   imports = [
     ../../use-cases
+    ../../modules/nixos/backup
     ./hardware.nix
   ];
 
@@ -31,6 +32,10 @@
 
     server.enable = true;
     style.enable = true;
+
+    backup = {
+      enable = true;
+    };
   };
 
   home-manager.users.${vars.username}.home.stateVersion = "22.05";
