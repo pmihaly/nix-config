@@ -8,6 +8,6 @@ let
 in
 {
   "email/password/mihaly_mihaly.codes.age".publicKeys = allKeys;
-  "backup/skylake.age".publicKeys = allKeys;
-  "backup/skylake-restic.age".publicKeys = allKeys;
+  "backup/s3-access.age".publicKeys = allKeys;
+  "backup/restic.age".publicKeys = allKeys;
 }

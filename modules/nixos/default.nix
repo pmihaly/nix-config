@@ -14,6 +14,5 @@
     ./qemu
     ./immich
     ./tailscale
-    ./backup
   ];
 }

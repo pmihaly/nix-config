@@ -8,7 +8,7 @@
 {
   imports = [
     ../../use-cases
-    ../../modules/nixos/backup
+    ../../modules-v2/nixos
     ./hardware.nix
   ];
 
@@ -35,6 +35,13 @@
 
     backup = {
       enable = true;
+      machineId = "skylake";
+      include = [
+        vars.storage
+        vars.serviceConfig
+      ];
+      exclude = [ "${vars.storage}/Media" ];
+      timer = "hourly";
     };
   };
 
