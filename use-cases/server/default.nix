@@ -37,11 +37,7 @@ optionalAttrs platform.isLinux {
         homer.enable = true;
         deluge.enable = true;
         arr.enable = true;
-        endlessh.enable = true;
-        monitoring.enable = false;
-        hledger.enable = false;
         paperless.enable = true;
-        syncthing.enable = true;
         immich.enable = true;
         tailscale.enable = true;
       };
