@@ -47,7 +47,8 @@ in
         enable = true;
         openFirewall = true;
         ports = [ 69 ];
-        settings.PasswordAuthentication = true;
+        settings.PasswordAuthentication = false;
+        hostKeys = cfg.sshServer.hostKeys;
       };
     })
 

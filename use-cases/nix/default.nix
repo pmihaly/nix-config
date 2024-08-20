@@ -21,6 +21,7 @@ in
       nixpkgs.overlays = import ../../overlays;
 
       nixpkgs.config.allowUnfree = true;
+      documentation.enable = false;
 
       nix = {
         nixPath = [ "nixpkgs=/etc/channels/nixpkgs" ];
