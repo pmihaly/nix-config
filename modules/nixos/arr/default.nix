@@ -12,6 +12,7 @@ let
     "${vars.serviceConfig}/sonarr"
     "${vars.serviceConfig}/radarr"
     "${vars.serviceConfig}/prowlarr"
+    "${vars.serviceConfig}/bazarr"
     "${vars.storage}/Media/Downloads"
     "${vars.storage}/Media/TV"
     "${vars.storage}/Media/Movies"
@@ -74,5 +75,49 @@ in
       };
       extraConfig.services.prowlarr.enable = true;
     })
+
+    (mkService {
+      subdomain = "bazarr";
+      port = 6767;
+      dashboard = {
+        category = "Media";
+        name = "Bazarr";
+        logo = ./bazarr.png;
+      };
+      extraConfig.virtualisation.oci-containers = {
+          containers.bazarr = {
+              image = "lscr.io/linuxserver/bazarr:v1.4.3-ls266";
+              ports = [
+                "6767:6767"
+              ];
+              volumes = [
+                "${vars.storage}/Media/TV:${vars.storage}/Media/TV"
+                "${vars.storage}/Media/Movies:${vars.storage}/Media/Movies"
+                "${vars.serviceConfig}/bazarr:/config"
+              ];
+              environment = {
+                TZ = vars.timeZone;
+              };
+            };
+          };
+    })
+
+# ---
+# services:
+#   bazarr:
+#     image: lscr.io/linuxserver/bazarr:v1.4.3-ls266
+#     container_name: bazarr
+#     environment:
+#       - PUID=1000
+#       - PGID=1000
+#       - TZ=Etc/UTC
+#     volumes:
+#       - /path/to/bazarr/config:/config
+#       - /path/to/movies:/movies #optional
+#       - /path/to/tv:/tv #optional
+#     ports:
+#       - 6767:6767
+#     restart: unless-stopped
+
   ]);
 }
