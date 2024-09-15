@@ -1,5 +1,6 @@
 {
   lib,
+  inputs,
   config,
   vars,
   ...
@@ -40,7 +41,9 @@ in
         virtualisation.oci-containers = {
           containers = {
             jellyfin = {
-              image = "lscr.io/linuxserver/jellyfin:10.9.10";
+              image = "lscr.io/linuxserver/jellyfin:${
+                builtins.replaceStrings [ "v" ] [ "" ] (getDockerVersionFromShield inputs.jellyfin-shield)
+              }";
               ports = [
                 "8096:8096"
                 "7359:7359/udp"

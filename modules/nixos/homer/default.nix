@@ -79,7 +79,7 @@ in
             };
           in
           {
-            image = "b4bz/homer:v24.05.1";
+            image = "b4bz/homer:${getDockerVersionFromShield inputs.homer-shield}";
             ports = [ "8080:8080" ];
             volumes = [
               "${style}:/www/assets/catppuccin-frappe.css"

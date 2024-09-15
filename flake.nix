@@ -61,6 +61,18 @@
       url = "github:ThePrimeagen/harpoon/harpoon2";
       flake = false;
     };
+    immich-shield = {
+      url = "https://img.shields.io/github/v/release/immich-app/immich.json";
+      flake = false;
+    };
+    homer-shield = {
+      url = "https://img.shields.io/github/v/release/bastienwirtz/homer.json";
+      flake = false;
+    };
+    jellyfin-shield = {
+      url = "https://img.shields.io/github/v/release/linuxserver/docker-jellyfin.json";
+      flake = false;
+    };
   };
 
   outputs =

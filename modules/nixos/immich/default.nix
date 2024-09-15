@@ -1,4 +1,5 @@
 {
+  inputs,
   lib,
   config,
   vars,
@@ -29,7 +30,7 @@ in
         ];
         environment = {
           TZ = vars.timeZone;
-          IMMICH_VERSION = "v1.115.0";
+          IMMICH_VERSION = getDockerVersionFromShield inputs.immich-shield;
           DB_HOSTNAME = "immich-database";
           DB_USERNAME = "postgres";
           DB_PASSWORD = "postgres";

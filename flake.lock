@@ -611,6 +611,18 @@
         "type": "github"
       }
     },
+    "homer-shield": {
+      "flake": false,
+      "locked": {
+        "narHash": "sha256-g0vgmjsW8EZPkG2NVgUcy8uaofBCwA7KuJveT/WOUlk=",
+        "type": "file",
+        "url": "https://img.shields.io/github/v/release/bastienwirtz/homer.json"
+      },
+      "original": {
+        "type": "file",
+        "url": "https://img.shields.io/github/v/release/bastienwirtz/homer.json"
+      }
+    },
     "img2theme": {
       "inputs": {
         "flake-utils": "flake-utils",
@@ -633,6 +645,18 @@
         "type": "github"
       }
     },
+    "immich-shield": {
+      "flake": false,
+      "locked": {
+        "narHash": "sha256-1Ok2KX04L238pBc85xIkb7g8+Oqbx0iTM5+2XLuarxQ=",
+        "type": "file",
+        "url": "https://img.shields.io/github/v/release/immich-app/immich.json"
+      },
+      "original": {
+        "type": "file",
+        "url": "https://img.shields.io/github/v/release/immich-app/immich.json"
+      }
+    },
     "impermanence": {
       "locked": {
         "lastModified": 1719091691,
@@ -646,6 +670,18 @@
         "owner": "nix-community",
         "repo": "impermanence",
         "type": "github"
+      }
+    },
+    "jellyfin-shield": {
+      "flake": false,
+      "locked": {
+        "narHash": "sha256-uryzQTkbTgLTImq3UihwPzxpF3a4ILDZ0NOz1lsWU8M=",
+        "type": "file",
+        "url": "https://img.shields.io/github/v/release/linuxserver/docker-jellyfin.json"
+      },
+      "original": {
+        "type": "file",
+        "url": "https://img.shields.io/github/v/release/linuxserver/docker-jellyfin.json"
       }
     },
     "nix-darwin": {
@@ -879,8 +915,11 @@
         "disko": "disko",
         "harpoon": "harpoon",
         "home-manager": "home-manager_2",
+        "homer-shield": "homer-shield",
         "img2theme": "img2theme",
+        "immich-shield": "immich-shield",
         "impermanence": "impermanence",
+        "jellyfin-shield": "jellyfin-shield",
         "nix-gaming": "nix-gaming",
         "nix-index-database": "nix-index-database",
         "nix-std": "nix-std",

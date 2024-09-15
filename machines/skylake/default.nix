@@ -42,10 +42,10 @@
         "${vars.storage}/Media/Pictures"
       ];
       exclude = [
-       "${vars.storage}/Media/Downloads"
-       "${vars.storage}/Media/TV"
-       "${vars.storage}/Media/Movies"
-       "${vars.storage}/Media/Audiobooks"
+        "${vars.storage}/Media/Downloads"
+        "${vars.storage}/Media/TV"
+        "${vars.storage}/Media/Movies"
+        "${vars.storage}/Media/Audiobooks"
       ];
       timer = "hourly";
     };
