@@ -1,4 +1,9 @@
-{ lib, config, ... }:
+{
+  pkgs,
+  lib,
+  config,
+  ...
+}:
 
 with lib;
 let
@@ -44,7 +49,12 @@ in
           ];
         };
       };
-      keymap.manager.prepend_keymap = bookmarksToYaziKeybindings cfg.bookmarks;
+      keymap.manager.prepend_keymap = [
+        {
+          on = [ "z" ];
+          run = "shell --block --confirm \"${pkgs.unzip}/bin/unzip $0\"";
+        }
+      ] ++ (bookmarksToYaziKeybindings cfg.bookmarks);
       theme = { };
     };
   };
