@@ -1,4 +1,7 @@
 { ... }:
 {
-  imports = [ ./backup ];
+  imports = [
+    ./backup
+    ./notification-server
+  ];
 }
