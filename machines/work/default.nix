@@ -16,7 +16,7 @@
     style.enable = true;
   };
 
-  ids.uids.nixbld = 300;  # i dont want to update macos
+  ids.uids.nixbld = 300; # i dont want to update macos
 
   home-manager.users.${vars.username} = {
     home.stateVersion = "22.05";
