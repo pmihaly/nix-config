@@ -93,6 +93,7 @@ in
             ai = { };
           };
         };
+        web-devicons.enable = true;
         comment.enable = true;
         sleuth.enable = true;
         project-nvim.enable = true;
@@ -172,7 +173,7 @@ in
           };
           servers = {
             pyright.enable = true;
-            tsserver.enable = true;
+            ts-ls.enable = true;
             dockerls.enable = true;
             docker-compose-language-service.enable = true;
             yamlls.enable = true;
@@ -187,7 +188,7 @@ in
 
         treesitter = {
           enable = true;
-          ensureInstalled = [
+          settings.ensure_installed = [
             "bash"
             "html"
             "javascript"
