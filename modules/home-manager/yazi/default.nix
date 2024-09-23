@@ -43,7 +43,7 @@ in
           ];
           play = [
             {
-              run = "mpv \"$@\"";
+              run = "${getExe config.programs.mpv.package} \"$@\"";
               orphan = true;
             }
           ];
@@ -52,7 +52,7 @@ in
       keymap.manager.prepend_keymap = [
         {
           on = [ "z" ];
-          run = "shell --block --confirm \"${pkgs.unzip}/bin/unzip $0\"";
+          run = "shell --block --confirm \"${getExe pkgs.unzip} $0\"";
         }
       ] ++ (bookmarksToYaziKeybindings cfg.bookmarks);
       theme = { };
