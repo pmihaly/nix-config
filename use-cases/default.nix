@@ -9,5 +9,6 @@
     ./music-production
     ./dev
     ./style
+    ./altserver
   ];
 }
