@@ -155,6 +155,7 @@ in
           };
         };
 
+        # https://nix-community.github.io/nixvim/plugins/lsp/index.html
         lsp = {
           enable = true;
           keymaps = {
