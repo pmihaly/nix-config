@@ -8,7 +8,7 @@ def main [] {
   | from json
   | $in.locks.nodes
   | transpose key value
-  | filter { $in.value.original? != null and $in.value.original.repo? != null and $in.value.original.repo != "default" }
+  | filter { $in.value.original? != null }
   | $in.key
   | filter { parse -r ".*_[0-9]*$" | is-empty }
   | filter { $in not-in $flakesToNotUpdate }
