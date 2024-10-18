@@ -51,11 +51,7 @@ in
           immich-server = {
             image = "ghcr.io/immich-app/immich-server:${environment.IMMICH_VERSION}";
             inherit environment;
-            cmd = [
-              "start.sh"
-              "immich"
-            ];
-            ports = [ "2283:3001" ];
+            ports = [ "2283:2283" ];
             volumes = [
               "${vars.storage}/Media/Pictures:/usr/src/app/upload"
               "/etc/localtime:/etc/localtime:ro"
@@ -64,24 +60,6 @@ in
               "immich-redis"
               "immich-database"
             ];
-          };
-
-          immich-microservices = {
-            image = "ghcr.io/immich-app/immich-server:${environment.IMMICH_VERSION}";
-            inherit environment;
-            cmd = [
-              "start.sh"
-              "microservices"
-            ];
-            volumes = [
-              "${vars.storage}/Media/Pictures:/usr/src/app/upload"
-              "/etc/localtime:/etc/localtime:ro"
-            ];
-            dependsOn = [
-              "immich-redis"
-              "immich-database"
-            ];
-            extraOptions = [ "--device=/dev/dri:/dev/dri" ];
           };
 
           immich-machine-learning = {
