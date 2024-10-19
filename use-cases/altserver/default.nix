@@ -18,39 +18,28 @@ in
   config = mkIf cfg.enable (
     optionalAttrs platform.isLinux {
 
-      systemd.tmpfiles.rules = [
-        "d ${vars.storage}/Services/altserver-windows 0755 ${vars.username} multimedia - -"
-      ];
+      systemd.tmpfiles.rules = ["d ${vars.storage}/Services/anisette 0750 misi multimedia -"];
 
-      networking.firewall = {
-        allowedTCPPorts = [
-          8006
-          3389
-        ];
-        allowedUDPPorts = [ 3389 ];
+      programs.zsh.shellAliases.altserver = "ALTSERVER_ANISETTE_SERVER='http://localhost:6969' ${getExe pkgs.altserver-linux}";
+
+      services.usbmuxd = {
+        enable = true;
       };
 
-      virtualisation.oci-containers.containers.altserver-windows = {
-        image = "dockurr/windows";
-        environment = {
-          VERSION = "win11";
-          USERNAME = "altserver";
-          PASSWORD = "altserver";
-          ARGUMENTS = "-device usb-host,vendorid=0x05ac,productid=0x12a8"; # should be working for any iphone
-        };
+      home-manager.users.${vars.username} = {
+        home.packages = with pkgs; [
+          libimobiledevice
+          altserver-linux
+        ];
+      };
+
+      virtualisation.oci-containers.containers.alt_anisette_server = {
+        image = "dadoum/anisette-v3-server";
         ports = [
-          "8006:8006"
-          "3389:3389/tcp"
-          "3389:3389/udp"
+          "6969:6969"
         ];
         volumes = [
-          "${vars.storage}/Services/altserver-windows:/storage"
-        ];
-        extraOptions = [
-          "--device=/dev/kvm"
-          "--device=/dev/bus/usb"
-          "--device=/dev/net/tun"
-          "--cap-add=all"
+          "${vars.storage}/Services/anisette:/home/Alcoholic/.config/anisette-v3/lib/"
         ];
       };
     }
