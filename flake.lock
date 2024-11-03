@@ -682,7 +682,7 @@
     "jellyfin-shield": {
       "flake": false,
       "locked": {
-        "narHash": "sha256-VDvUaOO6LmTpmONM9zfOo54QAYC5UPAc8lWwxqfOKiE=",
+        "narHash": "sha256-pvDaBlXx4pl3CyIZ73NYt+/qyTYfIFTz4j5hJo3vKg8=",
         "type": "file",
         "url": "https://img.shields.io/github/v/release/linuxserver/docker-jellyfin.json"
       },
