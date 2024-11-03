@@ -31,7 +31,6 @@
     };
 
     server.enable = true;
-    altserver.enable = true;
     style.enable = true;
 
     backup = {
