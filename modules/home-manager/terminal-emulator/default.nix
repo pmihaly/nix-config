@@ -1,8 +1,8 @@
 {
   pkgs,
-  inputs,
   lib,
   config,
+  inputs,
   ...
 }:
 
@@ -19,9 +19,7 @@ in
     programs.wezterm = {
       enable = true;
       enableZshIntegration = false; # adds weird env vars into terminal inside nvim
-      package =
-        warn "TODO wezterm check https://github.com/NixOS/nixpkgs/issues/336069"
-          inputs.nixpkgs-working-wezterm.legacyPackages.${pkgs.system}.wezterm;
+      package = inputs.wezterm.packages.${pkgs.system}.default;
       extraConfig = ''
         local wezterm = require 'wezterm'
 
@@ -31,7 +29,6 @@ in
         config.window_close_confirmation = 'NeverPrompt'
         config.window_decorations = 'RESIZE'
         config.audible_bell = 'Disabled'
-        config.enable_wayland = false
         config.window_padding = {
           left = 150,
           right = 150,
