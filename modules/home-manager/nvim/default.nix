@@ -21,7 +21,7 @@ in
       ".config/github-copilot"
     ];
 
-    programs.zsh.localVariables.EDITOR = "${config.programs.nixvim.finalPackage}/bin/nvim";
+    programs.zsh.localVariables.EDITOR = "${config.programs.nixvim.build.package}/bin/nvim";
 
     programs.nixvim = {
       enable = true;
@@ -174,14 +174,14 @@ in
           };
           servers = {
             pyright.enable = true;
-            ts-ls.enable = true;
+            ts_ls.enable = true;
             dockerls.enable = true;
-            docker-compose-language-service.enable = true;
+            docker_compose_language_service.enable = true;
             yamlls.enable = true;
             jsonls.enable = true;
-            nil-ls.enable = true;
+            nil_ls.enable = true;
             gopls.enable = true;
-            emmet-ls.enable = true;
+            emmet_ls.enable = true;
             nushell.enable = true;
           };
         };

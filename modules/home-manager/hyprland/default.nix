@@ -16,7 +16,7 @@ in
   config = mkIf cfg.enable {
     home.packages = with pkgs; [
       wl-clipboard # `wl-copy` and `wl-paste`
-      cinnamon.nemo
+      nemo
     ];
 
     programs.rofi = {
