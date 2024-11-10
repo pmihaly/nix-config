@@ -27,7 +27,7 @@ in
 
         config.enable_tab_bar = false
         config.window_close_confirmation = 'NeverPrompt'
-        config.window_decorations = 'RESIZE'
+        config.window_decorations = 'NONE'
         config.audible_bell = 'Disabled'
         config.window_padding = {
           left = 150,
