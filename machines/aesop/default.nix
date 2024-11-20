@@ -9,6 +9,7 @@
   imports = [
     ../../use-cases
     ../../modules/nixos
+    ../../modules-v2/nixos
     ./hardware.nix
   ];
 
@@ -29,6 +30,23 @@
     music-production.enable = true;
     dev.enable = true;
     style.enable = true;
+
+    backup = with config.home-manager.users.${vars.username}; {
+      enable = true;
+      machineId = "aesop";
+      include = [
+        xdg.dataHome
+        xdg.stateHome
+        xdg.userDirs.music
+        xdg.userDirs.pictures
+        xdg.userDirs.videos
+        "${home.homeDirectory}/personaldev"
+      ];
+      exclude = [
+        "${xdg.dataHome}/Steam"
+      ];
+      timer = "hourly";
+    };
   };
 
   home-manager.users.${vars.username}.home.stateVersion = "22.05";
