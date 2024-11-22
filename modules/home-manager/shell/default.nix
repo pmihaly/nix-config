@@ -53,6 +53,10 @@ in
     programs.nushell = {
       enable = true;
       shellAliases = (bookmarksToAliases cfg.bookmarks);
+      extraConfig = ''
+        plugin add ${getExe pkgs.nushellPlugins.polars}
+        plugin use polars
+      '';
     };
     programs.starship.enableNushellIntegration = true;
     programs.yazi.enableNushellIntegration = true;
@@ -194,7 +198,7 @@ in
             n = "nvim";
             sharedir = "${pkgs.python3}/bin/python3 -m http.server 9000";
             yt-dlp = "nix run nixpkgs#yt-dlp --"; # always use the latest yt-dlp to mitigate 403 errors from youtube
-            ncdu = "${pkgs.ncdu} --color=dark -t8"; # ncurses disk usage (with colors and 8 threads)
+            ncdu = "${getExe pkgs.ncdu} --color=dark -t8"; # ncurses disk usage (with colors and 8 threads)
           }
         ]
       );
