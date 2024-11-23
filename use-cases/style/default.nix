@@ -100,10 +100,6 @@ in
       (optionalAttrs platform.isLinux {
         targets = {
           console.enable = true;
-          grub = {
-            enable = true;
-            useImage = true;
-          };
         };
       })
     ];
