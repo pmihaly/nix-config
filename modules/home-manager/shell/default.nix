@@ -58,7 +58,7 @@ in
         plugin use polars
       '';
     };
-    programs.starship.enableNushellIntegration = true;
+    programs.starship.enableNushellIntegration = false; # prompt from stylix
     programs.yazi.enableNushellIntegration = true;
     programs.direnv.enableNushellIntegration = true;
 

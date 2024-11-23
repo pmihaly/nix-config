@@ -16,60 +16,63 @@ in
     enable = mkEnableOption "style";
   };
   config = mkIf cfg.enable {
+    home-manager.users.${vars.username} = {
+      programs.nixvim.colorschemes.nord.enable = true;
 
-    home-manager.users.${vars.username} = mkMerge [
+      programs.newsboat.extraConfig =
+        (builtins.readFile (
+          pkgs.fetchFromGitHub {
+            owner = "catppuccin";
+            repo = "newsboat";
+            rev = "be3d0ee1ba0fc26baf7a47c2aa7032b7541deb0f";
+            hash = "sha256-czvR3bVZ0NfBmuu0JixalS7B1vf1uEGSTSUVVTclKxI=";
+          }
+          + /themes/dark
+        ))
+        + ''
+          color listfocus          default color0 bold
+          color listfocus_unread   color2  color0 bold
+        '';
 
-      (optionalAttrs platform.isLinux {
-        gtk = {
-          enable = true;
-          iconTheme = {
-            name = "Papirus";
-            package = pkgs.catppuccin-papirus-folders.override {
-              accent = "mauve";
-              flavor = "frappe";
-            };
-          };
+      programs.vscode = {
+        extensions = [ pkgs.vscode-extensions.catppuccin.catppuccin-vsc-icons ];
+        userSettings = {
+          "workbench.iconTheme" = "catppuccin-frappe";
         };
-      })
+      };
 
-      {
-
-        programs.nixvim.colorschemes.catppuccin = {
-          enable = true;
-          settings = {
-            flavour = "frappe";
-            transparent_background = true;
+      stylix = {
+        enable = true;
+        autoEnable = false;
+        image = ../../wallpaper.png;
+        base16Scheme = "${pkgs.base16-schemes}/share/themes/nord.yaml";
+        # https://stylix.danth.me/?search=
+        targets = {
+          firefox = {
+            enable = true;
+            profileNames = [ "misi" ];
           };
+          yazi.enable = true;
+          zathura.enable = true;
+          wezterm.enable = true;
+          rofi.enable = true;
+          nushell.enable = true;
+          fzf.enable = true;
+          btop.enable = true;
+          tmux.enable = true;
+          bat.enable = true;
+          gtk.enable = true;
+          vscode.enable = true;
         };
-
-        programs.newsboat.extraConfig =
-          (builtins.readFile (
-            pkgs.fetchFromGitHub {
-              owner = "catppuccin";
-              repo = "newsboat";
-              rev = "be3d0ee1ba0fc26baf7a47c2aa7032b7541deb0f";
-              hash = "sha256-czvR3bVZ0NfBmuu0JixalS7B1vf1uEGSTSUVVTclKxI=";
-            }
-            + /themes/dark
-          ))
-          + ''
-            color listfocus          default color0 bold
-            color listfocus_unread   color2  color0 bold
-          '';
-      }
-
-    ];
+      };
+    };
 
     stylix = mkMerge [
       {
         enable = true;
-        autoEnable = true;
+        autoEnable = false;
         image = ../../wallpaper.png;
-        base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-frappe.yaml";
-
-        targets = {
-          nixvim.enable = false;
-        };
+        base16Scheme = "${pkgs.base16-schemes}/share/themes/nord.yaml";
 
         fonts = {
           emoji = {
@@ -93,6 +96,16 @@ in
           };
         };
       }
+
+      (optionalAttrs platform.isLinux {
+        targets = {
+          console.enable = true;
+          grub = {
+            enable = true;
+            useImage = true;
+          };
+        };
+      })
     ];
   };
 }

@@ -19,7 +19,6 @@ in
       enableExtensionUpdateCheck = false;
       enableUpdateCheck = false;
       extensions = with pkgs.vscode-extensions; [
-        catppuccin.catppuccin-vsc-icons
         eamodio.gitlens
         asvetliakov.vscode-neovim
         esbenp.prettier-vscode
@@ -32,7 +31,6 @@ in
         }
       ];
       userSettings = {
-        "workbench.iconTheme" = "catppuccin-frappe";
         "editor.fontLigatures" = true;
         "editor.cursorSmoothCaretAnimation" = "on";
         "editor.smoothScrolling" = true;
