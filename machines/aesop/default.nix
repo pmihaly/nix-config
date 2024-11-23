@@ -49,7 +49,13 @@
     };
   };
 
-  home-manager.users.${vars.username}.home.stateVersion = "22.05";
+  home-manager.users.${vars.username} = {
+    home.stateVersion = "22.05";
+    programs.firefox.profiles.misi = {
+      extensions = [ pkgs.nur.repos.rycee.firefox-addons.cookies-txt ];
+      userChrome = lib.mkForce "";
+    };
+  };
 
   users.mutableUsers = false;
   users.users.${vars.username} = {
