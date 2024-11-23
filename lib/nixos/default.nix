@@ -31,12 +31,7 @@ let
       extraConfig
     ];
   getDockerVersionFromShield =
-    githubTags:
-    lib.trivial.pipe githubTags [
-      builtins.readFile
-      builtins.fromJSON
-      (builtins.getAttr "value")
-    ];
+    githubTags: githubTags |> builtins.readFile |> builtins.fromJSON |> (builtins.getAttr "value");
 in
 {
   inherit mkService getDockerVersionFromShield;

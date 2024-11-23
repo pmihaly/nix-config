@@ -30,13 +30,13 @@ in
         homer =
           let
 
-            logoVolumes = trivial.pipe cfg.services [
-              builtins.attrValues
-              (map builtins.attrValues)
-              lists.flatten
-              (map (service: service.logo))
-              (map (logo: "${logo}:/www/assets${logo}"))
-            ];
+            logoVolumes =
+              cfg.services
+              |> builtins.attrValues
+              |> (map builtins.attrValues)
+              |> lists.flatten
+              |> (map (service: service.logo))
+              |> (map (logo: "${logo}:/www/assets${logo}"));
 
             mappedServices = lib.mapAttrsToList (groupName: groupData: {
               name = groupName;
