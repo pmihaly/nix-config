@@ -93,10 +93,11 @@ in
             new_optimizations = true;
           };
 
-          drop_shadow = true;
-          shadow_range = 80;
-          shadow_render_power = 3;
-          # "col.shadow" = "rgba($crustAlpha80)";
+          shadow = {
+            enabled = true;
+            range = 80;
+            render_power = 3;
+          };
         };
 
         animations = {
