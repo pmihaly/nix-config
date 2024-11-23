@@ -3,14 +3,14 @@
     "aerospace-zip": {
       "flake": false,
       "locked": {
-        "lastModified": 1723673641,
-        "narHash": "sha256-+29D2nZa+kcB/yG4U5UNRxKmDZbxRY5WDWazuuGbRCE=",
+        "lastModified": 1728844116,
+        "narHash": "sha256-jOSUtVSiy/S4nsgvfZZqZjxsppqNi90edn8rcTa+pFQ=",
         "type": "tarball",
-        "url": "https://github.com/nikitabobko/AeroSpace/releases/download/v0.14.2-Beta/AeroSpace-v0.14.2-Beta.zip"
+        "url": "https://github.com/nikitabobko/AeroSpace/releases/download/v0.15.2-Beta/AeroSpace-v0.15.2-Beta.zip"
       },
       "original": {
         "type": "tarball",
-        "url": "https://github.com/nikitabobko/AeroSpace/releases/download/v0.14.2-Beta/AeroSpace-v0.14.2-Beta.zip"
+        "url": "https://github.com/nikitabobko/AeroSpace/releases/download/v0.15.2-Beta/AeroSpace-v0.15.2-Beta.zip"
       }
     },
     "agenix": {
