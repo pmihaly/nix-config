@@ -20,25 +20,26 @@ in
       enable = true;
       enableZshIntegration = false; # adds weird env vars into terminal inside nvim
       package = inputs.wezterm.packages.${pkgs.system}.default;
-      extraConfig = concatStringsSep "\n" [''
-        local wezterm = require 'wezterm'
+      extraConfig = concatStringsSep "\n" [
+        ''
+          local wezterm = require 'wezterm'
 
-        local config = wezterm.config_builder()
+          local config = wezterm.config_builder()
 
-        config.enable_tab_bar = false
-        config.window_close_confirmation = 'NeverPrompt'
-        config.audible_bell = 'Disabled'
-        config.window_padding = {
-          left = 150,
-          right = 150,
-          top = 5,
-          bottom = 5,
-        }
+          config.enable_tab_bar = false
+          config.window_close_confirmation = 'NeverPrompt'
+          config.audible_bell = 'Disabled'
+          config.window_padding = {
+            left = 150,
+            right = 150,
+            top = 5,
+            bottom = 5,
+          }
 
-        config.font = wezterm.font_with_fallback({
-          { family = "Comic Code Ligatures", weight = "DemiBold" },
-          "Noto Color Emoji",
-        })''
+          config.font = wezterm.font_with_fallback({
+            { family = "Comic Code Ligatures", weight = "DemiBold" },
+            "Noto Color Emoji",
+          })''
 
         (
           if pkgs.stdenv.isDarwin then
