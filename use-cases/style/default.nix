@@ -93,13 +93,6 @@ in
           };
         };
       }
-
-      (optionalAttrs platform.isLinux {
-        cursor = {
-          name = "Catppuccin-Frappe-Light-Cursors";
-          package = pkgs.catppuccin-cursors.frappeLight;
-        };
-      })
     ];
   };
 }
