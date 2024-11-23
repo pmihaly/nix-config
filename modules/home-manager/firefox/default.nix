@@ -35,6 +35,7 @@ in
       set searchurls.r   https://old.reddit.com/r/
       set searchurls.r   https://old.reddit.com/r/
       set searchurls.dh  https://hub.docker.com/search?q=
+      set searchurls.map https://www.google.com/maps/search/
 
       blacklistadd excalidraw.com
 
