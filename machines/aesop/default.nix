@@ -95,7 +95,7 @@
       "/var/lib/nixos"
       "/var/lib/systemd/coredump"
     ];
-    files = [ "/etc/machine-id" ];
+    files = [ ];
     users.${vars.username} = {
       files = lib.lists.unique config.home-manager.users.${vars.username}.modules.persistence.files;
       directories = [
