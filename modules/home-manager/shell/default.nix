@@ -80,26 +80,25 @@ in
     programs.starship = {
       enable = true;
       enableZshIntegration = true;
-      settings =
-        {
-          add_newline = false;
-          format = lib.concatStrings [
-            " "
-            "$directory"
-            "$shell"
-          ];
-          scan_timeout = 10;
-          directory = {
-            truncation_length = 2;
-            style = "bold fg:#b48ead";
-          };
-          shell = {
-            disabled = false;
-            zsh_indicator = "🔮";
-            nu_indicator = "🧮";
-            style = "bold fg:#b48ead";
-          };
+      settings = {
+        add_newline = false;
+        format = lib.concatStrings [
+          " "
+          "$directory"
+          "$shell"
+        ];
+        scan_timeout = 10;
+        directory = {
+          truncation_length = 2;
+          style = "bold fg:#b48ead";
         };
+        shell = {
+          disabled = false;
+          zsh_indicator = "🔮";
+          nu_indicator = "🧮";
+          style = "bold fg:#b48ead";
+        };
+      };
     };
 
     programs.zsh = {
@@ -197,6 +196,7 @@ in
         XDG_STATE_HOME = config.xdg.stateHome;
         XDG_CACHE_HOME = config.xdg.cacheHome;
 
+        MANPAGER = "nvim +Man!";
         AWS_CONFIG_FILE = "${config.xdg.configHome}/aws/config";
         AWS_SHARED_CREDENTIALS_FILE = "${config.xdg.configHome}/aws/credentials";
         CARGO_HOME = "${config.xdg.dataHome}/cargo";
