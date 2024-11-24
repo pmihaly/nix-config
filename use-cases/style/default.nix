@@ -56,7 +56,6 @@ in
           zathura.enable = true;
           wezterm.enable = true;
           rofi.enable = true;
-          nushell.enable = true;
           fzf.enable = true;
           btop.enable = true;
           tmux.enable = true;
