@@ -82,7 +82,6 @@ in
       enableZshIntegration = true;
       settings =
         {
-          palette = "catppuccin_frappe";
           add_newline = false;
           format = lib.concatStrings [
             " "
@@ -92,26 +91,15 @@ in
           scan_timeout = 10;
           directory = {
             truncation_length = 2;
-            style = "bold fg:flamingo";
+            style = "bold fg:#b48ead";
           };
           shell = {
             disabled = false;
             zsh_indicator = "🔮";
             nu_indicator = "🧮";
-            style = "bold fg:flamingo";
+            style = "bold fg:#b48ead";
           };
-        }
-        // builtins.fromTOML (
-          builtins.readFile (
-            pkgs.fetchFromGitHub {
-              owner = "catppuccin";
-              repo = "starship";
-              rev = "5629d2356f62a9f2f8efad3ff37476c19969bd4f";
-              hash = "sha256-nsRuxQFKbQkyEI4TXgvAjcroVdG+heKX5Pauq/4Ota0=";
-            }
-            + /palettes/frappe.toml
-          )
-        );
+        };
     };
 
     programs.zsh = {
