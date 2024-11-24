@@ -28,6 +28,7 @@ optionalAttrs platform.isLinux {
 
     modules = {
       qemu.enable = true;
+      tailscale.enable = true;
     };
 
     services.pipewire = {
