@@ -175,7 +175,7 @@ in
               ' | pbcopy)'';
             dl = "dselect | xargs docker logs -f";
             dex = ''container=$(dselect); docker exec -it "$container" "''${@:-bash}"'';
-            ticket = ''git branch --show-current | grep -oE "[A-Z]+-[0-9]+"'';
+            ticket = ''git branch --show-current | grep -oE "[A-Z]+-[0-9]+" | tr -d "\n"'';
             gut = "git";
             qr = "${pkgs.qrencode}/bin/qrencode -t ansiutf8";
             sr = ''function _f() { fd --type file --exec ${pkgs.sd}/bin/sd "$1" "$2" }; _f'';
