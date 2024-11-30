@@ -152,6 +152,10 @@ in
                   name = "smooooth disco mix II";
                   url = "https://www.youtube.com/watch?v=JF5IYpI6IXA";
                 }
+                {
+                  name = "breakcore ascend to";
+                  url = "https://www.youtube.com/watch?v=gKh5eyGE9fs";
+                }
               ];
             }
           ];
