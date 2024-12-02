@@ -33,7 +33,6 @@ in
       set searchurls.g   https://google.com/search?q=
       set searchurls.ddg https://duckduckgo.com/?q=
       set searchurls.r   https://old.reddit.com/r/
-      set searchurls.r   https://old.reddit.com/r/
       set searchurls.dh  https://hub.docker.com/search?q=
       set searchurls.map https://www.google.com/maps/search/
 
@@ -155,6 +154,10 @@ in
                 {
                   name = "breakcore ascend to";
                   url = "https://www.youtube.com/watch?v=gKh5eyGE9fs";
+                }
+                {
+                  name = "neurofunk dnb";
+                  url = "https://www.youtube.com/watch?v=hqVJpfFkJ9k";
                 }
               ];
             }
