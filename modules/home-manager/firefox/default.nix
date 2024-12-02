@@ -22,19 +22,21 @@ in
 
       set modeindicator false
 
-      set searchurls.nps https://search.nixos.org/packages?channel=unstable&sort=relevance&type=packages&query=
-      set searchurls.nos https://search.nixos.org/options?channel=unstable&sort=relevance&type=packages&query=
-      set searchurls.hos https://home-manager-options.extranix.com/?release=master&query=
-      set searchurls.nog https://noogle.dev/q?term=
+      set searchurls.nps   https://search.nixos.org/packages?channel=unstable&sort=relevance&type=packages&query=
+      set searchurls.nos   https://search.nixos.org/options?channel=unstable&sort=relevance&type=packages&query=
+      set searchurls.hos   https://home-manager-options.extranix.com/?release=master&query=
+      set searchurls.nog   https://noogle.dev/q?term=
 
-      set searchurls.ys  https://youtube.com/results?search_query=
-      set searchurls.y   https://youtube.com/feed/subscriptions
+      set searchurls.ys    https://youtube.com/results?search_query=
+      set searchurls.y     https://youtube.com/feed/subscriptions
 
-      set searchurls.g   https://google.com/search?q=
-      set searchurls.ddg https://duckduckgo.com/?q=
-      set searchurls.r   https://old.reddit.com/r/
-      set searchurls.dh  https://hub.docker.com/search?q=
-      set searchurls.map https://www.google.com/maps/search/
+      set searchurls.g     https://google.com/search?q=
+      set searchurls.ddg   https://duckduckgo.com/?q=
+      set searchurls.r     https://old.reddit.com/r/
+      set searchurls.dh    https://hub.docker.com/search?q=
+      set searchurls.map   https://www.google.com/maps/search/
+      set searchurls.route https://www.google.com/maps/dir/?api=1&travelmode=transit&destination=
+
 
       blacklistadd excalidraw.com
 
