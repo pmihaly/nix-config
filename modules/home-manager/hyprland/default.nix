@@ -19,6 +19,13 @@ in
       nemo
     ];
 
+    services.gammastep = {
+      enable = true;
+      provider = "manual";
+      latitude = 47.4979;
+      longitude = 19.0402;
+    };
+
     programs.rofi = {
       enable = true;
       package = pkgs.rofi-wayland;
