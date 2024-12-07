@@ -78,6 +78,16 @@ in
           name = "misi";
           bookmarks = [
             {
+              name = "selfhosting";
+              toolbar = true;
+              bookmarks = [
+                {
+                  name = "skylake";
+                  url = "http://skylake";
+                }
+              ];
+            }
+            {
               name = "munsik";
               toolbar = true;
               bookmarks = [
