@@ -196,7 +196,7 @@ in
           };
           settings =
             let
-              tinkeringWithUserChrome = {
+              tinkeringWithUserChrome = { # open with opt+shift+cmd+i
                 "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
                 "devtools.debugger.remote-enabled" = true;
                 "devtools.chrome.enabled" = true;
@@ -252,6 +252,7 @@ in
             }
             toolbar {
               height: 0px !important;
+              visibility: collapse !important;
             }
 
             #tabbrowser-tabs {
