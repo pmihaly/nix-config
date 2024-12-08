@@ -34,6 +34,13 @@ in
         "/var/lib/sonarr/.config/NzbDrone"
         "/var/lib/radarr/.config/Radarr"
       ];
+
+      nixpkgs.config.permittedInsecurePackages = trivial.warn "check https://github.com/NixOS/nixpkgs/issues/360592" [
+        "aspnetcore-runtime-6.0.36"
+        "aspnetcore-runtime-wrapped-6.0.36"
+        "dotnet-sdk-6.0.428"
+        "dotnet-sdk-wrapped-6.0.428"
+      ];
     }
 
     (mkService {
