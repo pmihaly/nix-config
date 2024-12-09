@@ -48,6 +48,7 @@ in
       pup # jq for html
       dog # dns client
       gotify-cli
+      nvd # nix version diff
     ];
 
     programs.nushell = {
@@ -156,7 +157,8 @@ in
             o = "cd ~/Sync/org";
             on = ''o && (fd "^.*.org$" | fzf | xargs nvim)'';
             ld = "${pkgs.lazydocker}/bin/lazydocker";
-            ns = cfg.rebuildSwitch;
+            nixprevdiff = "${getExe pkgs.nvd} diff /nix/var/nix/profiles/system-$(sudo nix-env --list-generations --profile /nix/var/nix/profiles/system | tail -n2 | head -n1 | ${getExe pkgs.choose} 0)-link /nix/var/nix/profiles/system";
+            ns = cfg.rebuildSwitch + "; nixprevdiff";
             nr = "sudo nix-store --verify --check-contents --repair";
             ncg = "sudo nix-collect-garbage --delete-old";
             nsh = "function _f() { nix-shell -p $* --run zsh }; _f";
@@ -187,7 +189,7 @@ in
             yt-dlp = "nix run nixpkgs#yt-dlp --"; # always use the latest yt-dlp to mitigate 403 errors from youtube
             ncdu = "${getExe pkgs.ncdu} --color=dark -t8"; # ncurses disk usage (with colors and 8 threads)
             jd = "${pkgs.nodePackages_latest.json-diff}/bin/json-diff";
-          }
+            }
         ]
       );
 
