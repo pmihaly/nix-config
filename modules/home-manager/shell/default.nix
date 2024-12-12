@@ -47,7 +47,6 @@ in
       choose # frendlier cut
       pup # jq for html
       dog # dns client
-      gotify-cli
       nvd # nix version diff
     ];
 
