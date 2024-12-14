@@ -29,12 +29,7 @@ in
     };
 
     home.packages = with pkgs; [
-      httpie
-      # curlie # httpie but with --curl
       tldr
-      yq-go
-      jq
-      jiq # interactive jq
       wget
       scrub # delete files securely
       gum # pretty shell scripts
@@ -188,6 +183,7 @@ in
             yt-dlp = "nix run nixpkgs#yt-dlp --"; # always use the latest yt-dlp to mitigate 403 errors from youtube
             ncdu = "${getExe pkgs.ncdu} --color=dark -t8"; # ncurses disk usage (with colors and 8 threads)
             jd = "${pkgs.nodePackages_latest.json-diff}/bin/json-diff";
+            http = getExe pkgs.curlie;
             }
         ]
       );
