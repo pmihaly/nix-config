@@ -168,8 +168,8 @@ in
                   url = "https://www.youtube.com/watch?v=gKh5eyGE9fs";
                 }
                 {
-                  name = "neurofunk dnb";
-                  url = "https://www.youtube.com/watch?v=hqVJpfFkJ9k";
+                  name = "rare breakcore mix";
+                  url = "https://www.youtube.com/watch?v=6niPi2bTmoU";
                 }
               ];
             }
