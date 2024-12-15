@@ -11,6 +11,19 @@ let
   bookmarksToAliases = attrsets.mapAttrs' (
     name: value: attrsets.nameValuePair "g${name}" "cd ${value}"
   );
+  is-up = pkgs.writeScriptBin "is-up" ''
+    #! ${getExe pkgs.nushell}
+    def main [
+      service: string # the service to check
+    ] -> bool {
+      ${getExe pkgs.tailscale} status --json
+        | from json
+        | get Peer
+        | values
+        | where {$service in $in.DNSName}
+        | $in.0.Online
+      }
+  '';
 in
 {
   options.modules.shell = {
@@ -184,6 +197,7 @@ in
             ncdu = "${getExe pkgs.ncdu} --color=dark -t8"; # ncurses disk usage (with colors and 8 threads)
             jd = "${pkgs.nodePackages_latest.json-diff}/bin/json-diff";
             http = getExe pkgs.curlie;
+            is-up = getExe is-up;
             }
         ]
       );
