@@ -28,7 +28,7 @@ in
       ".local/share/PolyMC"
     ];
 
-    home.packages = [ pkgs.temurin-jre-bin-17 ];
+    home.packages = [ pkgs.temurin-jre-bin-21 ];
 
     xdg.desktopEntries.minecraft = {
       name = "Minecraft";
