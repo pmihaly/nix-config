@@ -2,30 +2,6 @@
   (final: prev: {
     nerdfonts-fira-code = prev.nerdfonts.override { fonts = [ "FiraCode" ]; };
 
-    comic-code = (
-      prev.stdenvNoCC.mkDerivation rec {
-        pname = "Comic-Code-Font";
-        version = "bb13a9d007b7a102ac86b18889bbf830680aeab1";
-
-        src = prev.fetchFromGitHub {
-          owner = "Mr-Coxall";
-          repo = pname;
-          rev = version;
-          hash = "sha256-ODp7Kl/F7lWeaQpReMLwuJKGd4YxXLb4+5XL2BtU6t0=";
-        };
-
-        installPhase = ''
-          runHook preInstall
-
-          mkdir -p $out/share/fonts
-
-          mv *.otf $out/share/fonts
-
-          runHook postInstall
-        '';
-      }
-    );
-
     hanken-grotesk = (
       prev.stdenvNoCC.mkDerivation rec {
         pname = "hanken-grotesk";

@@ -80,8 +80,8 @@ in
           };
 
           monospace = {
-            name = "Comic Code Ligatures";
-            package = pkgs.comic-code;
+            name = "Monocraft";
+            package = pkgs.monocraft;
           };
 
           sansSerif = {

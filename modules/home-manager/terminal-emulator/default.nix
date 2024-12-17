@@ -37,7 +37,7 @@ in
           }
 
           config.font = wezterm.font_with_fallback({
-            { family = "Comic Code Ligatures", weight = "DemiBold" },
+            { family = "Monocraft" },
             "Noto Color Emoji",
           })''
 
