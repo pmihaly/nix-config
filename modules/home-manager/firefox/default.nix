@@ -196,7 +196,8 @@ in
           };
           settings =
             let
-              tinkeringWithUserChrome = { # open with opt+shift+cmd+i
+              tinkeringWithUserChrome = {
+                # open with opt+shift+cmd+i
                 "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
                 "devtools.debugger.remote-enabled" = true;
                 "devtools.chrome.enabled" = true;

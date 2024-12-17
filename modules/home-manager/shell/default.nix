@@ -198,7 +198,7 @@ in
             jd = "${pkgs.nodePackages_latest.json-diff}/bin/json-diff";
             http = getExe pkgs.curlie;
             is-up = getExe is-up;
-            }
+          }
         ]
       );
 
