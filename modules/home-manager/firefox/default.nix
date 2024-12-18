@@ -39,6 +39,7 @@ in
       set searchurls.r     https://old.reddit.com/r/
       set searchurls.dh    https://hub.docker.com/search?q=
       set searchurls.map   https://www.google.com/maps/search/
+      set searchurls.maps  https://www.google.com/maps/search/
       set searchurls.route https://www.google.com/maps/dir/?api=1&travelmode=transit&destination=
 
 
