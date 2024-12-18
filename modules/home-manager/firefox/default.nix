@@ -12,6 +12,10 @@ in
 {
   options.modules.firefox = {
     enable = mkEnableOption "firefox";
+    hintchars = mkOption {
+      type = types.str;
+      default = "jfkdls;a";
+    };
   };
   config = mkIf cfg.enable {
 
@@ -60,6 +64,9 @@ in
       setnull searchurls.wikipedia
       setnull searchurls.yahoo
       setnull searchurls.youtube
+
+      set hintchars ${cfg.hintchars}
+      set hintnames uniform
     '';
 
     programs.firefox = {
