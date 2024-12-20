@@ -25,7 +25,10 @@
         }
       ];
     };
-    gui.enable = true;
+    gui = {
+      enable = true;
+      browser-hintchars = "tnseriao";
+    };
     gaming.enable = true;
     music-production.enable = true;
     dev.enable = true;

@@ -14,7 +14,6 @@ in
     enable = mkEnableOption "firefox";
     hintchars = mkOption {
       type = types.str;
-      default = "jfkdls;a";
     };
   };
   config = mkIf cfg.enable {

@@ -12,7 +12,10 @@
       };
     };
 
-    gui.enable = true;
+    gui = {
+      enable = true;
+      browser-hintchars = "jfkdls;a";
+    };
     style.enable = true;
   };
 

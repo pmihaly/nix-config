@@ -15,6 +15,9 @@ in
 {
   options.modules.gui = {
     enable = mkEnableOption "gui";
+    browser-hintchars = mkOption {
+      type = types.str;
+    };
   };
 
   imports = [
@@ -36,7 +39,10 @@ in
             "Documents"
             "Videos"
           ];
-          firefox.enable = true;
+          firefox = {
+            enable = true;
+            hintchars = cfg.browser-hintchars;
+          };
           mpv.enable = true;
           terminal-emulator.enable = true;
           newsboat.enable = true;
