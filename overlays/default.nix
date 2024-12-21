@@ -1,7 +1,5 @@
 [
   (final: prev: {
-    nerdfonts-fira-code = prev.nerdfonts.override { fonts = [ "FiraCode" ]; };
-
     hanken-grotesk = (
       prev.stdenvNoCC.mkDerivation rec {
         pname = "hanken-grotesk";
@@ -24,53 +22,6 @@
         '';
       }
     );
-
-    iosevka-custom = prev.iosevka.override {
-      privateBuildPlan = ''
-        [buildPlans.Iosevka-custom]
-        family = "Iosevka Custom"
-        spacing = "fontconfig-mono"
-        serifs = "slab"
-        noCvSs = true
-        exportGlyphNames = true
-
-          [buildPlans.Iosevka-custom.ligations]
-          inherits = "dlig"
-
-        [buildPlans.Iosevka-custom.weights.regular]
-        shape = 400
-        menu = 400
-        css = 400
-
-        [buildPlans.Iosevka-custom.weights.bold]
-        shape = 700
-        menu = 700
-        css = 700
-
-        [buildPlans.Iosevka-custom.weights.extrabold]
-        shape = 800
-        menu = 800
-        css = 800
-
-        [buildPlans.Iosevka-custom.weights.heavy]
-        shape = 900
-        menu = 900
-        css = 900
-
-        [buildPlans.Iosevka-custom.slopes.upright]
-        angle = 0
-        shape = "upright"
-        menu = "upright"
-        css = "normal"
-
-        [buildPlans.Iosevka-custom.slopes.italic]
-        angle = 9.4
-        shape = "italic"
-        menu = "italic"
-        css = "italic"
-      '';
-      set = "-custom";
-    };
 
     keepassxc =
       if !prev.stdenv.isDarwin then
