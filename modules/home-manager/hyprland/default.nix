@@ -178,8 +178,8 @@ in
           "$mainMod, u, workspace, 8"
           "$mainMod, y, workspace, 9"
 
-          "$mainMod CONTROL, m, movetoworkspace, 1"
-          "$mainMod CONTROL, n, movetoworkspace, 2"
+          "$mainMod CONTROL, m, movetoworkspace, 2"
+          "$mainMod CONTROL, n, movetoworkspace, 1" # first workspace is n
           "$mainMod CONTROL, e, movetoworkspace, 3"
           "$mainMod CONTROL, i, movetoworkspace, 4"
           "$mainMod CONTROL, o, movetoworkspace, 5"
