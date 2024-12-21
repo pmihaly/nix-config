@@ -83,16 +83,17 @@ in
         general = {
           gaps_in = 10;
           gaps_out = 40;
-          border_size = 0;
-          # "col.active_border" = "$crust";
-          # "col.inactive_border" = "$crust";
           allow_tearing = true;
+          border_size = 3;
+
+          "col.active_border" = "gradient(rgb(d8dee9) rgb(3b4252) rgb(81a1c1) 45deg)";
+          "col.inactive_border" = "gradient(rgb(d8dee9) rgb(3b4252) rgb(81a1c1) 45deg)";
 
           layout = "dwindle";
         };
 
         decoration = {
-          rounding = 15;
+          rounding = 20;
           blur = {
             enabled = true;
             size = 10;
@@ -102,8 +103,11 @@ in
 
           shadow = {
             enabled = true;
-            range = 80;
-            render_power = 3;
+            range = 300;
+            render_power = 4;
+            offset = "0 40";
+            color = "rgba(1a1a1aff)";
+            scale = 0.9;
           };
         };
 
