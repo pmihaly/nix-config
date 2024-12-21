@@ -22,7 +22,6 @@
     home.stateVersion = "22.05";
 
     modules = {
-      discord.enable = true;
       vscode.enable = true;
     };
 
