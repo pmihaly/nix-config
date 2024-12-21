@@ -17,6 +17,7 @@ in
     enable = mkEnableOption "gui";
     browser-hintchars = mkOption {
       type = types.str;
+      default = "jfkdls;a";
     };
   };
 
