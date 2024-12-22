@@ -30,7 +30,7 @@ in
       enable = true;
       package = pkgs.rofi-wayland;
       plugins = with pkgs; [
-        rofi-emoji
+        rofi-emoji-wayland
         rofi-calc
       ];
       extraConfig = {
