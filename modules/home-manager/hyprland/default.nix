@@ -87,7 +87,7 @@ in
           border_size = 2;
 
           "col.active_border" = "gradient(rgb(d8dee9) rgb(3b4252) rgb(81a1c1) 45deg)";
-          "col.inactive_border" = "gradient(rgb(d8dee9) rgb(3b4252) rgb(81a1c1) 45deg)";
+          "col.inactive_border" = "gradient(rgb(d8dee9) rgb(3b4252) 45deg)";
 
           layout = "dwindle";
         };
