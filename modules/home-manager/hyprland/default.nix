@@ -60,7 +60,7 @@ in
           "DP-1, 2560x1440@144, 0x0, 1"
           "HDMI-A-1, 1920x1080, 2560x0, 1"
         ];
-        "exec-once" = "${pkgs.swaybg}/bin/swaybg --image ~/.nix-config/wallpaper.png";
+        "exec-once" = "${getExe pkgs.swaybg} --image ${../../../wallpaper.png}";
         env = [
           "XCURSOR_SIZE,24"
           "WLR_DRM_NO_ATOMIC,1"
