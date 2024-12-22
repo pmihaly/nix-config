@@ -19,6 +19,10 @@ in
       type = types.str;
       default = "jfkdls;a";
     };
+    terminal-font-size = mkOption {
+      type = types.str;
+      default = "12.0";
+    };
   };
 
   imports = [
@@ -45,7 +49,10 @@ in
             hintchars = cfg.browser-hintchars;
           };
           mpv.enable = true;
-          terminal-emulator.enable = true;
+          terminal-emulator = {
+            enable = true;
+            font-size = cfg.terminal-font-size;
+          };
           newsboat.enable = true;
           neomutt.enable = true;
           zathura.enable = true;

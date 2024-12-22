@@ -14,6 +14,10 @@ in
   options.modules.terminal-emulator = {
     enable = mkEnableOption "terminal-emulator";
     binary = mkOption { type = types.str; };
+    font-size = mkOption {
+      type = types.str;
+      default = "12.0";
+    };
   };
   config = mkIf cfg.enable {
     programs.wezterm = {
@@ -39,7 +43,10 @@ in
           config.font = wezterm.font_with_fallback({
             { family = "Monocraft" },
             "Noto Color Emoji",
-          })''
+          })
+
+          config.font_size = ${cfg.font-size};
+        ''
 
         (
           if pkgs.stdenv.isDarwin then
