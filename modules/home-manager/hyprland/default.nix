@@ -160,7 +160,7 @@ in
           "$mainMod, R, exec, hyprctl reload"
           "$mainMod, F, fullscreen"
           "$mainMod, W, exec, firefox"
-          "$mainMod, A, exec, wezterm ${pkgs.pulsemixer}/bin/pulsemixer"
+          "$mainMod, A, exec, wezterm cli spawn --new-window ${getExe pkgs.pulsemixer}"
 
           "$mainMod, k, cyclenext"
           "$mainMod, h, cyclenext, prev"
