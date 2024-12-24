@@ -389,6 +389,14 @@ in
             noremap = true;
           };
         }
+        {
+          mode = [ "v" ];
+          key = "=";
+          action = "=gv";
+          options = {
+            noremap = true;
+          };
+        }
 
         {
           mode = [ "v" ];
