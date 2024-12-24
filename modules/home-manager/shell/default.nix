@@ -192,6 +192,8 @@ in
             ncdu = "${getExe pkgs.ncdu} --color=dark -t8"; # ncurses disk usage (with colors and 8 threads)
             jd = "${pkgs.nodePackages_latest.json-diff}/bin/json-diff";
             http = getExe pkgs.curlie;
+            # current full year, weeks starting with Monday
+            cal = "cal $(date +%Y)";
           }
         ]
       );
