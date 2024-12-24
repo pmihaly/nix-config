@@ -659,7 +659,7 @@
     "immich-shield": {
       "flake": false,
       "locked": {
-        "narHash": "sha256-Bqne11QoGbYEdh0rycV/JmFH81DzfI1XLgi9d/0XZUk=",
+        "narHash": "sha256-/3LaickAgUs5TqL7sDdXa3KF4RqbQlx9iGuYvmsM1Eo=",
         "type": "file",
         "url": "https://img.shields.io/github/v/release/immich-app/immich.json"
       },
@@ -714,7 +714,7 @@
     "jellyfin-shield": {
       "flake": false,
       "locked": {
-        "narHash": "sha256-GKEDm4wimZo1q9kv91KnVaKXEZV4yvw4RALgjz2jMjo=",
+        "narHash": "sha256-/CWSWpZIbblUGfLi1tMUrNqT3meUlykFmnIzgzf/aPY=",
         "type": "file",
         "url": "https://img.shields.io/github/v/release/linuxserver/docker-jellyfin.json"
       },
