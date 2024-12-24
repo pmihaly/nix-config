@@ -79,7 +79,7 @@ in
           allow_tearing = true;
           border_size = 1;
 
-          "col.active_border" = "rgb(3b4252) rgb(81a1c1) 45deg";
+          "col.active_border" = "rgb(3b4252) rgb(81a1c1) rgb(3b4252) 135deg";
           "col.inactive_border" = "rgb(3b4252) 45deg";
 
           layout = "dwindle";
