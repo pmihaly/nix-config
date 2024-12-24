@@ -13,7 +13,18 @@ in
 {
   options.modules.terminal-emulator = {
     enable = mkEnableOption "terminal-emulator";
-    binary = mkOption { type = types.str; };
+    binary = mkOption {
+      type = types.str;
+      default = getExe pkgs.wezterm;
+    };
+    name-in-shell = mkOption {
+      type = types.str;
+      default = "wezterm";
+    };
+    new-window-with-commad = mkOption {
+      type = types.str;
+      default = "wezterm cli spawn --new-window";
+    };
     font-size = mkOption {
       type = types.str;
       default = "12.0";

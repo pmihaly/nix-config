@@ -165,7 +165,7 @@ optionalAttrs platform.isDarwin {
           in
           workspaceBinds
           // {
-            "alt-enter" = "exec-and-forget ${pkgs.wezterm}/bin/wezterm";
+            "alt-enter" = "exec-and-forget ${config.home-manager.users.${vars.username}.modules.terminal-emulator.binary}";
             "alt-slash" = "mode service";
 
             "alt-n" = "focus left";

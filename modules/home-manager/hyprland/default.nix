@@ -31,21 +31,14 @@ in
       package = pkgs.rofi-wayland;
       plugins = with pkgs; [
         rofi-emoji-wayland
-        rofi-calc
       ];
       extraConfig = {
         icon-theme = "Papirus";
         show-icons = true;
-        terminal = "wezterm";
+        terminal = config.modules.terminal-emulator.binary;
         drun-display-format = "{icon} {name}";
         location = 0;
-        disable-history = false;
         hide-scrollbar = true;
-        display-drun = "   Apps ";
-        display-run = "   Run ";
-        display-window = "   Window";
-        display-Network = " 󰤨  Network";
-        sidebar-mode = true;
       };
     };
 
@@ -152,15 +145,14 @@ in
         ];
 
         bind = [
-          "$mainMod, T, exec, wezterm"
+          "$mainMod, T, exec, ${config.modules.terminal-emulator.name-in-shell}"
           "$mainMod, Q, killactive,"
           "$mainMod, SPACE, exec, rofi -show drun"
-          "$mainMod, c, exec, rofi -show calc -modi calc -no-show-match -no-sort"
           "$mainMod, x, exec, rofi -modi emoji -show emoji"
           "$mainMod, R, exec, hyprctl reload"
           "$mainMod, F, fullscreen"
           "$mainMod, W, exec, firefox"
-          "$mainMod, A, exec, wezterm cli spawn --new-window ${getExe pkgs.pulsemixer}"
+          "$mainMod, A, exec, ${config.modules.terminal-emulator.new-window-with-commad} ${getExe pkgs.pulsemixer}"
 
           "$mainMod, k, cyclenext"
           "$mainMod, h, cyclenext, prev"
