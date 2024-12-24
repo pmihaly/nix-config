@@ -74,6 +74,10 @@
       flake = false;
     };
     wezterm.url = "github:wez/wezterm?dir=nix";
+    treefmt-nix = {
+      inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:numtide/treefmt-nix";
+    };
   };
 
   outputs =
@@ -83,9 +87,36 @@
       home-manager,
       ...
     }@inputs:
+    let
+      eachSystem =
+        f:
+        nixpkgs.lib.genAttrs ([
+          "aarch64-darwin"
+          "x86_64-linux"
+        ]) (system: f nixpkgs.legacyPackages.${system});
+
+      treefmtEval = eachSystem (
+        pkgs:
+        inputs.treefmt-nix.lib.evalModule pkgs (
+          { pkgs, ... }:
+          {
+            projectRootFile = "flake.nix";
+            # https://github.com/numtide/treefmt-nix?tab=readme-ov-file#supported-programs
+            programs = {
+              prettier.enable = true;
+              nixfmt.enable = true;
+            };
+          }
+        )
+      );
+    in
     {
-      formatter.aarch64-darwin = nixpkgs.legacyPackages.aarch64-darwin.nixfmt-rfc-style;
-      formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.nixfmt-rfc-style;
+
+      formatter = eachSystem (pkgs: treefmtEval.${pkgs.system}.config.build.wrapper);
+      # for `nix flake check`
+      checks = eachSystem (pkgs: {
+        formatting = treefmtEval.${pkgs.system}.config.build.check self;
+      });
 
       darwinConfigurations.mac = inputs.darwin.lib.darwinSystem {
         specialArgs = {

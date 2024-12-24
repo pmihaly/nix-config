@@ -1024,6 +1024,7 @@
         "nixvim": "nixvim",
         "nur": "nur",
         "stylix": "stylix",
+        "treefmt-nix": "treefmt-nix_2",
         "wezterm": "wezterm"
       }
     },
@@ -1248,6 +1249,26 @@
         "owner": "numtide",
         "repo": "treefmt-nix",
         "rev": "50862ba6a8a0255b87377b9d2d4565e96f29b410",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "treefmt-nix",
+        "type": "github"
+      }
+    },
+    "treefmt-nix_2": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1734982074,
+        "narHash": "sha256-N7M37KP7cHWoXicuE536GrVvU8nMDT/gpI1kja2hkdg=",
+        "owner": "numtide",
+        "repo": "treefmt-nix",
+        "rev": "e41e948cf097cbf96ba4dff47a30ea6891af9f33",
         "type": "github"
       },
       "original": {
