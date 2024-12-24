@@ -162,15 +162,11 @@ in
           "$mainMod, W, exec, firefox"
           "$mainMod, A, exec, wezterm ${pkgs.pulsemixer}/bin/pulsemixer"
 
-          "$mainMod, h, movefocus, l"
-          "$mainMod, j, movefocus, d"
-          "$mainMod, k, movefocus, u"
-          "$mainMod, l, movefocus, r"
+          "$mainMod, k, cyclenext"
+          "$mainMod, h, cyclenext, prev"
 
-          "$mainMod SHIFT, h, movewindow, l"
-          "$mainMod SHIFT, j, movewindow, d"
-          "$mainMod SHIFT, k, movewindow, u"
-          "$mainMod SHIFT, l, movewindow, r"
+          "$mainMod CONTROL, k, swapnext"
+          "$mainMod CONTROL, h, swapnext, prev"
 
           "$mainMod, m, workspace, 1"
           "$mainMod, n, workspace, 2"
