@@ -84,7 +84,7 @@ in
           gaps_in = 10;
           gaps_out = 40;
           allow_tearing = true;
-          border_size = 2;
+          border_size = 1;
 
           "col.active_border" = "rgb(3b4252) rgb(81a1c1) 45deg";
           "col.inactive_border" = "rgb(3b4252) 45deg";
