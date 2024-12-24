@@ -20,6 +20,8 @@ in
 
     modules.persistence.directories = [ ".mozilla" ];
 
+    home.packages = with pkgs; if stdenv.isLinux then [ widevine-cdm ] else [ ];
+
     xdg.configFile."tridactyl/tridactylrc".text = ''
       bind gd tabdetach
 
