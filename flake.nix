@@ -78,6 +78,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
       url = "github:numtide/treefmt-nix";
     };
+    hyprland-qtutils = {
+      inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:hyprwm/hyprland-qtutils";
+    };
   };
 
   outputs =

@@ -2,6 +2,7 @@
   pkgs,
   lib,
   config,
+  inputs,
   ...
 }:
 
@@ -17,6 +18,7 @@ in
     home.packages = with pkgs; [
       wl-clipboard # `wl-copy` and `wl-paste`
       nemo
+      inputs.hyprland-qtutils.packages."${pkgs.system}".default
     ];
 
     services.gammastep = {
