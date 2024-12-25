@@ -69,6 +69,8 @@ in
 
       set hintchars ${cfg.hintchars}
       set hintnames uniform
+
+      colours shydactyl
     '';
 
     programs.firefox = {
