@@ -24,6 +24,7 @@ in
 
     xdg.configFile."tridactyl/tridactylrc".text = ''
       bind gd tabdetach
+      bind f hint -J
 
       set modeindicator false
 
