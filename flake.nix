@@ -73,7 +73,6 @@
       url = "https://img.shields.io/github/v/release/linuxserver/docker-jellyfin.json";
       flake = false;
     };
-    wezterm.url = "github:wez/wezterm?dir=nix";
     treefmt-nix = {
       inputs.nixpkgs.follows = "nixpkgs";
       url = "github:numtide/treefmt-nix";

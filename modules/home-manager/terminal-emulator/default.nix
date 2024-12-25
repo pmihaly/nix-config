@@ -2,7 +2,6 @@
   pkgs,
   lib,
   config,
-  inputs,
   ...
 }:
 
@@ -34,7 +33,6 @@ in
     programs.wezterm = {
       enable = true;
       enableZshIntegration = false; # adds weird env vars into terminal inside nvim
-      package = inputs.wezterm.packages.${pkgs.system}.default;
       extraConfig = concatStringsSep "\n" [
         ''
           local wezterm = require 'wezterm'
