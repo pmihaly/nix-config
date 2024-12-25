@@ -48,6 +48,10 @@ in
       xwayland.enable = true;
       sourceFirst = true;
 
+      plugins = with pkgs.hyprlandPlugins; [
+        hypr-dynamic-cursors
+      ];
+
       settings = {
         monitor = [
           "DP-1, 2560x1440@144, 0x0, 1"
@@ -191,6 +195,11 @@ in
           "$mainMod, mouse:272, movewindow"
           "$mainMod, mouse:273, resizewindow"
         ];
+
+        "plugin:dynamic-cursors" = {
+          enabled = true;
+          mode = "stretch";
+        };
       };
     };
 
