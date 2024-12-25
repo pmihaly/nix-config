@@ -21,7 +21,7 @@ in
       ".config/github-copilot"
     ];
 
-    programs.zsh.localVariables.EDITOR = "${config.programs.nixvim.build.package}/bin/nvim";
+    programs.zsh.localVariables.EDITOR = getExe config.programs.nixvim.build.package;
 
     programs.nixvim = {
       enable = true;

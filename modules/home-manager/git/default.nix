@@ -40,9 +40,9 @@ in
 
       diff.tool = "difftastic";
       difftool.prompt = false;
-      "difftool \"difftastic\"".cmd = ''${pkgs.difftastic}/bin/difft "$LOCAL" "$REMOTE"'';
+      "difftool \"difftastic\"".cmd = ''${getExe pkgs.difftastic} "$LOCAL" "$REMOTE"'';
       pager.difftool = true;
-      diff.external = "${pkgs.difftastic}/bin/difft";
+      diff.external = getExe pkgs.difftastic;
     };
 
     programs.lazygit = {
@@ -51,7 +51,7 @@ in
         notARepository = "quit";
         disableStartupPopups = true;
         promptToReturnFromSubprocess = false;
-        git.paging.externalDiffCommand = "${pkgs.difftastic}/bin/difft --color=always --tab-width=2";
+        git.paging.externalDiffCommand = "${getExe pkgs.difftastic} --color=always --tab-width=2";
         os.editPreset = "nvim-remote";
         gui.nerdFontsVersion = 3;
         customCommands = [

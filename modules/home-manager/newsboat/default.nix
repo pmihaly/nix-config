@@ -24,7 +24,7 @@ in
         if pkgs.stdenv.isDarwin then
           "${pkgs.firefox-bin}/Applications/Firefox.app/Contents/MacOS/firefox"
         else
-          "${pkgs.xdg-utils}/bin/xdg-open";
+          getExe' pkgs.xdg-utils "xdg-open";
       urls = [
         { url = "https://www.daemonology.net/hn-daily/index.rss"; }
         { url = "https://social.notjustbikes.com/@notjustbikes.rss"; }

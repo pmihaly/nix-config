@@ -127,7 +127,7 @@ in
         [ -f ~/.zshrc_work ] && . ~/.zshrc_work
 
         function unlockpdf() {
-          ${pkgs.pdftk}/bin/pdftk $2 input_pw $1 output "unlocked_$2"
+          ${getExe pkgs.pdftk} $2 input_pw $1 output "unlocked_$2"
         }
       '';
       enableCompletion = true;
@@ -155,13 +155,13 @@ in
         mkMerge [
           (bookmarksToAliases cfg.bookmarks)
           {
-            ls = "${pkgs.eza}/bin/eza -lah --icons $([ -d .git ] && echo '--git')";
+            ls = "${getExe pkgs.eza} -lah --icons $([ -d .git ] && echo '--git')";
             cat = "bat";
             p = "cd $(find ~/personaldev -maxdepth 1 -type d | fzf)";
             pn = "p && nvim";
             o = "cd ~/Sync/org";
             on = ''o && (fd "^.*.org$" | fzf | xargs nvim)'';
-            ld = "${pkgs.lazydocker}/bin/lazydocker";
+            ld = getExe pkgs.lazydocker;
             nixprevdiff = "${getExe pkgs.nvd} diff /nix/var/nix/profiles/system-$(sudo nix-env --list-generations --profile /nix/var/nix/profiles/system | tail -n2 | head -n1 | ${getExe pkgs.choose} 0)-link /nix/var/nix/profiles/system";
             ns = cfg.rebuildSwitch + "; nixprevdiff";
             nr = "sudo nix-store --verify --check-contents --repair";
@@ -170,9 +170,9 @@ in
             ndiff = "nix profile diff-closures --profile /nix/var/nix/profiles/system";
             cn = "cd ~/.nix-config && nvim";
             c = "cd ~/.nix-config";
-            thokr = "${pkgs.thokr}/bin/thokr --full-sentences 20";
-            kbp = ''sudo touch /dev/null ; ${pkgs.lsof}/bin/lsof -iTCP -sTCP:LISTEN -n -P +c0 | awk 'NR>1{gsub(/.*:/,"",$9); print $9, $1, $2}' | fzf --multi --with-nth=1,2 --header='Select processes to be killed' | cut -d' ' -f3 | xargs kill -9'';
-            urlencode = "${pkgs.jq}/bin/jq -sRr @uri";
+            thokr = "${getExe pkgs.thokr} --full-sentences 20";
+            kbp = ''sudo touch /dev/null ; ${getExe pkgs.lsof} -iTCP -sTCP:LISTEN -n -P +c0 | awk 'NR>1{gsub(/.*:/,"",$9); print $9, $1, $2}' | fzf --multi --with-nth=1,2 --header='Select processes to be killed' | cut -d' ' -f3 | xargs kill -9'';
+            urlencode = "${getExe pkgs.jq} -sRr @uri";
             dselect = "docker ps --format '{{.ID}}	{{.Image}}' | fzf --with-nth 2 | cut -f1";
             dim = ''
               dselect | tee >(tr -d '
@@ -181,18 +181,17 @@ in
             dex = ''container=$(dselect); docker exec -it "$container" "''${@:-bash}"'';
             ticket = ''git branch --show-current | grep -oE "[A-Z]+-[0-9]+" | tr -d "\n"'';
             gut = "git";
-            qr = "${pkgs.qrencode}/bin/qrencode -t ansiutf8";
-            sr = ''function _f() { fd --type file --exec ${pkgs.sd}/bin/sd "$1" "$2" }; _f'';
-            du = "${pkgs.du-dust}/bin/dust";
-            lsblk = "${pkgs.duf}/bin/duf";
-            wttr = "${pkgs.httpie}/bin/http wttr.in/budapest";
+            qr = "${getExe pkgs.qrencode} -t ansiutf8";
+            sr = ''function _f() { fd --type file --exec ${getExe pkgs.sd} "$1" "$2" }; _f'';
+            du = getExe pkgs.du-dust;
+            lsblk = "${getExe pkgs.duf}";
+            wttr = "${getExe' pkgs.httpie "https"} wttr.in/budapest";
             n = "nvim";
-            sharedir = "${pkgs.python3}/bin/python3 -m http.server 9000";
+            sharedir = "${getExe pkgs.python3} -m http.server 9000";
             yt-dlp = "nix run nixpkgs#yt-dlp --"; # always use the latest yt-dlp to mitigate 403 errors from youtube
             ncdu = "${getExe pkgs.ncdu} --color=dark -t8"; # ncurses disk usage (with colors and 8 threads)
-            jd = "${pkgs.nodePackages_latest.json-diff}/bin/json-diff";
+            jd = getExe' pkgs.nodePackages_latest.json-diff "json-diff";
             http = getExe pkgs.curlie;
-            # current full year, weeks starting with Monday
             cal = "cal $(date +%Y)";
           }
         ]
