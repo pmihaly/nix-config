@@ -23,6 +23,10 @@
 
     modules = {
       vscode.enable = true;
+      firefox.extraProfiles.work = {
+        id = 1;
+        name = "work";
+      };
     };
 
     programs.lazygit.settings.services = {

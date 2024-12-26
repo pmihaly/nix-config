@@ -15,12 +15,29 @@ in
     hintchars = mkOption {
       type = types.str;
     };
+    binary = mkOption {
+      type = types.str;
+      default =
+        if pkgs.stdenv.isLinux then
+          getExe pkgs.firefox-bin
+        else
+          "${pkgs.firefox-bin}/Applications/Firefox.app/Contents/MacOS/firefox";
+    };
+    extraProfiles = mkOption {
+      type = types.anything;
+      default = { };
+    };
+
   };
   config = mkIf cfg.enable {
 
     modules.persistence.directories = [ ".mozilla" ];
 
     home.packages = with pkgs; if stdenv.isLinux then [ widevine-cdm ] else [ ];
+
+    programs.zsh.shellAliases = {
+      misi = "${cfg.binary} -new-instance -P misi & disown";
+    } // mapAttrs (name: profile: "${cfg.binary} -new-instance -P ${name} & disown") cfg.extraProfiles;
 
     xdg.configFile."tridactyl/tridactylrc".text = ''
       bind gd tabdetach
@@ -84,108 +101,8 @@ in
       policies = {
         DisableAppUpdate = true;
       };
-      profiles = {
-        misi = {
-          id = 0;
-          name = "misi";
-          bookmarks = [
-            {
-              name = "selfhosting";
-              toolbar = true;
-              bookmarks = [
-                {
-                  name = "skylake";
-                  url = "http://skylake";
-                }
-              ];
-            }
-            {
-              name = "munsik";
-              toolbar = true;
-              bookmarks = [
-                {
-                  name = "skeler I";
-                  url = "https://www.youtube.com/watch?v=J0y6wM0aAgE";
-                }
-                {
-                  name = "skeler II";
-                  url = "https://www.youtube.com/watch?v=J4t4pMZBXZg";
-                }
-                {
-                  name = "skeler III";
-                  url = "https://www.youtube.com/watch?v=P4ALDytLAXQ";
-                }
-                {
-                  name = "skeler IV";
-                  url = "https://www.youtube.com/watch?v=HUUy3mnAhCE";
-                }
-                {
-                  name = "garage";
-                  url = "https://www.youtube.com/watch?v=e1w7R1hEvCs";
-                }
-                {
-                  name = "breakcore to dissociate to";
-                  url = "https://www.youtube.com/watch?v=BhZ0Ky9uqts";
-                }
-                {
-                  name = "breakcore to feel to";
-                  url = "https://www.youtube.com/watch?v=0KaBYaQGwbs";
-                }
-                {
-                  name = "dnb";
-                  url = "https://www.youtube.com/watch?v=qNaCzmbaYWI";
-                }
-                {
-                  name = "focus lofi🍯";
-                  url = "https://www.youtube.com/watch?v=Xf3-4A-uEc8";
-                }
-                {
-                  name = "ethereal breaks *:･ﾟ✧";
-                  url = "https://www.youtube.com/watch?v=tdceTb3vsmk";
-                }
-                {
-                  name = "cartoon tripping minimal techo";
-                  url = "https://www.youtube.com/watch?v=WddpRmmAYkg";
-                }
-                {
-                  name = "breakcore to vibe to";
-                  url = "https://www.youtube.com/watch?v=5nVLLll-CKs";
-                }
-                {
-                  name = "heaven.exe breakcore";
-                  url = "https://www.youtube.com/watch?v=z9e8CPULjW4";
-                }
-                {
-                  name = "abyss darksynth";
-                  url = "https://www.youtube.com/watch?v=aA9GhsYt2O0";
-                }
-                {
-                  name = "smooooth sonic dj";
-                  url = "https://www.youtube.com/watch?v=PYfhbYIxBxE";
-                }
-                {
-                  name = "smooooth disco mix I";
-                  url = "https://www.youtube.com/watch?v=4nvewes8Inc";
-                }
-                {
-                  name = "smooooth ukg cat fight";
-                  url = "https://www.youtube.com/watch?v=DjDWKh2bBzs";
-                }
-                {
-                  name = "smooooth disco mix II";
-                  url = "https://www.youtube.com/watch?v=JF5IYpI6IXA";
-                }
-                {
-                  name = "breakcore ascend to";
-                  url = "https://www.youtube.com/watch?v=gKh5eyGE9fs";
-                }
-                {
-                  name = "rare breakcore mix";
-                  url = "https://www.youtube.com/watch?v=6niPi2bTmoU";
-                }
-              ];
-            }
-          ];
+      profiles = let
+      defaults = {
           search = {
             force = true;
             default = "Brave search";
@@ -231,12 +148,7 @@ in
             localcdn
             clearurls
             tridactyl
-            sponsorblock
             istilldontcareaboutcookies
-            old-reddit-redirect
-            keepassxc-browser
-            youtube-nonstop
-            reddit-enhancement-suite
           ];
           userChrome = ''
             .tabbrowser-tab .tab-close-button,
@@ -381,8 +293,118 @@ in
             user_pref("webgl.renderer-string-override", " ");
             user_pref("webgl.vendor-string-override", " ");
           '';
-        };
       };
+      in {
+        misi = mkMerge [defaults {
+          id = 0;
+          name = "misi";
+          extensions = with pkgs.nur.repos.rycee.firefox-addons; [
+            sponsorblock
+            old-reddit-redirect
+            youtube-nonstop
+            reddit-enhancement-suite
+            keepassxc-browser
+          ];
+          bookmarks = [
+            {
+              name = "selfhosting";
+              toolbar = true;
+              bookmarks = [
+                {
+                  name = "skylake";
+                  url = "http://skylake";
+                }
+              ];
+            }
+            {
+              name = "munsik";
+              toolbar = true;
+              bookmarks = [
+                {
+                  name = "skeler I";
+                  url = "https://www.youtube.com/watch?v=J0y6wM0aAgE";
+                }
+                {
+                  name = "skeler II";
+                  url = "https://www.youtube.com/watch?v=J4t4pMZBXZg";
+                }
+                {
+                  name = "skeler III";
+                  url = "https://www.youtube.com/watch?v=P4ALDytLAXQ";
+                }
+                {
+                  name = "skeler IV";
+                  url = "https://www.youtube.com/watch?v=HUUy3mnAhCE";
+                }
+                {
+                  name = "garage";
+                  url = "https://www.youtube.com/watch?v=e1w7R1hEvCs";
+                }
+                {
+                  name = "breakcore to dissociate to";
+                  url = "https://www.youtube.com/watch?v=BhZ0Ky9uqts";
+                }
+                {
+                  name = "breakcore to feel to";
+                  url = "https://www.youtube.com/watch?v=0KaBYaQGwbs";
+                }
+                {
+                  name = "dnb";
+                  url = "https://www.youtube.com/watch?v=qNaCzmbaYWI";
+                }
+                {
+                  name = "focus lofi🍯";
+                  url = "https://www.youtube.com/watch?v=Xf3-4A-uEc8";
+                }
+                {
+                  name = "ethereal breaks *:･ﾟ✧";
+                  url = "https://www.youtube.com/watch?v=tdceTb3vsmk";
+                }
+                {
+                  name = "cartoon tripping minimal techo";
+                  url = "https://www.youtube.com/watch?v=WddpRmmAYkg";
+                }
+                {
+                  name = "breakcore to vibe to";
+                  url = "https://www.youtube.com/watch?v=5nVLLll-CKs";
+                }
+                {
+                  name = "heaven.exe breakcore";
+                  url = "https://www.youtube.com/watch?v=z9e8CPULjW4";
+                }
+                {
+                  name = "abyss darksynth";
+                  url = "https://www.youtube.com/watch?v=aA9GhsYt2O0";
+                }
+                {
+                  name = "smooooth sonic dj";
+                  url = "https://www.youtube.com/watch?v=PYfhbYIxBxE";
+                }
+                {
+                  name = "smooooth disco mix I";
+                  url = "https://www.youtube.com/watch?v=4nvewes8Inc";
+                }
+                {
+                  name = "smooooth ukg cat fight";
+                  url = "https://www.youtube.com/watch?v=DjDWKh2bBzs";
+                }
+                {
+                  name = "smooooth disco mix II";
+                  url = "https://www.youtube.com/watch?v=JF5IYpI6IXA";
+                }
+                {
+                  name = "breakcore ascend to";
+                  url = "https://www.youtube.com/watch?v=gKh5eyGE9fs";
+                }
+                {
+                  name = "rare breakcore mix";
+                  url = "https://www.youtube.com/watch?v=6niPi2bTmoU";
+                }
+              ];
+            }
+          ];
+        }];
+      } // mapAttrs (name: profile: mkMerge [defaults profile]) cfg.extraProfiles;
     };
   };
 }

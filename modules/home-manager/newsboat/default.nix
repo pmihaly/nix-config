@@ -1,5 +1,4 @@
 {
-  pkgs,
   lib,
   config,
   ...
@@ -20,11 +19,7 @@ in
     programs.newsboat = {
       enable = true;
       autoReload = true;
-      browser =
-        if pkgs.stdenv.isDarwin then
-          "${pkgs.firefox-bin}/Applications/Firefox.app/Contents/MacOS/firefox"
-        else
-          getExe' pkgs.xdg-utils "xdg-open";
+      browser = config.modules.firefox.binary;
       urls = [
         { url = "https://www.daemonology.net/hn-daily/index.rss"; }
         { url = "https://social.notjustbikes.com/@notjustbikes.rss"; }
