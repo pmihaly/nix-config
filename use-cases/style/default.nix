@@ -80,8 +80,8 @@ in
           };
 
           monospace = {
-            name = "Monocraft";
-            package = pkgs.monocraft;
+            name = "VCR OSD Mono";
+            package = pkgs.vcr-osd-mono;
           };
 
           sansSerif = {

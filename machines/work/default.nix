@@ -16,7 +16,10 @@
       };
     };
 
-    gui.enable = true;
+    gui = {
+      enable = true;
+      terminal-font-size = "13.0";
+    };
     style.enable = true;
   };
 

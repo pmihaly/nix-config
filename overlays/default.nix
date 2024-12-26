@@ -23,6 +23,27 @@
       }
     );
 
+    vcr-osd-mono = (
+      prev.stdenvNoCC.mkDerivation {
+        name = "vcr-osd-mono";
+
+        src = prev.fetchzip {
+          url = "https://dl.dafont.com/dl/?f=vcr_osd_mono";
+          extension = "zip";
+          hash = "sha256-6UrP5b0MUT+uoSOLzW4PwPNIst9el0ZMqhwz5BfFU+g=";
+        };
+
+        installPhase = ''
+          runHook preInstall
+
+          mkdir -p $out/share/fonts
+          cp *.ttf $out/share/fonts
+
+          runHook postInstall
+        '';
+      }
+    );
+
     keepassxc =
       if !prev.stdenv.isDarwin then
         prev.keepassxc

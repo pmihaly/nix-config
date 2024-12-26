@@ -27,7 +27,7 @@ in
     };
     font-size = mkOption {
       type = types.str;
-      default = "12.0";
+      default = "15.0";
     };
   };
   config = mkIf cfg.enable {
@@ -53,7 +53,7 @@ in
           }
 
           config.font = wezterm.font_with_fallback({
-            { family = "Monocraft" },
+            { family = "VCR OSD Mono" },
             "Noto Color Emoji",
           })
 
