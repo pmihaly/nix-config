@@ -37,8 +37,7 @@ in
       package =
         warn "TODO wezterm check https://github.com/NixOS/nixpkgs/issues/336069"
           inputs.nixpkgs-working-wezterm.legacyPackages.${pkgs.system}.wezterm;
-      extraConfig = concatStringsSep "\n" [
-        ''
+      extraConfig = ''
           local wezterm = require 'wezterm'
 
           local config = wezterm.config_builder()
@@ -58,19 +57,10 @@ in
             "Noto Color Emoji",
           })
 
-          config.font_size = ${cfg.font-size};
-        ''
-
-        (
-          if pkgs.stdenv.isDarwin then
-            ""
-          else
-            # doesnt work on macos (+ aerospace)
-            "config.window_decorations = 'NONE'"
-        )
-
-        "return config"
-      ];
+          config.font_size = ${cfg.font-size}
+          config.window_decorations = 'RESIZE'
+          return config
+        '';
     };
   };
 }
