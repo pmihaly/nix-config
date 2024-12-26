@@ -1,5 +1,6 @@
 {
   pkgs,
+  inputs,
   lib,
   config,
   ...
@@ -33,6 +34,9 @@ in
     programs.wezterm = {
       enable = true;
       enableZshIntegration = false; # adds weird env vars into terminal inside nvim
+      package =
+        warn "TODO wezterm check https://github.com/NixOS/nixpkgs/issues/336069"
+          inputs.nixpkgs-working-wezterm.legacyPackages.${pkgs.system}.wezterm;
       extraConfig = concatStringsSep "\n" [
         ''
           local wezterm = require 'wezterm'

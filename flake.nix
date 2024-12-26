@@ -81,6 +81,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
       url = "github:hyprwm/hyprland-qtutils";
     };
+    nixpkgs-working-wezterm.url = "github:nixos/nixpkgs/2b2eca6ef54c765b0a830830196701af42d66642";
   };
 
   outputs =
