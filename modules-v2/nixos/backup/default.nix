@@ -26,27 +26,23 @@ in
       default = "hourly";
     };
   };
-  config =
-    let
-      resticRepo = "s3:https://s3.amazonaws.com/misibackups/${cfg.machineId}";
-    in
-    mkIf cfg.enable {
-      users.groups.backup.members = [ "${vars.username}" ];
+  config = mkIf cfg.enable {
+    users.groups.backup.members = [ "${vars.username}" ];
 
-      services.restic.backups."${cfg.machineId}-backup" = {
-        repository = resticRepo;
-        environmentFile = config.age.secrets."backup/s3-access".path;
-        passwordFile = config.age.secrets."backup/restic".path;
-        paths = cfg.include;
-        exclude = cfg.exclude;
-        timerConfig = {
-          OnCalendar = cfg.timer;
-          Persistent = true;
-        };
-        initialize = true;
-        createWrapper = true;
+    services.restic.backups."${cfg.machineId}-backup" = {
+      repository = "s3:https://s3.amazonaws.com/misibackups/${cfg.machineId}";
+      environmentFile = config.age.secrets."backup/s3-access".path;
+      passwordFile = config.age.secrets."backup/restic".path;
+      paths = cfg.include;
+      exclude = cfg.exclude;
+      timerConfig = {
+        OnCalendar = cfg.timer;
+        Persistent = true;
       };
-
-      programs.zsh.shellAliases.restic = "restic-${cfg.machineId}-backup";
+      initialize = true;
+      createWrapper = true;
     };
+
+    programs.zsh.shellAliases.restic = "restic-${cfg.machineId}-backup";
+  };
 }

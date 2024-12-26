@@ -201,7 +201,6 @@ optionalAttrs platform.isDarwin {
       "raycast" # command+space
       "messenger"
       "signal"
-      "google-chrome"
       "caffeine" # keep screen alive
       "utm" # virtual machines
       "balenaetcher"
