@@ -38,29 +38,29 @@ in
         warn "TODO wezterm check https://github.com/NixOS/nixpkgs/issues/336069"
           inputs.nixpkgs-working-wezterm.legacyPackages.${pkgs.system}.wezterm;
       extraConfig = ''
-          local wezterm = require 'wezterm'
+        local wezterm = require 'wezterm'
 
-          local config = wezterm.config_builder()
+        local config = wezterm.config_builder()
 
-          config.enable_tab_bar = false
-          config.window_close_confirmation = 'NeverPrompt'
-          config.audible_bell = 'Disabled'
-          config.window_padding = {
-            left = 150,
-            right = 150,
-            top = 5,
-            bottom = 5,
-          }
+        config.enable_tab_bar = false
+        config.window_close_confirmation = 'NeverPrompt'
+        config.audible_bell = 'Disabled'
+        config.window_padding = {
+          left = 150,
+          right = 150,
+          top = 5,
+          bottom = 5,
+        }
 
-          config.font = wezterm.font_with_fallback({
-            { family = "VCR OSD Mono" },
-            "Noto Color Emoji",
-          })
+        config.font = wezterm.font_with_fallback({
+          { family = "VCR OSD Mono" },
+          "Noto Color Emoji",
+        })
 
-          config.font_size = ${cfg.font-size}
-          config.window_decorations = 'RESIZE'
-          return config
-        '';
+        config.font_size = ${cfg.font-size}
+        config.window_decorations = 'RESIZE'
+        return config
+      '';
     };
   };
 }

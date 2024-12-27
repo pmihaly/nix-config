@@ -131,11 +131,18 @@ in
               "<Tab>" = "cmp.mapping(cmp.mapping.select_next_item(), {'i', 's'})";
             };
             sources = [
+              { name = "vim-dadbod-completion"; }
               { name = "copilot"; }
               { name = "nvim_lsp"; }
               { name = "nvim_lsp_signature_help"; }
               { name = "buffer"; }
             ];
+            filetype = {
+              sql.sources = [
+                { name = "vim-dadbod-completion"; }
+                { name = "buffer"; }
+              ];
+            };
           };
         };
 
@@ -289,6 +296,9 @@ in
             prompt_save_on_select_new_entry = false;
           };
         };
+        vim-dadbod.enable = true;
+        vim-dadbod-ui.enable = true;
+        vim-dadbod-completion.enable = true;
       };
 
       extraPlugins = with pkgs.vimPlugins; [
@@ -615,6 +625,12 @@ in
           mode = [ "n" ];
           key = "gi";
           action = "<cmd>lua require('lspimport').import()<cr>";
+        }
+        {
+
+          mode = [ "n" ];
+          key = "<leader>db";
+          action = "<cmd>DBUI<cr>";
         }
       ];
 
