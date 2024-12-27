@@ -21,7 +21,7 @@ in
     };
     terminal-font-size = mkOption {
       type = types.str;
-      default = "12.0";
+      default = "15.0";
     };
   };
 
