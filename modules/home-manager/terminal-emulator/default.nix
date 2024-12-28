@@ -31,14 +31,16 @@ in
     };
   };
   config = mkIf cfg.enable {
-  programs.alacritty.enable = true;
+    programs.alacritty.enable = true;
     programs.wezterm = {
       enable = true;
       enableZshIntegration = false; # adds weird env vars into terminal inside nvim
       package =
-      if pkgs.stdenv.isLinux then inputs.wezterm-master.packages.${pkgs.system}.default else
-        warn "TODO wezterm check https://github.com/NixOS/nixpkgs/issues/336069"
-          inputs.nixpkgs-working-wezterm.legacyPackages.${pkgs.system}.wezterm;
+        if pkgs.stdenv.isLinux then
+          inputs.wezterm-master.packages.${pkgs.system}.default
+        else
+          warn "TODO wezterm check https://github.com/NixOS/nixpkgs/issues/336069"
+            inputs.nixpkgs-working-wezterm.legacyPackages.${pkgs.system}.wezterm;
       extraConfig = ''
         local wezterm = require 'wezterm'
 
