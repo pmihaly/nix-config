@@ -199,6 +199,15 @@ optionalAttrs platform.isDarwin {
       };
     };
 
+    services.jankyborders = {
+      enable = true;
+      active_color = "gradient(top_right=0x993B4252,bottom_left=0x9992B3F5)";
+      inactive_color = "gradient(top_right=0x9992B3F5,bottom_left=0x9992B3F5)";
+      blur_radius = 0.0;
+      width = 5.0;
+      hidpi = true;
+    };
+
     homebrew.casks = [
       "aerial" # screensaver
       "raycast" # command+space

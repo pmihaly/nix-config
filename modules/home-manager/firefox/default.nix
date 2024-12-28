@@ -311,6 +311,16 @@ in
               ];
               bookmarks = [
                 {
+                  name = "nixing";
+                  toolbar = true;
+                  bookmarks = [
+                    {
+                      name = "darwin options";
+                      url = "https://daiderd.com/nix-darwin/manual/index.html";
+                    }
+                  ];
+                }
+                {
                   name = "selfhosting";
                   toolbar = true;
                   bookmarks = [
