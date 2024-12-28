@@ -28,7 +28,7 @@
     gui = {
       enable = true;
       browser-hintchars = "tnseriao";
-      terminal-font-size = "10.0";
+      terminal-font-size = "13.0";
     };
     gaming.enable = true;
     music-production.enable = true;
