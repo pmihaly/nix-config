@@ -137,31 +137,34 @@ optionalAttrs platform.isDarwin {
         mode.main.binding =
           let
             workspaceBinds =
-              [
-                "j"
-                "k"
-                "l"
-                "semicolon"
+              trivial.pipe
+                [
+                  "j"
+                  "k"
+                  "l"
+                  "semicolon"
 
-                "u"
-                "i"
-                "o"
-                "p"
-              ]
-              |> (builtins.map (workspace: {
-                name = workspace;
-                value = null;
-              }))
-              |> builtins.listToAttrs
-              |> (lib.concatMapAttrs (
-                workspace: _: {
-                  "alt-${workspace}" = "workspace ${workspace}";
-                  "alt-shift-${workspace}" = [
-                    "move-node-to-workspace ${workspace}"
-                    "workspace ${workspace}"
-                  ];
-                }
-              ));
+                  "u"
+                  "i"
+                  "o"
+                  "p"
+                ]
+                [
+                  (builtins.map (workspace: {
+                    name = workspace;
+                    value = null;
+                  }))
+                  builtins.listToAttrs
+                  (lib.concatMapAttrs (
+                    workspace: _: {
+                      "alt-${workspace}" = "workspace ${workspace}";
+                      "alt-shift-${workspace}" = [
+                        "move-node-to-workspace ${workspace}"
+                        "workspace ${workspace}"
+                      ];
+                    }
+                  ))
+                ];
           in
           workspaceBinds
           // {
