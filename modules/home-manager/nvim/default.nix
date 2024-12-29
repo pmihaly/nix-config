@@ -111,10 +111,12 @@ in
         };
         floaterm = {
           enable = true;
-          width = 150;
-          height = 40;
-          title = "";
-          opener = "edit";
+          settings = {
+            width = 150;
+            height = 40;
+            title = "";
+            opener = "edit";
+          };
         };
 
         copilot-cmp.enable = true;
