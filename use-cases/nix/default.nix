@@ -26,7 +26,7 @@ in
       nix = {
         nixPath = [ "nixpkgs=/etc/channels/nixpkgs" ];
         settings = {
-          experimental-features = "nix-command flakes";
+          experimental-features = "nix-command flakes pipe-operators";
           trusted-users = [ vars.username ];
 
           substituters = [ "https://wezterm.cachix.org" ];
