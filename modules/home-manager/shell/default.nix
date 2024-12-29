@@ -173,13 +173,6 @@ in
             thokr = "${getExe pkgs.thokr} --full-sentences 20";
             kbp = ''sudo touch /dev/null ; ${getExe pkgs.lsof} -iTCP -sTCP:LISTEN -n -P +c0 | awk 'NR>1{gsub(/.*:/,"",$9); print $9, $1, $2}' | fzf --multi --with-nth=1,2 --header='Select processes to be killed' | cut -d' ' -f3 | xargs kill -9'';
             urlencode = "${getExe pkgs.jq} -sRr @uri";
-            dselect = "docker ps --format '{{.ID}}	{{.Image}}' | fzf --with-nth 2 | cut -f1";
-            dim = ''
-              dselect | tee >(tr -d '
-              ' | pbcopy)'';
-            dl = "dselect | xargs docker logs -f";
-            dex = ''container=$(dselect); docker exec -it "$container" "''${@:-bash}"'';
-            ticket = ''git branch --show-current | grep -oE "[A-Z]+-[0-9]+" | tr -d "\n"'';
             gut = "git";
             qr = "${getExe pkgs.qrencode} -t ansiutf8";
             sr = ''function _f() { fd --type file --exec ${getExe pkgs.sd} "$1" "$2" }; _f'';
