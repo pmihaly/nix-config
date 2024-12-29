@@ -187,7 +187,6 @@ optionalAttrs platform.isDarwin {
       "aerial" # screensaver
       "raycast" # command+space
       "messenger"
-      "signal"
       "caffeine" # keep screen alive
       "utm" # virtual machines
       "balenaetcher"

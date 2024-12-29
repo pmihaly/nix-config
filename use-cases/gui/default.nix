@@ -67,6 +67,7 @@ in
           inputs.img2theme.packages."${pkgs.system}".default
           feh
           tailscale
+          signal-desktop
         ];
       };
     }
