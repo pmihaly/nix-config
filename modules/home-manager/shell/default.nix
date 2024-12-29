@@ -41,7 +41,7 @@ in
       sd # more intuitive search and replace
       choose # frendlier cut
       pup # jq for html
-      dog # dns client
+      dogdns # dns client
       nvd # nix version diff
       (pkgs.writeScriptBin "is-up" ''
         #! ${getExe pkgs.nushell}
