@@ -61,7 +61,7 @@ in
           "Noto Color Emoji",
         })
 
-        enable_wayland = false;
+        ${if pkgs.stdenv.isDarwin then "config.window_decorations = 'RESIZE'" else ""}
 
         config.font_size = ${cfg.font-size}
         return config

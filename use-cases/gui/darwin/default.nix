@@ -107,12 +107,12 @@ optionalAttrs platform.isDarwin {
         key-mapping.preset = "qwerty";
 
         gaps = {
-          inner.horizontal = 0;
-          inner.vertical = 0;
-          outer.left = 0;
-          outer.bottom = 0;
-          outer.top = 0;
-          outer.right = 0;
+          inner.horizontal = 10;
+          inner.vertical = 10;
+          outer.left = 40;
+          outer.bottom = 40;
+          outer.top = 40;
+          outer.right = 40;
         };
 
         mode.service.binding = {
@@ -197,15 +197,6 @@ optionalAttrs platform.isDarwin {
           source = ./karabiner.json;
         };
       };
-    };
-
-    services.jankyborders = {
-      enable = true;
-      active_color = "gradient(top_right=0x993B4252,bottom_left=0x9992B3F5)";
-      inactive_color = "gradient(top_right=0x9992B3F5,bottom_left=0x9992B3F5)";
-      blur_radius = 0.0;
-      width = 5.0;
-      hidpi = true;
     };
 
     homebrew.casks = [
