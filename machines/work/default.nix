@@ -125,6 +125,7 @@ in
       slack
       gnumake
       mysql84 # vim dadbod
+      jetbrains.pycharm-community-bin
     ];
 
     programs.nixvim.globals.dbs =
@@ -193,7 +194,6 @@ in
 
   homebrew.casks = [
     "docker"
-    "pycharm-ce"
     "flux"
   ];
 
