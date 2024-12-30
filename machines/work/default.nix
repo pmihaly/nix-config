@@ -135,13 +135,13 @@ in
           url = "mysql://root@127.0.0.1:3306";
         }
         {
-          name = "staging";
+          name = "staging (tun)";
           url = workvars.staging-mysql-url;
         }
       ]
       ++ map
         (env: {
-          name = env;
+          name = "${env} (tun)";
           url = "mysql://${workvars.demo-db-creds}@${env}-mysql8.demo:3307";
         })
         [
