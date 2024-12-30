@@ -188,7 +188,16 @@ in
             docker_compose_language_service.enable = true;
             yamlls.enable = true;
             jsonls.enable = true;
-            nil_ls.enable = true;
+            nixd = {
+              enable = true;
+              settings = {
+                nixpkgs.expr = "import <nixpkgs> {}";
+                options = {
+                  nixos.expr = "(builtins.getFlake \"${config.home.homeDirectory}/.nix-config\").nixosConfigurations.aesop.options";
+                  darwin.expr = "(builtins.getFlake \"${config.home.homeDirectory}/.nix-config\").darwinConfigurations.mac.options";
+                };
+              };
+            };
             gopls.enable = true;
             emmet_ls.enable = true;
             nushell.enable = true;
