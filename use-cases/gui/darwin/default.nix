@@ -1,4 +1,5 @@
 {
+  pkgs,
   platform,
   lib,
   config,
@@ -78,7 +79,7 @@ optionalAttrs platform.isDarwin {
 
     home-manager.users.${vars.username} = {
       imports = [ ../../../modules/home-manager ];
-      home.packages = [ aerospace ];
+      home.packages = [ pkgs.aerospace ];
 
       xdg.configFile = {
         "karabiner/karabiner.json" = {
