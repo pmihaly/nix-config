@@ -5,5 +5,5 @@ rec {
   serviceConfig = "${persistDir}/opt/skylake-services";
   storage = "${persistDir}/opt/skylake-storage";
   username = "misi";
-  rebuildSwitch = "sudo nixos-rebuild switch --flake ~/.nix-config#skylake";
+  rebuildSwitch = "nh os switch ~/.nix-config --hostname skylake -- --option extra-experimental-features pipe-operators";
 }

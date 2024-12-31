@@ -79,6 +79,10 @@
     };
     nixpkgs-working-wezterm.url = "github:nixos/nixpkgs/2b2eca6ef54c765b0a830830196701af42d66642";
     wezterm-master.url = "github:wez/wezterm?dir=nix";
+    nh = {
+      inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:viperML/nh";
+    };
   };
 
   outputs =

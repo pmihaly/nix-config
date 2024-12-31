@@ -2,6 +2,7 @@
   pkgs,
   lib,
   config,
+  inputs,
   ...
 }:
 
@@ -42,7 +43,7 @@ in
       choose # frendlier cut
       pup # jq for html
       dogdns # dns client
-      nvd # nix version diff
+      inputs.nh.packages."${pkgs.system}".default
       (pkgs.writeScriptBin "is-up" ''
         #! ${getExe pkgs.nushell}
         def main [
@@ -163,7 +164,7 @@ in
             on = ''o && (fd "^.*.org$" | fzf | xargs nvim)'';
             ld = getExe pkgs.lazydocker;
             nixprevdiff = "${getExe pkgs.nvd} diff /nix/var/nix/profiles/system-$(sudo nix-env --list-generations --profile /nix/var/nix/profiles/system | tail -n2 | head -n1 | ${getExe pkgs.choose} 0)-link /nix/var/nix/profiles/system";
-            ns = cfg.rebuildSwitch + "; nixprevdiff";
+            ns = cfg.rebuildSwitch;
             nr = "sudo nix-store --verify --check-contents --repair";
             ncg = "sudo nix-collect-garbage --delete-old";
             nsh = "function _f() { nix-shell -p $* --run zsh }; _f";
