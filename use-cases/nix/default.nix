@@ -50,9 +50,10 @@ in
           ../../secrets/home-manager
         ];
 
-        home.packages = [
+        home.packages = with pkgs; [
           inputs.agenix.packages."${pkgs.system}".default
-          pkgs.deploy-rs
+          deploy-rs
+          nix-tree # visualisation of nix derivations
         ];
 
         programs.nix-index-database.comma.enable = true;

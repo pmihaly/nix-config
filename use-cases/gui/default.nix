@@ -61,8 +61,6 @@ in
 
         home.packages = with pkgs; [
           syncthing
-          act # running github actions locally
-          nix-tree # visualisation of nix derivations
           keepass-diff # diffing .kdbx files
           inputs.img2theme.packages."${pkgs.system}".default
           feh
