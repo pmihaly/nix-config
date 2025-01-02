@@ -202,6 +202,7 @@ in
     "docker"
     "flux"
     "google-chrome"
+    "fontlab"
   ];
 
   users.users.${vars.username}.home = "/Users/${vars.username}";
