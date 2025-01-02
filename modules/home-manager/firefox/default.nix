@@ -60,6 +60,8 @@ in
       set searchurls.map   https://www.google.com/maps/search/
       set searchurls.maps  https://www.google.com/maps/search/
       set searchurls.route https://www.google.com/maps/dir/?api=1&travelmode=transit&destination=
+      set searchurls.route https://www.google.com/maps/dir/?api=1&travelmode=transit&destination=
+      set searchurls.brew  https://formulae.brew.sh/cask/
 
 
       blacklistadd excalidraw.com
