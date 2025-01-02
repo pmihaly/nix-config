@@ -56,7 +56,5 @@
             '';
           }
         );
-
-    mpv = if !prev.stdenv.isDarwin then prev.mpv else prev.iina;
   })
 ]
