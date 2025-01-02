@@ -38,6 +38,13 @@ in
             command = [[wincmd L]],
           })
 
+          vim.api.nvim_create_autocmd("FileType", {
+            pattern = "dbout",
+            callback = function()
+              vim.opt_local.foldenable = false
+            end,
+          })
+
           -- highlight yanked stuff
           local highlight_group = vim.api.nvim_create_augroup('YankHighlight', { clear = true })
           vim.api.nvim_create_autocmd('TextYankPost', {
