@@ -1,6 +1,7 @@
 {
   pkgs,
   vars,
+  lib,
   ...
 }:
 let
@@ -69,34 +70,39 @@ in
             url = "calendar.google.com";
           }
         ]
-        ++ builtins.concatMap
-          (service: [
-            {
-              name = "${service} mr";
-              url = "https://gitlab.${workvars.domain}/lensa/phoenix/${service}/-/merge_requests";
-            }
-            {
-              name = "${service} pipe";
-              url = "https://gitlab.${workvars.domain}/lensa/phoenix/${service}/-/pipelines";
-            }
-          ])
-          [
-            "career-and-social-infra"
-            "career-and-social-sites"
-            "career-assistant"
-            "company-and-job-title"
-            "company-and-job-title-moderation"
-            "company-match"
-            "phoenix-overview"
-            "scripts"
-            "social-feed-engine"
-            "video-catalog"
-            "video-director"
-            "video-editor"
-            "video-infra"
-            "video-player"
-            "video-streamer"
-          ];
+        ++ lib.mapAttrsToList (key: val: {
+          name = key;
+          url = val;
+        }) workvars.extra-bookmarks
+        ++
+          builtins.concatMap
+            (service: [
+              {
+                name = "${service} mr";
+                url = "https://gitlab.${workvars.domain}/lensa/phoenix/${service}/-/merge_requests";
+              }
+              {
+                name = "${service} pipe";
+                url = "https://gitlab.${workvars.domain}/lensa/phoenix/${service}/-/pipelines";
+              }
+            ])
+            [
+              "career-and-social-infra"
+              "career-and-social-sites"
+              "career-assistant"
+              "company-and-job-title"
+              "company-and-job-title-moderation"
+              "company-match"
+              "phoenix-overview"
+              "scripts"
+              "social-feed-engine"
+              "video-catalog"
+              "video-director"
+              "video-editor"
+              "video-infra"
+              "video-player"
+              "video-streamer"
+            ];
     };
 
     programs.lazygit.settings.services = {
@@ -195,6 +201,7 @@ in
   homebrew.casks = [
     "docker"
     "flux"
+    "google-chrome"
   ];
 
   users.users.${vars.username}.home = "/Users/${vars.username}";
