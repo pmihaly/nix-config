@@ -95,15 +95,15 @@
     let
       eachSystem =
         f:
-        nixpkgs.lib.genAttrs ([
+        nixpkgs.lib.genAttrs [
           "aarch64-darwin"
           "x86_64-linux"
-        ]) (system: f nixpkgs.legacyPackages.${system});
+        ] (system: f nixpkgs.legacyPackages.${system});
 
       treefmtEval = eachSystem (
         pkgs:
         inputs.treefmt-nix.lib.evalModule pkgs (
-          { pkgs, ... }:
+          { ... }:
           {
             projectRootFile = "flake.nix";
             # https://github.com/numtide/treefmt-nix?tab=readme-ov-file#supported-programs
@@ -118,7 +118,6 @@
     {
 
       formatter = eachSystem (pkgs: treefmtEval.${pkgs.system}.config.build.wrapper);
-      # for `nix flake check`
       checks = eachSystem (pkgs: {
         formatting = treefmtEval.${pkgs.system}.config.build.check self;
       });

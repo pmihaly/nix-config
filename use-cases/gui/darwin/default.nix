@@ -79,7 +79,6 @@ optionalAttrs platform.isDarwin {
 
     home-manager.users.${vars.username} = {
       imports = [ ../../../modules/home-manager ];
-      home.packages = [ pkgs.aerospace ];
 
       xdg.configFile = {
         "karabiner/karabiner.json" = {
@@ -88,99 +87,101 @@ optionalAttrs platform.isDarwin {
       };
     };
 
-    services.aerospace.enable = true;
-    services.aerospace.settings = {
-      after-login-command = [ ];
-      after-startup-command = [ ];
-      on-focus-changed = [ "move-mouse window-lazy-center" ];
-      enable-normalization-flatten-containers = true;
-      enable-normalization-opposite-orientation-for-nested-containers = true;
-      accordion-padding = 30;
-      default-root-container-layout = "tiles";
-      default-root-container-orientation = "auto";
-      key-mapping.preset = "qwerty";
+    services.aerospace = {
+      enable = true;
+      settings = {
+        after-login-command = [ ];
+        after-startup-command = [ ];
+        on-focus-changed = [ "move-mouse window-lazy-center" ];
+        enable-normalization-flatten-containers = true;
+        enable-normalization-opposite-orientation-for-nested-containers = true;
+        accordion-padding = 30;
+        default-root-container-layout = "tiles";
+        default-root-container-orientation = "auto";
+        key-mapping.preset = "qwerty";
 
-      gaps = {
-        inner.horizontal = 10;
-        inner.vertical = 10;
-        outer.left = 40;
-        outer.bottom = 40;
-        outer.top = 40;
-        outer.right = 40;
-      };
-
-      mode.service.binding = {
-        esc = [
-          "reload-config"
-          "mode main"
-        ];
-      };
-
-      workspace-to-monitor-force-assignment = {
-        "u" = "main";
-        "i" = "main";
-        "o" = "main";
-        "p" = "secondary";
-
-        "j" = "main";
-        "k" = "main";
-        "l" = "main";
-        "semicolon" = "main";
-      };
-
-      mode.main.binding =
-        let
-          workspaceBinds =
-            [
-              "j"
-              "k"
-              "l"
-              "semicolon"
-
-              "u"
-              "i"
-              "o"
-              "p"
-            ]
-            |> (builtins.map (workspace: {
-              name = workspace;
-              value = null;
-            }))
-            |> builtins.listToAttrs
-            |> (lib.concatMapAttrs (
-              workspace: _: {
-                "alt-${workspace}" = "workspace ${workspace}";
-                "alt-shift-${workspace}" = [
-                  "move-node-to-workspace ${workspace}"
-                  "workspace ${workspace}"
-                ];
-              }
-            ));
-        in
-        workspaceBinds
-        // {
-          "alt-enter" = "exec-and-forget ${
-            config.home-manager.users.${vars.username}.modules.terminal-emulator.binary
-          }";
-          "alt-slash" = "mode service";
-
-          "alt-n" = "focus left";
-          "alt-shift-n" = "move left";
-          "alt-m" = "focus right";
-          "alt-shift-m" = "move right";
-
-          "alt-left" = "focus left";
-          "alt-down" = "focus down";
-          "alt-up" = "focus up";
-          "alt-right" = "focus right";
-          "alt-shift-left" = "move left";
-          "alt-shift-down" = "move down";
-          "alt-shift-up" = "move up";
-          "alt-shift-right" = "move right";
-
-          "alt-shift-minus" = "resize smart -50";
-          "alt-shift-equal" = "resize smart +50";
+        gaps = {
+          inner.horizontal = 10;
+          inner.vertical = 10;
+          outer.left = 40;
+          outer.bottom = 40;
+          outer.top = 40;
+          outer.right = 40;
         };
+
+        mode.service.binding = {
+          esc = [
+            "reload-config"
+            "mode main"
+          ];
+        };
+
+        workspace-to-monitor-force-assignment = {
+          "u" = "main";
+          "i" = "main";
+          "o" = "main";
+          "p" = "secondary";
+
+          "j" = "main";
+          "k" = "main";
+          "l" = "main";
+          "semicolon" = "main";
+        };
+
+        mode.main.binding =
+          let
+            workspaceBinds =
+              [
+                "j"
+                "k"
+                "l"
+                "semicolon"
+
+                "u"
+                "i"
+                "o"
+                "p"
+              ]
+              |> (builtins.map (workspace: {
+                name = workspace;
+                value = null;
+              }))
+              |> builtins.listToAttrs
+              |> (lib.concatMapAttrs (
+                workspace: _: {
+                  "alt-${workspace}" = "workspace ${workspace}";
+                  "alt-shift-${workspace}" = [
+                    "move-node-to-workspace ${workspace}"
+                    "workspace ${workspace}"
+                  ];
+                }
+              ));
+          in
+          workspaceBinds
+          // {
+            "alt-enter" = "exec-and-forget ${
+              config.home-manager.users.${vars.username}.modules.terminal-emulator.binary
+            }";
+            "alt-slash" = "mode service";
+
+            "alt-n" = "focus left";
+            "alt-shift-n" = "move left";
+            "alt-m" = "focus right";
+            "alt-shift-m" = "move right";
+
+            "alt-left" = "focus left";
+            "alt-down" = "focus down";
+            "alt-up" = "focus up";
+            "alt-right" = "focus right";
+            "alt-shift-left" = "move left";
+            "alt-shift-down" = "move down";
+            "alt-shift-up" = "move up";
+            "alt-shift-right" = "move right";
+
+            "alt-shift-minus" = "resize smart -50";
+            "alt-shift-equal" = "resize smart +50";
+          };
+      };
     };
 
     homebrew.casks = [
