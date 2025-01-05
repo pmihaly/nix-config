@@ -5,8 +5,8 @@
   ...
 }:
 let
-  workvars = builtins.fromJSON (
-    builtins.readFile "/Users/${vars.username}/.nix-config/machines/work/workvars.json"
+  workvars = builtins.fromTOML (
+    builtins.readFile "/Users/${vars.username}/.nix-config/machines/work/workvars.toml"
   );
 in
 {
