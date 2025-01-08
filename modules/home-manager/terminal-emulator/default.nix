@@ -1,6 +1,4 @@
 {
-  pkgs,
-  inputs,
   lib,
   config,
   ...
@@ -15,15 +13,15 @@ in
     enable = mkEnableOption "terminal-emulator";
     binary = mkOption {
       type = types.str;
-      default = getExe pkgs.wezterm;
+      default = getExe config.programs.kitty.package;
     };
     name-in-shell = mkOption {
       type = types.str;
-      default = "wezterm";
+      default = "kitty";
     };
     new-window-with-commad = mkOption {
       type = types.str;
-      default = "wezterm cli spawn --new-window";
+      default = "kitty";
     };
     font-size = mkOption {
       type = types.str;
@@ -31,41 +29,17 @@ in
     };
   };
   config = mkIf cfg.enable {
-    programs.alacritty.enable = true;
-    programs.wezterm = {
+    programs.kitty = {
       enable = true;
-      enableZshIntegration = false; # adds weird env vars into terminal inside nvim
-      package =
-        if pkgs.stdenv.isLinux then
-          inputs.wezterm-master.packages.${pkgs.system}.default
-        else
-          warn "TODO wezterm check https://github.com/NixOS/nixpkgs/issues/336069"
-            inputs.nixpkgs-working-wezterm.legacyPackages.${pkgs.system}.wezterm;
-      extraConfig = ''
-        local wezterm = require 'wezterm'
-
-        local config = wezterm.config_builder()
-
-        config.enable_tab_bar = false
-        config.window_close_confirmation = 'NeverPrompt'
-        config.audible_bell = 'Disabled'
-        config.window_padding = {
-          left = 150,
-          right = 150,
-          top = 5,
-          bottom = 5,
-        }
-
-        config.font = wezterm.font_with_fallback({
-          { family = "VCR OSD Mono" },
-          "Noto Color Emoji",
-        })
-
-        ${if pkgs.stdenv.isDarwin then "config.window_decorations = 'RESIZE'" else ""}
-
-        config.font_size = ${cfg.font-size}
-        return config
-      '';
+      settings = {
+        cursor_trail = 3;
+        cursor_trail_decay = "0.1 0.4";
+        macos_option_as_alt = true;
+        macos_quit_when_last_window_closed = true;
+        focus_follows_mouse = true;
+        font_size = cfg.font-size;
+        window_padding_width = "5 150";
+      };
     };
   };
 }

@@ -54,7 +54,7 @@ in
           };
           yazi.enable = true;
           zathura.enable = true;
-          wezterm.enable = true;
+          kitty.enable = true;
           rofi.enable = true;
           fzf.enable = true;
           btop.enable = true;
