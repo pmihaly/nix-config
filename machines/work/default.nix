@@ -118,6 +118,7 @@ in
       devenv = "set -o allexport && source config/dev.env";
       so = "source ./.ve/bin/activate ; devenv";
       gl = "mkdir -p ~/tun ; pushd ~/tun ; ssh -T graylog-staging-tunnel & (sleep 4 ; open http://localhost:9988)";
+      db = "mkdir -p ~/db ; pushd ~/db ; nvim -c DBUI";
     };
 
     home.packages = with pkgs; [
