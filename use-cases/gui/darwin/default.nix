@@ -104,10 +104,6 @@ optionalAttrs platform.isDarwin {
         gaps = {
           inner.horizontal = 10;
           inner.vertical = 10;
-          outer.left = 40;
-          outer.bottom = 40;
-          outer.top = 40;
-          outer.right = 40;
         };
 
         mode.service.binding = {
