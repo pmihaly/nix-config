@@ -166,7 +166,7 @@ in
             nixprevdiff = "${getExe pkgs.nvd} diff /nix/var/nix/profiles/system-$(sudo nix-env --list-generations --profile /nix/var/nix/profiles/system | tail -n2 | head -n1 | ${getExe pkgs.choose} 0)-link /nix/var/nix/profiles/system";
             ns = cfg.rebuildSwitch;
             nr = "sudo nix-store --verify --check-contents --repair";
-            ncg = "nh clean user";
+            ncg = "nh clean all";
             nsh = "function _f() { nix-shell -p $* --run zsh }; _f";
             ndiff = "nix profile diff-closures --profile /nix/var/nix/profiles/system";
             cn = "cd ~/.nix-config && nvim";
