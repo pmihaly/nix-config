@@ -91,6 +91,7 @@ in
       set hintnames uniform
 
       set markjumpnoisy false
+      set editorcmd ${config.modules.terminal-emulator.binary} nvim
 
       colours shydactyl
     '';
