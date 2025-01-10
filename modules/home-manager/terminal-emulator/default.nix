@@ -40,6 +40,10 @@ in
         font_size = cfg.font-size;
         window_padding_width = "5 150";
       };
+      keybindings = {
+        "ctrl+enter" = "";
+        "cmd+enter" = "";
+      };
     };
   };
 }
