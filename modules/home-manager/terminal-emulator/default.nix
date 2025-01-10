@@ -39,8 +39,6 @@ in
         focus_follows_mouse = true;
         font_size = cfg.font-size;
         window_padding_width = "5 150";
-        confirm_os_window_close = "0";
-        enable_audio_bell = false;
       };
     };
   };
