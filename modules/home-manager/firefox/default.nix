@@ -93,6 +93,8 @@ in
       set markjumpnoisy false
       set editorcmd ${config.modules.terminal-emulator.binary} nvim
 
+      setmark S https://open.spotify.com
+
       colours shydactyl
     '';
 
