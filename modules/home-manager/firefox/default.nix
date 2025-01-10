@@ -90,6 +90,8 @@ in
       set hintchars ${cfg.hintchars}
       set hintnames uniform
 
+      set markjumpnoisy false
+
       colours shydactyl
     '';
 
