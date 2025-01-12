@@ -128,7 +128,6 @@ in
       openssl
       obsidian
       jwt-cli
-      libossp_uuid # uuid from cli
       slack
       gnumake
       mysql84 # vim dadbod
