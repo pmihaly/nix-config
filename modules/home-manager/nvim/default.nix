@@ -18,6 +18,7 @@ in
 
     modules.persistence.directories = [
       ".local/share/nvim"
+      "~/.local/share/db-ui"
       ".config/github-copilot"
     ];
 
