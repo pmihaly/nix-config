@@ -213,6 +213,24 @@ in
         };
         cmp-nvim-lsp.enable = true;
 
+        harpoon = {
+          enable = true;
+          enableTelescope = true;
+          keymapsSilent = true;
+          markBranch = true;
+          saveOnToggle = true;
+          keymaps = {
+            addFile = "<leader>n";
+            toggleQuickMenu = "<leader>i";
+            navFile = {
+              "1" = "<leader>h";
+              "2" = "<leader>j";
+              "3" = "<leader>k";
+              "4" = "<leader>l";
+            };
+          };
+        };
+
         treesitter = {
           enable = true;
           settings.ensure_installed = [
@@ -352,11 +370,6 @@ in
             rev = "9c1c61a5020faeb1863bb66eb4b2a9107e641876";
             sha256 = "sha256-GIeuvGltgilFkYnKvsVYSogqQhDo1xcORy5jVtTz2cE=";
           };
-        })
-        (pkgs.vimUtils.buildVimPlugin {
-          pname = "harpoon";
-          version = "2024-04-09";
-          src = inputs.harpoon;
         })
         (pkgs.vimUtils.buildVimPlugin {
           pname = "nushell-syntax-vim";
@@ -526,37 +539,6 @@ in
           mode = [ "n" ];
           key = "<leader>v";
           action = "<cmd>FloatermNew --autoclose=2 lazygit<cr>";
-        }
-
-        {
-          mode = [ "n" ];
-          key = "<leader>n";
-          action = "<cmd>lua require('harpoon'):list():add()<cr>";
-        }
-        {
-          mode = [ "n" ];
-          key = "<leader>i";
-          action = "<cmd>lua require('harpoon').ui:toggle_quick_menu(require('harpoon'):list())<cr>";
-        }
-        {
-          mode = [ "n" ];
-          key = "<leader>h";
-          action = "<cmd>lua require('harpoon'):list():select(1)<cr>";
-        }
-        {
-          mode = [ "n" ];
-          key = "<leader>j";
-          action = "<cmd>lua require('harpoon'):list():select(2)<cr>";
-        }
-        {
-          mode = [ "n" ];
-          key = "<leader>k";
-          action = "<cmd>lua require('harpoon'):list():select(3)<cr>";
-        }
-        {
-          mode = [ "n" ];
-          key = "<leader>l";
-          action = "<cmd>lua require('harpoon'):list():select(4)<cr>";
         }
 
         {
