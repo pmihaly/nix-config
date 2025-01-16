@@ -81,6 +81,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
       url = "github:viperML/nh";
     };
+    nixpkgs-working-mysql = {
+      inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:rsynnest/nixpkgs";
+    };
   };
 
   outputs =
