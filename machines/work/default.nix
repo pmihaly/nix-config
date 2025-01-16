@@ -130,7 +130,7 @@ in
       jwt-cli
       slack
       gnumake
-      mysql84 # vim dadbod
+      mariadb # vim dadbod
       jetbrains.pycharm-community-bin
     ];
 
