@@ -141,9 +141,9 @@ in
               "<Tab>" = "cmp.mapping(cmp.mapping.select_next_item(), {'i', 's'})";
             };
             sources = [
+              { name = "nvim_lsp"; }
               { name = "vim-dadbod-completion"; }
               { name = "copilot"; }
-              { name = "nvim_lsp"; }
               { name = "nvim_lsp_signature_help"; }
               { name = "buffer"; }
             ];
