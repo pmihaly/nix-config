@@ -48,14 +48,13 @@ in
         #! ${getExe pkgs.nushell}
         def main [
           service: string # the service to check
-        ] -> bool {
+        ]: nothing -> bool {
           ${getExe pkgs.tailscale} status --json
             | from json
             | get Peer
             | values
             | where {$service in $in.DNSName}
             | $in.0.Online
-            | $"($in)\n"
           }
       '')
     ];
