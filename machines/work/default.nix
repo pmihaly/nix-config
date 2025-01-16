@@ -2,7 +2,6 @@
   pkgs,
   vars,
   lib,
-  inputs,
   ...
 }:
 let
@@ -131,7 +130,7 @@ in
       jwt-cli
       slack
       gnumake
-      inputs.nixpkgs-working-mysql.legacyPackages.${pkgs.system}.mysql84 # vim dadbod
+      mysql84 # vim dadbod
       jetbrains.pycharm-community-bin
     ];
 

@@ -889,21 +889,6 @@
         "type": "github"
       }
     },
-    "nixpkgs-working-mysql": {
-      "locked": {
-        "lastModified": 1736787615,
-        "narHash": "sha256-mzPGrJrHBgygLX+A+HGrFsyCfpwM3HFL3o39s/mMfCo=",
-        "owner": "rsynnest",
-        "repo": "nixpkgs",
-        "rev": "e4c9e02b74a08fba121bc85975d6f1c043314073",
-        "type": "github"
-      },
-      "original": {
-        "owner": "rsynnest",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
     "nixpkgs_2": {
       "locked": {
         "lastModified": 1736523798,
@@ -1028,7 +1013,6 @@
         "nix-std": "nix-std",
         "nixpkgs": "nixpkgs_2",
         "nixpkgs-firefox-darwin": "nixpkgs-firefox-darwin",
-        "nixpkgs-working-mysql": "nixpkgs-working-mysql",
         "nixvim": "nixvim",
         "nur": "nur",
         "stylix": "stylix",
