@@ -135,7 +135,16 @@ in
     ];
 
     programs.nixvim = {
-      extraConfigLua = "vim.cmd('cnoreabbrev mf make flint')";
+      keymaps = [
+        {
+          mode = [
+            "n"
+          ];
+          key = "<leader>mf";
+          action = ":make flint<cr>";
+        }
+      ];
+
       globals.dbs =
         [
           {
