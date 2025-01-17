@@ -134,27 +134,30 @@ in
       jetbrains.pycharm-community-bin
     ];
 
-    programs.nixvim.globals.dbs =
-      [
-        {
-          name = "local";
-          url = "mysql://root@127.0.0.1:3306";
-        }
-        {
-          name = "staging (tun)";
-          url = workvars.staging-mysql-url;
-        }
-      ]
-      ++ map
-        (env: {
-          name = "${env} (tun)";
-          url = "mysql://${workvars.demo-db-creds}@${env}-mysql8.demo:3307";
-        })
+    programs.nixvim = {
+      extraConfigLua = "vim.cmd('cnoreabbrev mf make flint')";
+      globals.dbs =
         [
-          "demo-px"
-          "demo-al"
-          "demo-vr"
-        ];
+          {
+            name = "local";
+            url = "mysql://root@127.0.0.1:3306";
+          }
+          {
+            name = "staging (tun)";
+            url = workvars.staging-mysql-url;
+          }
+        ]
+        ++ map
+          (env: {
+            name = "${env} (tun)";
+            url = "mysql://${workvars.demo-db-creds}@${env}-mysql8.demo:3307";
+          })
+          [
+            "demo-px"
+            "demo-al"
+            "demo-vr"
+          ];
+    };
 
     programs.ssh = {
       enable = true;
