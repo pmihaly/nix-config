@@ -2,7 +2,6 @@
   pkgs,
   lib,
   config,
-  inputs,
   ...
 }:
 
@@ -18,7 +17,7 @@ in
 
     modules.persistence.directories = [
       ".local/share/nvim"
-      "~/.local/share/db-ui"
+      ".local/share/db-ui"
       ".config/github-copilot"
     ];
 
@@ -79,8 +78,6 @@ in
         dap.listeners.before.event_exited.dapui_config = function()
           dapui.close()
         end
-
-        require('harpoon').setup()
       '';
 
       editorconfig.enable = true;
