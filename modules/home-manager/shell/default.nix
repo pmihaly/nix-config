@@ -127,7 +127,7 @@ in
         [ -f ~/.zshrc_work ] && . ~/.zshrc_work
 
         function unlockpdf() {
-          ${getExe pkgs.pdftk} $2 input_pw $1 output "unlocked_$2"
+          ${getExe pkgs.qpdf} --password=$1 --decrypt $2 "unlocked_$2"
         }
       '';
       enableCompletion = true;
