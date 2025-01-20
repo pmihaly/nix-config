@@ -310,8 +310,8 @@ in
                       size = 1;
                     }
                   ];
-                  position = "right";
-                  size = 75;
+                  position = "bottom";
+                  size = 20;
                 }
               ];
             };
