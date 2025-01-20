@@ -57,7 +57,7 @@ in
         customCommands = [
           rec {
             key = "P";
-            command = "git push --force-with-lease";
+            command = "git push --force-with-lease --force-if-includes";
             context = "global";
             description = command;
             loadingText = "${description}...";
