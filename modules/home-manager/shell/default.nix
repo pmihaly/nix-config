@@ -125,10 +125,6 @@ in
         bindkey "^X" edit-command-line
 
         [ -f ~/.zshrc_work ] && . ~/.zshrc_work
-
-        function unlockpdf() {
-          ${getExe pkgs.qpdf} --password=$1 --decrypt $2 "unlocked_$2"
-        }
       '';
       enableCompletion = true;
       completionInit = ''
@@ -177,7 +173,7 @@ in
             qr = "${getExe pkgs.qrencode} -t ansiutf8";
             sr = ''function _f() { fd --type file --exec ${getExe pkgs.sd} "$1" "$2" }; _f'';
             du = getExe pkgs.du-dust;
-            lsblk = "${getExe pkgs.duf}";
+            lsblk = getExe pkgs.duf;
             wttr = "${getExe' pkgs.httpie "https"} wttr.in/budapest";
             n = "nvim";
             sharedir = "${getExe pkgs.python3} -m http.server 9000";

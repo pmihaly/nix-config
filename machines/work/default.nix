@@ -4,6 +4,7 @@
   lib,
   ...
 }:
+with lib;
 let
   workvars = builtins.fromTOML (
     builtins.readFile "/Users/${vars.username}/.nix-config/machines/work/workvars.toml"
@@ -109,16 +110,23 @@ in
       "gsh.${workvars.domain}" = "gitlab:gitlab.${workvars.domain}";
     };
 
-    programs.zsh.shellAliases = {
-      d = "cd $(find ~/lensadev -maxdepth 1 -type d | fzf)";
-      dn = "d && nvim";
-      ticket = ''git branch --show-current | grep -oE "[A-Z]+-[0-9]+" | tr -d "\n"'';
-      jira = "ticket | xargs -I{} open '${workvars.jira-url}/{}'";
-      mr = "open \"https://gitlab.${workvars.domain}/lensa/phoenix/$(basename \"$(pwd)\")/-/merge_requests?scope=all&state=opened&search=$(ticket)\"";
-      devenv = "set -o allexport && source config/dev.env";
-      so = "source ./.ve/bin/activate ; devenv";
-      gl = "mkdir -p ~/tun ; pushd ~/tun ; ssh -T graylog-staging-tunnel";
-      db = "mkdir -p ~/db ; pushd ~/db ; nvim -c DBUI";
+    programs.zsh = {
+      initExtra = ''
+        function unlockpdf() {
+          ${getExe pkgs.qpdf} --password=$1 --decrypt $2 "unlocked_$2"
+        }
+      '';
+      shellAliases = {
+        d = "cd $(find ~/lensadev -maxdepth 1 -type d | fzf)";
+        dn = "d && nvim";
+        ticket = ''git branch --show-current | grep -oE "[A-Z]+-[0-9]+" | tr -d "\n"'';
+        jira = "ticket | xargs -I{} open '${workvars.jira-url}/{}'";
+        mr = "open \"https://gitlab.${workvars.domain}/lensa/phoenix/$(basename \"$(pwd)\")/-/merge_requests?scope=all&state=opened&search=$(ticket)\"";
+        devenv = "set -o allexport && source config/dev.env";
+        so = "source ./.ve/bin/activate ; devenv";
+        gl = "mkdir -p ~/tun ; pushd ~/tun ; ssh -T graylog-staging-tunnel";
+        db = "mkdir -p ~/db ; pushd ~/db ; nvim -c DBUI";
+      };
     };
 
     home.packages = with pkgs; [
