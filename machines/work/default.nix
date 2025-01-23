@@ -25,7 +25,7 @@ in
 
     gui = {
       enable = true;
-      terminal-font-size = "13.0";
+      terminal-font-size = "15.0";
     };
     style.enable = true;
   };
