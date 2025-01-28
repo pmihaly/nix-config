@@ -33,7 +33,7 @@ in
       enable = true;
       settings = {
         cursor_trail = 3;
-        cursor_trail_decay = "0.1 0.4";
+        cursor_trail_decay = "0.1 0.2";
         macos_option_as_alt = true;
         macos_quit_when_last_window_closed = true;
         focus_follows_mouse = true;
