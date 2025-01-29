@@ -189,29 +189,41 @@ in
           identityFile = "~/.ssh/lensa2";
         };
 
-        "natstaging" = {
-          hostname = workvars.staging-ip;
+        natstaging = {
+          hostname = workvars.ips.staging;
           identityFile = "~/.ssh/lensa2";
         };
 
-        "10.33.*" = {
+        "${workvars.ips.natstaging-range}" = {
           identityFile = "~/.ssh/new-staging2018.pem";
-          user = "ec2-user";
+          user = workvars.natstaging-user;
           identitiesOnly = true;
           proxyCommand = "ssh natstaging -W %h:%p";
         };
 
-        "graylog-staging-tunnel" = {
+        graylog-staging-tunnel = {
           user = "mihaly.papp";
-          hostname = workvars.staging-ip;
+          hostname = workvars.ips.staging;
           identityFile = "~/.ssh/lensa2";
           localForwards = [
             {
               bind.port = 9988;
-              host.address = "10.33.3.181";
+              host.address = workvars.ips.staging-graylog;
               host.port = 9000;
             }
           ];
+        };
+
+        demo-px = {
+          user = workvars.natstaging-user;
+          hostname = workvars.ips.demo-px;
+          identitiesOnly = true;
+          identityFile = "~/.ssh/new-staging2018.pem";
+          proxyCommand = "ssh natstaging -W %h:%p";
+          setEnv = {
+            TERM = "xterm";
+          };
+
         };
       };
 
