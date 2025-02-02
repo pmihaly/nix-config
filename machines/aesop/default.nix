@@ -53,7 +53,10 @@
     };
   };
 
-  home-manager.users.${vars.username}.home.stateVersion = "22.05";
+  home-manager.users.${vars.username} = {
+    home.stateVersion = "22.05";
+    programs.nixvim.plugins.harpoon.enable = lib.mkForce false;
+  };
 
   users.mutableUsers = false;
   users.users.${vars.username} = {
