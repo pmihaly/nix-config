@@ -137,7 +137,7 @@
           inputs.stylix.darwinModules.stylix
           {
             nixpkgs.overlays = [
-              inputs.nur.overlay
+              inputs.nur.overlays.default
               inputs.nixpkgs-firefox-darwin.overlay
             ];
           }
@@ -178,7 +178,7 @@
           inputs.disko.nixosModules.disko
           inputs.nixvim.nixosModules.nixvim
           inputs.stylix.nixosModules.stylix
-          { nixpkgs.overlays = [ inputs.nur.overlay ]; }
+          { nixpkgs.overlays = [ inputs.nur.overlays.default ]; }
           {
             home-manager.extraSpecialArgs = {
               inherit inputs;
@@ -217,7 +217,7 @@
           inputs.disko.nixosModules.disko
           inputs.nixvim.nixosModules.nixvim
           inputs.stylix.nixosModules.stylix
-          { nixpkgs.overlays = [ inputs.nur.overlay ]; }
+          { nixpkgs.overlays = [ inputs.nur.overlays.default ]; }
           {
             home-manager.extraSpecialArgs = {
               inherit inputs;

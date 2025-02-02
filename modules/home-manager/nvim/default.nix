@@ -111,8 +111,10 @@ in
         which-key.enable = true;
         copilot-lua = {
           enable = true;
-          panel.enabled = false;
-          suggestion.enabled = false;
+          settings = {
+            panel.enabled = false;
+            suggestion.enabled = false;
+          };
         };
         floaterm = {
           enable = true;
@@ -269,57 +271,59 @@ in
               texthl = "DapLogPoint";
             };
           };
-          extensions = {
-            dap-python.enable = true;
-            dap-go.enable = true;
-            dap-ui = {
-              enable = true;
-              floating.mappings = {
-                close = [
-                  "<ESC>"
-                  "q"
-                ];
-              };
-              layouts = [
-                {
-                  elements = [
-                    {
-                      id = "scopes";
-                      size = 0.25;
-                    }
-                    {
-                      id = "breakpoints";
-                      size = 0.25;
-                    }
-                    {
-                      id = "stacks";
-                      size = 0.25;
-                    }
-                    {
-                      id = "watches";
-                      size = 0.25;
-                    }
-                  ];
-                  position = "left";
-                  size = 50;
-                }
-                {
-                  elements = [
-                    {
-                      id = "console";
-                      size = 1;
-                    }
-                  ];
-                  position = "bottom";
-                  size = 20;
-                }
+        };
+
+        dap-python.enable = true;
+        dap-go.enable = true;
+        dap-ui = {
+          enable = true;
+          settings = {
+            floating.mappings = {
+              close = [
+                "<ESC>"
+                "q"
               ];
             };
-            dap-virtual-text = {
-              enable = true;
-            };
+            layouts = [
+              {
+                elements = [
+                  {
+                    id = "scopes";
+                    size = 0.25;
+                  }
+                  {
+                    id = "breakpoints";
+                    size = 0.25;
+                  }
+                  {
+                    id = "stacks";
+                    size = 0.25;
+                  }
+                  {
+                    id = "watches";
+                    size = 0.25;
+                  }
+                ];
+                position = "left";
+                size = 50;
+              }
+              {
+                elements = [
+                  {
+                    id = "console";
+                    size = 1;
+                  }
+                ];
+                position = "bottom";
+                size = 20;
+              }
+            ];
           };
         };
+        dap-virtual-text = {
+          enable = true;
+        };
+
         oil = {
           enable = true;
           settings = {
