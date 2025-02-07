@@ -356,10 +356,6 @@ in
                       url = "https://www.youtube.com/watch?v=HUUy3mnAhCE";
                     }
                     {
-                      name = "garage";
-                      url = "https://www.youtube.com/watch?v=e1w7R1hEvCs";
-                    }
-                    {
                       name = "breakcore to dissociate to";
                       url = "https://www.youtube.com/watch?v=BhZ0Ky9uqts";
                     }
@@ -372,20 +368,12 @@ in
                       url = "https://www.youtube.com/watch?v=qNaCzmbaYWI";
                     }
                     {
-                      name = "focus lofi🍯";
-                      url = "https://www.youtube.com/watch?v=Xf3-4A-uEc8";
-                    }
-                    {
                       name = "ethereal breaks *:･ﾟ✧";
                       url = "https://www.youtube.com/watch?v=tdceTb3vsmk";
                     }
                     {
                       name = "cartoon tripping minimal techo";
                       url = "https://www.youtube.com/watch?v=WddpRmmAYkg";
-                    }
-                    {
-                      name = "breakcore to vibe to";
-                      url = "https://www.youtube.com/watch?v=5nVLLll-CKs";
                     }
                     {
                       name = "heaven.exe breakcore";
@@ -410,14 +398,6 @@ in
                     {
                       name = "smooooth disco mix II";
                       url = "https://www.youtube.com/watch?v=JF5IYpI6IXA";
-                    }
-                    {
-                      name = "breakcore ascend to";
-                      url = "https://www.youtube.com/watch?v=gKh5eyGE9fs";
-                    }
-                    {
-                      name = "rare breakcore mix";
-                      url = "https://www.youtube.com/watch?v=6niPi2bTmoU";
                     }
                   ];
                 }
