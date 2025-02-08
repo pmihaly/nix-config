@@ -53,7 +53,6 @@ in
             profileNames = [ "misi" ];
           };
           yazi.enable = true;
-          zathura.enable = true;
           kitty.enable = true;
           rofi.enable = true;
           fzf.enable = true;

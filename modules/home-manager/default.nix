@@ -11,7 +11,6 @@
     ./terminal-emulator
     ./newsboat
     ./neomutt
-    ./zathura
     ./hyprland
     ./discord
     ./minecraft

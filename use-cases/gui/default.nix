@@ -55,7 +55,6 @@ in
           };
           newsboat.enable = true;
           neomutt.enable = true;
-          zathura.enable = true;
           keepassxc.enable = true;
         };
 
