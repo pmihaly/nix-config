@@ -403,6 +403,10 @@ in
                       name = "german underground techno";
                       url = "https://www.youtube.com/watch?v=M26nbsaIG7k";
                     }
+                    {
+                      name = "german underground techno II";
+                      url = "https://www.youtube.com/watch?v=1R8V0zWP9js";
+                    }
                   ];
                 }
               ];
