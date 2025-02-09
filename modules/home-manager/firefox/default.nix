@@ -401,7 +401,7 @@ in
                     }
                     {
                       name = "german underground techno";
-                      url = "https://www.youtube.com/watch?v=cjF-9In3hqU";
+                      url = "https://www.youtube.com/watch?v=M26nbsaIG7k";
                     }
                   ];
                 }
