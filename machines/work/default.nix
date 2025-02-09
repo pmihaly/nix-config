@@ -140,8 +140,15 @@ in
       gnumake
       mariadb # vim dadbod
       jetbrains.pycharm-community-bin
-      pqrs # open parquet in nushell: pqrs cat file.pq | lines | par-each {from json}
     ];
+
+    programs.nushell.extraConfig = ''
+      def open-pq [
+        filename: string # file
+      ]: nothing -> any {
+        ${getExe pkgs.pqrs} cat $filename | lines | par-each {from json}
+      }
+    '';
 
     programs.nixvim = {
       keymaps = [
