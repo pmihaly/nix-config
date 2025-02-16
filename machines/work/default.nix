@@ -247,5 +247,5 @@ in
 
   users.users.${vars.username}.home = "/Users/${vars.username}";
 
-  system.stateVersion = 4;
+  system.stateVersion = 5;
 }

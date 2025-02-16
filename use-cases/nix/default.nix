@@ -61,7 +61,6 @@ in
     (optionalAttrs platform.isLinux { nix.gc.dates = "weekly"; })
 
     (optionalAttrs platform.isDarwin {
-      services.nix-daemon.enable = true;
       homebrew = {
         enable = true;
         onActivation = {
@@ -69,14 +68,6 @@ in
           upgrade = true;
           cleanup = "zap";
         };
-      };
-
-      nix.gc = {
-        interval = {
-          Hour = 3;
-          Minute = 15;
-        };
-        user = vars.username;
       };
     })
   ]);
