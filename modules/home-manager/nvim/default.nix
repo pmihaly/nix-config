@@ -662,6 +662,7 @@ in
         # Make line numbers default
         number = false;
         relativenumber = false;
+        fillchars = "vert: ";
 
         # Enable mouse mode
         mouse = "a";
