@@ -253,6 +253,20 @@ in
             "c"
           ];
         };
+        treesitter-textobjects = {
+          enable = true;
+          select = {
+            enable = true;
+            keymaps = {
+              "if" = "@function.inner";
+              "af" = "@function.outer";
+              "ib" = "@block.inner";
+              "ab" = "@block.outer";
+              "ic" = "@class.inner";
+              "ac" = "@class.outer";
+            };
+          };
+        };
         undotree.enable = true;
 
         dap = {
