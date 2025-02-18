@@ -411,6 +411,14 @@ in
                       name = "dub techno";
                       url = "https://www.youtube.com/watch?v=NAiBeZdGIQ8";
                     }
+                    {
+                      name = "german hard techno";
+                      url = "https://www.youtube.com/watch?v=FdOfhuYW_OI";
+                    }
+                    {
+                      name = "german hard techno II";
+                      url = "https://www.youtube.com/watch?v=6FJAWPuD4s8";
+                    }
                   ];
                 }
               ];
