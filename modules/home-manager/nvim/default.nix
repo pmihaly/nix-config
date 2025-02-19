@@ -563,8 +563,13 @@ in
         }
         {
           mode = [ "n" ];
-          key = "<leader>g";
+          key = "<leader>b";
           action = "<cmd>Telescope live_grep<cr>";
+        }
+        {
+          mode = [ "n" ];
+          key = "<leader>g";
+          action = "<cmd>Telescope lsp_dynamic_workspace_symbols<cr>";
         }
 
         {
