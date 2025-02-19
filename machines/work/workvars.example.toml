@@ -1,7 +1,8 @@
 staging-mysql-url = "mysql://acme:hunter2@database.com:3306"
 jira-url = "https://acmeinc.atlassian.net/browse/"
 domain = "acme.com"
-demo-db-creds = "acme:hunter2"
+demo-db-user = "acme"
+demo-db-password = "hunter2"
 natstaging-user = "acme"
 
 [ips]

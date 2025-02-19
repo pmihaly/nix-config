@@ -9,6 +9,11 @@ let
   workvars = builtins.fromTOML (
     builtins.readFile "/Users/${vars.username}/.nix-config/machines/work/workvars.toml"
   );
+  envs = [
+    "demo-px"
+    "demo-al"
+    "demo-vr"
+  ];
 in
 {
   imports = [ ../../use-cases ];
@@ -116,17 +121,25 @@ in
           ${getExe pkgs.qpdf} --password=$1 --decrypt $2 "unlocked_$2"
         }
       '';
-      shellAliases = {
-        d = "cd $(find ~/lensadev -maxdepth 1 -type d | fzf)";
-        dn = "d && nvim";
-        ticket = ''git branch --show-current | grep -oE "[A-Z]+-[0-9]+" | tr -d "\n"'';
-        jira = "ticket | xargs -I{} open '${workvars.jira-url}/{}'";
-        mr = "open \"https://gitlab.${workvars.domain}/lensa/phoenix/$(basename \"$(pwd)\")/-/merge_requests?scope=all&state=opened&search=$(ticket)\"";
-        devenv = "set -o allexport && source config/dev.env";
-        so = "source ./.ve/bin/activate ; devenv";
-        gl = "mkdir -p ~/tun ; cd ~/tun ; ssh -T graylog-staging-tunnel";
-        db = "mkdir -p ~/db ; cd ~/db ; nvim -c DBUI";
-      };
+      shellAliases =
+        {
+          d = "cd $(find ~/lensadev -maxdepth 1 -type d | fzf)";
+          dn = "d && nvim";
+          ticket = ''git branch --show-current | grep -oE "[A-Z]+-[0-9]+" | tr -d "\n"'';
+          jira = "ticket | xargs -I{} open '${workvars.jira-url}/{}'";
+          mr = "open \"https://gitlab.${workvars.domain}/lensa/phoenix/$(basename \"$(pwd)\")/-/merge_requests?scope=all&state=opened&search=$(ticket)\"";
+          devenv = "set -o allexport && source config/dev.env";
+          so = "source ./.ve/bin/activate ; devenv";
+          gl = "mkdir -p ~/tun ; cd ~/tun ; ssh -T graylog-staging-tunnel";
+          db = "mkdir -p ~/db ; cd ~/db ; nvim -c DBUI";
+        }
+        // (
+          map (db: {
+            name = "${db}-dump";
+            value = "${pkgs.mariadb}/bin/mysqldump --user=${workvars.demo-db-user} --password=${workvars.demo-db-password} --host=${db}-mysql8.demo --port=3307";
+          }) envs
+          |> listToAttrs
+        );
     };
 
     home.packages = with pkgs; [
@@ -172,16 +185,10 @@ in
             url = workvars.staging-mysql-url;
           }
         ]
-        ++ map
-          (env: {
-            name = "${env} (tun)";
-            url = "mysql://${workvars.demo-db-creds}@${env}-mysql8.demo:3307";
-          })
-          [
-            "demo-px"
-            "demo-al"
-            "demo-vr"
-          ];
+        ++ map (env: {
+          name = "${env} (tun)";
+          url = "mysql://${workvars.demo-db-user}:${workvars.demo-db-password}@${env}-mysql8.demo:3307";
+        }) envs;
     };
 
     programs.ssh = {
