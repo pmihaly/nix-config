@@ -187,7 +187,6 @@ optionalAttrs platform.isDarwin {
       "messenger"
       "caffeine" # keep screen alive
       "utm" # virtual machines
-      "balenaetcher"
       "linearmouse"
       "karabiner-elements"
     ];
