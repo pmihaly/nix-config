@@ -65,6 +65,7 @@ in
 
 
       blacklistadd excalidraw.com
+      blacklistadd hackerrank.com
 
       setnull searchurls.amazon
       setnull searchurls.amazonuk
