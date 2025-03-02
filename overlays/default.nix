@@ -23,6 +23,39 @@
       }
     );
 
+    futuristic-iosevka = (
+      # use light as regular and regular as bold
+      prev.iosevka.override {
+        privateBuildPlan = ''
+          [buildPlans.Iosevka-custom]
+          family = "iosevka-custom"
+          spacing = "normal"
+          serifs = "sans"
+          noCvSs = true
+          exportGlyphNames = false
+
+            [buildPlans.Iosevka-custom.variants]
+            inherits = "ss07"
+
+          [buildPlans.Iosevka-custom.weights.Light]
+          shape = 200
+          menu = 200
+          css = 200
+
+          [buildPlans.Iosevka-custom.weights.Regular]
+          shape = 500
+          menu = 500
+          css = 500
+
+          [buildPlans.Iosevka-custom.widths.Normal]
+          shape = 500
+          menu = 5
+          css = "normal"
+        '';
+        set = "-custom";
+      }
+    );
+
     vcr-osd-mono = (
       prev.stdenvNoCC.mkDerivation {
         name = "vcr-osd-mono";
