@@ -334,6 +334,10 @@ in
                       name = "skylake";
                       url = "http://skylake";
                     }
+                    {
+                      name = "local syncthing";
+                      url = "http://127.0.0.1:8384";
+                    }
                   ];
                 }
                 {
