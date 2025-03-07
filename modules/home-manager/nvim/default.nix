@@ -18,7 +18,6 @@ in
     modules.persistence.directories = [
       ".local/share/nvim"
       ".local/share/db-ui"
-      ".config/github-copilot"
     ];
 
     programs.zsh.localVariables.EDITOR = getExe config.programs.nixvim.build.package;
@@ -109,13 +108,6 @@ in
           };
         };
         which-key.enable = true;
-        copilot-lua = {
-          enable = true;
-          settings = {
-            panel.enabled = false;
-            suggestion.enabled = false;
-          };
-        };
         floaterm = {
           enable = true;
           settings = {
@@ -126,7 +118,6 @@ in
           };
         };
 
-        copilot-cmp.enable = true;
         cmp = {
           enable = true;
           settings = {
@@ -142,7 +133,6 @@ in
             sources = [
               { name = "nvim_lsp"; }
               { name = "vim-dadbod-completion"; }
-              { name = "copilot"; }
               { name = "nvim_lsp_signature_help"; }
               { name = "buffer"; }
             ];
