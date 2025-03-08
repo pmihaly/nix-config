@@ -34,7 +34,7 @@ in
           color listfocus_unread   color2  color0 bold
         '';
 
-      programs.vscode = {
+      programs.vscode.profiles.default = {
         extensions = [ pkgs.vscode-extensions.catppuccin.catppuccin-vsc-icons ];
         userSettings = {
           "workbench.iconTheme" = "catppuccin-frappe";

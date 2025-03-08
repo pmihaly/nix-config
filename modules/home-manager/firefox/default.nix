@@ -150,7 +150,7 @@ in
                 "browser.newtabpage.pinned" = [ ];
                 "browser.startup.homepage" = "https://search.brave.com/search";
               };
-            extensions = with pkgs.nur.repos.rycee.firefox-addons; [
+            extensions.packages = with pkgs.nur.repos.rycee.firefox-addons; [
               ublock-origin
               localcdn
               clearurls
