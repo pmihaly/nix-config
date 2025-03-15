@@ -308,7 +308,7 @@ in
             {
               id = 0;
               name = "misi";
-              extensions = with pkgs.nur.repos.rycee.firefox-addons; [
+              extensions.packages = with pkgs.nur.repos.rycee.firefox-addons; [
                 sponsorblock
                 old-reddit-redirect
                 youtube-nonstop

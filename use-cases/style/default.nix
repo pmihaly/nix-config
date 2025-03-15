@@ -60,7 +60,10 @@ in
           tmux.enable = true;
           bat.enable = true;
           gtk.enable = true;
-          vscode.enable = true;
+          vscode = {
+            enable = true;
+            profileNames = [ "default" ];
+          };
         };
       };
     };
