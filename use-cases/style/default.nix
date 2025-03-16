@@ -82,8 +82,8 @@ in
           };
 
           monospace = {
-            name = "VCR OSD Mono";
-            package = pkgs.vcr-osd-mono;
+            name = "JetBrains Mono";
+            package = pkgs.jetbrains-mono;
           };
 
           sansSerif = {
