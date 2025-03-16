@@ -228,6 +228,45 @@
         ];
       };
 
+      nixosConfigurations.skylake-1 = nixpkgs.lib.nixosSystem {
+        specialArgs =
+          let
+            vars = import ./machines/skylake-1/vars.nix;
+          in
+          {
+            inherit inputs vars;
+            lib = nixpkgs.lib.extend (
+              final: prev:
+              (import ./lib/nixos {
+                lib = final;
+                inherit vars;
+              })
+            );
+            platform = {
+              isLinux = true;
+              isDarwin = false;
+            };
+          };
+
+        modules = [
+          home-manager.nixosModules.home-manager
+          inputs.agenix.nixosModules.default
+          inputs.impermanence.nixosModules.impermanence
+          inputs.nix-index-database.nixosModules.nix-index
+          inputs.disko.nixosModules.disko
+          inputs.nixvim.nixosModules.nixvim
+          inputs.stylix.nixosModules.stylix
+          { nixpkgs.overlays = [ inputs.nur.overlays.default ]; }
+          {
+            home-manager.extraSpecialArgs = {
+              inherit inputs;
+            };
+          }
+          ./secrets
+          ./machines/skylake-1
+        ];
+      };
+
       deploy.nodes = {
         skylake = {
           hostname = "skylake";
