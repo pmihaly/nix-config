@@ -63,7 +63,6 @@ in
       set searchurls.route https://www.google.com/maps/dir/?api=1&travelmode=transit&destination=
       set searchurls.brew  https://formulae.brew.sh/cask/
 
-
       blacklistadd excalidraw.com
       blacklistadd hackerrank.com
       blacklistadd console.hetzner.cloud/console
@@ -159,37 +158,60 @@ in
               istilldontcareaboutcookies
             ];
             userChrome = ''
-              .tabbrowser-tab .tab-close-button,
-              #firefox-view-button,
-              #alltabs-button,
-              #tracking-protection-icon-container,
-              #reader-mode-button,
-              #star-button-box,
-              #unified-extensions-button,
-              .unified-extensions-item,
-              #tabs-newtab-button,
-              #idbar,
-              #appMenu-update-available-notification
-              {
-                display: none !important;
-              }
+                            /* Source file https://github.com/MrOtherGuy/firefox-csshacks/tree/master/chrome/hide_tabs_toolbar_v2.css made available under Mozilla Public License v. 2.0
+              See the above repository for updates as well as full license text. */
 
-              #titlebar,
-              #PersonalToolbar
-              {
-                visibility: collapse !important;
-              }
-              #nav-bar {
-                min-height: 0px !important;
-                max-height: 0px !important;
-              }
-              toolbar {
-                height: 0px !important;
-                visibility: collapse !important;
-              }
+              /* This requires Firefox 133+ to work */
 
-              #tabbrowser-tabs {
-                border-inline-start: 1px solid transparent !important;
+              @media (-moz-bool-pref: "sidebar.verticalTabs"),
+                     -moz-pref("sidebar.verticalTabs"){
+                #sidebar-main{
+                  visibility: collapse;
+                }
+              }
+              @media (-moz-bool-pref: "userchrome.force-window-controls-on-left.enabled"),
+                     -moz-pref("userchrome.force-window-controls-on-left.enabled"){
+                #nav-bar > .titlebar-buttonbox-container{
+                  order: -1 !important;
+                  > .titlebar-buttonbox{
+                    flex-direction: row-reverse;
+                  }
+                }
+              }
+              @media not (-moz-bool-pref: "sidebar.verticalTabs"),
+                     not -moz-pref("sidebar.verticalTabs"){
+                #TabsToolbar:not([customizing]){
+                  visibility: collapse;
+                }
+                :root[sizemode="fullscreen"] #nav-bar > .titlebar-buttonbox-container{
+                  display: flex !important;
+                }
+                :root:is([tabsintitlebar],[customtitlebar]) #toolbar-menubar:not([autohide="false"]) ~ #nav-bar{
+                  > .titlebar-buttonbox-container{
+                    display: flex !important;
+                  }
+                  :root[sizemode="normal"] & {
+                    > .titlebar-spacer{
+                      display: flex !important;
+                    }
+                  }
+                  :root[sizemode="maximized"] & {
+                    > .titlebar-spacer[type="post-tabs"]{
+                      display: flex !important;
+                    }
+                    @media (-moz-bool-pref: "userchrome.force-window-controls-on-left.enabled"),
+                      -moz-pref("userchrome.force-window-controls-on-left.enabled"),
+                      (-moz-gtk-csd-reversed-placement),
+                      (-moz-platform: macos){
+                      > .titlebar-spacer[type="post-tabs"]{
+                        display: none !important;
+                      }
+                      > .titlebar-spacer[type="pre-tabs"]{
+                        display: flex !important;
+                      }
+                    }
+                  }
+                }
               }
             '';
             extraConfig = ''

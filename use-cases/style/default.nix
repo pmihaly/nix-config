@@ -39,6 +39,21 @@ in
         userSettings = {
           "workbench.iconTheme" = "catppuccin-frappe";
         };
+
+      };
+
+      programs.firefox.profiles.misi = {
+        userChrome = mkBefore ''
+          * {
+            font-size:12px !important;
+            font-weight: normal !important;
+            font-family: "JetBrains Mono", monospace !important;
+          }'';
+        extraConfig = mkBefore ''
+          user_pref("font.name.serif.x-western", "JetBrains Mono");
+          user_pref("font.name.sans-serif.x-western", "JetBrains Mono");
+          user_pref("font.name.monospace.x-western", "JetBrains Mono");
+        '';
       };
 
       stylix = {
