@@ -86,7 +86,6 @@
       "/var/log"
       "/var/lib/nixos"
       "/var/lib/systemd/coredump"
-      "/var/lib/${config.services.prometheus.stateDir}"
     ];
     files = [ "/etc/machine-id" ];
     users.${vars.username} = {
@@ -109,13 +108,6 @@
     LC_PAPER = "en_US.UTF-8";
     LC_TELEPHONE = "en_US.UTF-8";
     LC_TIME = "en_US.UTF-8";
-  };
-
-  services.prometheus = {
-    enable = true;
-    globalConfig = {
-      scrape_interval = "10s";
-    };
   };
 
   system.stateVersion = "23.05";
