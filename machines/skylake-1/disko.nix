@@ -1,5 +1,6 @@
 {
   fileSystems."/nix".neededForBoot = true;
+  fileSystems."/boot".neededForBoot = true;
   fileSystems."/persist".neededForBoot = true;
 
   disko.devices = {
@@ -20,17 +21,10 @@
         content = {
           type = "gpt";
           partitions = {
-            esp = {
+            boot = {
               priority = 1;
-              name = "ESP";
-              start = "1M";
-              end = "500M";
-              type = "EF00";
-              content = {
-                type = "filesystem";
-                format = "vfat";
-                mountpoint = "/boot";
-              };
+              size = "1M";
+              type = "EF02";
             };
             root = {
               size = "100%";
@@ -38,6 +32,14 @@
                 type = "btrfs";
 
                 subvolumes = {
+                  "boot" = {
+                    mountOptions = [
+                      "compress-force=zstd:1"
+                      "noatime"
+                    ];
+                    mountpoint = "/boot";
+                  };
+
                   "nix" = {
                     mountOptions = [
                       "compress-force=zstd:1"
