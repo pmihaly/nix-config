@@ -66,6 +66,24 @@ in
         plugin add ${getExe pkgs.nushellPlugins.polars}
         plugin use polars
       '';
+      settings = {
+        edit_mode = "vi";
+        use_kitty_protocol = true;
+        keybindings = [
+          {
+            name = "throw-wip-comand-into-editor";
+            modifier = "control";
+            keycode = "char_x";
+            mode = [
+              "vi_insert"
+              "vi_normal"
+            ];
+            event = [
+              { send = "OpenEditor"; }
+            ];
+          }
+        ];
+      };
     };
     programs.starship.enableNushellIntegration = false; # prompt from stylix
     programs.yazi.enableNushellIntegration = true;
