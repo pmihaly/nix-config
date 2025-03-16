@@ -57,10 +57,10 @@ in
       set searchurls.ddg   https://duckduckgo.com/?q=
       set searchurls.r     https://old.reddit.com/r/
       set searchurls.dh    https://hub.docker.com/search?q=
-      set searchurls.map   https://www.google.com/maps/search/
-      set searchurls.maps  https://www.google.com/maps/search/
-      set searchurls.route https://www.google.com/maps/dir/?api=1&travelmode=transit&destination=
-      set searchurls.route https://www.google.com/maps/dir/?api=1&travelmode=transit&destination=
+      set searchurls.map   https://google.com/maps/search/
+      set searchurls.maps  https://google.com/maps/search/
+      set searchurls.route https://google.com/maps/dir/?api=1&travelmode=transit&destination=
+      set searchurls.route https://google.com/maps/dir/?api=1&travelmode=transit&destination=
       set searchurls.brew  https://formulae.brew.sh/cask/
 
       blacklistadd excalidraw.com
@@ -369,87 +369,87 @@ in
                   bookmarks = [
                     {
                       name = "skeler I";
-                      url = "https://www.youtube.com/watch?v=J0y6wM0aAgE";
+                      url = "https://youtube.com/watch?v=J0y6wM0aAgE";
                     }
                     {
                       name = "skeler II";
-                      url = "https://www.youtube.com/watch?v=J4t4pMZBXZg";
+                      url = "https://youtube.com/watch?v=J4t4pMZBXZg";
                     }
                     {
                       name = "skeler III";
-                      url = "https://www.youtube.com/watch?v=P4ALDytLAXQ";
+                      url = "https://youtube.com/watch?v=P4ALDytLAXQ";
                     }
                     {
                       name = "skeler IV";
-                      url = "https://www.youtube.com/watch?v=HUUy3mnAhCE";
+                      url = "https://youtube.com/watch?v=HUUy3mnAhCE";
                     }
                     {
                       name = "breakcore to dissociate to";
-                      url = "https://www.youtube.com/watch?v=BhZ0Ky9uqts";
+                      url = "https://youtube.com/watch?v=BhZ0Ky9uqts";
                     }
                     {
                       name = "breakcore to feel to";
-                      url = "https://www.youtube.com/watch?v=0KaBYaQGwbs";
+                      url = "https://youtube.com/watch?v=0KaBYaQGwbs";
                     }
                     {
                       name = "dnb";
-                      url = "https://www.youtube.com/watch?v=qNaCzmbaYWI";
+                      url = "https://youtube.com/watch?v=qNaCzmbaYWI";
                     }
                     {
                       name = "ethereal breaks *:･ﾟ✧";
-                      url = "https://www.youtube.com/watch?v=tdceTb3vsmk";
+                      url = "https://youtube.com/watch?v=tdceTb3vsmk";
                     }
                     {
                       name = "cartoon tripping minimal techo";
-                      url = "https://www.youtube.com/watch?v=WddpRmmAYkg";
+                      url = "https://youtube.com/watch?v=WddpRmmAYkg";
                     }
                     {
                       name = "heaven.exe breakcore";
-                      url = "https://www.youtube.com/watch?v=z9e8CPULjW4";
+                      url = "https://youtube.com/watch?v=z9e8CPULjW4";
                     }
                     {
                       name = "abyss darksynth";
-                      url = "https://www.youtube.com/watch?v=aA9GhsYt2O0";
+                      url = "https://youtube.com/watch?v=aA9GhsYt2O0";
                     }
                     {
                       name = "smooooth sonic dj";
-                      url = "https://www.youtube.com/watch?v=PYfhbYIxBxE";
+                      url = "https://youtube.com/watch?v=PYfhbYIxBxE";
                     }
                     {
                       name = "smooooth disco mix I";
-                      url = "https://www.youtube.com/watch?v=4nvewes8Inc";
+                      url = "https://youtube.com/watch?v=4nvewes8Inc";
                     }
                     {
                       name = "smooooth ukg cat fight";
-                      url = "https://www.youtube.com/watch?v=DjDWKh2bBzs";
+                      url = "https://youtube.com/watch?v=DjDWKh2bBzs";
                     }
                     {
                       name = "smooooth disco mix II";
-                      url = "https://www.youtube.com/watch?v=JF5IYpI6IXA";
+                      url = "https://youtube.com/watch?v=JF5IYpI6IXA";
                     }
                     {
                       name = "german underground techno";
-                      url = "https://www.youtube.com/watch?v=M26nbsaIG7k";
+                      url = "https://youtube.com/watch?v=M26nbsaIG7k";
                     }
                     {
                       name = "german underground techno II";
-                      url = "https://www.youtube.com/watch?v=1R8V0zWP9js";
+                      url = "https://youtube.com/watch?v=1R8V0zWP9js";
                     }
                     {
                       name = "dub techno";
-                      url = "https://www.youtube.com/watch?v=NAiBeZdGIQ8";
+                      url = "https://youtube.com/watch?v=NAiBeZdGIQ8";
                     }
                     {
                       name = "dub techno II";
-                      url = "https://www.youtube.com/watch?v=OnYKl4KKMWY";
+                      url = "https://youtube.com/watch?v=OnYKl4KKMWY";
                     }
                     {
                       name = "german hard techno";
-                      url = "https://www.youtube.com/watch?v=FdOfhuYW_OI";
+                      url = "https://youtube.com/watch?v=FdOfhuYW_OI";
                     }
                     {
                       name = "german hard techno II";
-                      url = "https://www.youtube.com/watch?v=6FJAWPuD4s8";
+                      url = "https://youtube.com/watch?v=6FJAWPuD4s8";
                     }
                   ];
                 }
