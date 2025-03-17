@@ -140,7 +140,7 @@ in
 
         autoload -z edit-command-line
         zle -N edit-command-line
-        bindkey "^X" edit-command-line
+        bindkey "^O" edit-command-line
 
         [ -f ~/.zshrc_work ] && . ~/.zshrc_work
       '';
