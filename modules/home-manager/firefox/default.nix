@@ -455,6 +455,14 @@ in
                       name = "german hard techno II";
                       url = "https://youtube.com/watch?v=6FJAWPuD4s8";
                     }
+                    {
+                      name = "argent metal I";
+                      url = "https://youtube.com/watch?v=bgu94ChWTCA";
+                    }
+                    {
+                      name = "argent metal II";
+                      url = "https://www.youtube.com/watch?v=HIekm-GR14M";
+                    }
                   ];
                 }
               ];
