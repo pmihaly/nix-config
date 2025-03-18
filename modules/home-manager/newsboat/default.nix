@@ -30,6 +30,7 @@ in
         { url = "https://old.reddit.com/r/escapehungary.rss"; }
         { url = "https://old.reddit.com/r/kiszamolo.rss"; }
         { url = "https://old.reddit.com/r/programminghungary.rss"; }
+        { url = "https://nushell.sh/rss.xml"; }
       ];
       extraConfig = ''
         #show-read-feeds no
