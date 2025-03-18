@@ -136,24 +136,36 @@ in
         // (
           map (db: {
             name = "${db}-dump";
-            value = "${pkgs.mariadb}/bin/mysqldump --user=${workvars.demo-db-user} --password=${workvars.demo-db-password} --host=${db}-mysql8.demo --port=3307";
+            value = "${getExe' pkgs.mariadb "mysqldump"} --user=${workvars.demo-db-user} --password=${workvars.demo-db-password} --host=${db}-mysql8.demo --port=3307";
           }) envs
           |> listToAttrs
         );
     };
 
-    home.packages = with pkgs; [
-      awscli
-      git-lfs
-      saml2aws
-      openssl
-      obsidian
-      jwt-cli
-      slack
-      gnumake
-      mariadb # vim dadbod
-      jetbrains.pycharm-community-bin
-    ];
+    home.packages =
+      with pkgs;
+      [
+        awscli
+        git-lfs
+        saml2aws
+        openssl
+        obsidian
+        jwt-cli
+        slack
+        gnumake
+        mariadb # vim dadbod
+        jetbrains.pycharm-community-bin
+      ]
+      ++ (concatMap (
+        env:
+        let
+          envId = env |> splitString "-" |> lists.last;
+        in
+        [
+          (pkgs.writeShellScriptBin "trget-${envId}" "${getExe' pkgs.httpie "http"} get http://tracing-system-app.${env}.lms/api/v1/business-process/$1")
+          (pkgs.writeShellScriptBin "trparent-${envId}" "${getExe pkgs.jq} -r .parent_global_trace_id | xargs -I{} ${getExe' pkgs.httpie "http"} get http://tracing-system-app.${env}.lms/api/v1/business-process/{}")
+        ]
+      ) envs);
 
     programs.nushell.extraConfig = ''
       def open-pq [
