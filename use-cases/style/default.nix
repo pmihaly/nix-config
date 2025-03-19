@@ -47,12 +47,12 @@ in
           * {
             font-size:12px !important;
             font-weight: normal !important;
-            font-family: "${config.stylix.fonts.monospace.name}", monospace !important;
+            font-family: "JetBrains Mono", monospace !important;
           }'';
         extraConfig = mkBefore ''
-          user_pref("font.name.serif.x-western", "${config.stylix.fonts.monospace.name}");
-          user_pref("font.name.sans-serif.x-western", "${config.stylix.fonts.monospace.name}");
-          user_pref("font.name.monospace.x-western", "${config.stylix.fonts.monospace.name}");
+          user_pref("font.name.serif.x-western", "JetBrains Mono");
+          user_pref("font.name.sans-serif.x-western", "JetBrains Mono");
+          user_pref("font.name.monospace.x-western", "JetBrains Mono");
         '';
       };
 
@@ -99,39 +99,8 @@ in
           };
 
           monospace = {
-            name = "Iosevka-custom-2";
-            package = (
-              pkgs.iosevka.override {
-                privateBuildPlan = ''
-                  [buildPlans.Iosevka-custom-2]
-                  family = "iosevka-custom-2"
-                  spacing = "term"
-                  serifs = "sans"
-                  noCvSs = false
-                  exportGlyphNames = true
-
-                  [buildPlans.Iosevka-custom-2.variants]
-                  inherits = "ss14"
-
-                    [buildPlans.Iosevka-custom-2.variants.design]
-                    zero = "tall-slashed"
-
-                  [buildPlans.Iosevka-custom-2.ligations]
-                  inherits = "dlig"
-
-                  [buildPlans.Iosevka-custom-2.weights.Regular]
-                  shape = 400
-                  menu = 400
-                  css = 400
-
-                  [buildPlans.Iosevka-custom-2.widths.Normal]
-                  shape = 500
-                  menu = 5
-                  css = "normal"
-                '';
-                set = "-custom-2";
-              }
-            );
+            name = "JetBrains Mono";
+            package = pkgs.jetbrains-mono;
           };
 
           sansSerif = {
