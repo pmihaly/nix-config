@@ -158,63 +158,72 @@ in
               istilldontcareaboutcookies
             ];
             userChrome = ''
-                            /* Source file https://github.com/MrOtherGuy/firefox-csshacks/tree/master/chrome/hide_tabs_toolbar_v2.css made available under Mozilla Public License v. 2.0
-              See the above repository for updates as well as full license text. */
-
-              /* This requires Firefox 133+ to work */
-
-              @media (-moz-bool-pref: "sidebar.verticalTabs"),
-                     -moz-pref("sidebar.verticalTabs"){
-                #sidebar-main{
-                  visibility: collapse;
-                }
+              #tracking-protection-icon-container,
+              .urlbar-page-action,
+              #fxa-toolbar-menu-button
+              {
+                visibility: collapse;
               }
-              @media (-moz-bool-pref: "userchrome.force-window-controls-on-left.enabled"),
-                     -moz-pref("userchrome.force-window-controls-on-left.enabled"){
-                #nav-bar > .titlebar-buttonbox-container{
-                  order: -1 !important;
-                  > .titlebar-buttonbox{
-                    flex-direction: row-reverse;
+
+                              /* Source file https://github.com/MrOtherGuy/firefox-csshacks/tree/master/chrome/hide_tabs_toolbar_v2.css made available under Mozilla Public License v. 2.0
+                See the above repository for updates as well as full license text. */
+
+                /* This requires Firefox 133+ to work */
+
+                @media (-moz-bool-pref: "sidebar.verticalTabs"),
+                       -moz-pref("sidebar.verticalTabs"){
+                  #sidebar-main{
+                    visibility: collapse;
                   }
                 }
-              }
-              @media not (-moz-bool-pref: "sidebar.verticalTabs"),
-                     not -moz-pref("sidebar.verticalTabs"){
-                #TabsToolbar:not([customizing]){
-                  visibility: collapse;
+                @media (-moz-bool-pref: "userchrome.force-window-controls-on-left.enabled"),
+                       -moz-pref("userchrome.force-window-controls-on-left.enabled"){
+                  #nav-bar > .titlebar-buttonbox-container{
+                    order: -1 !important;
+                    > .titlebar-buttonbox{
+                      flex-direction: row-reverse;
+                    }
+                  }
                 }
-                :root[sizemode="fullscreen"] #nav-bar > .titlebar-buttonbox-container{
-                  display: flex !important;
-                }
-                :root:is([tabsintitlebar],[customtitlebar]) #toolbar-menubar:not([autohide="false"]) ~ #nav-bar{
-                  > .titlebar-buttonbox-container{
+                @media not (-moz-bool-pref: "sidebar.verticalTabs"),
+                       not -moz-pref("sidebar.verticalTabs"){
+                  #TabsToolbar:not([customizing]){
+                    visibility: collapse;
+                  }
+                  :root[sizemode="fullscreen"] #nav-bar > .titlebar-buttonbox-container{
                     display: flex !important;
                   }
-                  :root[sizemode="normal"] & {
-                    > .titlebar-spacer{
+                  :root:is([tabsintitlebar],[customtitlebar]) #toolbar-menubar:not([autohide="false"]) ~ #nav-bar{
+                    > .titlebar-buttonbox-container{
                       display: flex !important;
                     }
-                  }
-                  :root[sizemode="maximized"] & {
-                    > .titlebar-spacer[type="post-tabs"]{
-                      display: flex !important;
-                    }
-                    @media (-moz-bool-pref: "userchrome.force-window-controls-on-left.enabled"),
-                      -moz-pref("userchrome.force-window-controls-on-left.enabled"),
-                      (-moz-gtk-csd-reversed-placement),
-                      (-moz-platform: macos){
-                      > .titlebar-spacer[type="post-tabs"]{
-                        display: none !important;
-                      }
-                      > .titlebar-spacer[type="pre-tabs"]{
+                    :root[sizemode="normal"] & {
+                      > .titlebar-spacer{
                         display: flex !important;
                       }
                     }
+                    :root[sizemode="maximized"] & {
+                      > .titlebar-spacer[type="post-tabs"]{
+                        display: flex !important;
+                      }
+                      @media (-moz-bool-pref: "userchrome.force-window-controls-on-left.enabled"),
+                        -moz-pref("userchrome.force-window-controls-on-left.enabled"),
+                        (-moz-gtk-csd-reversed-placement),
+                        (-moz-platform: macos){
+                        > .titlebar-spacer[type="post-tabs"]{
+                          display: none !important;
+                        }
+                        > .titlebar-spacer[type="pre-tabs"]{
+                          display: flex !important;
+                        }
+                      }
+                    }
                   }
                 }
-              }
             '';
             extraConfig = ''
+              user_pref("browser.translation.enable", "false");
+
               user_pref("app.normandy.api_url", "");
               user_pref("app.normandy.enabled", false);
               user_pref("app.shield.optoutstudies.enabled", false);
