@@ -10,7 +10,7 @@
     ./yazi
     ./terminal-emulator
     ./newsboat
-    ./neomutt
+    ./email
     ./hyprland
     ./discord
     ./minecraft

@@ -1,5 +1,4 @@
 {
-  pkgs,
   lib,
   config,
   ...
@@ -7,11 +6,11 @@
 
 with lib;
 let
-  cfg = config.modules.neomutt;
+  cfg = config.modules.email;
 in
 {
-  options.modules.neomutt = {
-    enable = mkEnableOption "neomutt";
+  options.modules.email = {
+    enable = mkEnableOption "email";
   };
   imports = [ ../../../secrets/home-manager ];
   config = mkIf cfg.enable {
@@ -27,28 +26,13 @@ in
         primary = true;
         imap.host = "imap.mailbox.org";
         smtp.host = "smtp.mailbox.org";
-        neomutt.enable = true;
-        mbsync = {
-          enable = true;
-          create = "maildir";
-        };
-        msmtp.enable = true;
-        notmuch.enable = true;
+        aerc.enable = true;
       };
     };
 
-    programs.neomutt = {
+    programs.aerc = {
       enable = true;
-      vimKeys = true;
-    };
-
-    programs.mbsync.enable = true;
-    programs.msmtp.enable = true;
-    programs.notmuch = {
-      enable = true;
-      hooks = {
-        preNew = "mbsync --all";
-      };
+      extraConfig.general.unsafe-accounts-conf = true;
     };
   };
 }
