@@ -66,6 +66,12 @@ in
         plugin add ${getExe pkgs.nushellPlugins.polars}
         plugin use polars
       '';
+      environmentVariables = {
+        PROMPT_INDICATOR_VI_NORMAL = "";
+        PROMPT_INDICATOR_VI_INSERT = "";
+        TRANSIENT_PROMPT_INDICATOR_VI_NORMAL = "";
+        TRANSIENT_PROMPT_INDICATOR_VI_INSERT = "";
+      };
       settings = {
         edit_mode = "vi";
         use_kitty_protocol = true;
@@ -85,7 +91,7 @@ in
         ];
       };
     };
-    programs.starship.enableNushellIntegration = false; # prompt from stylix
+    programs.starship.enableNushellIntegration = true;
     programs.yazi.enableNushellIntegration = true;
     programs.direnv.enableNushellIntegration = true;
 
@@ -122,7 +128,7 @@ in
         shell = {
           disabled = false;
           zsh_indicator = "🔮";
-          nu_indicator = "🧮";
+          nu_indicator = "🧙";
           style = "bold fg:#b48ead";
         };
       };
