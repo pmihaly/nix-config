@@ -149,9 +149,20 @@ in
           enable = true;
           enabledExtensions = [ "dap" ];
           settings = {
+            defaults.mappings = {
+              i = {
+                "<C-j>" = {
+                  __raw = "require('telescope.actions').move_selection_next";
+                };
+                "<C-k>" = {
+                  __raw = "require('telescope.actions').move_selection_previous";
+                };
+              };
+            };
+
             pickers = {
               find_command = [
-                "rg"
+                (getExe pkgs.ripgrep)
                 "--files"
                 "--hidden"
                 "-g"
