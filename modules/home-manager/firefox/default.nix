@@ -224,6 +224,7 @@ in
             extraConfig = ''
               user_pref("browser.translation.enable", "false");
               user_pref("signon.rememberSignons", "false");
+              user_pref("app.update.checkInstallTime", "false");
 
               user_pref("app.normandy.api_url", "");
               user_pref("app.normandy.enabled", false);
