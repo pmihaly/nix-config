@@ -35,10 +35,7 @@ in
       passwordFile = config.age.secrets."backup/restic".path;
       paths = cfg.include;
       exclude = cfg.exclude;
-      timerConfig = {
-        OnCalendar = cfg.timer;
-        Persistent = true;
-      };
+      timerConfig = builtins.warn "dont forget to enable skylake-1 backup schedule (add make timer nullable)" null;
       initialize = true;
       createWrapper = true;
     };
