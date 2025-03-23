@@ -67,15 +67,7 @@
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
 
-  networking = {
-    hostName = "skylake-1";
-    interfaces.enp5s0.ipv4.addresses = [
-      {
-        address = "192.168.0.30";
-        prefixLength = 24;
-      }
-    ];
-  };
+  networking.hostName = "skylake-1";
 
   programs.fuse.userAllowOther = true;
 
