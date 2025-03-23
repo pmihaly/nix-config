@@ -45,7 +45,7 @@ in
     };
 
     programs.firefox.profiles.misi = {
-      bookmarks =
+      bookmarks.settings =
         [
           {
             name = "jumpcloud";

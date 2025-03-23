@@ -349,134 +349,137 @@ in
                 reddit-enhancement-suite
                 keepassxc-browser
               ];
-              bookmarks = [
-                {
-                  name = "nixing";
-                  toolbar = true;
-                  bookmarks = [
-                    {
-                      name = "darwin options";
-                      url = "https://daiderd.com/nix-darwin/manual/index.html";
-                    }
-                  ];
-                }
-                {
-                  name = "selfhosting";
-                  toolbar = true;
-                  bookmarks = [
-                    {
-                      name = "skylake";
-                      url = "http://skylake";
-                    }
-                    {
-                      name = "local syncthing";
-                      url = "http://127.0.0.1:8384";
-                    }
-                  ];
-                }
-                {
-                  name = "munsik";
-                  toolbar = true;
-                  bookmarks = [
-                    {
-                      name = "skeler I";
-                      url = "https://youtube.com/watch?v=J0y6wM0aAgE";
-                    }
-                    {
-                      name = "skeler II";
-                      url = "https://youtube.com/watch?v=J4t4pMZBXZg";
-                    }
-                    {
-                      name = "skeler III";
-                      url = "https://youtube.com/watch?v=P4ALDytLAXQ";
-                    }
-                    {
-                      name = "skeler IV";
-                      url = "https://youtube.com/watch?v=HUUy3mnAhCE";
-                    }
-                    {
-                      name = "breakcore to dissociate to";
-                      url = "https://youtube.com/watch?v=BhZ0Ky9uqts";
-                    }
-                    {
-                      name = "breakcore to feel to";
-                      url = "https://youtube.com/watch?v=0KaBYaQGwbs";
-                    }
-                    {
-                      name = "dnb";
-                      url = "https://youtube.com/watch?v=qNaCzmbaYWI";
-                    }
-                    {
-                      name = "ethereal breaks *:･ﾟ✧";
-                      url = "https://youtube.com/watch?v=tdceTb3vsmk";
-                    }
-                    {
-                      name = "cartoon tripping minimal techo";
-                      url = "https://youtube.com/watch?v=WddpRmmAYkg";
-                    }
-                    {
-                      name = "heaven.exe breakcore";
-                      url = "https://youtube.com/watch?v=z9e8CPULjW4";
-                    }
-                    {
-                      name = "abyss darksynth";
-                      url = "https://youtube.com/watch?v=aA9GhsYt2O0";
-                    }
-                    {
-                      name = "smooooth sonic dj";
-                      url = "https://youtube.com/watch?v=PYfhbYIxBxE";
-                    }
-                    {
-                      name = "smooooth disco mix I";
-                      url = "https://youtube.com/watch?v=4nvewes8Inc";
-                    }
-                    {
-                      name = "smooooth ukg cat fight";
-                      url = "https://youtube.com/watch?v=DjDWKh2bBzs";
-                    }
-                    {
-                      name = "smooooth disco mix II";
-                      url = "https://youtube.com/watch?v=JF5IYpI6IXA";
-                    }
-                    {
-                      name = "german underground techno";
-                      url = "https://youtube.com/watch?v=M26nbsaIG7k";
-                    }
-                    {
-                      name = "german underground techno II";
-                      url = "https://youtube.com/watch?v=1R8V0zWP9js";
-                    }
-                    {
-                      name = "dub techno";
-                      url = "https://youtube.com/watch?v=NAiBeZdGIQ8";
-                    }
-                    {
-                      name = "dub techno II";
-                      url = "https://youtube.com/watch?v=OnYKl4KKMWY";
-                    }
-                    {
-                      name = "dub techno III";
-                      url = "https://www.youtube.com/watch?v=80VIQIAtOnQ";
-                    }
-                    {
-                      name = "german hard techno";
-                      url = "https://youtube.com/watch?v=FdOfhuYW_OI";
-                    }
-                    {
-                      name = "german hard techno II";
-                      url = "https://youtube.com/watch?v=6FJAWPuD4s8";
-                    }
-                    {
-                      name = "argent metal I";
-                      url = "https://youtube.com/watch?v=bgu94ChWTCA";
-                    }
-                    {
-                      name = "argent metal II";
-                      url = "https://www.youtube.com/watch?v=HIekm-GR14M";
-                    }
-                  ];
-                }
-              ];
+              bookmarks = {
+                force = true;
+                settings = [
+                  {
+                    name = "nixing";
+                    toolbar = true;
+                    bookmarks = [
+                      {
+                        name = "darwin options";
+                        url = "https://daiderd.com/nix-darwin/manual/index.html";
+                      }
+                    ];
+                  }
+                  {
+                    name = "selfhosting";
+                    toolbar = true;
+                    bookmarks = [
+                      {
+                        name = "skylake";
+                        url = "http://skylake";
+                      }
+                      {
+                        name = "local syncthing";
+                        url = "http://127.0.0.1:8384";
+                      }
+                    ];
+                  }
+                  {
+                    name = "munsik";
+                    toolbar = true;
+                    bookmarks = [
+                      {
+                        name = "skeler I";
+                        url = "https://youtube.com/watch?v=J0y6wM0aAgE";
+                      }
+                      {
+                        name = "skeler II";
+                        url = "https://youtube.com/watch?v=J4t4pMZBXZg";
+                      }
+                      {
+                        name = "skeler III";
+                        url = "https://youtube.com/watch?v=P4ALDytLAXQ";
+                      }
+                      {
+                        name = "skeler IV";
+                        url = "https://youtube.com/watch?v=HUUy3mnAhCE";
+                      }
+                      {
+                        name = "breakcore to dissociate to";
+                        url = "https://youtube.com/watch?v=BhZ0Ky9uqts";
+                      }
+                      {
+                        name = "breakcore to feel to";
+                        url = "https://youtube.com/watch?v=0KaBYaQGwbs";
+                      }
+                      {
+                        name = "dnb";
+                        url = "https://youtube.com/watch?v=qNaCzmbaYWI";
+                      }
+                      {
+                        name = "ethereal breaks *:･ﾟ✧";
+                        url = "https://youtube.com/watch?v=tdceTb3vsmk";
+                      }
+                      {
+                        name = "cartoon tripping minimal techo";
+                        url = "https://youtube.com/watch?v=WddpRmmAYkg";
+                      }
+                      {
+                        name = "heaven.exe breakcore";
+                        url = "https://youtube.com/watch?v=z9e8CPULjW4";
+                      }
+                      {
+                        name = "abyss darksynth";
+                        url = "https://youtube.com/watch?v=aA9GhsYt2O0";
+                      }
+                      {
+                        name = "smooooth sonic dj";
+                        url = "https://youtube.com/watch?v=PYfhbYIxBxE";
+                      }
+                      {
+                        name = "smooooth disco mix I";
+                        url = "https://youtube.com/watch?v=4nvewes8Inc";
+                      }
+                      {
+                        name = "smooooth ukg cat fight";
+                        url = "https://youtube.com/watch?v=DjDWKh2bBzs";
+                      }
+                      {
+                        name = "smooooth disco mix II";
+                        url = "https://youtube.com/watch?v=JF5IYpI6IXA";
+                      }
+                      {
+                        name = "german underground techno";
+                        url = "https://youtube.com/watch?v=M26nbsaIG7k";
+                      }
+                      {
+                        name = "german underground techno II";
+                        url = "https://youtube.com/watch?v=1R8V0zWP9js";
+                      }
+                      {
+                        name = "dub techno";
+                        url = "https://youtube.com/watch?v=NAiBeZdGIQ8";
+                      }
+                      {
+                        name = "dub techno II";
+                        url = "https://youtube.com/watch?v=OnYKl4KKMWY";
+                      }
+                      {
+                        name = "dub techno III";
+                        url = "https://www.youtube.com/watch?v=80VIQIAtOnQ";
+                      }
+                      {
+                        name = "german hard techno";
+                        url = "https://youtube.com/watch?v=FdOfhuYW_OI";
+                      }
+                      {
+                        name = "german hard techno II";
+                        url = "https://youtube.com/watch?v=6FJAWPuD4s8";
+                      }
+                      {
+                        name = "argent metal I";
+                        url = "https://youtube.com/watch?v=bgu94ChWTCA";
+                      }
+                      {
+                        name = "argent metal II";
+                        url = "https://www.youtube.com/watch?v=HIekm-GR14M";
+                      }
+                    ];
+                  }
+                ];
+              };
             }
           ];
         }
