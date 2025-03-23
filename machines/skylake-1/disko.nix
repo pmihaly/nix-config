@@ -15,9 +15,9 @@
       };
     };
     disk = {
-      main = {
+      boot = {
         type = "disk";
-        device = "/dev/sda";
+        device = "/dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_59935981";
         content = {
           type = "gpt";
           partitions = {
@@ -47,7 +47,24 @@
                     ];
                     mountpoint = "/nix";
                   };
+                };
+              };
+            };
+          };
+        };
+      };
+      main = {
+        type = "disk";
+        device = "/dev/disk/by-id/scsi-0HC_Volume_102315515";
+        content = {
+          type = "gpt";
+          partitions = {
+            root = {
+              size = "100%";
+              content = {
+                type = "btrfs";
 
+                subvolumes = {
                   "persist" = {
                     mountOptions = [
                       "compress-force=zstd:1"
