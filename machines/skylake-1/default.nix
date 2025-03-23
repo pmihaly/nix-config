@@ -35,7 +35,7 @@
 
     backup = {
       enable = true;
-      machineId = "skylake-1";
+      machineId = "skylake";
       include = [
         vars.storage
         vars.serviceConfig
