@@ -469,13 +469,22 @@ in
                         url = "https://youtube.com/watch?v=6FJAWPuD4s8";
                       }
                       {
-                        name = "argent metal I";
+                        name = "argent metal k1lled I";
                         url = "https://youtube.com/watch?v=bgu94ChWTCA";
                       }
                       {
-                        name = "argent metal II";
+                        name = "argent metal k1lled II";
                         url = "https://www.youtube.com/watch?v=HIekm-GR14M";
                       }
+                      {
+                        name = "argent metal aim to head";
+                        url = "https://www.youtube.com/watch?v=e0odt0EIdrE";
+                      }
+                      {
+                        name = "argent metal underground";
+                        url = "https://www.youtube.com/watch?v=znqWSaqW9n8";
+                      }
+
                     ];
                   }
                 ];
