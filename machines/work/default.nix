@@ -13,6 +13,7 @@ let
     "demo-px"
     "demo-al"
     "demo-vr"
+    "demo-am2"
   ];
 in
 {
