@@ -25,6 +25,7 @@ in
     shell = {
       enable = true;
       extraBookmarks = {
+        su = "'~/Library/Application Support'";
         w = "~/lensadev";
       };
     };
