@@ -15,8 +15,6 @@ in
   imports = [ ../../../secrets/home-manager ];
   config = mkIf cfg.enable {
 
-    modules.persistence.directories = [ "Maildir" ];
-
     accounts.email.accounts = {
       "mihaly_mihaly.codes" = rec {
         address = "mihaly@mihaly.codes";
