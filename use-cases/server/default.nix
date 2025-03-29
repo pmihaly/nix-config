@@ -40,6 +40,7 @@ optionalAttrs platform.isLinux {
         paperless.enable = true;
         immich.enable = true;
         tailscale.enable = true;
+        stirling-pdf.enable = true;
       };
     }
   ]);

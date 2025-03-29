@@ -10,5 +10,6 @@
     ./qemu
     ./immich
     ./tailscale
+    ./stirling-pdf
   ];
 }
