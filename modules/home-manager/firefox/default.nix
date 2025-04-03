@@ -484,7 +484,10 @@ in
                         name = "argent metal underground";
                         url = "https://www.youtube.com/watch?v=znqWSaqW9n8";
                       }
-
+                      {
+                        name = "ultrakill workout mix";
+                        url = "https://www.youtube.com/watch?v=o9kNiYGJDOo";
+                      }
                     ];
                   }
                 ];
