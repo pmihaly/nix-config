@@ -197,7 +197,7 @@ in
             sr = ''function _f() { fd --type file --exec ${getExe pkgs.sd} "$1" "$2" }; _f'';
             du = getExe pkgs.du-dust;
             lsblk = getExe pkgs.duf;
-            wttr = "${getExe' pkgs.httpie "https"} wttr.in/budapest";
+            wttr = "${getExe pkgs.curl} 'https://wttr.in/budapest?m'";
             n = "nvim";
             sharedir = "${getExe pkgs.python3} -m http.server 9000";
             yt-dlp = "nix run nixpkgs#yt-dlp --"; # always use the latest yt-dlp to mitigate 403 errors from youtube
