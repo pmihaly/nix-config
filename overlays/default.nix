@@ -76,18 +76,5 @@
         '';
       }
     );
-
-    keepassxc =
-      if !prev.stdenv.isDarwin then
-        prev.keepassxc
-      else
-        prev.keepassxc.overrideAttrs (
-          prevAttrs: finalAttrs: {
-            postInstall = ''
-              mkdir -p "$out/lib/mozilla/native-messaging-hosts"
-              substituteAll "${./keepassxc-darwin-firefox-native-messaging-host.json}" "$out/lib/mozilla/native-messaging-hosts/org.keepassxc.keepassxc_browser.json"
-            '';
-          }
-        );
   })
 ]
