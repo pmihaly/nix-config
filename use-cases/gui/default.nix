@@ -65,6 +65,7 @@ in
           feh
           tailscale
           signal-desktop
+          transmission
         ];
       };
     }
