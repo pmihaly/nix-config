@@ -200,7 +200,6 @@ in
             wttr = "${getExe pkgs.curl} 'https://wttr.in/budapest?m'";
             n = "nvim";
             sharedir = "${getExe pkgs.python3} -m http.server 9000";
-            yt-dlp = "nix run nixpkgs#yt-dlp --"; # always use the latest yt-dlp to mitigate 403 errors from youtube
             ncdu = "${getExe pkgs.ncdu} --color=dark -t0"; # ncurses disk usage
             jd = getExe' pkgs.nodePackages_latest.json-diff "json-diff";
             http = getExe pkgs.curlie;
