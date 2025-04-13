@@ -1,4 +1,5 @@
 {
+  pkgs,
   lib,
   config,
   ...
@@ -14,12 +15,15 @@ in
   };
   config = mkIf cfg.enable {
 
+    home.packages = with pkgs; [ material-icons ];
+
     programs.mpv = {
       enable = true;
       config = {
         ytdl-format = "bestvideo+bestaudio/best";
       };
       defaultProfiles = [ "gpu-hq" ];
+      scripts = with pkgs.mpvScripts; [ uosc ];
       bindings = {
         "l" = "seek 5";
         "h" = "seek -5";
