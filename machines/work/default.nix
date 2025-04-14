@@ -110,6 +110,7 @@ in
               "video-infra"
               "video-player"
               "video-streamer"
+              "kokoro-fastapi"
             ];
     };
 
