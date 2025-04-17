@@ -363,8 +363,8 @@ in
           src = pkgs.fetchFromGitHub {
             owner = "akinsho";
             repo = "org-bullets.nvim";
-            rev = "3623e86e0fa6d07f45042f7207fc333c014bf167";
-            sha256 = "sha256-aIEe1dgUmDzu9kl33JCNcgyfp8DymURltH0HcZfph0Y=";
+            rev = "21437cfa99c70f2c18977bffd423f912a7b832ea";
+            sha256 = "sha256-/l8IfvVSPK7pt3Or39+uenryTM5aBvyJZX5trKNh0X0=";
           };
         })
         (pkgs.vimUtils.buildVimPlugin {
