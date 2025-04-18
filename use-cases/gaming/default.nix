@@ -29,7 +29,6 @@ optionalAttrs platform.isLinux {
       imports = [ ../../modules/home-manager ];
 
       home.packages = with pkgs; [
-        transmission_4-gtk
         lutris
         wine
         gamescope
@@ -49,8 +48,6 @@ optionalAttrs platform.isLinux {
 
           ".steam"
           ".local/share/Steam"
-
-          ".config/transmission"
         ];
       };
     };

@@ -43,6 +43,7 @@ in
             "Pictures"
             "Documents"
             "Videos"
+            ".config/transmission"
           ];
           firefox = {
             enable = true;
@@ -65,7 +66,7 @@ in
           feh
           tailscale
           signal-desktop
-          transmission
+          transmission_4-gtk
         ];
       };
     }
