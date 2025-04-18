@@ -158,6 +158,7 @@ in
         gnumake
         mariadb # vim dadbod
         jetbrains.pycharm-community-bin
+        aegisub
       ]
       ++ (concatMap (
         env:

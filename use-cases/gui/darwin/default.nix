@@ -79,7 +79,6 @@ optionalAttrs platform.isDarwin {
 
     home-manager.users.${vars.username} = {
       imports = [ ../../../modules/home-manager ];
-      home.packages = [ pkgs.aegisub ];
 
       xdg.configFile = {
         "karabiner/karabiner.json" = {
