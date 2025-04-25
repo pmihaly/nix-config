@@ -486,7 +486,7 @@ in
                       }
                       {
                         name = "ultrakill workout mix";
-                        url = "https://www.youtube.com/watch?v=o9kNiYGJDOo";
+                        url = "https://www.youtube.com/watch?v=WAEvqMB4ytU";
                       }
                     ];
                   }
