@@ -141,11 +141,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1744145203,
-        "narHash": "sha256-I2oILRiJ6G+BOSjY+0dGrTPe080L3pbKpc+gCV3Nmyk=",
+        "lastModified": 1745502102,
+        "narHash": "sha256-LqhRwzvIVPEjH0TaPgwzqpyhW6DtCrvz7FnUJDoUZh8=",
         "owner": "nix-community",
         "repo": "disko",
-        "rev": "76c0a6dba345490508f36c1aa3c7ba5b6b460989",
+        "rev": "ca27b88c88948d96feeee9ed814cbd34f53d0d70",
         "type": "github"
       },
       "original": {
@@ -703,7 +703,7 @@
     "immich-shield": {
       "flake": false,
       "locked": {
-        "narHash": "sha256-Ggh4s1OAymvRz2yAM08sBDtUIsyMkcmgWl5aikbBWgY=",
+        "narHash": "sha256-HCcj5/scsBFxFblHKKu8+zmxl6P+e1hLC/wb8N5V+LE=",
         "type": "file",
         "url": "https://img.shields.io/github/v/release/immich-app/immich.json"
       },
@@ -758,7 +758,7 @@
     "jellyfin-shield": {
       "flake": false,
       "locked": {
-        "narHash": "sha256-Kmv6Sa6jeZnq66Q2tpsA5M1Rzd/UutDssmQcIcs0fmA=",
+        "narHash": "sha256-Mw15FUs+YwC8DS9r3Tqaz4ii0wiqrB2ZiJ12HDmL1Xk=",
         "type": "file",
         "url": "https://img.shields.io/github/v/release/linuxserver/docker-jellyfin.json"
       },
@@ -795,11 +795,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1744524344,
-        "narHash": "sha256-n61Xx2svmzqRyfoQc9wDWCyBrWx1MvFGDYIXkQCx2vs=",
+        "lastModified": 1745718727,
+        "narHash": "sha256-Q+8ki5/0doymTb/6yZyB1IgKy7vIkWG5IILIzw9Vz1U=",
         "owner": "fufexan",
         "repo": "nix-gaming",
-        "rev": "3be2c40717a973af17228d2dd14de0dbd6b91a6d",
+        "rev": "f42092f4379fe71bf810a71c1c33f1f807b97746",
         "type": "github"
       },
       "original": {
@@ -912,11 +912,11 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1744932701,
-        "narHash": "sha256-fusHbZCyv126cyArUwwKrLdCkgVAIaa/fQJYFlCEqiU=",
+        "lastModified": 1745526057,
+        "narHash": "sha256-ITSpPDwvLBZBnPRS2bUcHY3gZSwis/uTe255QgMtTLA=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "b024ced1aac25639f8ca8fdfc2f8c4fbd66c48ef",
+        "rev": "f771eb401a46846c1aebd20552521b233dd7e18b",
         "type": "github"
       },
       "original": {
