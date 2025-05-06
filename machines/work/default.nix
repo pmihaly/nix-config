@@ -168,6 +168,7 @@ in
         [
           (pkgs.writeShellScriptBin "trget-${envId}" "${getExe' pkgs.httpie "http"} get http://tracing-system-app.${env}.lms/api/v1/business-process/$1")
           (pkgs.writeShellScriptBin "trparent-${envId}" "${getExe pkgs.jq} -r .parent_global_trace_id | xargs -I{} ${getExe' pkgs.httpie "http"} get http://tracing-system-app.${env}.lms/api/v1/business-process/{}")
+          (pkgs.writeShellScriptBin "trcreate-${envId}" ''${getExe pkgs.jq} '{"source": "misi_lol", "global_state": .}' | ${getExe' pkgs.httpie "http"} post http://tracing-system-app.${env}.lms/api/v1/business-process/$1/v1 | ${getExe pkgs.jq} '.global_trace_id' -r | xargs -I{} trget-${envId} {}'')
         ]
       ) envs);
 
