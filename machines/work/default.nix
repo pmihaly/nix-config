@@ -119,6 +119,7 @@ in
     };
 
     programs.zsh = {
+      localVariables.NIXPKGS_ALLOW_UNFREE = "1"; # windusrf-nvim
       initExtra = ''
         function unlockpdf() {
           ${getExe pkgs.qpdf} --password=$1 --decrypt $2 "unlocked_$2"
@@ -206,6 +207,10 @@ in
           name = "${env} (tun)";
           url = "mysql://${workvars.demo-db-user}:${workvars.demo-db-password}@${env}-mysql8.demo:3307";
         }) envs;
+
+      plugins.windsurf-nvim = {
+        enable = true;
+      };
     };
 
     programs.ssh = {
