@@ -135,6 +135,7 @@ in
           so = "source ./.ve/bin/activate ; devenv";
           gl = "mkdir -p ~/tun ; cd ~/tun ; ssh -T graylog-staging-tunnel";
           db = "mkdir -p ~/db ; cd ~/db ; nvim -c DBUI";
+          "docker-prune" = "docker system prune --all --force --volumes";
         }
         // (
           map (db: {
