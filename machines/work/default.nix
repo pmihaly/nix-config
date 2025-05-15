@@ -159,6 +159,28 @@ in
         mariadb # vim dadbod
         jetbrains.pycharm-community-bin
         aegisub
+        (pkgs.writers.writePython3Bin "json-to-pq" { libraries = [ pkgs.python3Packages.polars ]; } ''
+          import sys
+          import polars as pl
+          from io import BytesIO
+
+          df = pl.read_json(sys.stdin.buffer.read())
+
+          buf = BytesIO()
+          df.write_parquet(buf)
+          sys.stdout.buffer.write(buf.getvalue())
+        '')
+        (pkgs.writers.writePython3Bin "pq-to-json" { libraries = [ pkgs.python3Packages.polars ]; } ''
+          import sys
+          import polars as pl
+          from io import BytesIO
+
+          df = pl.read_parquet(sys.stdin.buffer.read())
+
+          buf = BytesIO()
+          df.write_json(buf)
+          sys.stdout.buffer.write(buf.getvalue())
+        '')
       ]
       ++ (concatMap (
         env:
@@ -171,14 +193,6 @@ in
           (pkgs.writeShellScriptBin "trcreate-${envId}" ''${getExe pkgs.jq} '{"source": "misi_lol", "global_state": .}' | ${getExe' pkgs.httpie "http"} post http://tracing-system-app.${env}.lms/api/v1/business-process/$1/v1 | ${getExe pkgs.jq} '.global_trace_id' -r | xargs -I{} trget-${envId} {}'')
         ]
       ) envs);
-
-    programs.nushell.extraConfig = ''
-      def open-pq [
-        filename: string # file
-      ]: nothing -> any {
-        ${getExe pkgs.pqrs} cat $filename | lines | par-each {from json}
-      }
-    '';
 
     programs.nixvim = {
       keymaps = [
