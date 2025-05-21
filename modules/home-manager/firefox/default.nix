@@ -449,6 +449,10 @@ in
                         url = "https://youtube.com/watch?v=1R8V0zWP9js";
                       }
                       {
+                        name = "german underground techno III";
+                        url = "https://www.youtube.com/watch?v=eWU6v4EtKk0";
+                      }
+                      {
                         name = "dub techno";
                         url = "https://youtube.com/watch?v=NAiBeZdGIQ8";
                       }
