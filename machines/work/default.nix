@@ -14,6 +14,7 @@ let
     "demo-al"
     "demo-vr"
     "demo-am2"
+    "demo-fp2"
   ];
 in
 {
