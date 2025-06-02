@@ -492,6 +492,10 @@ in
                         name = "ultrakill workout mix";
                         url = "https://www.youtube.com/watch?v=WAEvqMB4ytU";
                       }
+                      {
+                        name = "old+new school doom";
+                        url = "https://www.youtube.com/watch?v=k8aPouLFoZw";
+                      }
                     ];
                   }
                 ];
