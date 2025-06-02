@@ -63,10 +63,6 @@ in
     programs.nushell = {
       enable = true;
       shellAliases = (bookmarksToAliases cfg.bookmarks);
-      extraConfig = ''
-        plugin add ${getExe pkgs.nushellPlugins.polars}
-        plugin use polars
-      '';
       environmentVariables = {
         PROMPT_INDICATOR_VI_NORMAL = "";
         PROMPT_INDICATOR_VI_INSERT = "";

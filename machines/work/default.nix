@@ -196,6 +196,11 @@ in
         ]
       ) envs);
 
+    programs.nushell.extraConfig = ''
+      def "from pq" [] { pq-to-json | from json }
+      def "to pq" [] { to json | json-to-pq }
+    '';
+
     programs.nixvim = {
       keymaps = [
         {
