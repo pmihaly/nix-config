@@ -204,7 +204,7 @@ in
             ncdu = "${getExe pkgs.ncdu} --color=dark -t0"; # ncurses disk usage
             jd = getExe' pkgs.nodePackages_latest.json-diff "json-diff";
             http = getExe pkgs.curlie;
-            cal = "cal $(date +%Y)";
+            cal = "cal -y";
           }
         ]
       );
