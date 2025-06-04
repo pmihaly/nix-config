@@ -201,6 +201,7 @@ in
             jd = getExe' pkgs.nodePackages_latest.json-diff "json-diff";
             http = getExe pkgs.curlie;
             cal = "cal -y";
+            httpcat = "function _f() { ${config.modules.firefox.binary} https://http.cat/$1 }; _f";
           }
         ]
       );
