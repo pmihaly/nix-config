@@ -85,6 +85,8 @@ optionalAttrs platform.isDarwin {
           source = ./karabiner.json;
         };
       };
+
+      home.packages = [ pkgs.betterdisplay ];
     };
 
     services.aerospace = {
