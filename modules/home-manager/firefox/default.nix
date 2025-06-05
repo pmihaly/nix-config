@@ -19,9 +19,9 @@ in
       type = types.str;
       default =
         if pkgs.stdenv.isLinux then
-          getExe pkgs.firefox-bin
+          getExe pkgs.firefox
         else
-          "${pkgs.firefox-bin}/Applications/Firefox.app/Contents/MacOS/firefox";
+          "${pkgs.firefox}/Applications/Firefox.app/Contents/MacOS/firefox";
     };
     extraProfiles = mkOption {
       type = types.anything;
@@ -99,7 +99,6 @@ in
 
     programs.firefox = {
       enable = true;
-      package = pkgs.firefox-bin;
       nativeMessagingHosts = [
         pkgs.tridactyl-native
         pkgs.keepassxc

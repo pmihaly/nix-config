@@ -1,4 +1,4 @@
 {
   username = "mihaly.papp";
-  rebuildSwitch = "nh darwin switch ~/.nix-config --hostname mac -- --impure";
+  rebuildSwitch = "export NIXPKGS_ALLOW_BROKEN=1; nh darwin switch ~/.nix-config --hostname mac -- --impure";
 }

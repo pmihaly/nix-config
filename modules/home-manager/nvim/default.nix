@@ -216,19 +216,12 @@ in
         harpoon = {
           enable = true;
           enableTelescope = true;
-          keymapsSilent = true;
-          markBranch = true;
-          saveOnToggle = true;
-          keymaps = {
-            addFile = "<leader>n";
-            toggleQuickMenu = "<leader>i";
-            navFile = {
-              "1" = "<leader>h";
-              "2" = "<leader>j";
-              "3" = "<leader>k";
-              "4" = "<leader>l";
-            };
-          };
+          # TODO check harpoon settings
+          # settings = {
+          #   keymaps_silent = true;
+          #   mark_branch = true;
+          #   save_on_toggle = true;
+          # };
         };
 
         treesitter = {
@@ -408,25 +401,6 @@ in
           key = "<leader>";
           action = "<Nop>";
           options = {
-            silent = true;
-          };
-        }
-
-        {
-          mode = [ "n" ];
-          key = "k";
-          action = "v:count == 0 ? 'gk' : 'k'";
-          options = {
-            expr = true;
-            silent = true;
-          };
-        }
-        {
-          mode = [ "n" ];
-          key = "j";
-          action = "v:count == 0 ? 'gj' : 'j'";
-          options = {
-            expr = true;
             silent = true;
           };
         }
@@ -648,6 +622,37 @@ in
           mode = [ "n" ];
           key = "<leader>db";
           action = "<cmd>DBUI<cr>";
+        }
+
+        {
+          mode = "n";
+          key = "<leader>n";
+          action.__raw = "function() require'harpoon':list():add() end";
+        }
+        {
+          mode = "n";
+          key = "<leader>i";
+          action.__raw = "function() require'harpoon'.ui:toggle_quick_menu(require'harpoon':list()) end";
+        }
+        {
+          mode = "n";
+          key = "<leader>h";
+          action.__raw = "function() require'harpoon':list():select(1) end";
+        }
+        {
+          mode = "n";
+          key = "<leader>j";
+          action.__raw = "function() require'harpoon':list():select(2) end";
+        }
+        {
+          mode = "n";
+          key = "<leader>k";
+          action.__raw = "function() require'harpoon':list():select(3) end";
+        }
+        {
+          mode = "n";
+          key = "<leader>l";
+          action.__raw = "function() require'harpoon':list():select(4) end";
         }
       ];
 

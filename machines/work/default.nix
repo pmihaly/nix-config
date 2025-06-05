@@ -26,7 +26,7 @@ in
     shell = {
       enable = true;
       extraBookmarks = {
-        su = "'~/Library/Application Support'";
+        su = "'~/Library/Application\\ Support'";
         w = "~/lensadev";
       };
     };
@@ -303,6 +303,7 @@ in
   ];
 
   users.users.${vars.username}.home = "/Users/${vars.username}";
+  system.primaryUser = vars.username;
 
   system.stateVersion = 5;
 }
