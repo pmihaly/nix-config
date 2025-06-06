@@ -440,6 +440,10 @@ in
                         url = "https://youtube.com/watch?v=kTWLNco__OU";
                       }
                       {
+                        name = "smooooth disco mix III";
+                        url = "https://www.youtube.com/watch?v=f18xfDO10UI";
+                      }
+                      {
                         name = "german underground techno";
                         url = "https://youtube.com/watch?v=M26nbsaIG7k";
                       }
