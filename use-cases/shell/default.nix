@@ -38,6 +38,8 @@ in
   config = mkIf cfg.enable (mkMerge [
 
     (optionalAttrs platform.isLinux {
+      environment.shells = [ (getExe pkgs.nushell) ];
+
       programs.nix-index.enableBashIntegration = false;
       programs.command-not-found.enable = false;
 
