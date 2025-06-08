@@ -43,6 +43,7 @@ in
       createWrapper = true;
     };
 
-    programs.zsh.shellAliases.restic = "restic-${cfg.machineId}-backup";
+    home-manager.users.${vars.username}.programs.nushell.shellAliases.restic =
+      "restic-${cfg.machineId}-backup";
   };
 }

@@ -62,7 +62,55 @@ in
 
     programs.nushell = {
       enable = true;
-      shellAliases = (bookmarksToAliases cfg.bookmarks);
+      extraConfig = ''
+        def ns [] {${cfg.rebuildSwitch}}
+
+        def --env p [] {ls ~/personaldev | where type == "dir" | par-each {{path: $in.name, name: ($in.name | split row "/" | last)}} | input list --fuzzy --display name | cd $in.path}
+        def --env pn [] {p ; nvim}
+
+        def --env o [] {cd ~/Sync/org}
+        def --env on [] {ls ~/Sync/org | get name | input list --fuzzy | nvim $in}
+
+        def --env c [] {cd ~/.nix-config}
+        def --env cn [] {c; nvim}
+
+        def kbp [] {
+          lsof -iTCP -sTCP:LISTEN -n -P +c0
+          | detect columns
+          | uniq-by NAME
+          | select COMMAND PID NAME
+          | par-each {|it| {...$it, PORT: ($it.NAME | split row ":" | last | $"($it.NAME) (($it.COMMAND))")}}
+          | input list --fuzzy --display PORT
+          | get PID
+          | into int
+          | kill --force $in
+        }
+
+        def sr [old: string, new: string] {glob **/* -e ["**/node_modules/**", "**/.git/**", "**/.direnv/**", "**/.ve/**"] --no-dir | par-each {${getExe pkgs.gnused} -i $"s/($old)/($new)/g" $in}}
+
+        def httpcat [code: int] {start $"https://http.cat/($code)"}
+        def cal [] {${pkgs.toybox}/bin/cal (date now | format date "%Y")}
+      '';
+      shellAliases = mkMerge [
+        (bookmarksToAliases cfg.bookmarks)
+        {
+          ld = getExe pkgs.lazydocker;
+          nixprevdiff = "${getExe pkgs.nvd} diff $\"/nix/var/nix/profiles/system-(sudo nix-env --list-generations --profile /nix/var/nix/profiles/system | lines | reverse | $in.2 | split words | first)-link\" /nix/var/nix/profiles/system";
+          nr = "sudo nix-store --verify --check-contents --repair";
+          ncg = "sudo nix-collect-garbage --delete-old";
+          ndiff = "nix profile diff-closures --profile /nix/var/nix/profiles/system";
+          thokr = "${getExe pkgs.thokr} --full-sentences 20";
+          gut = "git";
+          qr = "${getExe pkgs.qrencode} -t ansiutf8";
+          du = getExe pkgs.du-dust;
+          lsblk = getExe pkgs.duf;
+          wttr = "${getExe pkgs.curl} 'https://wttr.in/budapest?m'";
+          n = "nvim";
+          sharedir = "${getExe pkgs.python3} -m http.server 9000";
+          ncdu = "${getExe pkgs.ncdu} --color=dark -t0"; # ncurses disk usage
+          jd = getExe' pkgs.nodePackages_latest.json-diff "json-diff";
+        }
+      ];
       environmentVariables = {
         PROMPT_INDICATOR_VI_NORMAL = "";
         PROMPT_INDICATOR_VI_INSERT = "";
@@ -167,44 +215,7 @@ in
         path = "${config.xdg.dataHome}/zsh";
         ignoreDups = true;
       };
-      shellAliases = (
-        mkMerge [
-          (bookmarksToAliases cfg.bookmarks)
-          {
-            ls = "${getExe pkgs.eza} -lah --icons $([ -d .git ] && echo '--git')";
-            cat = "bat";
-            p = "cd $(find ~/personaldev -maxdepth 1 -type d | fzf)";
-            pn = "p && nvim";
-            o = "cd ~/Sync/org";
-            on = ''o && (fd "^.*.org$" | fzf | xargs nvim)'';
-            ld = getExe pkgs.lazydocker;
-            nixprevdiff = "${getExe pkgs.nvd} diff /nix/var/nix/profiles/system-$(sudo nix-env --list-generations --profile /nix/var/nix/profiles/system | tail -n2 | head -n1 | ${getExe pkgs.choose} 0)-link /nix/var/nix/profiles/system";
-            ns = cfg.rebuildSwitch;
-            nr = "sudo nix-store --verify --check-contents --repair";
-            ncg = "sudo nix-collect-garbage --delete-old";
-            nsh = "function _f() { nix-shell -p $* --run zsh }; _f";
-            ndiff = "nix profile diff-closures --profile /nix/var/nix/profiles/system";
-            cn = "cd ~/.nix-config && nvim";
-            c = "cd ~/.nix-config";
-            thokr = "${getExe pkgs.thokr} --full-sentences 20";
-            kbp = ''sudo touch /dev/null ; ${getExe pkgs.lsof} -iTCP -sTCP:LISTEN -n -P +c0 | awk 'NR>1{gsub(/.*:/,"",$9); print $9, $1, $2}' | fzf --multi --with-nth=1,2 --header='Select processes to be killed' | cut -d' ' -f3 | xargs kill -9'';
-            urlencode = "${getExe pkgs.jq} -sRr @uri";
-            gut = "git";
-            qr = "${getExe pkgs.qrencode} -t ansiutf8";
-            sr = ''function _f() { fd --type file --exec ${getExe pkgs.sd} "$1" "$2" }; _f'';
-            du = getExe pkgs.du-dust;
-            lsblk = getExe pkgs.duf;
-            wttr = "${getExe pkgs.curl} 'https://wttr.in/budapest?m'";
-            n = "nvim";
-            sharedir = "${getExe pkgs.python3} -m http.server 9000";
-            ncdu = "${getExe pkgs.ncdu} --color=dark -t0"; # ncurses disk usage
-            jd = getExe' pkgs.nodePackages_latest.json-diff "json-diff";
-            http = getExe pkgs.curlie;
-            cal = "cal -y";
-            httpcat = "function _f() { ${config.modules.firefox.binary} https://http.cat/$1 }; _f";
-          }
-        ]
-      );
+      shellAliases = (bookmarksToAliases cfg.bookmarks);
 
       localVariables = {
         XDG_DATA_HOME = config.xdg.dataHome;
@@ -271,7 +282,7 @@ in
         set-option -g automatic-rename on
         set-option -g automatic-rename-format '#{b:pane_current_path} #{pane_current_command}'
         set-option -g status off
-        set-option -g default-command zsh
+        set-option -g default-command nu
         set-option -g terminal-overrides ",xterm-256color:Tc"
 
         set-option -g allow-passthrough on

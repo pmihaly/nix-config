@@ -24,7 +24,7 @@ in
     };
   };
   config = mkIf cfg.enable {
-    programs.zsh.shellAliases.ya = "yy"; # idk where "yy" zsh function comes from
+    programs.nushell.shellAliases.ya = "yy"; # idk where "yy" zsh function comes from
     programs.yazi = {
       enable = true;
       settings = {
@@ -37,7 +37,7 @@ in
         opener = {
           edit = [
             {
-              run = "${config.programs.zsh.localVariables.EDITOR} \"$@\"";
+              run = "$EDITOR \"$@\"";
               block = true;
             }
           ];

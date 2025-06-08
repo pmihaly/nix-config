@@ -38,7 +38,7 @@ in
   config = mkIf cfg.enable (mkMerge [
 
     (optionalAttrs platform.isLinux {
-      programs.zsh.enable = true;
+      environment.shells = [ (getExe pkgs.nushell) ];
 
       programs.nix-index.enableBashIntegration = false;
       programs.command-not-found.enable = false;
@@ -51,7 +51,7 @@ in
       };
     })
 
-    { users.users.${vars.username}.shell = pkgs.zsh; }
+    { users.users.${vars.username}.shell = pkgs.nushell; }
 
     (optionalAttrs platform.isLinux { home-manager.users.${vars.username}.xdg.userDirs.enable = true; })
 
