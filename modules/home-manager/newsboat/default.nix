@@ -63,6 +63,6 @@ in
       '';
     };
 
-    programs.zsh.shellAliases.nb = "newsboat";
+    programs.nushell.shellAliases.nb = "newsboat";
   };
 }

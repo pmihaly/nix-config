@@ -101,12 +101,10 @@ in
       };
     };
 
-    programs.zsh = {
-      shellAliases = {
-        lg = "lazygit";
-        dm = "git diff origin/master HEAD";
-        nge = "nvim .git/info/exclude";
-      };
+    programs.nushell.shellAliases = {
+      lg = "lazygit";
+      dm = "git diff origin/master HEAD";
+      nge = "nvim .git/info/exclude";
     };
   };
 }

@@ -43,6 +43,6 @@ in
       createWrapper = true;
     };
 
-    programs.zsh.shellAliases.restic = "restic-${cfg.machineId}-backup";
+    programs.nushell.shellAliases.restic = "restic-${cfg.machineId}-backup";
   };
 }

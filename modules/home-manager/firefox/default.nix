@@ -35,7 +35,7 @@ in
 
     home.packages = with pkgs; if stdenv.isLinux then [ widevine-cdm ] else [ ];
 
-    programs.zsh.shellAliases = {
+    programs.nushell.shellAliases = {
       misi = "${cfg.binary} -new-instance -P misi >/dev/null & disown";
     } // mapAttrs (name: profile: "${cfg.binary} -new-instance -P ${name} & disown") cfg.extraProfiles;
 

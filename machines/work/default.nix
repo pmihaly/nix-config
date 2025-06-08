@@ -17,7 +17,7 @@ let
     "demo-fp2"
   ];
 in
-{
+rec {
   imports = [ ../../use-cases ];
 
   modules = {
@@ -26,7 +26,7 @@ in
     shell = {
       enable = true;
       extraBookmarks = {
-        su = "'~/Library/Application\\ Support'";
+        su = "'~/Library/Application Support'";
         w = "~/lensadev";
       };
     };
@@ -119,34 +119,6 @@ in
       "gsh.${workvars.domain}" = "gitlab:gitlab.${workvars.domain}";
     };
 
-    programs.zsh = {
-      initExtra = ''
-        function unlockpdf() {
-          ${getExe pkgs.qpdf} --password=$1 --decrypt $2 "unlocked_$2"
-        }
-      '';
-      shellAliases =
-        {
-          d = "cd $(find ~/lensadev -maxdepth 1 -type d | fzf)";
-          dn = "d && nvim";
-          ticket = ''git branch --show-current | grep -oE "[A-Z]+-[0-9]+" | tr -d "\n"'';
-          jira = "ticket | xargs -I{} open '${workvars.jira-url}/{}'";
-          mr = "open \"https://gitlab.${workvars.domain}/lensa/phoenix/$(basename \"$(pwd)\")/-/merge_requests?scope=all&state=opened&search=$(ticket)\"";
-          devenv = "set -o allexport && source config/dev.env";
-          so = "source ./.ve/bin/activate ; devenv";
-          gl = "mkdir -p ~/tun ; cd ~/tun ; ssh -T graylog-staging-tunnel";
-          db = "mkdir -p ~/db ; cd ~/db ; nvim -c DBUI";
-          "docker-prune" = "docker system prune --all --force --volumes";
-        }
-        // (
-          map (db: {
-            name = "${db}-dump";
-            value = "${getExe' pkgs.mariadb "mysqldump"} --user=${workvars.demo-db-user} --password=${workvars.demo-db-password} --host=${db}-mysql8.demo --port=3307";
-          }) envs
-          |> listToAttrs
-        );
-    };
-
     home.packages =
       with pkgs;
       [
@@ -205,12 +177,24 @@ in
               | ${getExe pkgs.yt-dlp} $in -o $"($vid).mp4"
               }
           '')
+          (pkgs.writeShellScriptBin "dump-${envId}" "${getExe' pkgs.mariadb "mysqldump"} --user=${workvars.demo-db-user} --password=${workvars.demo-db-password} --host=${env}-mysql8.demo --port=3307 $1")
         ]
       ) envs);
 
     programs.nushell.extraConfig = ''
+      def --env d [] { ls ${modules.shell.extraBookmarks.w} | where type == "dir" | par-each {{path: $in.name, name: ($in.name | split row "/" | last)}} | input list --fuzzy --display name | cd $in.path }
+      def --env dn [] { p ; nvim }
+
       def "from pq" [] { pq-to-json | from json }
       def "to pq" [] { to json | json-to-pq }
+
+      def unlockpdf [password: string, filename: string] { ${getExe pkgs.qpdf} --password=$password --decrypt $filename $"unlocked_($filename)" }
+
+      def ticket [] { git branch --show-current | split words | take 2 | str join "-" }
+      def jira [] { ticket | start $"${workvars.jira-url}/($in)" }
+
+      def db [] { mkdir ~/db; cd ~/db; nvim -c DBUI }
+      def docker-prune [] { docker system prune --all --force --volumes }
     '';
 
     programs.nixvim = {
