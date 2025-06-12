@@ -19,8 +19,7 @@ in
       ".local/share/nvim"
       ".local/share/db-ui"
     ];
-
-    programs.zsh.localVariables.EDITOR = getExe config.programs.nixvim.build.package;
+    programs.nushell.environmentVariables.EDITOR = getExe config.programs.nixvim.build.package;
 
     programs.nixvim = {
       enable = true;
