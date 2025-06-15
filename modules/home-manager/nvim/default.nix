@@ -201,7 +201,7 @@ in
                 nixpkgs.expr = "import <nixpkgs> {}";
                 options = {
                   nixos.expr = "(builtins.getFlake \"${config.home.homeDirectory}/.nix-config\").nixosConfigurations.aesop.options";
-                  darwin.expr = "(builtins.getFlake \"${config.home.homeDirectory}/.nix-config\").darwinConfigurations.mac.options";
+                  darwin.expr = "(builtins.getFlake \"${config.home.homeDirectory}/.nix-config\").darwinConfigurations.work.options";
                 };
               };
             };

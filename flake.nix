@@ -116,7 +116,7 @@
         formatting = treefmtEval.${pkgs.system}.config.build.check self;
       });
 
-      darwinConfigurations.mac = inputs.darwin.lib.darwinSystem {
+      darwinConfigurations.work = inputs.darwin.lib.darwinSystem {
         specialArgs = {
           inherit inputs;
           vars = (import ./machines/work/vars.nix);
