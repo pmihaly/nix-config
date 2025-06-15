@@ -120,6 +120,7 @@ in
       settings = {
         edit_mode = "vi";
         use_kitty_protocol = true;
+        show_banner = false;
         keybindings = [
           {
             name = "throw-wip-comand-into-editor";
