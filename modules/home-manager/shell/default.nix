@@ -25,7 +25,10 @@ in
   config = mkIf cfg.enable {
 
     modules.persistence = {
-      files = [ ".local/share/zsh" ".config/nushell/history.txt" ];
+      files = [
+        ".local/share/zsh"
+        ".config/nushell/history.txt"
+      ];
       directories = [ ".local/share/direnv" ];
     };
 
