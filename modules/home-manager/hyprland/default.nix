@@ -54,7 +54,6 @@ in
         ecosystem.no_update_news = true;
         monitor = [
           "DP-1, 2560x1440@144, 0x0, 1"
-          "HDMI-A-1, 1920x1080, 2560x0, 1"
         ];
         "exec-once" = "${getExe pkgs.swaybg} --image ${../../../wallpaper.png}";
         env = [
@@ -141,10 +140,10 @@ in
           "3,monitor:DP-1"
           "4,monitor:DP-1"
           "5,monitor:DP-1"
-          "6,monitor:HDMI-A-1"
-          "7,monitor:HDMI-A-1"
-          "8,monitor:HDMI-A-1"
-          "9,monitor:HDMI-A-1"
+          "6,monitor:DP-1"
+          "7,monitor:DP-1"
+          "8,monitor:DP-1"
+          "9,monitor:DP-1"
         ];
 
         bind = [
