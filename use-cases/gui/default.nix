@@ -44,7 +44,7 @@ in
             "Documents"
             "Videos"
             ".config/transmission"
-            ".local/share/syncthing"
+            ".local/state/syncthing"
           ];
           firefox = {
             enable = true;
