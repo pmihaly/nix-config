@@ -53,7 +53,15 @@
     };
   };
 
-  home-manager.users.${vars.username}.home.stateVersion = "22.05";
+  home-manager.users.${vars.username} = {
+    home.stateVersion = "22.05";
+    programs.firefox.profiles.misi.bookmarks.settings = [
+      {
+        name = "terraria progression graph";
+        url = "https://terraria.fandom.com/wiki/Guide:Game_progression_graph";
+      }
+    ];
+  };
 
   users.mutableUsers = false;
   users.users.${vars.username} = {
@@ -98,7 +106,8 @@
       files = lib.lists.unique config.home-manager.users.${vars.username}.modules.persistence.files;
       directories = [
         "Sync"
-      ] ++ lib.lists.unique config.home-manager.users.${vars.username}.modules.persistence.directories;
+      ]
+      ++ lib.lists.unique config.home-manager.users.${vars.username}.modules.persistence.directories;
     };
   };
 
