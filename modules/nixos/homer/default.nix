@@ -53,7 +53,8 @@ in
               title = "❄️🧙";
               services = mappedServices;
               footer = false;
-            } // cfg.homerConfig;
+            }
+            // cfg.homerConfig;
 
           in
           {
@@ -61,7 +62,8 @@ in
             ports = [ "8080:8080" ];
             volumes = [
               "${(pkgs.formats.yaml { }).generate "config.yml" homerConfig}:/www/assets/config.yml"
-            ] ++ logoVolumes;
+            ]
+            ++ logoVolumes;
             environment = {
               INIT_ASSETS = "0";
               SUBFOLDER = "/homer";
