@@ -43,39 +43,38 @@ rec {
     };
 
     programs.firefox.profiles.misi = {
-      bookmarks.settings =
-        [
-          {
-            name = "jira";
-            url = "${workvars.jira-url}/PHOENIX";
-          }
-          {
-            name = "gmail";
-            url = "gmail.com";
-          }
-          {
-            name = "calendar";
-            url = "calendar.google.com";
-          }
-        ]
-        ++ lib.mapAttrsToList (key: val: {
-          name = key;
-          url = val;
-        }) workvars.extra-bookmarks
-        ++
-          builtins.concatMap
-            (service: [
-              {
-                name = "${service} mr";
-                url = "https://gitlab.${workvars.domain}/lensa/phoenix/${service}/-/merge_requests";
-              }
-              {
-                name = "${service} pipe";
-                url = "https://gitlab.${workvars.domain}/lensa/phoenix/${service}/-/pipelines";
-              }
-            ])
-            [
-            ];
+      bookmarks.settings = [
+        {
+          name = "jira";
+          url = "${workvars.jira-url}/PHOENIX";
+        }
+        {
+          name = "gmail";
+          url = "gmail.com";
+        }
+        {
+          name = "calendar";
+          url = "calendar.google.com";
+        }
+      ]
+      ++ lib.mapAttrsToList (key: val: {
+        name = key;
+        url = val;
+      }) workvars.extra-bookmarks
+      ++
+        builtins.concatMap
+          (service: [
+            {
+              name = "${service} mr";
+              url = "https://gitlab.${workvars.domain}/lensa/phoenix/${service}/-/merge_requests";
+            }
+            {
+              name = "${service} pipe";
+              url = "https://gitlab.${workvars.domain}/lensa/phoenix/${service}/-/pipelines";
+            }
+          ])
+          [
+          ];
     };
 
     home.packages = with pkgs; [
@@ -95,17 +94,16 @@ rec {
     '';
 
     programs.nixvim = {
-      globals.dbs =
-        [
-          {
-            name = "local";
-            url = "mysql://root@127.0.0.1:3306";
-          }
-        ]
-        ++ map (env: {
-          name = "${env} (tun)";
-          url = "mysql://${workvars.demo-db-user}:${workvars.demo-db-password}@${env}-mysql8.demo:3307";
-        }) envs;
+      globals.dbs = [
+        {
+          name = "local";
+          url = "mysql://root@127.0.0.1:3306";
+        }
+      ]
+      ++ map (env: {
+        name = "${env} (tun)";
+        url = "mysql://${workvars.demo-db-user}:${workvars.demo-db-password}@${env}-mysql8.demo:3307";
+      }) envs;
     };
   };
 

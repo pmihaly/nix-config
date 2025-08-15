@@ -37,7 +37,8 @@ in
 
     programs.nushell.shellAliases = {
       misi = "${cfg.binary} -new-instance -P misi >/dev/null & disown";
-    } // mapAttrs (name: profile: "${cfg.binary} -new-instance -P ${name} & disown") cfg.extraProfiles;
+    }
+    // mapAttrs (name: profile: "${cfg.binary} -new-instance -P ${name} & disown") cfg.extraProfiles;
 
     xdg.configFile."tridactyl/tridactylrc".text = ''
       bind gd tabdetach

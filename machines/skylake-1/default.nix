@@ -83,7 +83,8 @@
       files = lib.lists.unique config.home-manager.users.${vars.username}.modules.persistence.files;
       directories = [
         "Sync"
-      ] ++ lib.lists.unique config.home-manager.users.${vars.username}.modules.persistence.directories;
+      ]
+      ++ lib.lists.unique config.home-manager.users.${vars.username}.modules.persistence.directories;
     };
   };
 

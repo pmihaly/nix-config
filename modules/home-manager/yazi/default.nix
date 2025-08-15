@@ -54,7 +54,8 @@ in
           on = [ "z" ];
           run = "shell --block --confirm \"${getExe pkgs.unzip} $0\"";
         }
-      ] ++ (bookmarksToYaziKeybindings cfg.bookmarks);
+      ]
+      ++ (bookmarksToYaziKeybindings cfg.bookmarks);
       theme = { };
     };
   };
