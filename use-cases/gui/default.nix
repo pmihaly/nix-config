@@ -60,8 +60,9 @@ in
           keepassxc.enable = true;
         };
 
+        services.syncthing.enable = true;
+
         home.packages = with pkgs; [
-          syncthing
           keepass-diff # diffing .kdbx files
           inputs.img2theme.packages."${pkgs.system}".default
           feh
