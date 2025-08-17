@@ -48,6 +48,7 @@ optionalAttrs platform.isLinux {
 
           ".steam"
           ".local/share/Steam"
+          ".local/share/Terraria"
         ];
       };
     };
