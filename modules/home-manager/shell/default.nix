@@ -107,7 +107,7 @@ in
           qr = "${getExe pkgs.qrencode} -t ansiutf8";
           du = getExe pkgs.du-dust;
           lsblk = getExe pkgs.duf;
-          wttr = "${getExe pkgs.curl} 'https://wttr.in/budapest?m'";
+          wttr = "${getExe pkgs.curl} 'https://wttr.in/amsterdam?m'";
           n = "nvim";
           sharedir = "${getExe pkgs.python3} -m http.server 9000";
           ncdu = "${getExe pkgs.ncdu} --color=dark -t0"; # ncurses disk usage
