@@ -60,7 +60,10 @@ in
           keepassxc.enable = true;
         };
 
-        services.syncthing.enable = true;
+        services.syncthing = {
+          enable = true;
+          tray = true;
+        };
 
         home.packages = with pkgs; [
           keepass-diff # diffing .kdbx files
