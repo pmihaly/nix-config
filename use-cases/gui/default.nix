@@ -71,6 +71,7 @@ in
           feh
           tailscale
           transmission_4-gtk
+          clock-rs
         ];
       };
     }
