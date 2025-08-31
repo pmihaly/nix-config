@@ -99,7 +99,6 @@ in
         web-devicons.enable = true;
         comment.enable = true;
         sleuth.enable = true;
-        project-nvim.enable = true;
         markdown-preview = {
           enable = true;
           settings = {
