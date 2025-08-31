@@ -111,8 +111,6 @@
     };
   };
 
-  systemd.tmpfiles.rules = [ "L+    /opt/rocm/hip   -    -    -     -    ${pkgs.rocmPackages.clr}" ];
-
   time.timeZone = vars.timeZone;
   i18n.defaultLocale = "en_US.UTF-8";
   i18n.extraLocaleSettings = {
