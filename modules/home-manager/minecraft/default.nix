@@ -11,8 +11,8 @@ let
   mcScript = pkgs.writeShellScriptBin "minecraft" ''
     ${getExe pkgs.appimage-run} ${
       builtins.fetchurl {
-        url = "https://github.com/PolyMC/PolyMC/releases/download/6.1/PolyMC-Linux-6.1-x86_64.AppImage";
-        sha256 = "0hzfa5b4rmkj4g7y0j774lzfjjlpipq3ps13d9vmaj4g4nsqm46i";
+        url = "https://github.com/PolyMC/PolyMC/releases/download/7.0/PolyMC-Linux-7.0-x86_64.AppImage";
+        sha256 = "1xz91mjzc9rm50n6viqxjgjvlqi4mdkf21xzld6idr9wp1j3vyqi";
       }
     }
   '';
