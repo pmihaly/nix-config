@@ -99,11 +99,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1751313918,
-        "narHash": "sha256-HsJM3XLa43WpG+665aGEh8iS8AfEwOIQWk3Mke3e7nk=",
+        "lastModified": 1757430124,
+        "narHash": "sha256-MhDltfXesGH8VkGv3hmJ1QEKl1ChTIj9wmGAFfWj/Wk=",
         "owner": "lnl7",
         "repo": "nix-darwin",
-        "rev": "e04a388232d9a6ba56967ce5b53a8a6f713cdfcf",
+        "rev": "830b3f0b50045cf0bcfd4dab65fad05bf882e196",
         "type": "github"
       },
       "original": {
@@ -573,11 +573,11 @@
         "systems": "systems_3"
       },
       "locked": {
-        "lastModified": 1753819801,
-        "narHash": "sha256-tHe6XeNeVeKapkNM3tcjW4RuD+tB2iwwoogWJOtsqTI=",
+        "lastModified": 1757694755,
+        "narHash": "sha256-j+w5QUUr2QT/jkxgVKecGYV8J7fpzXCMgzEEr6LG9ug=",
         "owner": "hyprwm",
         "repo": "hyprland-qtutils",
-        "rev": "b308a818b9dcaa7ab8ccab891c1b84ebde2152bc",
+        "rev": "5ffdfc13ed03df1dae5084468d935f0a3f2c9a4c",
         "type": "github"
       },
       "original": {
@@ -719,7 +719,7 @@
     "jellyfin-shield": {
       "flake": false,
       "locked": {
-        "narHash": "sha256-3ZDqsNkCyEmomXpG6JDPTl8Tb+Q8DfY4ViTQLXkULD8=",
+        "narHash": "sha256-eZu7CevyedNxZzcdvyydeYd4jYAzNIMhf58fWdUs8FQ=",
         "type": "file",
         "url": "https://img.shields.io/github/v/release/linuxserver/docker-jellyfin.json"
       },
@@ -756,11 +756,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1757210397,
-        "narHash": "sha256-pGAd0KLt6FMu7x742zs4OVYkoUx2o6vJGvYUVZJpNG4=",
+        "lastModified": 1757814419,
+        "narHash": "sha256-wmlDAkOrwX9cvhXQa7wekGr/5G6SfE2D5KlvuvSEEXc=",
         "owner": "fufexan",
         "repo": "nix-gaming",
-        "rev": "e479c636519292b50de48f73d7df6cf14c745a1c",
+        "rev": "17db183a6a2ba1217bbfc123b47d4b5ee70b256a",
         "type": "github"
       },
       "original": {
@@ -873,11 +873,11 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1757068644,
-        "narHash": "sha256-NOrUtIhTkIIumj1E/Rsv1J37Yi3xGStISEo8tZm3KW4=",
+        "lastModified": 1757745802,
+        "narHash": "sha256-hLEO2TPj55KcUFUU1vgtHE9UEIOjRcH/4QbmfHNF820=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "8eb28adfa3dc4de28e792e3bf49fcf9007ca8ac9",
+        "rev": "c23193b943c6c689d70ee98ce3128239ed9e32d1",
         "type": "github"
       },
       "original": {
