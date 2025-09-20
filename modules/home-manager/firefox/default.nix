@@ -66,7 +66,7 @@ in
 
       blacklistadd excalidraw.com
       blacklistadd hackerrank.com
-      blacklistadd console.hetzner.cloud/console
+      blacklistadd console.hetzner.com/console
 
       setnull searchurls.amazon
       setnull searchurls.amazonuk
