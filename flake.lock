@@ -520,7 +520,7 @@
     "homer-shield": {
       "flake": false,
       "locked": {
-        "narHash": "sha256-lTXzl9VdruVUbD0G3A7WYSP1g4WJw5DoJH0cavlyiIA=",
+        "narHash": "sha256-baUwLis2LPQK76IP8QXF9Ujoxr3P+PqOXiIrJKtdIx8=",
         "type": "file",
         "url": "https://img.shields.io/github/v/release/bastienwirtz/homer.json"
       },
@@ -719,7 +719,7 @@
     "jellyfin-shield": {
       "flake": false,
       "locked": {
-        "narHash": "sha256-eZu7CevyedNxZzcdvyydeYd4jYAzNIMhf58fWdUs8FQ=",
+        "narHash": "sha256-DHgiHpZMT21kNmwcnheSS7fnYPVbtmhLDkqd/tqvBqs=",
         "type": "file",
         "url": "https://img.shields.io/github/v/release/linuxserver/docker-jellyfin.json"
       },
