@@ -41,6 +41,7 @@ optionalAttrs platform.isLinux {
         immich.enable = true;
         tailscale.enable = true;
         stirling-pdf.enable = true;
+        it-tools.enable = true;
       };
     }
   ]);

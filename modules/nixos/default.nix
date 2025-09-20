@@ -11,5 +11,6 @@
     ./immich
     ./tailscale
     ./stirling-pdf
+    ./it-tools
   ];
 }
