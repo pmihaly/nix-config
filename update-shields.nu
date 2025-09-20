@@ -6,10 +6,10 @@ def main [] {
   | from json
   | $in.locks.nodes
   | transpose key value
-  | filter { $in.value.original? != null }
+  | where { $in.value.original? != null }
   | $in.key
-  | filter { parse -r ".*_[0-9]*$" | is-empty }
-  | filter { "-shield" in $in }
-  | par-each {|it| nix flake lock --update-input $it }
-  | null
+  | where { parse -r ".*_[0-9]*$" | is-empty }
+  | where { "-shield" in $in }
+  | each {|it| nix flake lock --update-input $it }
+  | ignore
 }
