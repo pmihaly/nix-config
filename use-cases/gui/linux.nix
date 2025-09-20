@@ -48,7 +48,7 @@ optionalAttrs platform.isLinux {
       enable = true;
       settings = {
         default_session = {
-          command = "${getExe pkgs.greetd.tuigreet} --time --remember --cmd Hyprland";
+          command = "${getExe pkgs.tuigreet} --time --remember --cmd Hyprland";
           user = "greeter";
         };
       };

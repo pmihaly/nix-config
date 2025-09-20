@@ -185,7 +185,7 @@ in
     programs.zsh = {
       enable = true;
       dotDir = ".config/zsh";
-      initExtra = ''
+      initContent = ''
         autoload -U promptinit; promptinit
 
         set -o vi
