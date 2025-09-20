@@ -62,21 +62,12 @@
     hashedPasswordFile = "/persist/${vars.username}-password";
   };
 
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
+  boot.loader.grub.enable = true;
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
 
-  networking = {
-    hostName = "skylake";
-    interfaces.enp5s0.ipv4.addresses = [
-      {
-        address = "192.168.0.30";
-        prefixLength = 24;
-      }
-    ];
-  };
+  networking.hostName = "skylake";
 
   programs.fuse.userAllowOther = true;
 

@@ -1,6 +1,6 @@
 rec {
   domainName = "skylake.anaconda-snapper.ts.net";
-  timeZone = "Europe/Budapest";
+  timeZone = "Europe/Helsinki";
   persistDir = "/persist";
   serviceConfig = "${persistDir}/opt/skylake-services";
   storage = "${persistDir}/opt/skylake-storage";
