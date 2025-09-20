@@ -20,7 +20,7 @@ in
 
       virtualHosts."${vars.domainName}".globalRedirect = "${vars.domainName}/homer";
 
-      recommendedZstdSettings = true;
+      experimentalZstdSettings = true;
       recommendedTlsSettings = true;
       recommendedProxySettings = true;
       recommendedOptimisation = true;
