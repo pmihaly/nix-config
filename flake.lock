@@ -664,7 +664,7 @@
     "immich-shield": {
       "flake": false,
       "locked": {
-        "narHash": "sha256-IQfnbtHaieLsIUmtjLtpLiIEoeQSHyVoHYnDpm1F0g4=",
+        "narHash": "sha256-H96TDDNG5Gtci55oDPapNSaskF7dc1yLZT4sw+1ghq0=",
         "type": "file",
         "url": "https://img.shields.io/github/v/release/immich-app/immich.json"
       },
