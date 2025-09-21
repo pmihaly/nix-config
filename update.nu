@@ -8,10 +8,10 @@ def main [] {
   | from json
   | $in.locks.nodes
   | transpose key value
-  | filter { $in.value.original? != null }
+  | where { $in.value.original? != null }
   | $in.key
-  | filter { parse -r ".*_[0-9]*$" | is-empty }
-  | filter { $in not-in $flakesToNotUpdate }
+  | where { parse -r ".*_[0-9]*$" | is-empty }
+  | where { $in not-in $flakesToNotUpdate }
   | par-each {|it| nix flake lock --update-input $it }
-  | null
+  | ignore
 }
