@@ -31,6 +31,7 @@ optionalAttrs platform.isLinux {
       home.packages = with pkgs; [
         lutris
         wine
+        winetricks
         gamescope
         gamemode
         mangohud
