@@ -21,10 +21,14 @@ optionalAttrs platform.isLinux {
     home-manager.users.${vars.username} = {
       imports = [ ../../modules/home-manager ];
 
+      home.sessionVariables.NIXOS_OZONE_WL = "1"; # run electron apps without xwayland
+
       modules = {
         hyprland.enable = true;
       };
     };
+
+    programs.hyprland.enable = true;
 
     modules = {
       qemu.enable = true;
