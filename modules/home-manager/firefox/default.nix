@@ -500,6 +500,10 @@ in
                         name = "old+new school doom";
                         url = "https://www.youtube.com/watch?v=k8aPouLFoZw";
                       }
+                      {
+                        name = "low poly dnb/jungle";
+                        url = "https://www.youtube.com/watch?v=Nh9BrD3xIeU";
+                      }
                     ];
                   }
                 ];
