@@ -504,6 +504,10 @@ in
                         name = "low poly dnb/jungle";
                         url = "https://www.youtube.com/watch?v=Nh9BrD3xIeU";
                       }
+                      {
+                        name = "french house to whimsically vibe to";
+                        url = "https://www.youtube.com/watch?v=48wo5KINI_g";
+                      }
                     ];
                   }
                 ];
