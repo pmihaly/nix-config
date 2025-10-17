@@ -90,7 +90,6 @@
         prefixLength = 24;
       }
     ];
-    nameservers = [ "9.9.9.11" "149.112.112.11" ];
   };
 
   programs.fuse.userAllowOther = true;
