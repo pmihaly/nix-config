@@ -27,7 +27,6 @@ in
     modules.persistence = {
       files = [
         ".local/share/zsh"
-        ".config/nushell/history.txt"
       ];
       directories = [ ".local/share/direnv" ];
     };
@@ -63,83 +62,6 @@ in
       '')
     ];
 
-    programs.nushell = {
-      enable = true;
-      extraConfig = ''
-        def ns [] {${cfg.rebuildSwitch}}
-
-        def --env p [] {ls ~/personaldev | where type == "dir" | par-each {{path: $in.name, name: ($in.name | split row "/" | last)}} | input list --fuzzy --display name | cd $in.path}
-        def --env pn [] {p ; nvim}
-
-        def --env o [] {cd ~/Sync/org}
-        def --env on [] {ls ~/Sync/org | get name | input list --fuzzy | nvim $in}
-
-        def --env c [] {cd ~/.nix-config}
-        def --env cn [] {c; nvim}
-
-        def kbp [] {
-          lsof -iTCP -sTCP:LISTEN -n -P +c0
-          | detect columns
-          | uniq-by NAME
-          | select COMMAND PID NAME
-          | par-each {|it| {...$it, PORT: ($it.NAME | split row ":" | last | $"($it.NAME) (($it.COMMAND))")}}
-          | input list --fuzzy --display PORT
-          | get PID
-          | into int
-          | kill --force $in
-        }
-
-        def sr [old: string, new: string] {glob **/* -e ["**/node_modules/**", "**/.git/**", "**/.direnv/**", "**/.ve/**"] --no-dir | par-each {${getExe pkgs.gnused} -i $"s/($old)/($new)/g" $in}}
-
-        def httpcat [code: int] {start $"https://http.cat/($code)"}
-        def cal [] {${pkgs.toybox}/bin/cal (date now | format date "%Y")}
-      '';
-      shellAliases = mkMerge [
-        (bookmarksToAliases cfg.bookmarks)
-        {
-          ld = getExe pkgs.lazydocker;
-          nixprevdiff = "${getExe pkgs.nvd} diff $\"/nix/var/nix/profiles/system-(sudo nix-env --list-generations --profile /nix/var/nix/profiles/system | lines | reverse | $in.2 | split words | first)-link\" /nix/var/nix/profiles/system";
-          nr = "sudo nix-store --verify --check-contents --repair";
-          ncg = "sudo nix-collect-garbage --delete-old";
-          ndiff = "nix profile diff-closures --profile /nix/var/nix/profiles/system";
-          thokr = "${getExe pkgs.thokr} --full-sentences 20";
-          gut = "git";
-          qr = "${getExe pkgs.qrencode} -t ansiutf8";
-          du = getExe pkgs.du-dust;
-          lsblk = getExe pkgs.duf;
-          wttr = "${getExe pkgs.curl} 'https://wttr.in/amsterdam?m'";
-          n = "nvim";
-          sharedir = "${getExe pkgs.python3} -m http.server 9000";
-          ncdu = "${getExe pkgs.ncdu} --color=dark -t0"; # ncurses disk usage
-          jd = getExe' pkgs.nodePackages_latest.json-diff "json-diff";
-        }
-      ];
-      environmentVariables = {
-        PROMPT_INDICATOR_VI_NORMAL = "";
-        PROMPT_INDICATOR_VI_INSERT = "";
-        TRANSIENT_PROMPT_INDICATOR_VI_NORMAL = "";
-        TRANSIENT_PROMPT_INDICATOR_VI_INSERT = "";
-      };
-      settings = {
-        edit_mode = "vi";
-        use_kitty_protocol = true;
-        show_banner = false;
-        keybindings = [
-          {
-            name = "throw-wip-comand-into-editor";
-            modifier = "control";
-            keycode = "char_x";
-            mode = [
-              "vi_insert"
-              "vi_normal"
-            ];
-            event = [
-              { send = "OpenEditor"; }
-            ];
-          }
-        ];
-      };
-    };
     programs.starship.enableNushellIntegration = true;
     programs.yazi.enableNushellIntegration = true;
     programs.direnv.enableNushellIntegration = true;
@@ -148,7 +70,7 @@ in
 
     programs.fzf = {
       enable = true;
-      tmux.enableShellIntegration = true;
+      tmux.enableShellIntegration = false;
     };
 
     home.sessionPath = [
@@ -179,6 +101,13 @@ in
           nu_indicator = "🧙";
           style = "bold fg:#b48ead";
         };
+      };
+    };
+
+    programs.bash = {
+      enable = true;
+      shellAliases = {
+        ns = cfg.rebuildSwitch;
       };
     };
 
@@ -254,7 +183,7 @@ in
       };
     };
     programs.yazi.enableZshIntegration = true;
-    programs.fzf.enableZshIntegration = true;
+    programs.fzf.enableZshIntegration = false;
     programs.direnv.enableZshIntegration = true;
 
     programs.direnv = {

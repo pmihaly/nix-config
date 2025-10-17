@@ -100,11 +100,5 @@ in
         ];
       };
     };
-
-    programs.nushell.shellAliases = {
-      lg = "lazygit";
-      dm = "git diff origin/master HEAD";
-      nge = "nvim .git/info/exclude";
-    };
   };
 }

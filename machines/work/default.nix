@@ -82,17 +82,6 @@ rec {
       mariadb # vim dadbod
     ];
 
-    programs.nushell.extraConfig = ''
-      def --env d [] { ls ${modules.shell.extraBookmarks.w} | where type == "dir" | par-each {{path: $in.name, name: ($in.name | split row "/" | last)}} | input list --fuzzy --display name | cd $in.path }
-      def --env dn [] { p ; nvim }
-
-      def ticket [] { git branch --show-current | split words | take 2 | str join "-" }
-      def jira [] { ticket | start $"${workvars.jira-url}/($in)" }
-
-      def db [] { mkdir ~/db; cd ~/db; nvim -c DBUI }
-      def docker-prune [] { docker system prune --all --force --volumes }
-    '';
-
     programs.nixvim = {
       globals.dbs = [
         {

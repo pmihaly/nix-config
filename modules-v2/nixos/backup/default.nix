@@ -43,7 +43,7 @@ in
       createWrapper = true;
     };
 
-    home-manager.users.${vars.username}.programs.nushell.shellAliases.restic =
+    home-manager.users.${vars.username}.programs.bash.shellAliases.restic =
       "restic-${cfg.machineId}-backup";
   };
 }
