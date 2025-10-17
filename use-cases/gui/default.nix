@@ -62,7 +62,6 @@ in
 
         services.syncthing = {
           enable = true;
-          tray = true;
         };
 
         home.packages = with pkgs; [
