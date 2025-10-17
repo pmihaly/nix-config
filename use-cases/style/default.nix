@@ -69,7 +69,6 @@ in
           };
           yazi.enable = true;
           nvf.enable = true;
-          nushell.enable = true;
           kitty.enable = true;
           rofi.enable = true;
           fzf.enable = true;

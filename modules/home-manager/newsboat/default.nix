@@ -62,7 +62,5 @@ in
         macro , open-in-browser
       '';
     };
-
-    programs.nushell.shellAliases.nb = "newsboat";
   };
 }

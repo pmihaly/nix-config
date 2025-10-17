@@ -24,7 +24,6 @@ in
     };
   };
   config = mkIf cfg.enable {
-    programs.nushell.shellAliases.ya = "yy"; # idk where "yy" zsh function comes from
     programs.yazi = {
       enable = true;
       settings = {
