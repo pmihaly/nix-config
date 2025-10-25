@@ -31,7 +31,6 @@
     };
 
     server.enable = true;
-    style.enable = true;
 
     backup = {
       enable = true;

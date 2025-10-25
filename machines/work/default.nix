@@ -30,7 +30,6 @@ rec {
       enable = true;
       terminal-font-size = "14.0";
     };
-    style.enable = true;
   };
 
   ids.uids.nixbld = 350;

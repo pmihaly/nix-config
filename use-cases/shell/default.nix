@@ -73,11 +73,6 @@ in
             rebuildSwitch = vars.rebuildSwitch;
           };
 
-          yazi = {
-            enable = true;
-            bookmarks = bookmarks // cfg.extraBookmarks;
-          };
-
           nvim.enable = true;
           git.enable = true;
         };

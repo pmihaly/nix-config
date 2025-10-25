@@ -34,12 +34,8 @@ in
         rofi
       ];
       extraConfig = {
-        icon-theme = "Papirus";
         show-icons = true;
         terminal = config.modules.terminal-emulator.binary;
-        drun-display-format = "{icon} {name}";
-        location = 0;
-        hide-scrollbar = true;
       };
     };
 
@@ -54,9 +50,8 @@ in
         monitor = [
           "DP-1, 2560x1440@144, 0x0, 1"
         ];
-        "exec-once" = "${getExe pkgs.swaybg} --image ${../../../wallpaper.png}";
+        "exec-once" = "${getExe pkgs.swaybg} --image ${../../../wallpaper.jpg}";
         env = [
-          "XCURSOR_SIZE,24"
           "WLR_DRM_NO_ATOMIC,1"
         ];
         input = {
@@ -74,46 +69,12 @@ in
           accel_profile = "flat";
         };
 
+        animations.enabled = false;
+
         general = {
-          gaps_in = 10;
-          gaps_out = 40;
-          allow_tearing = true;
-          border_size = 1;
-
-          "col.active_border" = "rgb(3b4252) rgb(81a1c1) rgb(3b4252) 135deg";
-          "col.inactive_border" = "rgb(3b4252) 45deg";
-
-          layout = "dwindle";
-        };
-
-        decoration = {
-          rounding = 20;
-          blur = {
-            enabled = true;
-            size = 10;
-            passes = 3;
-            new_optimizations = true;
-          };
-
-          shadow = {
-            enabled = true;
-            range = 300;
-            render_power = 4;
-            offset = "0 40";
-            color = "rgba(1a1a1aff)";
-            scale = 0.9;
-          };
-        };
-
-        animations = {
-          enabled = true;
-
-          animation = [
-            "windows, 1, 0.7, default"
-            "workspaces, 1, 0.7, default"
-            "fade, 1, 0.7, default"
-            "border, 1, 0.7, default"
-          ];
+          gaps_in = 0;
+          gaps_out = 0;
+          allow_tearing = 1;
         };
 
         dwindle = {

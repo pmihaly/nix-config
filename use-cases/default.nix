@@ -8,6 +8,5 @@
     ./gaming
     ./music-production
     ./dev
-    ./style
   ];
 }

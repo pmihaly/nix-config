@@ -33,7 +33,6 @@
     gaming.enable = true;
     music-production.enable = true;
     dev.enable = true;
-    style.enable = true;
 
     backup = with config.home-manager.users.${vars.username}; {
       enable = true;

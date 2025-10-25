@@ -26,7 +26,7 @@ in
 
     modules.persistence = {
       files = [
-        ".local/share/zsh"
+        ".bash_history"
       ];
       directories = [ ".local/share/direnv" ];
     };
@@ -62,16 +62,9 @@ in
       '')
     ];
 
-    programs.starship.enableNushellIntegration = true;
-    programs.yazi.enableNushellIntegration = true;
     programs.direnv.enableNushellIntegration = true;
 
-    programs.bat.enable = true;
-
-    programs.fzf = {
-      enable = true;
-      tmux.enableShellIntegration = false;
-    };
+    programs.fzf.enable = true;
 
     home.sessionPath = [
       "/Users/$USER/.local/bin"
@@ -80,111 +73,18 @@ in
       "/etc/profiles/per-user/$USER/bin"
     ];
 
-    programs.starship = {
-      enable = true;
-      enableZshIntegration = true;
-      settings = {
-        add_newline = false;
-        format = lib.concatStrings [
-          " "
-          "$directory"
-          "$shell"
-        ];
-        scan_timeout = 10;
-        directory = {
-          truncation_length = 2;
-          style = "bold fg:#b48ead";
-        };
-        shell = {
-          disabled = false;
-          zsh_indicator = "🔮";
-          nu_indicator = "🧙";
-          style = "bold fg:#b48ead";
-        };
-      };
-    };
-
     programs.bash = {
       enable = true;
-      shellAliases = {
+      shellAliases = rec {
         ns = cfg.rebuildSwitch;
+        ncg = cfg.rebuildSwitch;
+        nh = "nh clean all";
+        n = "nvim";
+	c = "cd ~/.nix-config";
+	cn = c + "; nvim .";
+        p = "cd `find ~/personaldev/ -maxdepth 1 | fzf`";
       };
     };
-
-    programs.zsh = {
-      enable = true;
-      dotDir = ".config/zsh";
-      initContent = ''
-        autoload -U promptinit; promptinit
-
-        set -o vi
-
-        zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
-
-        autoload -z edit-command-line
-        zle -N edit-command-line
-        bindkey "^O" edit-command-line
-
-        [ -f ~/.zshrc_work ] && . ~/.zshrc_work
-      '';
-      enableCompletion = true;
-      completionInit = ''
-        autoload bashcompinit && bashcompinit
-        autoload -Uz compinit && compinit
-
-        complete -C 'aws_completer' aws
-      '';
-
-      syntaxHighlighting = {
-        enable = true;
-        styles = {
-          main = "";
-          brackets = "";
-        };
-      };
-      autosuggestion.enable = true;
-      autocd = true;
-      history = {
-        path = "${config.xdg.dataHome}/zsh";
-        ignoreDups = true;
-      };
-      shellAliases = (bookmarksToAliases cfg.bookmarks);
-
-      localVariables = {
-        XDG_DATA_HOME = config.xdg.dataHome;
-        XDG_CONFIG_HOME = config.xdg.configHome;
-        XDG_STATE_HOME = config.xdg.stateHome;
-        XDG_CACHE_HOME = config.xdg.cacheHome;
-
-        MANPAGER = "nvim +Man!";
-        AWS_CONFIG_FILE = "${config.xdg.configHome}/aws/config";
-        AWS_SHARED_CREDENTIALS_FILE = "${config.xdg.configHome}/aws/credentials";
-        CARGO_HOME = "${config.xdg.dataHome}/cargo";
-        DOCKER_CONFIG = "${config.xdg.configHome}/docker";
-        GNUPGHOME = "${config.xdg.dataHome}/gnupg";
-        GOPATH = "${config.xdg.dataHome}/go";
-        GRADLE_USER_HOME = "${config.xdg.dataHome}/gradle";
-        GTK2_RC_FILES = "${config.xdg.configHome}/gtk-2.0/gtkrc";
-        IPYTHONDIR = "${config.xdg.configHome}/ipython";
-        JUPYTER_CONFIG_DIR = "${config.xdg.configHome}/jupyter";
-        LEDGER_FILE = "${config.xdg.dataHome}/hledger.journal";
-        LESSHISTFILE = "${config.xdg.cacheHome}/less/history";
-        NODE_REPL_HISTORY = "${config.xdg.dataHome}/node_repl_history";
-        NPM_CONFIG_USERCONFIG = "${config.xdg.configHome}/npm/npmrc";
-        PARALLEL_HOME = "${config.xdg.configHome}/parallel";
-        PYLINTHOME = "${config.xdg.cacheHome}/pylint";
-        PYTHONSTARTUP = "${config.xdg.configHome}/python/pythonrc";
-        REDISCLI_HISTFILE = "${config.xdg.dataHome}/redis/rediscli_history";
-        STACK_ROOT = "${config.xdg.dataHome}/stack";
-        WINEPREFIX = "${config.xdg.dataHome}/wine";
-        XCOMPOSECACHE = "${config.xdg.cacheHome}/X11/xcompose";
-        ZDOTDIR = "${config.home.homeDirectory}/.config/zsh";
-        _JAVA_OPTIONS = ''-Djava.util.prefs.userRoot="${config.xdg.configHome}"/java'';
-      };
-    };
-    programs.yazi.enableZshIntegration = true;
-    programs.fzf.enableZshIntegration = false;
-    programs.direnv.enableZshIntegration = true;
 
     programs.direnv = {
       enable = true;
