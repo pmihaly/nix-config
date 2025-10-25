@@ -77,12 +77,12 @@ in
       enable = true;
       shellAliases = rec {
         ns = cfg.rebuildSwitch;
-        ncg = cfg.rebuildSwitch;
+        ncg = "sudo nix-collect-garbage --delete-old";
         nh = "nh clean all";
         n = "nvim";
 	c = "cd ~/.nix-config";
 	cn = c + "; nvim .";
-        p = "cd `find ~/personaldev/ -maxdepth 1 | fzf`";
+        p = "cd `find ~/personaldev/ -mindepth 1 -maxdepth 1 | fzf`";
       };
     };
 
