@@ -7,7 +7,6 @@
     ./git
     ./shell
     ./mpv
-    ./yazi
     ./terminal-emulator
     ./newsboat
     ./email

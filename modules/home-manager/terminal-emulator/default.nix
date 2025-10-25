@@ -1,4 +1,5 @@
 {
+  pkgs,
   lib,
   config,
   ...
@@ -31,14 +32,14 @@ in
   config = mkIf cfg.enable {
     programs.kitty = {
       enable = true;
+      font.name = "VCR OSD Mono";
+      font.package = pkgs.vcr-osd-mono;
       settings = {
-        cursor_trail = 3;
-        cursor_trail_decay = "0.1 0.2";
         macos_option_as_alt = true;
         macos_quit_when_last_window_closed = true;
         focus_follows_mouse = true;
         font_size = cfg.font-size;
-        window_padding_width = "5 150";
+        # window_padding_width = "5 150";
         confirm_os_window_close = "0";
         enable_audio_bell = false;
       };
