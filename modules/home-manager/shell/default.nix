@@ -80,8 +80,8 @@ in
         ncg = "sudo nix-collect-garbage --delete-old";
         nh = "nh clean all";
         n = "nvim";
-	c = "cd ~/.nix-config";
-	cn = c + "; nvim .";
+        c = "cd ~/.nix-config";
+        cn = c + "; nvim .";
         p = "cd `find ~/personaldev/ -mindepth 1 -maxdepth 1 | fzf`";
       };
     };
