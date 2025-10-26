@@ -19,6 +19,7 @@ in
       wl-clipboard # `wl-copy` and `wl-paste`
       nemo
       inputs.hyprland-qtutils.packages."${pkgs.system}".default
+      imv # image viewer
     ];
 
     services.gammastep = {
