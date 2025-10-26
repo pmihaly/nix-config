@@ -61,6 +61,7 @@ in
           }
       '')
       gnumake
+      universal-ctags
     ];
 
     programs.direnv.enableNushellIntegration = true;
