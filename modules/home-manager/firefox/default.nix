@@ -506,6 +506,10 @@ in
                         name = "french house to whimsically vibe to";
                         url = "https://www.youtube.com/watch?v=48wo5KINI_g";
                       }
+                      {
+                        name = "another ethereal breaks";
+                        url = "https://www.youtube.com/watch?v=5C2s-WSc8ME&list=RD5C2s-WSc8ME";
+                      }
                     ];
                   }
                 ];
