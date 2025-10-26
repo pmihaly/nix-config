@@ -247,16 +247,8 @@
             path = inputs.deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.skylake;
             sshUser = "misi";
             user = "root";
-            sshOpts = [
-              "-t"
-              "-p"
-              "69"
-              "-i"
-              "~/.ssh/skylake"
-            ];
             magicRollback = false;
             autoRollback = false;
-            remoteBuild = true;
             interactiveSudo = true;
             skipChecks = true;
           };
