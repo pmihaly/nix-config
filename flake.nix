@@ -45,10 +45,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nix-std.url = "github:chessai/nix-std";
-    nixvim = {
-      url = "github:nix-community/nixvim";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     stylix = {
       url = "github:danth/stylix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -133,7 +129,6 @@
         system = "aarch64-darwin";
         modules = [
           home-manager.darwinModules.home-manager
-          inputs.nixvim.nixDarwinModules.nixvim
           inputs.stylix.darwinModules.stylix
           {
             nixpkgs.overlays = [
@@ -176,7 +171,6 @@
           inputs.impermanence.nixosModules.impermanence
           inputs.nix-index-database.nixosModules.nix-index
           inputs.disko.nixosModules.disko
-          inputs.nixvim.nixosModules.nixvim
           inputs.stylix.nixosModules.stylix
           inputs.copyparty.nixosModules.default
           {
@@ -221,7 +215,6 @@
           inputs.impermanence.nixosModules.impermanence
           inputs.nix-index-database.nixosModules.nix-index
           inputs.disko.nixosModules.disko
-          inputs.nixvim.nixosModules.nixvim
           inputs.stylix.nixosModules.stylix
           inputs.copyparty.nixosModules.default
           {
