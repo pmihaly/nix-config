@@ -77,6 +77,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
       url = "github:viperML/nh";
     };
+    copyparty = {
+      inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:9001/copyparty";
+    };
   };
 
   outputs =
@@ -174,7 +178,13 @@
           inputs.disko.nixosModules.disko
           inputs.nixvim.nixosModules.nixvim
           inputs.stylix.nixosModules.stylix
-          { nixpkgs.overlays = [ inputs.nur.overlays.default ]; }
+          inputs.copyparty.nixosModules.default
+          {
+            nixpkgs.overlays = [
+              inputs.nur.overlays.default
+              inputs.copyparty.overlays.default
+            ];
+          }
           {
             home-manager.extraSpecialArgs = {
               inherit inputs;
@@ -213,7 +223,13 @@
           inputs.disko.nixosModules.disko
           inputs.nixvim.nixosModules.nixvim
           inputs.stylix.nixosModules.stylix
-          { nixpkgs.overlays = [ inputs.nur.overlays.default ]; }
+          inputs.copyparty.nixosModules.default
+          {
+            nixpkgs.overlays = [
+              inputs.nur.overlays.default
+              inputs.copyparty.overlays.default
+            ];
+          }
           {
             home-manager.extraSpecialArgs = {
               inherit inputs;

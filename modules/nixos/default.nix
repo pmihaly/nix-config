@@ -12,5 +12,6 @@
     ./tailscale
     ./stirling-pdf
     ./it-tools
+    ./copyparty
   ];
 }
