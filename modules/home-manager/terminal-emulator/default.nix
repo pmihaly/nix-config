@@ -39,7 +39,7 @@ in
         macos_quit_when_last_window_closed = true;
         focus_follows_mouse = true;
         font_size = cfg.font-size;
-        # window_padding_width = "5 150";
+        copy_on_select = true;
         confirm_os_window_close = "0";
         enable_audio_bell = false;
       };
