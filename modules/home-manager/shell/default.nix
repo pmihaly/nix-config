@@ -78,7 +78,6 @@ in
       shellAliases = rec {
         ns = cfg.rebuildSwitch;
         ncg = "sudo nix-collect-garbage --delete-old";
-        nh = "nh clean all";
         n = "nvim";
         c = "cd ~/.nix-config";
         cn = c + "; nvim .";
