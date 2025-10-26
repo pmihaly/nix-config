@@ -60,6 +60,7 @@ in
             | $in.0.Online
           }
       '')
+      gnumake
     ];
 
     programs.direnv.enableNushellIntegration = true;
