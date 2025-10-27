@@ -1,5 +1,4 @@
 {
-  pkgs,
   lib,
   config,
   ...
@@ -19,8 +18,8 @@ in
       ".local/share/nvim"
       ".local/share/db-ui"
     ];
-    programs.bash.sessionVariables.EDITOR = getExe config.programs.neovim.package;
+    programs.bash.sessionVariables.EDITOR = getExe config.programs.nixvim.build.package;
 
-    home.packages = [ pkgs.neovim ];
+    programs.nixvim.enable = true;
   };
 }

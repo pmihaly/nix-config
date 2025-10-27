@@ -40,6 +40,7 @@ in
       home-manager.users.${vars.username} = {
         imports = [
           inputs.agenix.homeManagerModules.default
+          inputs.nixvim.homeModules.default
           inputs.nix-index-database.hmModules.nix-index
           ../../secrets/home-manager
         ];

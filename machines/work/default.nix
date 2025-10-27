@@ -80,6 +80,19 @@ rec {
       slack
       mariadb # vim dadbod
     ];
+
+    programs.nixvim = {
+      globals.dbs = [
+        {
+          name = "local";
+          url = "mysql://root@127.0.0.1:3306";
+        }
+      ]
+      ++ map (env: {
+        name = "${env} (tun)";
+        url = "mysql://${workvars.demo-db-user}:${workvars.demo-db-password}@${env}-mysql8.demo:3307";
+      }) envs;
+    };
   };
 
   homebrew.casks = [
