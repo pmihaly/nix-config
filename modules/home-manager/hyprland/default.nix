@@ -109,13 +109,13 @@ in
         ];
 
         bind = [
-          "$mainMod, T, exec, ${config.modules.terminal-emulator.name-in-shell}"
+          "$mainMod, RETURN, exec, ${config.modules.terminal-emulator.name-in-shell}"
           "$mainMod, Q, killactive,"
           "$mainMod, SPACE, exec, rofi -show drun"
           "$mainMod, x, exec, rofi -modi emoji -show emoji"
           "$mainMod, R, exec, hyprctl reload"
           "$mainMod, F, fullscreen"
-          "$mainMod, W, exec, firefox"
+          "$mainMod, B, exec, firefox"
           "$mainMod, A, exec, ${config.modules.terminal-emulator.new-window-with-commad} ${getExe pkgs.pulsemixer}"
 
           "$mainMod, n, cyclenext"
