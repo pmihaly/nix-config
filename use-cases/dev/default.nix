@@ -29,7 +29,10 @@ optionalAttrs platform.isLinux {
     home-manager.users.${vars.username} = {
       home.packages = [ pkgs.docker-compose ];
 
-      modules.persistence.directories = [ ".config/aws" ".local/share/docker" ];
+      modules.persistence.directories = [
+        ".config/aws"
+        ".local/share/docker"
+      ];
     };
   };
 }

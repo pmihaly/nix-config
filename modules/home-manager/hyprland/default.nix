@@ -56,8 +56,9 @@ in
           "WLR_DRM_NO_ATOMIC,1"
         ];
         input = {
-          kb_options = "caps:escape";
-
+          kb_model = "pc105";
+          kb_layout = "us";
+          # kb_variant = "intl";
           follow_mouse = 1;
 
           touchpad = {
@@ -117,31 +118,29 @@ in
           "$mainMod, W, exec, firefox"
           "$mainMod, A, exec, ${config.modules.terminal-emulator.new-window-with-commad} ${getExe pkgs.pulsemixer}"
 
-          "$mainMod, k, cyclenext"
-          "$mainMod, h, cyclenext, prev"
+          "$mainMod, n, cyclenext"
+          "$mainMod, m, cyclenext, prev"
 
-          "$mainMod CONTROL, k, swapnext"
-          "$mainMod CONTROL, h, swapnext, prev"
+          "$mainMod CONTROL, n, swapnext"
+          "$mainMod CONTROL, m, swapnext, prev"
 
-          "$mainMod, m, workspace, 1"
-          "$mainMod, n, workspace, 2"
-          "$mainMod, e, workspace, 3"
-          "$mainMod, i, workspace, 4"
-          "$mainMod, o, workspace, 5"
-          "$mainMod, j, workspace, 6"
-          "$mainMod, l, workspace, 7"
-          "$mainMod, u, workspace, 8"
-          "$mainMod, y, workspace, 9"
+          "$mainMod, j, workspace, 1"
+          "$mainMod, k, workspace, 2"
+          "$mainMod, l, workspace, 3"
+          "$mainMod, ;, workspace, 4"
+          "$mainMod, u, workspace, 5"
+          "$mainMod, i, workspace, 6"
+          "$mainMod, o, workspace, 7"
+          "$mainMod, p, workspace, 8"
 
-          "$mainMod CONTROL, m, movetoworkspace, 1"
-          "$mainMod CONTROL, n, movetoworkspace, 2"
-          "$mainMod CONTROL, e, movetoworkspace, 3"
-          "$mainMod CONTROL, i, movetoworkspace, 4"
-          "$mainMod CONTROL, o, movetoworkspace, 5"
-          "$mainMod CONTROL, j, movetoworkspace, 6"
-          "$mainMod CONTROL, l, movetoworkspace, 7"
-          "$mainMod CONTROL, u, movetoworkspace, 8"
-          "$mainMod CONTROL, y, movetoworkspace, 9"
+          "$mainMod CONTROL, j, movetoworkspace, 1"
+          "$mainMod CONTROL, k, movetoworkspace, 2"
+          "$mainMod CONTROL, l, movetoworkspace, 3"
+          "$mainMod CONTROL, ;, movetoworkspace, 4"
+          "$mainMod CONTROL, u, movetoworkspace, 5"
+          "$mainMod CONTROL, i, movetoworkspace, 6"
+          "$mainMod CONTROL, o, movetoworkspace, 7"
+          "$mainMod CONTROL, p, movetoworkspace, 8"
 
           ", XF86AudioRaiseVolume, exec, wpctl set-volume -l 1.4 @DEFAULT_AUDIO_SINK@ 5%+"
           ", XF86AudioLowerVolume, exec, wpctl set-volume -l 1.4 @DEFAULT_AUDIO_SINK@ 5%-"

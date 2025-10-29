@@ -27,7 +27,7 @@
     };
     gui = {
       enable = true;
-      browser-hintchars = "tnseriao";
+      browser-hintchars = "fjdksla;";
       terminal-font-size = "13.0";
     };
     gaming.enable = true;
@@ -99,6 +99,7 @@
       "/var/log"
       "/var/lib/nixos"
       "/var/lib/systemd/coredump"
+      "/var/lib/bluetooth"
     ];
     files = [ ];
     users.${vars.username} = {
@@ -107,6 +108,33 @@
         "Sync"
       ]
       ++ lib.lists.unique config.home-manager.users.${vars.username}.modules.persistence.directories;
+    };
+  };
+
+  hardware.bluetooth.enable = true;
+  services.blueman.enable = true;
+
+  services.keyd = {
+    enable = true;
+    keyboards.default = {
+      ids = [ "*" ];
+      settings = {
+        main = {
+          capslock = "esc";
+
+          leftalt = "layer(control)";
+          leftcontrol = "leftalt";
+
+          "f+a" = "layer(shift)";
+          "j+semicolon" = "layer(shift)";
+
+          "f+s" = "layer(control)";
+          "j+l" = "layer(control)";
+
+          "f+d" = "layer(meta)";
+          "j+k" = "layer(meta)";
+        };
+      };
     };
   };
 
