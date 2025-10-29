@@ -346,6 +346,7 @@ in
                 youtube-nonstop
                 reddit-enhancement-suite
                 keepassxc-browser
+                dearrow
               ];
               bookmarks = {
                 force = true;
