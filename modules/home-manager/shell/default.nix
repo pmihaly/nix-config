@@ -104,35 +104,7 @@ in
 
     programs.tmux = {
       enable = true;
-      plugins = with pkgs; [
-        tmuxPlugins.sensible
-        tmuxPlugins.fuzzback
-        tmuxPlugins.fzf-tmux-url
-      ];
-      mouse = true;
-      clock24 = true;
-      extraConfig = ''
-        set-option -g status-interval 5
-        set-option -g automatic-rename on
-        set-option -g automatic-rename-format '#{b:pane_current_path} #{pane_current_command}'
-        set-option -g status off
-        set-option -g default-command nu
-        set-option -g terminal-overrides ",xterm-256color:Tc"
 
-        set-option -g allow-passthrough on
-        set-option -ga update-environment TERM
-        set-option -ga update-environment TERM_PROGRAM
-
-        set-option -g prefix C-Space
-        bind-key C-Space send-prefix
-
-        bind j display-popup -E "tmux list-windows -F '#{window_index} #{b:pane_current_path} #{pane_current_command} #{pane_title}' | grep -v \"$(tmux display-message -p '#I') \" | fzf | choose 0 | xargs tmux select-window -t"
-
-        bind k display-popup -E "tmux list-windows -F '#{window_index} #{b:pane_current_path} #{pane_current_command} #{pane_title}' | fzf --multi | choose 0 | xargs -I{} tmux kill-window -t {}"
-
-        set -g @fuzzback-bind ?
-        set -g @fzf-url-bind u
-      '';
     };
   };
 }
