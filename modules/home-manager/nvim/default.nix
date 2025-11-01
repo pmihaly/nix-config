@@ -26,9 +26,11 @@ in
         lsp = {
           enable = true;
           servers = {
+            # https://nix-community.github.io/nixvim/plugins/lsp/servers/ada_ls/index.html
             basedpyright.enable = true;
             nixd.enable = true;
             gopls.enable = true;
+            vtsls.enable = true; # typescript
           };
         };
         cmp = {
