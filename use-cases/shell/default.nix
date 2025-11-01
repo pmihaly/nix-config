@@ -49,6 +49,12 @@ in
         settings.PasswordAuthentication = true;
         hostKeys = cfg.sshServer.hostKeys;
       };
+
+      services.locate = {
+        enable = true;
+        prunePaths = [ vars.persistDir ];
+      };
+      environment.persistence.${vars.persistDir}.directories = [ config.services.locate.output ];
     })
 
     { users.users.${vars.username}.shell = pkgs.bash; }
