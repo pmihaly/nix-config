@@ -55,6 +55,8 @@ in
         prunePaths = [ vars.persistDir ];
       };
       environment.persistence.${vars.persistDir}.directories = [ config.services.locate.output ];
+      environment.systemPackages = with pkgs; [ lsof ];
+
     })
 
     { users.users.${vars.username}.shell = pkgs.bash; }
