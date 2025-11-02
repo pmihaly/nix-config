@@ -84,7 +84,7 @@ in
         c = "cd ~/.nix-config";
         cn = c + "; nvim .";
         p = "cd `find ~/personaldev/ -mindepth 1 -maxdepth 1 | fzf`";
-      };
+      } // (bookmarksToAliases cfg.bookmarks);
     };
 
     programs.direnv = {
