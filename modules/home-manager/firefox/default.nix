@@ -511,6 +511,10 @@ in
                         name = "another ethereal breaks";
                         url = "https://www.youtube.com/watch?v=5C2s-WSc8ME&list=RD5C2s-WSc8ME";
                       }
+                      {
+                        name = "goose mix";
+                        url = "https://www.youtube.com/watch?v=hKfcZCH1QrM";
+                      }
                     ];
                   }
                 ];
