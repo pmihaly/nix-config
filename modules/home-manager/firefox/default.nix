@@ -515,6 +515,10 @@ in
                         name = "goose mix";
                         url = "https://www.youtube.com/watch?v=hKfcZCH1QrM";
                       }
+                      {
+                        name = "peter's domain (atmospheric dnb)";
+                        url = "https://www.youtube.com/watch?v=2djElBjA9og";
+                      }
                     ];
                   }
                 ];
