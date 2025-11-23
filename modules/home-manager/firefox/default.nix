@@ -331,6 +331,7 @@ in
                             user_pref("ui.systemUsesDarkTheme", 1);
                             user_pref("browser.in-content.dark-mode", true);
                             user_pref("widget.content.gtk-theme-override", "Adwaita:dark");
+                            user_pref("browser.contextual-password-manager.enabled", false);
               	      '';
           };
         in
