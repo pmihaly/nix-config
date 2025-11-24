@@ -146,7 +146,7 @@ in
                 "browser.startup.homepage" = "https://search.brave.com/search";
               };
             extensions.packages = with pkgs.nur.repos.rycee.firefox-addons; [
-              adnauseam
+              ublock-origin
               localcdn
               clearurls
               tridactyl
