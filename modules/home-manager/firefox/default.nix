@@ -520,6 +520,10 @@ in
                         name = "peter's domain (atmospheric dnb)";
                         url = "https://www.youtube.com/watch?v=2djElBjA9og";
                       }
+                      {
+                        name = "deep lofi house";
+                        url = "https://www.youtube.com/watch?v=QVTWvOzktbE";
+                      }
                     ];
                   }
                 ];
