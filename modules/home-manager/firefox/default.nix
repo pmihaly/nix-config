@@ -524,6 +524,10 @@ in
                         name = "deep lofi house";
                         url = "https://www.youtube.com/watch?v=QVTWvOzktbE";
                       }
+                      {
+                        name = "minimal techno for locking in";
+                        url = "https://www.youtube.com/watch?v=iniu15gkDEQ";
+                      }
                     ];
                   }
                 ];
