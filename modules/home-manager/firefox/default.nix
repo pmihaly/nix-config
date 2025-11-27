@@ -56,10 +56,7 @@ in
       set searchurls.map   https://google.com/maps/search/
       set searchurls.maps  https://google.com/maps/search/
       set searchurls.route https://google.com/maps/dir/?api=1&travelmode=transit&destination=
-      set searchurls.route https://google.com/maps/dir/?api=1&travelmode=transit&destination=
-      set searchurls.brew  https://formulae.brew.sh/cask/
-
-      blacklistadd excalidraw.com
+      set searchurls.brew  https://formulae.brew.sh/cask/ blacklistadd excalidraw.com
       blacklistadd hackerrank.com
       blacklistadd console.hetzner.com/console
 
