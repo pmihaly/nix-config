@@ -121,18 +121,6 @@
       settings = {
         main = {
           capslock = "esc";
-
-          leftalt = "layer(control)";
-          leftcontrol = "leftalt";
-
-          "f+a" = "layer(shift)";
-          "j+semicolon" = "layer(shift)";
-
-          "f+s" = "layer(control)";
-          "j+l" = "layer(control)";
-
-          "f+d" = "layer(meta)";
-          "j+k" = "layer(meta)";
         };
       };
     };
