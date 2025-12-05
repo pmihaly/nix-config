@@ -525,6 +525,10 @@ in
                         name = "minimal techno for locking in";
                         url = "https://www.youtube.com/watch?v=iniu15gkDEQ";
                       }
+                      {
+                        name = "youve done well so lets groove";
+                        url = "https://www.youtube.com/watch?v=87rkKuWNRQ4";
+                      }
                     ];
                   }
                 ];
