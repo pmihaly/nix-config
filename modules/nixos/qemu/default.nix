@@ -33,7 +33,10 @@ in
     users.users.${vars.username}.extraGroups = [ "libvirtd" ];
 
     virtualisation = {
-      libvirtd.enable = true;
+      libvirtd = {
+        enable = true;
+        qemu.swtpm.enable = true;
+      };
       spiceUSBRedirection.enable = true;
     };
 
