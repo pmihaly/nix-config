@@ -37,7 +37,6 @@ in
       scrub # delete files securely
       gum # pretty shell scripts
       fd # alternative to find
-      parallel # xargs but with multiprocessing
       watch # run a command periodically
       ripgrep # basically grep
       killall
@@ -62,6 +61,7 @@ in
       '')
       gnumake
       universal-ctags
+      moreutils
     ];
 
     programs.direnv.enableNushellIntegration = true;
