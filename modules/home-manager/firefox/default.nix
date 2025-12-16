@@ -118,7 +118,7 @@ in
                       ];
                     }
                   ];
-                  iconUpdateURL = "https://cdn.search.brave.com/serp/v2/_app/immutable/assets/favicon-32x32.86083f5b.png";
+                  icon = "https://cdn.search.brave.com/serp/v2/_app/immutable/assets/favicon-32x32.86083f5b.png";
                 };
               };
             };
