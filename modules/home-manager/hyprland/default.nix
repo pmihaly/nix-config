@@ -115,7 +115,7 @@ in
           "$mainMod, x, exec, rofi -modi emoji -show emoji"
           "$mainMod, R, exec, hyprctl reload"
           "$mainMod, F, fullscreen"
-          "$mainMod, B, exec, firefox"
+          "$mainMod, W, exec, firefox"
           "$mainMod, A, exec, ${config.modules.terminal-emulator.new-window-with-commad} ${getExe pkgs.pulsemixer}"
 
           "$mainMod, n, cyclenext"
