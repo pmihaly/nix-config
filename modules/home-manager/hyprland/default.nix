@@ -117,6 +117,7 @@ in
           "$mainMod, F, fullscreen"
           "$mainMod, W, exec, firefox"
           "$mainMod, A, exec, ${config.modules.terminal-emulator.new-window-with-commad} ${getExe pkgs.pulsemixer}"
+          "$mainMod, S, exec, ${getExe pkgs.slurp} | xargs -I{} ${getExe pkgs.grim} -g {}"
 
           "$mainMod, n, cyclenext"
           "$mainMod, m, cyclenext, prev"
