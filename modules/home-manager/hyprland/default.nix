@@ -45,7 +45,6 @@ in
       systemd.enable = true;
       xwayland.enable = true;
       sourceFirst = true;
-      plugins = [ pkgs.hyprlandPlugins.hyprscrolling ];
 
       settings = {
         ecosystem.no_update_news = true;
@@ -78,7 +77,6 @@ in
           gaps_in = 0;
           gaps_out = 0;
           allow_tearing = 1;
-          layout = "scrolling";
         };
 
         dwindle = {
@@ -92,12 +90,6 @@ in
 
         misc = {
           disable_hyprland_logo = true;
-        };
-
-        plugin = {
-          hyprscrolling = {
-            fullscreen_on_one_column = true;
-          };
         };
 
         windowrulev2 = "immediate, class:^(.gamescope-wrapped|Minecraft*)$";
@@ -127,11 +119,11 @@ in
           "$mainMod, A, exec, ${config.modules.terminal-emulator.new-window-with-commad} ${getExe pkgs.pulsemixer}"
           "$mainMod, S, exec, ${getExe pkgs.slurp} | xargs -I{} ${getExe pkgs.grim} -g {}"
 
-          "$mainMod, n, cyclenext, prev"
-          "$mainMod, m, cyclenext"
+          "$mainMod, n, cyclenext"
+          "$mainMod, m, cyclenext, prev"
 
-          "$mainMod CONTROL, n, swapnext, prev"
-          "$mainMod CONTROL, m, swapnext"
+          "$mainMod CONTROL, n, swapnext"
+          "$mainMod CONTROL, m, swapnext, prev"
 
           "$mainMod, j, workspace, 1"
           "$mainMod, k, workspace, 2"
