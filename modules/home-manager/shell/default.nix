@@ -43,7 +43,6 @@ in
       sd # more intuitive search and replace
       choose # frendlier cut
       pup # jq for html
-      dogdns # dns client
       yt-dlp
       inputs.nh.packages."${pkgs.system}".default
       (pkgs.writeScriptBin "is-up" ''
