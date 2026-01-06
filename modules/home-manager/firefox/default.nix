@@ -522,12 +522,16 @@ in
                         url = "https://www.youtube.com/watch?v=QVTWvOzktbE";
                       }
                       {
-                        name = "minimal techno for locking in";
+                        name = "minimal deep tech I (locking in)";
                         url = "https://www.youtube.com/watch?v=iniu15gkDEQ";
                       }
                       {
                         name = "youve done well so lets groove";
                         url = "https://www.youtube.com/watch?v=87rkKuWNRQ4";
+                      }
+                      {
+                        name = "minimal deep tech II (visuals)";
+                        url = "https://www.youtube.com/watch?v=2hjPBHmYpPw";
                       }
                     ];
                   }
