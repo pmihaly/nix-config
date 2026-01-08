@@ -533,6 +533,10 @@ in
                         name = "minimal deep tech II (visuals)";
                         url = "https://www.youtube.com/watch?v=2hjPBHmYpPw";
                       }
+                      {
+                        name = "minimal deep tech III (visuals 2)";
+                        url = "https://www.youtube.com/watch?v=WBaJ7fbi8vg";
+                      }
                     ];
                   }
                 ];
