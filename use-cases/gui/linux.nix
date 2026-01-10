@@ -52,7 +52,7 @@ optionalAttrs platform.isLinux {
       enable = true;
       settings = {
         default_session = {
-          command = "${getExe pkgs.tuigreet} --time --remember --cmd Hyprland";
+          command = "${getExe pkgs.tuigreet} --time --remember --cmd start-hyprland";
           user = "greeter";
         };
       };
