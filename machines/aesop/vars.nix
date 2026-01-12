@@ -1,5 +1,5 @@
 {
-  timeZone = "Europe/Budapest";
+  timeZone = "Europe/Amsterdam";
   persistDir = "/persist";
   username = "misi";
   rebuildSwitch = "nh os switch ~/.nix-config --hostname aesop";
