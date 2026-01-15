@@ -81,6 +81,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
       url = "github:9001/copyparty";
     };
+    musnix = {
+      inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:musnix/musnix";
+    };
   };
 
   outputs =
@@ -179,6 +183,7 @@
           inputs.nixvim.nixosModules.nixvim
           inputs.stylix.nixosModules.stylix
           inputs.copyparty.nixosModules.default
+          inputs.musnix.nixosModules.musnix
           {
             nixpkgs.overlays = [
               inputs.nur.overlays.default
@@ -224,6 +229,7 @@
           inputs.nixvim.nixosModules.nixvim
           inputs.stylix.nixosModules.stylix
           inputs.copyparty.nixosModules.default
+          inputs.musnix.nixosModules.musnix
           {
             nixpkgs.overlays = [
               inputs.nur.overlays.default
