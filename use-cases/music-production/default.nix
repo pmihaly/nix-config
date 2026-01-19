@@ -40,9 +40,9 @@ optionalAttrs platform.isLinux {
         dragonfly-reverb
         calf
         dexed
-        drumkv1
         fire
         cardinal
+	mixxx
       ];
 
       modules = {

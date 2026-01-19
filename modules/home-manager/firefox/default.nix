@@ -537,6 +537,10 @@ in
                         name = "minimal deep tech III (visuals 2)";
                         url = "https://www.youtube.com/watch?v=WBaJ7fbi8vg";
                       }
+                      {
+                        name = "snts boiler room set";
+                        url = "https://www.youtube.com/watch?v=Vk7Qr6I4nfk";
+                      }
                     ];
                   }
                 ];
