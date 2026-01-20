@@ -42,7 +42,9 @@ optionalAttrs platform.isLinux {
         dexed
         fire
         cardinal
-	mixxx
+        mixxx
+        geonkick
+        chow-tape-model
       ];
 
       modules = {
@@ -50,11 +52,13 @@ optionalAttrs platform.isLinux {
           ".local/share/icons"
           ".local/share/applications"
           ".local/share/bottles"
+          ".local/share/geonkick"
           ".vital"
           ".local/share/vital"
           ".cache/ardour8"
           ".config/ardour8"
           ".config/lsp-plugins"
+          ".config/geonkick"
         ];
       };
     };
