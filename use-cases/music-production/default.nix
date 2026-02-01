@@ -45,6 +45,78 @@ optionalAttrs platform.isLinux {
         mixxx
         geonkick
         chow-tape-model
+        qdelay
+        (stdenv.mkDerivation rec {
+          name = "ducktool";
+          src = fetchurl {
+            url = "https://drive.usercontent.google.com/download?id=1HPD8plaQ-ulrn_IoFgEhCr1b0WyG-PEJ&export=download&authuser=0";
+            sha256 = "01ad9n4aah07b23in6ns756sgxc4zq1bmlbnk449dprbfihcmyk3";
+          };
+          nativeBuildInputs = [
+            makeWrapper
+            unzip
+          ];
+          buildInputs = [
+            alsa-lib
+            freetype
+            libglvnd
+            stdenv.cc.cc.lib
+            xorg.libICE
+            xorg.libSM
+            xorg.libX11
+            xorg.libXext
+            zlib
+            fontconfig
+          ];
+
+          unpackPhase = ''
+            unzip $src
+          '';
+
+          installPhase = ''
+            mkdir -p $out/lib/vst3
+            cp -r ducktool-linux/VST3/* $out/lib/vst3
+          '';
+          postFixup = ''
+            patchelf --set-rpath "${lib.makeLibraryPath buildInputs}" $out/lib/vst3/DuckTool.vst3/Contents/x86_64-linux/DuckTool.so
+          '';
+        })
+        (stdenv.mkDerivation rec {
+          name = "byod";
+          src = fetchurl {
+            url = "https://release-assets.githubusercontent.com/github-production-release-asset/378525798/323bc5e8-2bac-478a-a9ac-5e5eb11cf8e0";
+            sha256 = "sha256-wYA65Xtxe6sE7yBywQKEvLfUT741LUJkUHWwxodcmus=";
+          };
+          nativeBuildInputs = [
+            makeWrapper
+            unzip
+          ];
+          buildInputs = [
+            alsa-lib
+            freetype
+            libglvnd
+            stdenv.cc.cc.lib
+            xorg.libICE
+            xorg.libSM
+            xorg.libX11
+            xorg.libXext
+            zlib
+            fontconfig
+          ];
+
+          unpackPhase = ''
+            ar x $src
+	    tar -xf data.tar.xz
+          '';
+
+          installPhase = ''
+            mkdir -p $out/lib/vst3
+            cp -r usr/lib/vst3/BYOD.vst3 $out/lib/vst3
+          '';
+          postFixup = ''
+            patchelf --set-rpath "${lib.makeLibraryPath buildInputs}" $out/lib/vst3/BYOD.vst3/Contents/x86_64-linux/BYOD.so
+          '';
+        })
       ];
 
       modules = {
