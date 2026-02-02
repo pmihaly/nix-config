@@ -92,7 +92,7 @@ in
           disable_hyprland_logo = true;
         };
 
-        windowrulev2 = "immediate, class:^(.gamescope-wrapped|Minecraft*)$";
+        windowrule = "match:class ^(.gamescope-wrapped|Minecraft*)$, immediate yes";
 
         "$mainMod" = "SUPER";
 
