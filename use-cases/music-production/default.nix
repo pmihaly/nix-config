@@ -4,6 +4,7 @@
   lib,
   vars,
   config,
+  inputs,
   ...
 }:
 
@@ -46,6 +47,7 @@ optionalAttrs platform.isLinux {
         geonkick
         chow-tape-model
         qdelay
+	inputs.nixpkgs-working-elektroid.legacyPackages."x86_64-linux".elektroid
         (stdenv.mkDerivation rec {
           name = "ducktool";
           src = fetchurl {

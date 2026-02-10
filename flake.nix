@@ -85,6 +85,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
       url = "github:musnix/musnix";
     };
+    nixpkgs-working-elektroid.url = "github:nixos/nixpkgs/23b3807ea8241d5f73e5161c1dd706966108c5b9";
   };
 
   outputs =

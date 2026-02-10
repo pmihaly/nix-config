@@ -869,6 +869,22 @@
         "type": "github"
       }
     },
+    "nixpkgs-working-elektroid": {
+      "locked": {
+        "lastModified": 1744576233,
+        "narHash": "sha256-cviuRKqMRu9kBmjiDYCC3aP4OYi1JRsUMmOgZfL+2+4=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "23b3807ea8241d5f73e5161c1dd706966108c5b9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "23b3807ea8241d5f73e5161c1dd706966108c5b9",
+        "type": "github"
+      }
+    },
     "nixpkgs_2": {
       "locked": {
         "lastModified": 1768564909,
@@ -1050,6 +1066,7 @@
         "nix-std": "nix-std",
         "nixpkgs": "nixpkgs_3",
         "nixpkgs-firefox-darwin": "nixpkgs-firefox-darwin",
+        "nixpkgs-working-elektroid": "nixpkgs-working-elektroid",
         "nixvim": "nixvim",
         "nur": "nur",
         "stylix": "stylix",
