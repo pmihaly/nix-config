@@ -25,6 +25,7 @@ optionalAttrs platform.isLinux {
         "${home.homeDirectory}/.vital"
         "${home.homeDirectory}/.local/share/vital"
         "${home.homeDirectory}/.config/ardour8"
+        "${home.homeDirectory}/.cache/ardour8"
         "${home.homeDirectory}/.config/lsp-plugins"
       ];
     };
@@ -35,7 +36,8 @@ optionalAttrs platform.isLinux {
       home.packages = with pkgs; [
         wine
         bottles
-        ardour
+        ardour_8
+        # ardour
         vital
         lsp-plugins
         dragonfly-reverb
@@ -47,7 +49,64 @@ optionalAttrs platform.isLinux {
         geonkick
         chow-tape-model
         qdelay
-	inputs.nixpkgs-working-elektroid.legacyPackages."x86_64-linux".elektroid
+        inputs.nixpkgs-working-elektroid.legacyPackages."x86_64-linux".elektroid
+        # paulstretch
+        distrobox
+        # (stdenv.mkDerivation {
+        #  pname = "paulstretch";
+        #  version = "2.2-2";
+        #
+        #  src = fetchFromGitHub {
+        #    owner = "paulnasca";
+        #    repo = "paulstretch_cpp";
+        #    rev = "7d0b60b5e1f73968e982c85d979f3b9edccd18c6";
+        #    sha256 = "RJbexvT0IFK5xbInSh1qFryySib/skrKnj4fmnrz46Y=";
+        #  };
+        #
+        #  nativeBuildInputs = [ pkg-config ];
+        #
+        #  buildInputs = [
+        #    audiofile
+        #    libvorbis
+        #    fltk
+        #    fftw
+        #    fftwFloat
+        #    minixml
+        #    libmad
+        #    libjack2
+        #    portaudio
+        #    libsamplerate
+        #  ];
+        #
+        #  patches = [
+        #    # https://github.com/paulnasca/paulstretch_cpp/pull/12
+        #    (fetchpatch {
+        #      url = "https://github.com/paulnasca/paulstretch_cpp/commit/d8671b36135fe66839b11eadcacb474cc8dae0d1.patch";
+        #      sha256 = "0lx1rfrs53afkiz1drp456asqgj5yv6hx3lkc01165cv1jsbw6q4";
+        #    })
+        #  ];
+        #
+        #  buildPhase = ''
+        #    bash compile_linux_fftw_jack.sh
+        #  '';
+        #
+        #  installPhase = ''
+        #    install -Dm555 ./paulstretch $out/bin/paulstretch
+        #  '';
+        #
+        #  meta = {
+        #    description = "Produces high quality extreme sound stretching";
+        #    longDescription = ''
+        #      This is a program for stretching the audio. It is suitable only for
+        #      extreme sound stretching of the audio (like 50x) and for applying
+        #      special effects by "spectral smoothing" the sounds.
+        #      It can transform any sound/music to a texture.
+        #    '';
+        #    homepage = "https://github.com/paulnasca/paulstretch_cpp/";
+        #    platforms = lib.platforms.linux;
+        #    license = lib.licenses.gpl2;
+        #    mainProgram = "paulstretch";
+        #  };})
         (stdenv.mkDerivation rec {
           name = "ducktool";
           src = fetchurl {
@@ -86,7 +145,7 @@ optionalAttrs platform.isLinux {
         (stdenv.mkDerivation rec {
           name = "byod";
           src = fetchurl {
-            url = "https://release-assets.githubusercontent.com/github-production-release-asset/378525798/323bc5e8-2bac-478a-a9ac-5e5eb11cf8e0";
+            url = "https://github.com/Chowdhury-DSP/BYOD/releases/download/v1.3.0/BYOD-Linux-x64-1.3.0.deb";
             sha256 = "sha256-wYA65Xtxe6sE7yBywQKEvLfUT741LUJkUHWwxodcmus=";
           };
           nativeBuildInputs = [
@@ -107,8 +166,8 @@ optionalAttrs platform.isLinux {
           ];
 
           unpackPhase = ''
-            ar x $src
-	    tar -xf data.tar.xz
+                        ar x $src
+            	    tar -xf data.tar.xz
           '';
 
           installPhase = ''
@@ -117,6 +176,39 @@ optionalAttrs platform.isLinux {
           '';
           postFixup = ''
             patchelf --set-rpath "${lib.makeLibraryPath buildInputs}" $out/lib/vst3/BYOD.vst3/Contents/x86_64-linux/BYOD.so
+          '';
+        })
+        (stdenv.mkDerivation rec {
+          name = "overwitch";
+          src = fetchFromGitHub {
+            owner = "dagargo";
+            repo = "overwitch";
+            rev = "2.2";
+            sha256 = "sha256-EYT5m4N9kzeYaOcm1furGGxw1k+Bw+m+FvONVZN9ohk=";
+          };
+          nativeBuildInputs = with pkgs; [
+            pkg-config
+            autoreconfHook
+            wrapGAppsHook3
+          ];
+
+          buildInputs = with pkgs; [
+            libtool
+            libusb1
+            libjack2
+            libsamplerate
+            libsndfile
+            gettext
+            json-glib
+            gtk4
+          ];
+
+          postInstall = ''
+            # install udev/hwdb rules
+            mkdir -p $out/etc/udev/rules.d/
+            mkdir -p $out/etc/udev/hwdb.d/
+            cp ./udev/*.hwdb $out/etc/udev/hwdb.d/
+            cp ./udev/*.rules $out/etc/udev/rules.d/
           '';
         })
       ];

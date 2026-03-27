@@ -20,6 +20,8 @@ in
     ];
     programs.bash.sessionVariables.EDITOR = getExe config.programs.nixvim.build.package;
 
+    # plugins.lsp.servers.rust_analyzer.installCargo = true
+
     programs.nixvim = {
       enable = true;
       plugins = {
@@ -31,6 +33,11 @@ in
             nixd.enable = true;
             gopls.enable = true;
             vtsls.enable = true; # typescript
+            rust_analyzer = {
+              enable = true;
+              installCargo = true;
+              installRustc = true;
+            };
           };
         };
         cmp = {
