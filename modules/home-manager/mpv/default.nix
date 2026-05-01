@@ -18,7 +18,8 @@ in
     home.packages = with pkgs; [ material-icons ];
 
     programs.mpv = {
-      enable = true;
+      enable = false;
+      package = pkgs.mpv;
       config = {
         ytdl-format = "bestvideo+bestaudio/best";
       };

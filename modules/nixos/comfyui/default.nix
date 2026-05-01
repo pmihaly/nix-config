@@ -1,0 +1,44 @@
+{
+  pkgs,
+  lib,
+  config,
+  vars,
+  inputs,
+  ...
+}:
+
+with lib;
+let
+  cfg = config.modules.comfyui;
+in
+{
+  options.modules.comfyui = {
+    enable = mkEnableOption "comfyui";
+  };
+  config = mkIf cfg.enable {
+
+    # environment.persistence.${vars.persistDir} = {
+    #   directories = [ "/var/lib/comfyui" ];
+    # };
+    # services.comfyui = {
+    #   enable = true;
+    #   gpuSupport = "rocm";
+    #   enableManager = false;
+    #   port = 8188;
+    # };
+
+    nix.settings = {
+      substituters = [
+        "https://cache.nixos.org"
+        "https://comfyui.cachix.org"
+        "https://nix-community.cachix.org"
+      ];
+      trusted-public-keys = [
+        "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+        "comfyui.cachix.org-1:33mf9VzoIjzVbp0zwj+fT51HG0y31ZTK3nzYZAX0rec="
+        "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+      ];
+    };
+
+  };
+}

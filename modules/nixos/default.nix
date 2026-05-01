@@ -13,5 +13,6 @@
     ./stirling-pdf
     ./it-tools
     ./copyparty
+    ./comfyui
   ];
 }

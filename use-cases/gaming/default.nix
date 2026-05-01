@@ -25,6 +25,15 @@ optionalAttrs platform.isLinux {
       extraCompatPackages = [ pkgs.proton-ge-bin ];
     };
 
+
+      nixpkgs.overlays = [
+(final: prev: {
+  openldap = prev.openldap.overrideAttrs (_: {
+    doCheck = false;
+  });
+})
+      ];
+
     home-manager.users.${vars.username} = {
       imports = [ ../../modules/home-manager ];
 

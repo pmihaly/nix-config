@@ -86,6 +86,11 @@
       url = "github:musnix/musnix";
     };
     nixpkgs-working-elektroid.url = "github:nixos/nixpkgs/23b3807ea8241d5f73e5161c1dd706966108c5b9";
+    comfyui = {
+      inputs.nixpkgs.follows = "nixpkgs";
+      # url = "github:utensils/comfyui-nix?ref=fix/rocm-xformers-segfault";
+      url = "github:utensils/comfyui-nix";
+    };
   };
 
   outputs =
@@ -185,10 +190,12 @@
           inputs.stylix.nixosModules.stylix
           inputs.copyparty.nixosModules.default
           inputs.musnix.nixosModules.musnix
+          inputs.comfyui.nixosModules.default
           {
             nixpkgs.overlays = [
               inputs.nur.overlays.default
               inputs.copyparty.overlays.default
+              inputs.comfyui.overlays.default
             ];
           }
           {

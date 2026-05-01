@@ -43,7 +43,7 @@ in
       sd # more intuitive search and replace
       choose # frendlier cut
       pup # jq for html
-      yt-dlp
+      yt-dlp-light
       inputs.nh.packages."${pkgs.system}".default
       (pkgs.writeScriptBin "is-up" ''
         #! ${getExe pkgs.nushell}
