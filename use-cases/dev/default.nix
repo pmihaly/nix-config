@@ -31,13 +31,8 @@ optionalAttrs platform.isLinux {
 
       modules.persistence.directories = [
         ".config/aws"
-        ".claude"
         ".local/share/docker"
       ];
-
-      programs.claude-code = {
-	enable = true;
-      };
     };
   };
 }
