@@ -17,15 +17,8 @@ in
   };
   config = mkIf cfg.enable {
 
-    # environment.persistence.${vars.persistDir} = {
-    #   directories = [ "/var/lib/comfyui" ];
-    # };
-    # services.comfyui = {
-    #   enable = true;
-    #   gpuSupport = "rocm";
-    #   enableManager = false;
-    #   port = 8188;
-    # };
+    # environment.systemPackages = [ pkgs.comfy-ui-rocm ];
+    # environment.systemPackages = [ inputs.comfyui.packages."${pkgs.system}".rocm ];
 
     nix.settings = {
       substituters = [
