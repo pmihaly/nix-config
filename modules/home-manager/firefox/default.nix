@@ -541,6 +541,10 @@ in
                         name = "snts boiler room set";
                         url = "https://www.youtube.com/watch?v=Vk7Qr6I4nfk";
                       }
+                      {
+                        name = "kassis set";
+                        url = "https://www.youtube.com/watch?v=d3dcH5Myc_k";
+                      }
                     ];
                   }
                 ];
