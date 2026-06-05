@@ -79,10 +79,7 @@ in
           allow_tearing = 1;
         };
 
-        dwindle = {
-          pseudotile = true;
-          preserve_split = true;
-        };
+        dwindle.preserve_split = true;
 
         master = {
           new_status = true;
@@ -117,6 +114,7 @@ in
           "$mainMod, x, exec, rofi -modi emoji -show emoji"
           "$mainMod, R, exec, hyprctl reload"
           "$mainMod, F, fullscreen"
+          "$mainMod, V, togglefloating"
           "$mainMod, W, exec, firefox"
           "$mainMod, A, exec, ${config.modules.terminal-emulator.new-window-with-commad} ${getExe pkgs.pulsemixer}"
           "$mainMod, S, exec, ${getExe pkgs.slurp} | xargs -I{} ${getExe pkgs.grim} -g {}"
