@@ -545,6 +545,14 @@ in
                         name = "kassis set";
                         url = "https://www.youtube.com/watch?v=d3dcH5Myc_k";
                       }
+                      {
+                        name = "exil der schatten hex";
+                        url = "https://www.youtube.com/watch?v=Iny49eDAAz8";
+                      }
+                      {
+                        name = "orgie verknipt";
+                        url = "https://www.youtube.com/watch?v=zCJ9E5bbjWQ";
+                      }
                     ];
                   }
                 ];
