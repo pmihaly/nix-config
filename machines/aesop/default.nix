@@ -61,6 +61,8 @@
         url = "https://terraria.fandom.com/wiki/Guide:Game_progression_graph";
       }
     ];
+
+    services.mpris-proxy.enable = true; # enable bluetooth headphone controls
   };
 
   users.mutableUsers = false;
@@ -114,6 +116,7 @@
 
   hardware.bluetooth.enable = true;
   services.blueman.enable = true;
+  services.pulseaudio.package = pkgs.pulseaudioFull; # extra bluetooth codecs
 
   services.keyd = {
     enable = true;
