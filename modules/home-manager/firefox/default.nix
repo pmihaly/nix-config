@@ -138,7 +138,6 @@ in
                 "browser.tabs.warnOnCloseOtherTabs" = false;
                 "browser.toolbars.bookmarks.visibility" = "newtab";
                 "browser.chrome.toolbar_tips" = false;
-                "media.videocontrols.picture-in-picture.enabled" = false;
                 "browser.newtabpage.pinned" = [ ];
                 "browser.startup.homepage" = "https://search.brave.com/search";
               };
@@ -279,8 +278,6 @@ in
                             user_pref("extensions.webservice.discoverURL", "");
                             user_pref("media.autoplay.default", 1);
                             user_pref("media.autoplay.enabled", false);
-                            user_pref("media.eme.enabled", false);
-                            user_pref("media.gmp-widevinecdm.enabled", false);
                             user_pref("media.navigator.enabled", false);
                             user_pref("media.peerconnection.enabled", false);
                             user_pref("media.video_stats.enabled", false);
