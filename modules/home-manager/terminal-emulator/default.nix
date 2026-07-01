@@ -32,8 +32,8 @@ in
   config = mkIf cfg.enable {
     programs.kitty = {
       enable = true;
-      font.name = "VCR OSD Mono";
-      font.package = pkgs.vcr-osd-mono;
+      font.name = "JetBrains Mono";
+      font.package = pkgs.jetbrains-mono;
       settings = {
         macos_option_as_alt = true;
         macos_quit_when_last_window_closed = true;
