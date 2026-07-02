@@ -108,6 +108,14 @@ optionalAttrs platform.isLinux {
 
       programs.opencode = {
         enable = true;
+        context = ''
+          You are a concise assistant. Keep answers short and avoid unnecessary preamble.
+          Assume nothing is installed locally. Always use `nix-shell -p <package> --run "<command>"` to invoke tools and commands.
+          Never generate or guess URLs unless confident they are relevant.
+          Follow existing code conventions. Mimic style, naming, and patterns before introducing new ones.
+          Run lint/typecheck commands before completing work if they exist in the repo.
+          Do not commit changes unless explicitly asked.
+        '';
         settings = {
           server = {
             port = 4096;

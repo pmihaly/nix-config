@@ -159,6 +159,43 @@
         ];
       };
 
+      homeConfigurations.aesop = home-manager.lib.homeManagerConfiguration {
+        pkgs = nixpkgs.legacyPackages.x86_64-linux;
+        modules = [
+          inputs.nixvim.homeManagerModules.nixvim
+          inputs.stylix.homeManagerModules.stylix
+          {
+            nixpkgs.overlays = [
+              inputs.nur.overlays.default
+            ];
+            home = {
+              username = "misi";
+              homeDirectory = "/home/misi";
+              stateVersion = "22.05";
+            };
+          }
+          ./modules/home-manager/firefox
+          ./modules/home-manager/git
+          ./modules/home-manager/shell
+          ./modules/home-manager/mpv
+          ./modules/home-manager/terminal-emulator
+          ./modules/home-manager/newsboat
+          ./modules/home-manager/vscode
+          ./modules/home-manager/discord
+          ./modules/home-manager/minecraft
+          ./modules/home-manager/keepassxc
+          ./modules/home-manager/persistence
+        ];
+        extraSpecialArgs = {
+          inherit inputs;
+          vars = import ./machines/aesop/vars.nix;
+          platform = {
+            isLinux = true;
+            isDarwin = false;
+          };
+        };
+      };
+
       nixosConfigurations.aesop = nixpkgs.lib.nixosSystem {
         specialArgs =
           let
