@@ -18,7 +18,7 @@ in
     home.packages = with pkgs; [
       wl-clipboard # `wl-copy` and `wl-paste`
       nemo
-      inputs.hyprland-qtutils.packages."${pkgs.system}".default
+      inputs.hyprland-qtutils.packages.${pkgs.stdenv.hostPlatform.system}.default
       imv # image viewer
     ];
 
@@ -42,6 +42,7 @@ in
 
     wayland.windowManager.hyprland = {
       enable = true;
+      configType = "hyprlang";
       systemd.enable = true;
       xwayland.enable = true;
       sourceFirst = true;

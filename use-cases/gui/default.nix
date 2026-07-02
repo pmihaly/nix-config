@@ -66,7 +66,7 @@ in
 
         home.packages = with pkgs; [
           keepass-diff # diffing .kdbx files
-          inputs.img2theme.packages."${pkgs.system}".default
+          inputs.img2theme.packages.${pkgs.stdenv.hostPlatform.system}.default
           feh
           tailscale
           transmission_4-gtk

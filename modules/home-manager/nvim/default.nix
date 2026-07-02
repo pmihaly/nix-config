@@ -1,6 +1,8 @@
 {
+  pkgs,
   lib,
   config,
+  inputs,
   ...
 }:
 
@@ -24,6 +26,7 @@ in
 
     programs.nixvim = {
       enable = true;
+      nixpkgs.source = inputs.nixpkgs;
       plugins = {
         lsp = {
           enable = true;

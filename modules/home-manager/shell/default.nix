@@ -44,7 +44,7 @@ in
       choose # frendlier cut
       pup # jq for html
       yt-dlp-light
-      inputs.nh.packages."${pkgs.system}".default
+      inputs.nh.packages.${pkgs.stdenv.hostPlatform.system}.default
       (pkgs.writeScriptBin "is-up" ''
         #! ${getExe pkgs.nushell}
         def main [

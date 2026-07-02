@@ -122,10 +122,10 @@ optionalAttrs platform.isLinux {
             freetype
             libglvnd
             stdenv.cc.cc.lib
-            xorg.libICE
-            xorg.libSM
-            xorg.libX11
-            xorg.libXext
+            libice
+            libsm
+            libx11
+            libxext
             zlib
             fontconfig
           ];
@@ -157,10 +157,10 @@ optionalAttrs platform.isLinux {
             freetype
             libglvnd
             stdenv.cc.cc.lib
-            xorg.libICE
-            xorg.libSM
-            xorg.libX11
-            xorg.libXext
+            libice
+            libsm
+            libx11
+            libxext
             zlib
             fontconfig
           ];

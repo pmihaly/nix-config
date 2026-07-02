@@ -74,7 +74,6 @@
       "video"
       "render"
     ];
-    initialPassword = vars.username;
     hashedPasswordFile = "${vars.persistDir}/${vars.username}-password";
   };
 

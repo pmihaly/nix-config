@@ -61,7 +61,14 @@ in
 
     { users.users.${vars.username}.shell = pkgs.bash; }
 
-    (optionalAttrs platform.isLinux { home-manager.users.${vars.username}.xdg.userDirs.enable = true; })
+    (optionalAttrs platform.isLinux {
+      home-manager.users.${vars.username} = {
+        xdg.userDirs = {
+          enable = true;
+          setSessionVariables = true;
+        };
+      };
+    })
 
     {
       home-manager.users.${vars.username} = {
