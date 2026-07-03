@@ -160,6 +160,8 @@ optionalAttrs platform.isLinux {
         ".config/aws"
         ".local/share/docker"
         ".config/opencode"
+        ".local/share/opencode"
+        ".local/state/opencode"
       ];
     };
   };
