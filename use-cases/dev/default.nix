@@ -103,22 +103,6 @@ optionalAttrs platform.isLinux {
       "d /var/lib/llama-cpp 0755 llama-cpp llama-cpp -"
     ];
 
-    services.llama-swap = {
-      enable = true;
-      settings = {
-        healthCheckTimeout = 60;
-        logToStdout = "proxy";
-        globalTTL = 0;
-        sendLoadingState = true;
-        models."Qwen3.6-27B Q4 +MTP" = {
-          name = "Qwen3.6-27B Q4 +MTP";
-          proxy = "http://127.0.0.1:8083";
-          checkEndpoint = "/health";
-          ttl = 0;
-        };
-      };
-    };
-
     home-manager.users.${vars.username} = {
       home.packages = [ pkgs.docker-compose ];
 
@@ -177,7 +161,7 @@ optionalAttrs platform.isLinux {
           name = "llama.cpp (local)";
           npm = "@ai-sdk/openai-compatible";
           options = {
-            baseURL = "http://127.0.0.1:8080/v1";
+            baseURL = "http://127.0.0.1:8083/v1";
             apiKey = "local";
           };
           models."Qwen3.6-27B Q4 +MTP".name = "Qwen3.6-27B Q4 +MTP";
