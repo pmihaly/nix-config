@@ -74,7 +74,7 @@ optionalAttrs platform.isLinux {
                   parallel = 1;
                 };
               }
-            } --no-webui";
+            }";
           checkEndpoint = "/health";
           ttl = 0;
         };
