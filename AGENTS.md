@@ -34,6 +34,10 @@
 - Browse Home Manager options: https://home-manager-options.extranix.com/
 - Browse NixOS options: https://search.nixos.org/options
 
+## Configuration Policy
+
+All configuration changes must be made in this repo — never edit files under `~/.config/`, `/etc/`, or other runtime paths directly. Before modifying any tool or service, look up its existing configuration in this repo first, then check the nix store if not found (e.g., `grep -r "<option>" /nix/store/…-nixos-system-*/etc/` or reading the active config from the store).
+
 ## Helpers
 
 - `lib/nixos/default.nix` exports `mkService` (sets up nginx reverse proxy + dashboard) and `getDockerVersionFromShield`
