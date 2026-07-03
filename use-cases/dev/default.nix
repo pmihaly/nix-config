@@ -66,21 +66,21 @@ optionalAttrs platform.isLinux {
           --port 8083 \
           --models-preset ${
             (pkgs.formats.ini { }).generate "models.ini" {
-               "Qwen3.6-27B Q4 +MTP" = {
-                 "hf-repo" = "unsloth/Qwen3.6-27B-MTP-GGUF";
-                 "hf-file" = "Qwen3.6-27B-Q4_K_M.gguf";
-                 "spec-type" = "draft-mtp";
-                 ngl = "all";
-                 fa = "on";
-                  "cache-type-k" = "q4_0";
-                  "cache-type-v" = "q4_0";
-                  "fit-target" = 19000;
-                  "ctx-size" = 32768;
-                 "ubatch-size" = 1024;
-                 "batch-size" = 2048;
-                 "cache-reuse" = 256;
-                 parallel = 1;
-               };
+              "Qwen3.6-27B Q4 +MTP" = {
+                "hf-repo" = "unsloth/Qwen3.6-27B-MTP-GGUF";
+                "hf-file" = "Qwen3.6-27B-Q4_K_M.gguf";
+                "spec-type" = "draft-mtp";
+                ngl = "all";
+                fa = "on";
+                "cache-type-k" = "q4_0";
+                "cache-type-v" = "q4_0";
+                "fit-target" = 19000;
+                "ctx-size" = 32768;
+                "ubatch-size" = 1024;
+                "batch-size" = 2048;
+                "cache-reuse" = 256;
+                parallel = 1;
+              };
 
             }
           }
@@ -89,6 +89,7 @@ optionalAttrs platform.isLinux {
     users.users.llama-cpp = {
       isSystemUser = true;
       group = "llama-cpp";
+      extraGroups = [ "video" ];
     };
 
     users.groups.llama-cpp = { };
@@ -107,16 +108,50 @@ optionalAttrs platform.isLinux {
       enable = true;
       settings = {
         healthCheckTimeout = 60;
-        logToStdout = "proxy";
+        logToStdout = "both";
         globalTTL = 0;
         sendLoadingState = true;
         models."Qwen3.6-27B Q4 +MTP" = {
           name = "Qwen3.6-27B Q4 +MTP";
-          proxy = "http://127.0.0.1:8083";
+          cmd =
+            "${pkgs.llama-cpp-rocm}/bin/llama-server --host 0.0.0.0 --port "
+            + "$"
+            + "{PORT} --models-preset ${
+              (pkgs.formats.ini { }).generate "models.ini" {
+                "Qwen3.6-27B Q4 +MTP" = {
+                  "hf-repo" = "unsloth/Qwen3.6-27B-MTP-GGUF";
+                  "hf-file" = "Qwen3.6-27B-Q4_K_M.gguf";
+                  "spec-type" = "draft-mtp";
+                  ngl = "all";
+                  fa = "on";
+                  "cache-type-k" = "q4_0";
+                  "cache-type-v" = "q4_0";
+                  "fit-target" = 19000;
+                  "ctx-size" = 32768;
+                  "ubatch-size" = 1024;
+                  "batch-size" = 2048;
+                  "cache-reuse" = 256;
+                  parallel = 1;
+                };
+              }
+            } --no-webui";
           checkEndpoint = "/health";
           ttl = 0;
         };
       };
+    };
+
+    systemd.services.llama-swap.serviceConfig = {
+      DynamicUser = lib.mkForce false;
+      PrivateDevices = lib.mkForce false;
+      PrivateUsers = lib.mkForce false;
+      ProtectSystem = lib.mkForce "false";
+      User = "llama-cpp";
+      Group = "llama-cpp";
+      Environment = [
+        "LLAMA_CACHE=/var/cache/llama-cpp"
+      ];
+      ReadWritePaths = [ "/var/cache/llama-cpp" ];
     };
 
     home-manager.users.${vars.username} = {
@@ -174,14 +209,14 @@ optionalAttrs platform.isLinux {
             hostname = "0.0.0.0";
           };
           provider.llama = {
-          name = "llama.cpp (local)";
-          npm = "@ai-sdk/openai-compatible";
-          options = {
-            baseURL = "http://127.0.0.1:8080/v1";
-            apiKey = "local";
+            name = "llama.cpp (local)";
+            npm = "@ai-sdk/openai-compatible";
+            options = {
+              baseURL = "http://127.0.0.1:8080/v1";
+              apiKey = "local";
+            };
+            models."Qwen3.6-27B Q4 +MTP".name = "Qwen3.6-27B Q4 +MTP";
           };
-          models."Qwen3.6-27B Q4 +MTP".name = "Qwen3.6-27B Q4 +MTP";
-        };
         };
       };
 
