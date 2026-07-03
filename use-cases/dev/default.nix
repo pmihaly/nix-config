@@ -26,66 +26,6 @@ optionalAttrs platform.isLinux {
       };
     };
 
-    systemd.services.llama-cpp = {
-      description = "llama.cpp HTTP server";
-      after = [ "network.target" ];
-      wantedBy = [ "multi-user.target" ];
-
-      serviceConfig = {
-        User = "llama-cpp";
-        Group = "llama-cpp";
-
-        WorkingDirectory = "/var/lib/llama-cpp";
-
-        StateDirectory = "";
-        CacheDirectory = "";
-
-        NoNewPrivileges = true;
-        PrivateTmp = true;
-        PrivateDevices = false;
-
-        ProtectSystem = "strict";
-        ProtectHome = true;
-
-        ReadWritePaths = [
-          "/var/lib/llama-cpp"
-          "/var/cache/llama-cpp"
-        ];
-
-        Restart = "on-failure";
-        RestartSec = 5;
-      };
-
-      environment = {
-        LLAMA_CACHE = "/var/cache/llama-cpp";
-      };
-
-      script = ''
-        exec ${pkgs.llama-cpp-rocm}/bin/llama-server \
-          --host 0.0.0.0 \
-          --port 8083 \
-          --models-preset ${
-            (pkgs.formats.ini { }).generate "models.ini" {
-              "Qwen3.6-27B Q4 +MTP" = {
-                "hf-repo" = "unsloth/Qwen3.6-27B-MTP-GGUF";
-                "hf-file" = "Qwen3.6-27B-Q4_K_M.gguf";
-                "spec-type" = "draft-mtp";
-                ngl = "all";
-                fa = "on";
-                "cache-type-k" = "q4_0";
-                "cache-type-v" = "q4_0";
-                "fit-target" = 19000;
-                "ctx-size" = 32768;
-                "ubatch-size" = 1024;
-                "batch-size" = 2048;
-                "cache-reuse" = 256;
-                parallel = 1;
-              };
-
-            }
-          }
-      '';
-    };
     users.users.llama-cpp = {
       isSystemUser = true;
       group = "llama-cpp";
@@ -144,14 +84,10 @@ optionalAttrs platform.isLinux {
     systemd.services.llama-swap.serviceConfig = {
       DynamicUser = lib.mkForce false;
       PrivateDevices = lib.mkForce false;
-      PrivateUsers = lib.mkForce false;
       ProtectSystem = lib.mkForce "false";
       User = "llama-cpp";
       Group = "llama-cpp";
-      Environment = [
-        "LLAMA_CACHE=/var/cache/llama-cpp"
-      ];
-      ReadWritePaths = [ "/var/cache/llama-cpp" ];
+      Environment = [ "LLAMA_CACHE=/var/cache/llama-cpp" ];
     };
 
     home-manager.users.${vars.username} = {
