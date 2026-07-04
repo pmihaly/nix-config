@@ -46,49 +46,63 @@ optionalAttrs platform.isLinux {
 
     services.llama-swap = {
       enable = true;
-      listenAddress = "0.0.0.0";
-      openFirewall = true;
       settings = {
         healthCheckTimeout = 60;
         logToStdout = "both";
         globalTTL = 0;
         sendLoadingState = true;
-        models = {
-          "Qwen3.6-27B Q3" = {
-            name = "Qwen3.6-27B Q3";
-            cmd =
-              "${pkgs.llama-cpp-rocm}/bin/llama-server --host 0.0.0.0 --port "
-              + "$"
-              + "{PORT} --models-preset ${
-                (pkgs.formats.ini { }).generate "big.ini" {
-                  "Qwen3.6-27B Q3" = {
-                    "hf-repo" = "unsloth/Qwen3.6-27B-GGUF";
-                    "hf-file" = "Qwen3.6-27B-Q3_K_M.gguf";
-                    ngl = "all";
-                    fa = "on";
-                    "cache-type-k" = "q4_0";
-                    "cache-type-v" = "q4_0";
-                    "fit-target" = 9500;
-                    "ctx-size" = 32768;
-                    "ubatch-size" = 1024;
-                    "batch-size" = 2048;
-                    "cache-reuse" = 256;
-                    parallel = 2;
-                  };
-                }
-              }";
-            checkEndpoint = "/health";
-            ttl = 0;
-          };
-
+        models."Qwen3.6-27B Q4 +MTP" = {
+          name = "Qwen3.6-27B Q4 +MTP";
+          cmd =
+            "${pkgs.llama-cpp-rocm}/bin/llama-server --host 0.0.0.0 --port "
+            + "$"
+            + "{PORT} --models-preset ${
+              (pkgs.formats.ini { }).generate "models.ini" {
+                "Qwen3.6-27B Q4 +MTP" = {
+                  "hf-repo" = "unsloth/Qwen3.6-27B-MTP-GGUF";
+                  "hf-file" = "Qwen3.6-27B-Q4_K_M.gguf";
+                  "spec-type" = "draft-mtp";
+                  ngl = "all";
+                  fa = "on";
+                  "cache-type-k" = "q4_0";
+                  "cache-type-v" = "q4_0";
+                  "fit-target" = 19000;
+                  "ctx-size" = 32768;
+                  "ubatch-size" = 1024;
+                  "batch-size" = 2048;
+                  "cache-reuse" = 256;
+                  parallel = 1;
+                };
+              }
+            }";
+          checkEndpoint = "/health";
+          ttl = 0;
         };
-        groups = {
-          default = {
-            swap = false;
-            members = [
-              "Qwen3.6-27B Q3"
-            ];
-          };
+        models."Qwen3-4B Q4" = {
+          name = "Qwen3-4B Q4";
+          cmd =
+            "${pkgs.llama-cpp-rocm}/bin/llama-server --host 0.0.0.0 --port "
+            + "$"
+            + "{PORT} --models-preset ${
+              (pkgs.formats.ini { }).generate "small.ini" {
+                "Qwen3-4B Q4" = {
+                  "hf-repo" = "unsloth/Qwen3-4B-GGUF";
+                  "hf-file" = "Qwen3-4B-Q4_K_M.gguf";
+                  ngl = "all";
+                  fa = "on";
+                  "cache-type-k" = "q4_0";
+                  "cache-type-v" = "q4_0";
+                  "fit-target" = 3000;
+                  "ctx-size" = 32768;
+                  "ubatch-size" = 1024;
+                  "batch-size" = 2048;
+                  "cache-reuse" = 256;
+                  parallel = 1;
+                };
+              }
+            }";
+          checkEndpoint = "/health";
+          ttl = 0;
         };
       };
     };
@@ -108,48 +122,26 @@ optionalAttrs platform.isLinux {
       programs.opencode = {
         enable = true;
         context = ''
-          ## Communication
+          ## Behavior
+          - Concise. No preamble. No guessed URLs. Never commit unless asked.
+          - Use `nix-shell -p <pkg> --run "<cmd>"` for all tool invocations.
+          - Run lint/typecheck before completing work.
 
-          - You are a concise assistant. Keep answers short and avoid unnecessary preamble.
-          - Never generate or guess URLs unless confident they are relevant.
-
-          ## Environment
-
-          - Assume nothing is installed locally. Always use `nix-shell -p <package> --run "<command>"` to invoke tools and commands.
-          - Run lint/typecheck commands before completing work if they exist in the repo.
-          - Do not commit changes unless explicitly asked.
-
-          ## Code Style
-
-          - Follow existing code conventions. Mimic style, naming, and patterns before introducing new ones.
-          - Always write the simplest code possible.
-          - Simplicity is trapping complex behavior within a simple interface — keep interfaces small.
-          - Do not introduce new functions, classes, or symbols unless strictly required.
+          ## Code
+          - Follow existing conventions. Write the simplest code possible. No new symbols unless required.
+          - Keep interfaces small; push complexity to implementation. Few deep methods over many shallow ones.
+          - Provide sensible defaults so parameters disappear for the common case.
+          - Vertical slices by business terms. Max 1 level of nesting. No `else` — early returns. Immutable by default.
 
           ## API Design
+          - Make illegal states unrepresentable. Prefer total functions and idempotent operations.
+          - Use types to eliminate invalid states at compile time. Absorb rare cases into the common case.
+          - Hide implementation details. Name for meaning, not mechanism. Question every parameter.
 
-          - Make illegal states unrepresentable — design errors out of existence.
-          - Ask "how do I change the semantics so this is no longer an error?" not "how do I handle it?".
-          - Prefer idempotent operations, total functions, and wide valid input over error handling.
-          - Use types to eliminate invalid states at compile time (e.g., `NonEmptyList` vs `List`).
-          - Absorb rare cases into the common case; eliminate special cases in data models.
-          - Push complexity from the caller to the called — the library should be complex, the API should be simple.
-          - Distinguish interface complexity from implementation complexity. Keep interfaces simple; implementation complexity is acceptable if it reduces interface complexity.
-          - A small interface means "few things the caller is forced to think about."
-          - Provide sensible defaults so parameters disappear for the common case.
-          - Separate general-purpose core from special-purpose wrappers; don't let one-offs bloat the core interface.
-          - Hide implementation details — callers should never need to know how something works to use it.
-          - Favor few, deep methods over many, shallow ones.
-          - Name things for what they mean, not how they're implemented.
-          - Question every parameter: "does the caller need to know this at all?"
-
-          ## Code Structure
-
-          - Organize by business terms, not technical concerns — use vertical slices.
-          - Never nest code beyond +1 level — a function can only have one level of nesting.
-          - Never use `else`; prefer early returns.
-          - Use immutability unless mutability is simpler.
-          - Keep diffs as small as possible.
+          ## Error Handling
+          - No silent fallbacks: no bare `??`, `||`, empty `catch {}`, or `return null`.
+          - First design errors out of existence. If unavoidable, handle explicitly and visibly.
+          - Fail loudly with context. Never swallow errors without logging.
         '';
         settings = {
           server = {
@@ -163,9 +155,8 @@ optionalAttrs platform.isLinux {
               baseURL = "http://127.0.0.1:8080/v1";
               apiKey = "local";
             };
-            models = {
-              "Qwen3.6-27B Q3".name = "Qwen3.6-27B Q3";
-            };
+            models."Qwen3.6-27B Q4 +MTP".name = "Qwen3.6-27B Q4 +MTP";
+            models."Qwen3-4B Q4".name = "Qwen3-4B Q4";
           };
         };
         agents = {
@@ -173,7 +164,7 @@ optionalAttrs platform.isLinux {
             ---
             description: System architecture and design decisions
             mode: subagent
-            model: llama/Qwen3.6-27B Q3
+            model: llama/Qwen3.6-27B Q4 +MTP
             temperature: 0.2
             permission:
               edit: deny
@@ -197,7 +188,7 @@ optionalAttrs platform.isLinux {
             ---
             description: Implementation and code writing
             mode: subagent
-            model: llama/Qwen3.6-27B Q3
+            model: llama/Qwen3.6-27B Q4 +MTP
             temperature: 0.1
             ---
             You are a coder agent. Implement features, fix bugs, and write clean code.
@@ -215,7 +206,7 @@ optionalAttrs platform.isLinux {
             ---
             description: Codebase exploration and research
             mode: subagent
-            model: llama/Qwen3.6-27B Q3
+            model: llama/Qwen3.6-27B Q4 +MTP
             temperature: 0.1
             permission:
               edit: deny
@@ -239,7 +230,7 @@ optionalAttrs platform.isLinux {
             ---
             description: Writing and running tests
             mode: subagent
-            model: llama/Qwen3.6-27B Q3
+            model: llama/Qwen3.6-27B Q4 +MTP
             temperature: 0.1
             ---
             You are a tester agent. Write tests and verify code correctness.
