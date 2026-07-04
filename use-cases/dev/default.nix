@@ -68,86 +68,25 @@ optionalAttrs platform.isLinux {
                     fa = "on";
                     "cache-type-k" = "q4_0";
                     "cache-type-v" = "q4_0";
-                    "fit-target" = 15500;
+                    "fit-target" = 9500;
                     "ctx-size" = 32768;
                     "ubatch-size" = 1024;
                     "batch-size" = 2048;
                     "cache-reuse" = 256;
-                    parallel = 1;
+                    parallel = 2;
                   };
                 }
               }";
             checkEndpoint = "/health";
             ttl = 0;
           };
-          "Qwen3-4B Q4" = {
-            name = "Qwen3-4B Q4";
-            cmd =
-              "${pkgs.llama-cpp-rocm}/bin/llama-server --host 0.0.0.0 --port "
-              + "$"
-              + "{PORT} --models-preset ${
-                (pkgs.formats.ini { }).generate "small.ini" {
-                  "Qwen3-4B Q4" = {
-                    "hf-repo" = "unsloth/Qwen3-4B-GGUF";
-                    "hf-file" = "Qwen3-4B-Q4_K_M.gguf";
-                    ngl = "all";
-                    fa = "on";
-                    "cache-type-k" = "q4_0";
-                    "cache-type-v" = "q4_0";
-                    "fit-target" = 3000;
-                    "ctx-size" = 32768;
-                    "ubatch-size" = 1024;
-                    "batch-size" = 2048;
-                    "cache-reuse" = 256;
-                    parallel = 1;
-                  };
-                }
-              }";
-            checkEndpoint = "/health";
-            ttl = 0;
-          };
-          "Qwen3.6-27B MTP Q4" = {
-            name = "Qwen3.6-27B MTP Q4";
-            cmd =
-              "${pkgs.llama-cpp-rocm}/bin/llama-server --host 0.0.0.0 --port "
-              + "$"
-              + "{PORT} --models-preset ${
-                (pkgs.formats.ini { }).generate "mtp.ini" {
-                  "Qwen3.6-27B MTP Q4" = {
-                    "hf-repo" = "unsloth/Qwen3.6-27B-MTP-GGUF";
-                    "hf-file" = "Qwen3.6-27B-Q4_K_M.gguf";
-                    "spec-type" = "draft-mtp";
-                    ngl = "all";
-                    fa = "on";
-                    "cache-type-k" = "q4_0";
-                    "cache-type-v" = "q4_0";
-                    "fit-target" = 19000;
-                    "ctx-size" = 32768;
-                    "ubatch-size" = 1024;
-                    "batch-size" = 2048;
-                    "cache-reuse" = 256;
-                    parallel = 1;
-                  };
-                }
-              }";
-            checkEndpoint = "/health";
-            ttl = 0;
-          };
+
         };
         groups = {
           default = {
             swap = false;
             members = [
               "Qwen3.6-27B Q3"
-              "Qwen3-4B Q4"
-            ];
-          };
-          # Requires ~19 GB — can't coexist with default group.
-          # Cycle the service or comment out `default` group to use.
-          backup = {
-            swap = true;
-            members = [
-              "Qwen3.6-27B MTP Q4"
             ];
           };
         };
@@ -226,10 +165,93 @@ optionalAttrs platform.isLinux {
             };
             models = {
               "Qwen3.6-27B Q3".name = "Qwen3.6-27B Q3";
-              "Qwen3-4B Q4".name = "Qwen3-4B Q4";
-              "Qwen3.6-27B MTP Q4".name = "Qwen3.6-27B MTP Q4";
             };
           };
+        };
+        agents = {
+          architect = ''
+            ---
+            description: System architecture and design decisions
+            mode: subagent
+            model: llama/Qwen3.6-27B Q3
+            temperature: 0.2
+            permission:
+              edit: deny
+              bash:
+                "*": deny
+                "nix *": allow
+                "git *": allow
+            ---
+            You are an architect agent. Analyze requirements, design system architecture, and make high-level technical decisions.
+
+            Focus on:
+            - System structure and module boundaries
+            - API design and interface contracts
+            - Tradeoffs between alternatives
+            - Error handling strategy
+            - Data flow and dependencies
+
+            Provide concrete, actionable plans. Question assumptions and surface hidden complexity.
+          '';
+          coder = ''
+            ---
+            description: Implementation and code writing
+            mode: subagent
+            model: llama/Qwen3.6-27B Q3
+            temperature: 0.1
+            ---
+            You are a coder agent. Implement features, fix bugs, and write clean code.
+
+            Principles:
+            - Write the simplest code that works
+            - Never nest beyond one level — use early returns
+            - Keep functions small and focused
+            - Follow existing conventions
+            - Question every parameter and dependency
+
+            Run relevant tests or lint commands after making changes.
+          '';
+          researcher = ''
+            ---
+            description: Codebase exploration and research
+            mode: subagent
+            model: llama/Qwen3.6-27B Q3
+            temperature: 0.1
+            permission:
+              edit: deny
+              write: deny
+              bash:
+                "*": deny
+                "nix *": allow
+                "git *": allow
+            ---
+            You are a researcher agent. Explore codebases, find relevant code, and understand how things work.
+
+            Focus on:
+            - Finding the right files and functions
+            - Understanding existing patterns and conventions
+            - Tracing data flow and dependencies
+            - Summarizing findings concisely
+
+            Return specific file paths, line numbers, and code snippets. Verify everything in the actual code.
+          '';
+          tester = ''
+            ---
+            description: Writing and running tests
+            mode: subagent
+            model: llama/Qwen3.6-27B Q3
+            temperature: 0.1
+            ---
+            You are a tester agent. Write tests and verify code correctness.
+
+            Focus on:
+            - Writing focused, single-purpose tests
+            - Covering edge cases and error paths
+            - Following existing test patterns
+            - Running tests to verify they pass
+
+            Keep tests simple and readable. Mirror the style of existing tests.
+          '';
         };
       };
 
