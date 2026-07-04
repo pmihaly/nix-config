@@ -46,37 +46,110 @@ optionalAttrs platform.isLinux {
 
     services.llama-swap = {
       enable = true;
+      listenAddress = "0.0.0.0";
+      openFirewall = true;
       settings = {
         healthCheckTimeout = 60;
         logToStdout = "both";
         globalTTL = 0;
         sendLoadingState = true;
-        models."Qwen3.6-27B Q4 +MTP" = {
-          name = "Qwen3.6-27B Q4 +MTP";
-          cmd =
-            "${pkgs.llama-cpp-rocm}/bin/llama-server --host 0.0.0.0 --port "
-            + "$"
-            + "{PORT} --models-preset ${
-              (pkgs.formats.ini { }).generate "models.ini" {
-                "Qwen3.6-27B Q4 +MTP" = {
-                  "hf-repo" = "unsloth/Qwen3.6-27B-MTP-GGUF";
-                  "hf-file" = "Qwen3.6-27B-Q4_K_M.gguf";
-                  "spec-type" = "draft-mtp";
-                  ngl = "all";
-                  fa = "on";
-                  "cache-type-k" = "q4_0";
-                  "cache-type-v" = "q4_0";
-                  "fit-target" = 19000;
-                  "ctx-size" = 32768;
-                  "ubatch-size" = 1024;
-                  "batch-size" = 2048;
-                  "cache-reuse" = 256;
-                  parallel = 1;
-                };
-              }
-            }";
-          checkEndpoint = "/health";
-          ttl = 0;
+        models = {
+          "Qwen3.6-27B Q3" = {
+            name = "Qwen3.6-27B Q3";
+            cmd =
+              "${pkgs.llama-cpp-rocm}/bin/llama-server --host 0.0.0.0 --port "
+              + "$"
+              + "{PORT} --models-preset ${
+                (pkgs.formats.ini { }).generate "big.ini" {
+                  "Qwen3.6-27B Q3" = {
+                    "hf-repo" = "unsloth/Qwen3.6-27B-GGUF";
+                    "hf-file" = "Qwen3.6-27B-Q3_K_M.gguf";
+                    ngl = "all";
+                    fa = "on";
+                    "cache-type-k" = "q4_0";
+                    "cache-type-v" = "q4_0";
+                    "fit-target" = 15500;
+                    "ctx-size" = 32768;
+                    "ubatch-size" = 1024;
+                    "batch-size" = 2048;
+                    "cache-reuse" = 256;
+                    parallel = 1;
+                  };
+                }
+              }";
+            checkEndpoint = "/health";
+            ttl = 0;
+          };
+          "Qwen3-4B Q4" = {
+            name = "Qwen3-4B Q4";
+            cmd =
+              "${pkgs.llama-cpp-rocm}/bin/llama-server --host 0.0.0.0 --port "
+              + "$"
+              + "{PORT} --models-preset ${
+                (pkgs.formats.ini { }).generate "small.ini" {
+                  "Qwen3-4B Q4" = {
+                    "hf-repo" = "unsloth/Qwen3-4B-GGUF";
+                    "hf-file" = "Qwen3-4B-Q4_K_M.gguf";
+                    ngl = "all";
+                    fa = "on";
+                    "cache-type-k" = "q4_0";
+                    "cache-type-v" = "q4_0";
+                    "fit-target" = 3000;
+                    "ctx-size" = 32768;
+                    "ubatch-size" = 1024;
+                    "batch-size" = 2048;
+                    "cache-reuse" = 256;
+                    parallel = 1;
+                  };
+                }
+              }";
+            checkEndpoint = "/health";
+            ttl = 0;
+          };
+          "Qwen3.6-27B MTP Q4" = {
+            name = "Qwen3.6-27B MTP Q4";
+            cmd =
+              "${pkgs.llama-cpp-rocm}/bin/llama-server --host 0.0.0.0 --port "
+              + "$"
+              + "{PORT} --models-preset ${
+                (pkgs.formats.ini { }).generate "mtp.ini" {
+                  "Qwen3.6-27B MTP Q4" = {
+                    "hf-repo" = "unsloth/Qwen3.6-27B-MTP-GGUF";
+                    "hf-file" = "Qwen3.6-27B-Q4_K_M.gguf";
+                    "spec-type" = "draft-mtp";
+                    ngl = "all";
+                    fa = "on";
+                    "cache-type-k" = "q4_0";
+                    "cache-type-v" = "q4_0";
+                    "fit-target" = 19000;
+                    "ctx-size" = 32768;
+                    "ubatch-size" = 1024;
+                    "batch-size" = 2048;
+                    "cache-reuse" = 256;
+                    parallel = 1;
+                  };
+                }
+              }";
+            checkEndpoint = "/health";
+            ttl = 0;
+          };
+        };
+        groups = {
+          default = {
+            swap = false;
+            members = [
+              "Qwen3.6-27B Q3"
+              "Qwen3-4B Q4"
+            ];
+          };
+          # Requires ~19 GB — can't coexist with default group.
+          # Cycle the service or comment out `default` group to use.
+          backup = {
+            swap = true;
+            members = [
+              "Qwen3.6-27B MTP Q4"
+            ];
+          };
         };
       };
     };
@@ -151,7 +224,11 @@ optionalAttrs platform.isLinux {
               baseURL = "http://127.0.0.1:8080/v1";
               apiKey = "local";
             };
-            models."Qwen3.6-27B Q4 +MTP".name = "Qwen3.6-27B Q4 +MTP";
+            models = {
+              "Qwen3.6-27B Q3".name = "Qwen3.6-27B Q3";
+              "Qwen3-4B Q4".name = "Qwen3-4B Q4";
+              "Qwen3.6-27B MTP Q4".name = "Qwen3.6-27B MTP Q4";
+            };
           };
         };
       };
