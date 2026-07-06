@@ -34,14 +34,23 @@ optionalAttrs platform.isLinux {
 
     users.groups.llama-cpp = { };
 
+    users.users.open-webui = {
+      isSystemUser = true;
+      group = "open-webui";
+    };
+
+    users.groups.open-webui = { };
+
     environment.persistence.${vars.persistDir}.directories = [
       "/var/cache/llama-cpp"
       "/var/lib/llama-cpp"
+      "/var/lib/open-webui"
     ];
 
     systemd.tmpfiles.rules = [
       "d /var/cache/llama-cpp 0755 llama-cpp llama-cpp -"
       "d /var/lib/llama-cpp 0755 llama-cpp llama-cpp -"
+      "d /var/lib/open-webui 0755 open-webui open-webui -"
     ];
 
     services.llama-swap = {
@@ -114,6 +123,27 @@ optionalAttrs platform.isLinux {
       User = "llama-cpp";
       Group = "llama-cpp";
       Environment = [ "LLAMA_CACHE=/var/cache/llama-cpp" ];
+    };
+
+    services.open-webui = {
+      enable = true;
+      host = "0.0.0.0";
+      port = 3000;
+      stateDir = "/var/lib/open-webui";
+      environment = {
+        OLLAMA_BASE_URL = "http://127.0.0.1:8080/v1";
+        OLLAMA_API_BASE_URL = "http://127.0.0.1:8080";
+        OPENAI_API_BASE_URL = "http://127.0.0.1:8080/v1";
+        OPENAI_API_KEY = "local";
+        # Override default "http://localhost:PORT" so API calls use relative URLs
+        WEBUI_URL = "";
+      };
+    };
+
+    systemd.services.open-webui.serviceConfig = {
+      DynamicUser = lib.mkForce false;
+      User = "open-webui";
+      Group = "open-webui";
     };
 
     home-manager.users.${vars.username} = {
