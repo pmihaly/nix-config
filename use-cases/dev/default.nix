@@ -72,9 +72,22 @@ optionalAttrs platform.isLinux {
         ExecStart = "${pkgs.searxng}/bin/searxng-run";
         WorkingDirectory = "/var/lib/searxng";
         Environment = [
-          "SEARXNG_PORT=8888"
-          "SEARXNG_BIND_ADDRESS=127.0.0.1"
-          "SEARXNG_SECRET=searxng-secret-${vars.username}"
+          "SEARXNG_SETTINGS_PATH=${pkgs.writeTextFile { name = "searxng-settings.yml"; text = ''
+            use_default_settings: true
+            server:
+              port: 8888
+              bind_address: "127.0.0.1"
+              secret_key: "searxng-secret-${vars.username}"
+              limiter: false
+              image_proxy: false
+            search:
+              safe_search: 0
+              autocomplete: ""
+              default_lang: ""
+              formats:
+                - html
+                - json
+          ''; }}"
         ];
         StateDirectory = "searxng";
       };
