@@ -41,17 +41,45 @@ optionalAttrs platform.isLinux {
 
     users.groups.open-webui = { };
 
+    users.users.searxng = {
+      isSystemUser = true;
+      group = "searxng";
+    };
+
+    users.groups.searxng = { };
+
     environment.persistence.${vars.persistDir}.directories = [
       "/var/cache/llama-cpp"
       "/var/lib/llama-cpp"
       "/var/lib/open-webui"
+      "/var/lib/searxng"
     ];
 
     systemd.tmpfiles.rules = [
       "d /var/cache/llama-cpp 0755 llama-cpp llama-cpp -"
       "d /var/lib/llama-cpp 0755 llama-cpp llama-cpp -"
       "d /var/lib/open-webui 0755 open-webui open-webui -"
+      "d /var/lib/searxng 0755 searxng searxng -"
     ];
+
+    systemd.services.searxng = {
+      description = "SearXNG search engine";
+      after = [ "network.target" ];
+      serviceConfig = {
+        Type = "exec";
+        User = "searxng";
+        Group = "searxng";
+        ExecStart = "${pkgs.searxng}/bin/searxng-run";
+        WorkingDirectory = "/var/lib/searxng";
+        Environment = [
+          "SEARXNG_PORT=8888"
+          "SEARXNG_BIND_ADDRESS=127.0.0.1"
+          "SEARXNG_SECRET=searxng-secret-${vars.username}"
+        ];
+        StateDirectory = "searxng";
+      };
+      wantedBy = [ "multi-user.target" ];
+    };
 
     services.llama-swap = {
       enable = true;
@@ -137,6 +165,7 @@ optionalAttrs platform.isLinux {
         OPENAI_API_KEY = "local";
         # Override default "http://localhost:PORT" so API calls use relative URLs
         WEBUI_URL = "";
+        SEARXNG_API_URL = "http://127.0.0.1:8888";
       };
     };
 
