@@ -42,9 +42,11 @@ in
 
     services.searx = {
       enable = true;
+      openFirewall = true;
       settings = {
         server = {
-          bind_address = "127.0.0.1";
+          bind_address = "0.0.0.0";
+          port = 8888;
           secret_key = "searxng-secret-${vars.username}";
         };
         search.formats = [
@@ -110,7 +112,7 @@ in
         OPENAI_API_KEY = "local";
         ENABLE_OLLAMA_API = "false";
         WEBUI_URL = "";
-        SEARXNG_QUERY_URL = "http://127.0.0.1:8080";
+        SEARXNG_QUERY_URL = "http://127.0.0.1:8888";
         ENABLE_WEB_SEARCH = "true";
         WEB_SEARCH_ENGINE = "searxng";
         BYPASS_RETRIEVAL_ACCESS_CONTROL = "true";
