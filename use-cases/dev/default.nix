@@ -72,22 +72,27 @@ optionalAttrs platform.isLinux {
         ExecStart = "${pkgs.searxng}/bin/searxng-run";
         WorkingDirectory = "/var/lib/searxng";
         Environment = [
-          "SEARXNG_SETTINGS_PATH=${pkgs.writeTextFile { name = "searxng-settings.yml"; text = ''
-            use_default_settings: true
-            server:
-              port: 8888
-              bind_address: "127.0.0.1"
-              secret_key: "searxng-secret-${vars.username}"
-              limiter: false
-              image_proxy: false
-            search:
-              safe_search: 0
-              autocomplete: ""
-              default_lang: ""
-              formats:
-                - html
-                - json
-          ''; }}"
+          "SEARXNG_SETTINGS_PATH=${
+            pkgs.writeTextFile {
+              name = "searxng-settings.yml";
+              text = ''
+                use_default_settings: true
+                server:
+                  port: 8888
+                  bind_address: "127.0.0.1"
+                  secret_key: "searxng-secret-${vars.username}"
+                  limiter: false
+                  image_proxy: false
+                search:
+                  safe_search: 0
+                  autocomplete: ""
+                  default_lang: ""
+                  formats:
+                    - html
+                    - json
+              '';
+            }
+          }"
         ];
         StateDirectory = "searxng";
       };
@@ -172,13 +177,20 @@ optionalAttrs platform.isLinux {
       port = 3000;
       stateDir = "/var/lib/open-webui";
       environment = {
-        OLLAMA_BASE_URL = "http://127.0.0.1:8080/v1";
-        OLLAMA_API_BASE_URL = "http://127.0.0.1:8080";
         OPENAI_API_BASE_URL = "http://127.0.0.1:8080/v1";
         OPENAI_API_KEY = "local";
+        # Disable Ollama API entirely (llama-swap is OpenAI-compatible only)
+        ENABLE_OLLAMA_API = "false";
         # Override default "http://localhost:PORT" so API calls use relative URLs
         WEBUI_URL = "";
-        SEARXNG_API_URL = "http://127.0.0.1:8888";
+        SEARXNG_QUERY_URL = "http://127.0.0.1:8888";
+        # Enable web search tool
+        ENABLE_WEB_SEARCH = "true";
+        WEB_SEARCH_ENGINE = "searxng";
+        # Allow web search collections to be retrieved (single-user local setup)
+        BYPASS_RETRIEVAL_ACCESS_CONTROL = "true";
+        # Debug retrieval step
+        GLOBAL_LOG_LEVEL = "DEBUG";
       };
     };
 
