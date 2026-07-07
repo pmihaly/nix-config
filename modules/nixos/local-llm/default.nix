@@ -28,55 +28,30 @@ in
     };
     users.groups.open-webui = { };
 
-    users.users.searxng = {
-      isSystemUser = true;
-      group = "searxng";
-    };
-    users.groups.searxng = { };
-
     environment.persistence.${vars.persistDir}.directories = [
       "/var/cache/llama-cpp"
       "/var/lib/llama-cpp"
       "/var/lib/open-webui"
-      "/var/lib/searxng"
     ];
 
     systemd.tmpfiles.rules = [
       "d /var/cache/llama-cpp 0755 llama-cpp llama-cpp -"
       "d /var/lib/llama-cpp 0755 llama-cpp llama-cpp -"
       "d /var/lib/open-webui 0755 open-webui open-webui -"
-      "d /var/lib/searxng 0755 searxng searxng -"
     ];
 
-    systemd.services.searxng = {
-      description = "SearXNG search engine";
-      after = [ "network.target" ];
-      serviceConfig = {
-        Type = "exec";
-        User = "searxng";
-        Group = "searxng";
-        ExecStart = "${pkgs.searxng}/bin/searxng-run";
-        WorkingDirectory = "/var/lib/searxng";
-        Environment = [
-          "SEARXNG_SETTINGS_PATH=${
-            pkgs.writeTextFile {
-              name = "searxng-settings.yml";
-              text = ''
-                use_default_settings: true
-                server:
-                  bind_address: "127.0.0.1"
-                  secret_key: "searxng-secret-${vars.username}"
-                search:
-                  formats:
-                    - html
-                    - json
-              '';
-            }
-          }"
+    services.searx = {
+      enable = true;
+      settings = {
+        server = {
+          bind_address = "127.0.0.1";
+          secret_key = "searxng-secret-${vars.username}";
+        };
+        search.formats = [
+          "html"
+          "json"
         ];
-        StateDirectory = "searxng";
       };
-      wantedBy = [ "multi-user.target" ];
     };
 
     services.llama-swap = {
@@ -135,7 +110,7 @@ in
         OPENAI_API_KEY = "local";
         ENABLE_OLLAMA_API = "false";
         WEBUI_URL = "";
-        SEARXNG_QUERY_URL = "http://127.0.0.1:8888";
+        SEARXNG_QUERY_URL = "http://127.0.0.1:8080";
         ENABLE_WEB_SEARCH = "true";
         WEB_SEARCH_ENGINE = "searxng";
         BYPASS_RETRIEVAL_ACCESS_CONTROL = "true";
