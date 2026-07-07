@@ -554,6 +554,10 @@ in
                         name = "orgie verknipt";
                         url = "https://www.youtube.com/watch?v=zCJ9E5bbjWQ";
                       }
+                      {
+                        name = "tinzo 2000s mix";
+                        url = "https://www.youtube.com/watch?v=CIiDf2xCO4g";
+                      }
                     ];
                   }
                 ];
