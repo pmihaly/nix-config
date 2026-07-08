@@ -11,10 +11,42 @@
     ../../modules/nixos
     ../../modules-v2/nixos
     ./hardware.nix
+    (lib.mkService {
+      subdomain = "open-webui";
+      port = 3000;
+      dashboard = {
+        category = "AI";
+        name = "Open WebUI";
+        logo = ../../modules/nixos/local-llm/openwebui.svg;
+      };
+      extraConfig = { };
+    })
+    (lib.mkService {
+      subdomain = "llama-swap";
+      port = 8081;
+      dashboard = {
+        category = "AI";
+        name = "Llama Swap";
+        logo = ../../modules/nixos/local-llm/llama-swap.svg;
+      };
+      extraConfig = { };
+    })
+    (lib.mkService {
+      subdomain = "searx";
+      port = 8888;
+      dashboard = {
+        category = "AI";
+        name = "SearXNG";
+        logo = ../../modules/nixos/local-llm/searx.svg;
+      };
+      extraConfig = { };
+    })
   ];
 
   modules = {
     nix.enable = true;
+    nginx.enable = true;
+    homer.enable = true;
     shell = {
       enable = true;
       extraBookmarks = { };
