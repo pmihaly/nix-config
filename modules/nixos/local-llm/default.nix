@@ -9,6 +9,8 @@
 with lib;
 let
   cfg = config.modules.local-llm;
+  llamaSwapCfg = config.services.llama-swap;
+  configFile = (pkgs.formats.yaml { }).generate "config.yaml" llamaSwapCfg.settings;
 in
 {
   options.modules.local-llm = {
@@ -59,6 +61,7 @@ in
     services.llama-swap = {
       enable = true;
       port = 8081;
+      openFirewall = true;
       settings = {
         healthCheckTimeout = 60;
         logToStdout = "both";
@@ -101,7 +104,10 @@ in
       User = "llama-cpp";
       Group = "llama-cpp";
       Environment = [ "LLAMA_CACHE=/var/cache/llama-cpp" ];
+      ExecStart = lib.mkForce "${pkgs.llama-swap}/bin/llama-swap --listen :${toString llamaSwapCfg.port} --config ${configFile}";
     };
+
+    networking.firewall.allowedTCPPorts = [ 3000 ];
 
     services.open-webui = {
       enable = true;
