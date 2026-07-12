@@ -87,6 +87,10 @@
       # url = "github:utensils/comfyui-nix?ref=fix/rocm-xformers-segfault";
       url = "github:utensils/comfyui-nix";
     };
+    boxes = {
+      url = "github:pmihaly/boxes";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =

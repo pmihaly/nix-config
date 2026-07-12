@@ -1,5 +1,6 @@
 {
   platform,
+  inputs,
   pkgs,
   lib,
   vars,
@@ -28,7 +29,11 @@ optionalAttrs platform.isLinux {
     };
 
     home-manager.users.${vars.username} = {
-      home.packages = [ pkgs.docker-compose ];
+      home.packages = [ 
+        pkgs.docker-compose 
+        pkgs.docker-compose 
+        inputs.boxes.packages.${pkgs.stdenv.hostPlatform.system}.default
+      ];
 
       programs.opencode = {
         enable = true;
@@ -63,7 +68,7 @@ optionalAttrs platform.isLinux {
             name = "llama.cpp (local)";
             npm = "@ai-sdk/openai-compatible";
             options = {
-              baseURL = "http://127.0.0.1:8080/v1";
+              baseURL = "http://127.0.0.1:8081/v1";
               apiKey = "local";
             };
             models."Qwen3.6-27B Q4 +MTP".name = "Qwen3.6-27B Q4 +MTP";

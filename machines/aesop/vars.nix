@@ -1,4 +1,5 @@
 {
+  domainName = "aesop";
   timeZone = "Europe/Amsterdam";
   persistDir = "/persist";
   username = "misi";
