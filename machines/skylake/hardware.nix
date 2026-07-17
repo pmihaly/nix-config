@@ -13,15 +13,17 @@
   ];
 
   boot.initrd.availableKernelModules = lib.mkForce [
-    "ahci"
-    "libahci"
-    "libata"
     "sd_mod"
     "sr_mod"
+    "virtio"
+    "virtio_ring"
+    "virtio_scsi"
+    "virtio_pci"
+    "virtio_balloon"
+    "virtio_net"
     "xhci_pci"
     "usbhid"
     "uas"
-    "igb"
   ];
   boot.initrd.kernelModules = [ ];
   boot.kernelModules = [ ];
