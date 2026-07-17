@@ -22,7 +22,6 @@
     "usbhid"
     "uas"
     "igb"
-    "ixgb"
   ];
   boot.initrd.kernelModules = [ ];
   boot.kernelModules = [ ];
