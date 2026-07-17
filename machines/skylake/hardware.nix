@@ -9,17 +9,20 @@
 
 {
   imports = [
-    (modulesPath + "/profiles/qemu-guest.nix")
     ./disko.nix
   ];
 
-  boot.initrd.availableKernelModules = [
+  boot.initrd.availableKernelModules = lib.mkForce [
     "ahci"
-    "xhci_pci"
-    "virtio_pci"
-    "virtio_scsi"
+    "libahci"
+    "libata"
     "sd_mod"
     "sr_mod"
+    "xhci_pci"
+    "usbhid"
+    "uas"
+    "igb"
+    "ixgb"
   ];
   boot.initrd.kernelModules = [ ];
   boot.kernelModules = [ ];
