@@ -126,6 +126,8 @@
       settings = {
         main = {
           capslock = "esc";
+          leftcontrol = "leftalt";
+          leftalt = "leftcontrol";
         };
       };
     };
