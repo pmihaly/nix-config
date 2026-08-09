@@ -91,6 +91,10 @@
       url = "github:pmihaly/boxes";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    cr = {
+      url = "github:pmihaly/cr";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
