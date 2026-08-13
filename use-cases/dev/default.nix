@@ -29,10 +29,11 @@ optionalAttrs platform.isLinux {
     };
 
     home-manager.users.${vars.username} = {
-      home.packages = [ 
-        pkgs.docker-compose 
-        pkgs.docker-compose 
+      home.packages = [
+        pkgs.docker-compose
+        pkgs.docker-compose
         inputs.boxes.packages.${pkgs.stdenv.hostPlatform.system}.default
+        inputs.cr.packages.${pkgs.stdenv.hostPlatform.system}.default
       ];
 
       programs.opencode = {
