@@ -26,11 +26,20 @@ in
       let
         directories = [
           "${vars.storage}/Media/Pictures"
-          "${vars.storage}/Services/immich/postgres"
+          "${vars.storage}/Services/immich/postgres-v3"
         ];
         environment = {
           TZ = vars.timeZone;
-          IMMICH_VERSION = getDockerVersionFromShield inputs.immich-shield;
+          # Migrated to v3.1.0 (2026-08-23): v3 requires the `vector` (pgvector) or
+          # `vchord` extension — the old pgvecto-rs image only provided `vectors`,
+          # which crashed v3 ("No vector extension found"), so we were stuck on v2.7.5.
+          # New DB built on docker.io/pgvector/pgvector:pg14-trixie (pg14 is accepted:
+          # POSTGRES_VERSION_RANGE '>=14.0.0', pgvector 0.8.6 satisfies '>=0.5 <1'),
+          # restored from db-v2.7.5-pre-v3-20260823.dump (kept in the immich dir as
+          # rollback). v3 applies its 20 remaining kysely migrations on first start and
+          # recreates clip_index/face_index as pgvector HNSW via schema sync.
+          # ROLLBACK: restore the dump into the old `postgres` data dir + revert this file.
+          IMMICH_VERSION = "v3.1.0";
           DB_HOSTNAME = "immich-database";
           DB_USERNAME = "postgres";
           DB_PASSWORD = "postgres";
@@ -49,7 +58,7 @@ in
         virtualisation.oci-containers.containers = {
 
           immich-server = {
-            image = "ghcr.io/immich-app/immich-server:${environment.IMMICH_VERSION}";
+            image = "ghcr.io/immich-app/immich-server:v3.1.0@sha256:079cc990b26a88d71f96027341c67329cb11829d4c341ce33b3718fe0f84cbfa";
             inherit environment;
             ports = [ "2283:2283" ];
             volumes = [
@@ -63,7 +72,7 @@ in
           };
 
           immich-machine-learning = {
-            image = "ghcr.io/immich-app/immich-machine-learning:${environment.IMMICH_VERSION}";
+            image = "ghcr.io/immich-app/immich-machine-learning:v3.1.0@sha256:5a0839dc5303cd7215bcd2180a26aed3af41675aefb3e75e5157e9f10ad16e6e";
             inherit environment;
             volumes = [ "model-cache:/cache" ];
           };
@@ -74,13 +83,15 @@ in
           };
 
           immich-database = {
-            image = "registry.hub.docker.com/tensorchord/pgvecto-rs:pg14-v0.2.0@sha256:90724186f0a3517cf6914295b5ab410db9ce23190a2d9d0b9dd6463e3fa298f0";
+            # pg14 is fine for v3 (server requires >=14.0.0); pgvector 0.8.6 in this
+            # image provides the `vector` extension v3 accepts (Vector or VectorChord).
+            image = "docker.io/pgvector/pgvector:pg14-trixie@sha256:2ab5b03acb45471246f52692764ed9590fc34288de2b5bce68da53ef1b8c1a35";
             environment = {
               POSTGRES_PASSWORD = environment.DB_PASSWORD;
               POSTGRES_USER = environment.DB_USERNAME;
               POSTGRES_DB = environment.DB_DATABASE_NAME;
             };
-            volumes = [ "${vars.storage}/Services/immich/postgres:/var/lib/postgresql/data" ];
+            volumes = [ "${vars.storage}/Services/immich/postgres-v3:/var/lib/postgresql/data" ];
           };
         };
       };
