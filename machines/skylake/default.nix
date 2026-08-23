@@ -48,6 +48,11 @@
       ];
       timer = "hourly";
     };
+
+    containers-gc = {
+      enable = true;
+      timer = "daily"; # prune unused podman images — 2026-08 /persist ENOSPC root cause
+    };
   };
 
   home-manager.users.${vars.username}.home.stateVersion = "22.05";
@@ -57,8 +62,7 @@
     isNormalUser = true;
     description = vars.username;
     extraGroups = [ "wheel" ];
-    initialPassword = vars.username;
-    hashedPasswordFile = "/persist/${vars.username}-password";
+    password = vars.username;
   };
 
   boot.loader.grub.enable = true;
@@ -86,6 +90,17 @@
       ++ lib.lists.unique config.home-manager.users.${vars.username}.modules.persistence.directories;
     };
   };
+
+  # Hetzner cx23 (2 vCPU / 4 GB, downsized from cpx42 2026-10): steady-state usage
+  # (~4 GB with immich ML indexing + jellyfin peaks) can exceed RAM, so keep an
+  # 8 GB swapfile on /persist. btrfs: NixOS's mkswap unit uses `btrfs filesystem
+  # mkswapfile` (handles nodatacow) when the file doesn't exist yet.
+  swapDevices = [
+    {
+      device = "/persist/swapfile";
+      size = 8192; # MiB
+    }
+  ];
 
   time.timeZone = vars.timeZone;
   i18n.defaultLocale = "en_US.UTF-8";
