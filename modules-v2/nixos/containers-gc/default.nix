@@ -55,7 +55,6 @@ in
     systemd.timers.containers-gc = {
       description = "Timer: prune unused podman images";
       wantedBy = [ "timers.target" ];
-      unit = "containers-gc.service";
       timerConfig = {
         OnCalendar = cfg.timer;
         Persistent = true;
