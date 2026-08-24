@@ -37,11 +37,9 @@ optionalAttrs platform.isLinux {
         jellyfin.enable = true;
         homer.enable = true;
         deluge.enable = true;
-        arr.enable = true;
         paperless.enable = true;
         immich.enable = true;
         tailscale.enable = true;
-        stirling-pdf.enable = true;
         it-tools.enable = true;
         copyparty.enable = true;
       };
