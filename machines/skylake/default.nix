@@ -58,6 +58,15 @@
   home-manager.users.${vars.username}.home.stateVersion = "22.05";
 
   users.mutableUsers = false;
+
+  # /root is NOT in the persistence list (only /home is), so /root/.ssh vanishes
+  # on every boot (root = tmpfs). Declare the key here so it is recreated from
+  # the store each activation. (2026-08-23: after the migration to the new
+  # Hetzner server, root login was lost until this was added.)
+  users.users.root.openssh.authorizedKeys.keys = [
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIE82BvyY3AfskGM3QlHEpjG7N6FomVAI21MbkilGBOHC misi@aesop"
+  ];
+
   users.users.${vars.username} = {
     isNormalUser = true;
     description = vars.username;
