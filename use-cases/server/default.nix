@@ -81,9 +81,49 @@ optionalAttrs platform.isLinux {
       # flushes the built-in FORWARD chain on a system switch, so without
       # them the rules would accumulate on every deploy.
       #
-      # Note: extraCommands only takes effect with the iptables firewall
-      # backend (the default). If the backend is ever switched to nftables,
-      # this needs porting to networking.nftables or a separate activation.
+      # --- Application mechanism ------------------------------------------------
+      #
+      # The rules below are installed by a dedicated oneshot unit
+      # (fw-forward.service), NOT by networking.firewall.extraCommands.
+      #
+      # Reason: with nixos-unstable @ 56c02bc the firewall *unit* silently
+      # ignores extraCommands — adding the rules to extraCommands changed the
+      # evaluated option (visible via nix eval) but the generated
+      # unit-firewall.service kept the exact same store hash as before
+      # (sjgp5aks35fwncdpqj34djkdr6i83j98), i.e. the rules never reached the
+      # unit. Same class of silent config drop that cce82a7 fixed in mkService.
+      # A plain systemd oneshot cannot be dropped by a firewall-backend quirk:
+      # it is version-agnostic and shows up in `systemctl` like anything else.
+      #
+      # The extraCommands copy is kept as well: harmless if the module keeps
+      # dropping it (the -D preambles make double application idempotent) and
+      # it becomes the primary mechanism if a future nixpkgs honours it.
+      #
+      # Ordering: the unit runs in sysinit right after firewall.service.
+      # firewall-stop only removes nixos-fw/nixos-drop rules and never touches
+      # the FORWARD chain or policy, so the rules survive firewall restarts
+      # across system switches; they are re-applied (idempotently) at boot.
+      #
+      # Note: iptables-only (IPv4). If the firewall backend is ever switched
+      # to nftables, port this to networking.nftables or an nft oneshot.
+
+      systemd.services.fw-forward = {
+        description = "FORWARD chain hardening (podman published ports off the WAN)";
+        wantedBy = [ "sysinit.target" ];
+        after = [ "network-pre.target" "firewall.service" ];
+        script = ''
+          iptables -w -D FORWARD -i tailscale0 -j ACCEPT 2>/dev/null || true
+          iptables -w -D FORWARD -i lo -j ACCEPT 2>/dev/null || true
+          iptables -w -D FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT 2>/dev/null || true
+          iptables -w -A FORWARD -i tailscale0 -j ACCEPT
+          iptables -w -A FORWARD -i lo -j ACCEPT
+          iptables -w -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+          iptables -w -P FORWARD DROP
+        '';
+        environment.PATH = lib.makeBinPath [ pkgs.iptables ];
+        serviceConfig.RemainAfterExit = true;
+      };
+
       networking.firewall.extraCommands = ''
         iptables -w -D FORWARD -i tailscale0 -j ACCEPT 2>/dev/null || true
         iptables -w -D FORWARD -i lo -j ACCEPT 2>/dev/null || true

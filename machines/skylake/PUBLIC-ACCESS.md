@@ -27,14 +27,20 @@ while keeping the rest Tailscale-only.
 - [x] Hardening: IPv4 `FORWARD` policy `DROP` (+ tailnet/lo/established allows)
       so podman-published ports are not reachable from the WAN even though the
       NixOS INPUT firewall doesn't see forwarded traffic
-- [ ] Deploy (deploy-rs needs an interactive sudo password, so use the manual
-      non-interactive equivalent: `nix copy` the closure as root over ssh +
-      `switch-to-configuration switch`; `make skylake` works from a real TTY)
-- [ ] Verify post-deploy: `https://it-tools.skylake.mihaly.codes` reachable from outside
-      the tailnet (real Let's Encrypt cert, app served); other ports closed from
-      outside (port scan of 8096/8080/2283/28981/3210/8088 → filtered), still
-      reachable via tailnet (e.g. from aesop); `iptables -S FORWARD` shows
-      policy DROP + the 3 allow rules; container egress still works
+- [x] Deploy (deploy-rs needs an interactive sudo password, so the manual
+      non-interactive equivalent was used: `nix copy` the closure as root over ssh
+      + `switch-to-configuration switch`)
+- [x] Verify post-deploy (2026-08-24, from aesop): `https://it-tools.skylake.
+      mihaly.codes` → 200 with the real Let's Encrypt cert (ssl_verify=0),
+      HTTP 301→HTTPS; WAN probes: 8096/2283/8080 **blocked**, 443/80 open;
+      tailnet probes (100.69.8.15): 8096/2283/28981/8112/8080/3210/22 all
+      open; `iptables -S FORWARD`: policy DROP + the 3 allow rules; container
+      egress verified (podman exec fetch of api.github.com → 200); all services
+      active
+- [x] Persist FORWARD hardening across reboots: the firewall module silently
+      dropped `extraCommands` (see root-cause section below) → dedicated
+      `fw-forward` oneshot unit; rules were also applied live by hand on
+      2026-08-24 before the unit landed
 - [x] One-time ACME bring-up (done 2026-08-24 on the live system, pre-deploy):
       `systemd-tmpfiles --create /etc/tmpfiles.d/10-acme.conf` created the webroot,
       `systemctl start acme-order-renew-it-tools...` then obtained a **real Let's
@@ -304,6 +310,37 @@ world rules); every podman-published port is a silent DROP, and
 established connections survive (policy DROP only affects the
 first packet of a flow).
 
+## ⚠️ Second silent drop: the firewall module ignores `extraCommands` (nixos-unstable @ 56c02bc)
+
+Symptom: the FORWARD rules above were set in the evaluated config (`nix eval
+…config.networking.firewall.extraCommands` shows all seven iptables lines),
+yet the generated `unit-firewall.service` kept the **exact same store hash**
+(`sjgp5aks35fwncdpqj34djkdr6i83j98`) as generations built *before* the rules
+were added — none of the lines ever reached the unit. The live FORWARD chain
+stayed `-P FORWARD ACCEPT` after the deploy, leaving the podman-published
+ports world-reachable until the rules were applied by hand (2026-08-24).
+
+Same class of silent drop as the mkService bug (cce82a7): option set,
+evaluation looks correct, the mechanism that is supposed to materialise it
+quietly doesn't. The exact module-side cause was not pinned down (the
+56c02bc firewall module's iptables unit generation is the suspect; the
+module is no longer in the local source checkout at a matching rev), so the
+fix does not depend on it:
+
+Fix (`use-cases/server/default.nix`): a dedicated `fw-forward` oneshot unit
+(applies the same idempotent rule set, `After=firewall.service`,
+`WantedBy=sysinit.target`, `RemainAfterExit`). A plain systemd unit cannot be
+dropped by a firewall-backend quirk, and it shows up in `systemctl` like
+anything else. The `extraCommands` copy is kept too: harmless if the module
+keeps dropping it (the `-D` preambles make double application idempotent),
+and it becomes redundant-but-correct if a future nixpkgs honours it.
+
+Restart safety (verified against the unit's scripts): `firewall-stop` only
+removes the `nixos-fw`/`nixos-drop` rules and never touches the FORWARD chain
+or policy, and `firewall-start` never flushes FORWARD either — so the rules
+survive firewall restarts across system switches; they are re-applied at
+boot (sysinit, right after `firewall.service`).
+
 ## Changes
 
 1. `machines/skylake/vars.nix` — add `publicDomainName =
@@ -321,7 +358,10 @@ first packet of a flow).
 3. `use-cases/server/default.nix` — IPv4 `FORWARD` hardening (policy `DROP`
    + tailnet/lo/established allows) so podman-published container ports are
    not reachable from the public internet (see "Root cause of the world
-   exposure" above).
+   exposure" above). Applied via a dedicated `fw-forward` oneshot unit
+   (the firewall module silently drops `extraCommands` in the locked
+   nixpkgs; the `extraCommands` copy is kept as belt-and-suspenders — see
+   "Second silent drop" above).
 4. `flake.lock` — root `nixpkgs` re-locked to
    `nixos/nixpkgs@nixos-unstable` `56c02bc` (2026-08-23, 26.11 era),
    matching flake.nix and the deployed system's release line (see
