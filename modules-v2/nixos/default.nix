@@ -2,5 +2,6 @@
 {
   imports = [
     ./backup
+    ./containers-gc
   ];
 }
