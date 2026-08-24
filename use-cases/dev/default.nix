@@ -32,6 +32,7 @@ optionalAttrs platform.isLinux {
       home.packages = [
         pkgs.docker-compose
         pkgs.docker-compose
+        pkgs.pi-coding-agent
         inputs.boxes.packages.${pkgs.stdenv.hostPlatform.system}.default
         inputs.cr.packages.${pkgs.stdenv.hostPlatform.system}.default
       ];
@@ -72,7 +73,7 @@ optionalAttrs platform.isLinux {
               baseURL = "http://127.0.0.1:8081/v1";
               apiKey = "local";
             };
-            models."Qwen3.6-27B Q4 +MTP".name = "Qwen3.6-27B Q4 +MTP";
+            models."Qwen3.8-27B Q4 +MTP".name = "Qwen3.8-27B Q4 +MTP";
           };
         };
         agents = {
@@ -80,7 +81,7 @@ optionalAttrs platform.isLinux {
             ---
             description: System architecture and design decisions
             mode: subagent
-            model: llama/Qwen3.6-27B Q4 +MTP
+            model: llama/Qwen3.8-27B Q4 +MTP
             temperature: 0.2
             permission:
               edit: deny
@@ -111,7 +112,7 @@ optionalAttrs platform.isLinux {
             ---
             description: Implementation and code writing
             mode: subagent
-            model: llama/Qwen3.6-27B Q4 +MTP
+            model: llama/Qwen3.8-27B Q4 +MTP
             temperature: 0.1
             ---
             You are a coder agent. Implement features, fix bugs, and write clean code.
@@ -139,7 +140,7 @@ optionalAttrs platform.isLinux {
             ---
             description: Codebase exploration and research
             mode: subagent
-            model: llama/Qwen3.6-27B Q4 +MTP
+            model: llama/Qwen3.8-27B Q4 +MTP
             temperature: 0.1
             permission:
               edit: deny
@@ -166,7 +167,7 @@ optionalAttrs platform.isLinux {
             ---
             description: Writing and running tests
             mode: subagent
-            model: llama/Qwen3.6-27B Q4 +MTP
+            model: llama/Qwen3.8-27B Q4 +MTP
             temperature: 0.1
             ---
             You are a tester agent. Write tests and verify code correctness.
@@ -194,12 +195,47 @@ optionalAttrs platform.isLinux {
         };
       };
 
+      home.file = {
+        ".pi/agent/models.json" = {
+          force = true;
+          text = toJSON {
+            providers."llama-swap" = {
+              baseUrl = "http://127.0.0.1:8081/v1";
+              api = "openai-completions";
+              apiKey = "local";
+              compat.supportsDeveloperRole = false;
+              models = [
+                {
+                  id = "Qwen3.8-27B Q4 +MTP";
+                  name = "Qwen3.8-27B Q4 +MTP (local)";
+                  reasoning = true;
+                  input = [ "text" ];
+                  contextWindow = 65536;
+                  maxTokens = 8192;
+                }
+              ];
+            };
+          };
+        };
+
+        ".pi/agent/settings.json" = {
+          force = true;
+          text = toJSON {
+            defaultProvider = "llama-swap";
+            defaultModel = "Qwen3.8-27B Q4 +MTP";
+            theme = "dark";
+            lastChangelogVersion = pkgs.pi-coding-agent.version;
+          };
+        };
+      };
+
       modules.persistence.directories = [
         ".config/aws"
         ".local/share/docker"
         ".config/opencode"
         ".local/share/opencode"
         ".local/state/opencode"
+        ".pi"
       ];
     };
   };

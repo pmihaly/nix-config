@@ -41,3 +41,7 @@ All configuration changes must be made in this repo — never edit files under `
 ## Helpers
 
 - `lib/nixos/default.nix` exports `mkService` (sets up nginx reverse proxy + dashboard) and `getDockerVersionFromShield`
+
+## Server Recovery
+
+- `machines/skylake/RESCUE.md` — full guide for entering/exiting Hetzner rescue mode, mounting disks, building and installing a new NixOS generation from the rescue environment (contains secrets, not in git)

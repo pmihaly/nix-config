@@ -25,8 +25,8 @@ in
     services.gammastep = {
       enable = true;
       provider = "manual";
-      latitude = 47.4979;
-      longitude = 19.0402;
+      latitude = 52.3728;
+      longitude = 4.8936;
     };
 
     programs.rofi = {
