@@ -44,7 +44,9 @@ in
         '';
         web = {
           enable = true;
-          openFirewall = true;
+          # No openFirewall: the web UI port is tailnet-only via mkService
+          # (the daemon's port 6881 stays world-open via openFirewall above,
+          # which is inherent to BitTorrent peer traffic).
           port = 8112;
         };
       };

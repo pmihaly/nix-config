@@ -34,9 +34,7 @@ in
       {
         systemd.tmpfiles.rules = map (x: "d ${x} 0775 ${vars.username} multimedia - -") directories;
 
-        networking.firewall = {
-          allowedUDPPorts = [ 7359 ];
-        };
+        # No UDP 7359 (SSDP discovery): pointless for a server accessed via URL.
 
         virtualisation.oci-containers = {
           containers = {
@@ -46,7 +44,6 @@ in
               }";
               ports = [
                 "8096:8096"
-                "7359:7359/udp"
               ];
               volumes = [
                 "${vars.storage}/Media/TV:/data/tvshows"
