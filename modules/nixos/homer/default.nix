@@ -58,7 +58,7 @@ in
 
           in
           {
-            image = "b4bz/homer:${getDockerVersionFromShield inputs.homer-shield}";
+            image = "docker.io/b4bz/homer:${getDockerVersionFromShield inputs.homer-shield}";
             ports = [ "8080:8080" ];
             volumes = [
               "${(pkgs.formats.yaml { }).generate "config.yml" homerConfig}:/www/assets/config.yml"
