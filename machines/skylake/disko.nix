@@ -17,7 +17,7 @@
     disk = {
       boot = {
         type = "disk";
-        device = "/dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_59935981";
+        device = "/dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_125861345";
         content = {
           type = "gpt";
           partitions = {
@@ -55,7 +55,7 @@
       };
       main = {
         type = "disk";
-        device = "/dev/disk/by-id/scsi-0HC_Volume_102315515";
+        device = "/dev/disk/by-id/scsi-0HC_Volume_106683582";
         content = {
           type = "gpt";
           partitions = {
