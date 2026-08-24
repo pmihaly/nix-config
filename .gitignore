@@ -1,1 +1,8 @@
 result
+
+# Local scratch/secret files — contain live credentials (Hetzner API token,
+# rescue passwords). Kept out of git per AGENTS.md (RESCUE.md policy).
+api-token
+machines/skylake/RESCUE.md
+machines/skylake/RECOVERY.md
+skylake-boot-debug.md
