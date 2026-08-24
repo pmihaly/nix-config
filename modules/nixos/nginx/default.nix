@@ -30,8 +30,10 @@ in
 
     networking.firewall = {
       enable = true;
+      # Web ports only. SSH is deliberately NOT opened here: on skylake it is
+      # tailnet-only (machines/skylake/default.nix); on desktops
+      # services.openssh.openFirewall (shell use-case) still exposes it.
       allowedTCPPorts = [
-        22
         80
         443
       ];

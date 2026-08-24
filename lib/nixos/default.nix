@@ -118,5 +118,5 @@ let
     |> (builtins.getAttr "value");
 in
 {
-  inherit mkService getDockerVersionFromShield;
+  inherit mkService getDockerVersionFromShield tailnetRules;
 }
