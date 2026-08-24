@@ -16,9 +16,9 @@ in
   };
   config = mkIf cfg.enable {
 
-      home.packages = [
-        inputs.cr.packages.${pkgs.stdenv.hostPlatform.system}.default
-      ];
+    home.packages = [
+      inputs.cr.packages.${pkgs.stdenv.hostPlatform.system}.default
+    ];
 
     modules.persistence.directories = [
       ".local/share/nvim"

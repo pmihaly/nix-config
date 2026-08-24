@@ -58,6 +58,7 @@ optionalAttrs platform.isLinux {
           ".steam"
           ".local/share/Steam"
           ".local/share/Terraria"
+          ".local/share/Colossal Order"
         ];
       };
     };

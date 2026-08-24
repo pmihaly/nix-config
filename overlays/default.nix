@@ -77,4 +77,25 @@
       }
     );
   })
+  (final: prev: {
+    patool = prev.patool.overrideAttrs (_: {
+      doInstallCheck = false;
+    });
+
+    python3Packages = prev.python3Packages.overrideScope (
+      pyFinal: pyPrev: {
+        patool = pyPrev.patool.overrideAttrs (_: {
+          doInstallCheck = false;
+        });
+      }
+    );
+
+    python314Packages = prev.python314Packages.overrideScope (
+      pyFinal: pyPrev: {
+        patool = pyPrev.patool.overrideAttrs (_: {
+          doInstallCheck = false;
+        });
+      }
+    );
+  })
 ]
