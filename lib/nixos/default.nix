@@ -86,6 +86,22 @@ let
           acceptTerms = true;
           defaults.email = vars.acmeEmail;
         };
+
+        # The HTTP-01 webroot must exist before lego runs. The acme module
+        # ships its own tmpfiles rule for it (10-acme.conf, acme:acme 0755),
+        # but on skylake the webroot was nonetheless missing after the
+        # 2026-08-23 migration (spurious tmpfiles failure + first-activation
+        # race with the /var/lib/acme mount; see
+        # machines/skylake/PUBLIC-ACCESS.md). This rule in 00-nixos.conf is
+        # processed *before* 10-acme.conf and is version-agnostic: `d`
+        # creates the dir if missing, `z` heals ownership to acme:nginx 0750
+        # if it exists (lego writes the token as acme, nginx serves it).
+        # Idempotent, self-healing after a /persist rebuild, survives the
+        # tmpfs root.
+        systemd.tmpfiles.rules = [
+          "d /var/lib/acme/acme-challenge 0750 acme nginx -"
+          "z /var/lib/acme/acme-challenge 0750 acme nginx -"
+        ];
       };
     in
     # mkMerge, NOT shallow `//`: `//` would merge mkIf's wrapper attributes
