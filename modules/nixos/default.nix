@@ -11,7 +11,6 @@
     ./tailscale
     ./it-tools
     ./copyparty
-    ./comfyui
     ./local-llm
   ];
 }

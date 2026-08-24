@@ -35,7 +35,6 @@
     gaming.enable = true;
     music-production.enable = true;
     dev.enable = true;
-    comfyui.enable = true;
 
     backup = with config.home-manager.users.${vars.username}; {
       enable = true;
