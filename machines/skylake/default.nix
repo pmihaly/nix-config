@@ -90,6 +90,11 @@
       "/var/log"
       "/var/lib/nixos"
       "/var/lib/systemd/coredump"
+      # ACME: Let's Encrypt account keys + issued certs + challenge webroot.
+      # Without this, every reboot would re-register the LE account and
+      # re-order certificates (rate limits!), and nginx would serve the
+      # minica self-signed bootstrap cert again.
+      "/var/lib/acme"
     ];
     files = [ "/etc/machine-id" ];
     users.${vars.username} = {

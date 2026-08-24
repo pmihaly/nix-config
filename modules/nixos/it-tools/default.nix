@@ -16,6 +16,9 @@ in
   config = mkIf cfg.enable (mkService {
     subdomain = "it-tools";
     port = 8088;
+    # Public: https://it-tools.skylake.mihaly.codes (nginx on 80/443 proxies
+    # to this vhost's port 8088 on loopback; cert via Let's Encrypt).
+    public = true;
     dashboard = {
       category = "Documents";
       name = "IT Tools";

@@ -48,8 +48,6 @@ in
             PAPERLESS_URL = "https://paperless.${vars.domainName}";
           };
         };
-
-        networking.firewall.allowedTCPPorts = [ 28981 ];
       };
   });
 }
