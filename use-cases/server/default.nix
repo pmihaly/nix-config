@@ -121,7 +121,7 @@ optionalAttrs platform.isLinux {
           iptables -w -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
           iptables -w -P FORWARD DROP
         '';
-        environment.PATH = lib.makeBinPath [ pkgs.iptables ];
+        environment.PATH = lib.mkForce (lib.makeBinPath [ pkgs.iptables ]);
         serviceConfig.RemainAfterExit = true;
       };
 
