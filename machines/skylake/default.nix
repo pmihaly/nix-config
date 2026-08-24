@@ -67,6 +67,15 @@
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIE82BvyY3AfskGM3QlHEpjG7N6FomVAI21MbkilGBOHC misi@aesop"
   ];
 
+  # SSH is tailnet-only. Two things used to expose 22 to any source: the
+  # shell use-case's `openFirewall = true`, and (until 2026-08) the nginx
+  # module's allowedTCPPorts. On a VPS neither may stand, so kill the former
+  # and allow 22 from tailscale0 only. tailnetRules emits rules for both
+  # firewall backends (the active backend uses its own, the other is inert),
+  # same pattern as mkService.
+  services.openssh.openFirewall = lib.mkForce false; # plain def in shell use-case conflicts
+  networking.firewall = lib.tailnetRules [ 22 ];
+
   users.users.${vars.username} = {
     isNormalUser = true;
     description = vars.username;
