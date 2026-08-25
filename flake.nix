@@ -288,15 +288,26 @@
 
       deploy.nodes = {
         skylake = {
-          hostname = "skylake";
+          # Tailscale IP: port 22 on the public Hetzner address
+          # (157.180.77.226) is firewalled — ssh is tailscale0-only
+          # (machines/skylake/default.nix). The `Host skylake` entry in
+          # ~/.ssh/config still points at the blocked WAN IP, so the key
+          # must be named explicitly here; deploy-rs passes sshOpts to
+          # every ssh invocation and to `nix copy` via NIX_SSHOPTS.
+          hostname = "100.69.8.15";
+          sshOpts = [
+            "-i" "/home/misi/.ssh/id_skylake_rescue"
+            "-o" "StrictHostKeyChecking=accept-new"
+          ];
           profiles.system = {
             path = inputs.deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.skylake;
             sshUser = "misi";
             user = "root";
             magicRollback = false;
             autoRollback = false;
+            # Prompt for the sudo password on the local terminal and pipe
+            # it in; the activation itself runs as root.
             interactiveSudo = true;
-            skipChecks = true;
           };
         };
       };
