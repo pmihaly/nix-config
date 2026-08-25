@@ -52,7 +52,7 @@ in
         monitor = [
           "DP-1, 2560x1440@144, 0x0, 1"
         ];
-        "exec-once" = "${getExe pkgs.swaybg} --image ${../../../wallpaper.jpg}";
+        "exec-once" = "${getExe pkgs.swaybg} --image ${../../../wallpaper.png}";
         env = [
           "WLR_DRM_NO_ATOMIC,1"
         ];

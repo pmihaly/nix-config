@@ -28,7 +28,6 @@ in
           experimental-features = "nix-command flakes pipe-operators";
           trusted-users = [ vars.username ];
         };
-        gc.automatic = true;
       };
 
       nix.registry.nixpkgs.flake = inputs.nixpkgs;

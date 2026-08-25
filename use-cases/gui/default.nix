@@ -43,7 +43,6 @@ in
             "Pictures"
             "Documents"
             "Videos"
-            ".config/transmission"
             ".local/state/syncthing"
           ];
           firefox = {
@@ -56,7 +55,7 @@ in
             font-size = cfg.terminal-font-size;
           };
           newsboat.enable = true;
-          email.enable = true;
+          email.enable = false;
           keepassxc.enable = true;
         };
 
@@ -69,7 +68,6 @@ in
           inputs.img2theme.packages.${pkgs.stdenv.hostPlatform.system}.default
           feh
           tailscale
-          transmission_4-gtk
           clock-rs
         ];
       };

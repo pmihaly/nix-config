@@ -12,6 +12,14 @@ in
 {
   options.modules.git = {
     enable = mkEnableOption "git";
+    name = mkOption {
+      default = "pmihaly";
+      type = types.str;
+    };
+    email = mkOption {
+      default = "misi@pappmihaly.com";
+      type = types.str;
+    };
   };
   config = mkIf cfg.enable {
 
@@ -23,8 +31,8 @@ in
 
     home.file."${config.xdg.configHome}/git/config".text = generators.toINI { } {
       user = {
-        name = "pmihaly";
-        email = "misi@pappmihaly.com";
+        name = cfg.name;
+        email = cfg.email;
       };
       pull.rebase = true;
       merge.conflictstyle = "zdiff3";

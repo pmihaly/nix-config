@@ -20,6 +20,14 @@ in
       default = { };
       type = types.attrs;
     };
+    aliases = mkOption {
+      default = { };
+      type = types.attrs;
+    };
+    env = mkOption {
+      default = { };
+      type = types.attrs;
+    };
     rebuildSwitch = mkOption { type = types.str; };
   };
   config = mkIf cfg.enable {
@@ -65,7 +73,25 @@ in
 
     programs.direnv.enableNushellIntegration = true;
 
-    programs.fzf.enable = true;
+    programs.fzf = {
+      enable = true;
+      colors = {
+        # Nord
+        fg = "#e5e9f0";
+        bg = "#3b4252";
+        hl = "#81a1c1";
+        "fg+" = "#e5e9f0";
+        "bg+" = "#4c566a";
+        "hl+" = "#81a1c1";
+        info = "#ebcb8b";
+        prompt = "#bf616a";
+        pointer = "#b48ead";
+        marker = "#a3be8c";
+        spinner = "#b48ead";
+        header = "#a3be8c";
+        border = "#4c566a";
+      };
+    };
 
     home.sessionPath = [
       "/Users/$USER/.local/bin"
@@ -84,7 +110,9 @@ in
         cn = c + "; nvim .";
         p = "cd `find ~/personaldev/ -mindepth 1 -maxdepth 1 | fzf`";
       }
+      // cfg.aliases
       // (bookmarksToAliases cfg.bookmarks);
+      sessionVariables = cfg.env;
     };
 
     programs.direnv = {

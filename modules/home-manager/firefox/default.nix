@@ -51,7 +51,7 @@ in
 
       set searchurls.g     https://google.com/search?q=
       set searchurls.ddg   https://duckduckgo.com/?q=
-      set searchurls.r     https://old.reddit.com/r/
+      set searchurls.r     https://reddit.com/r/
       set searchurls.dh    https://hub.docker.com/search?q=
       set searchurls.map   https://google.com/maps/search/
       set searchurls.maps  https://google.com/maps/search/
@@ -92,7 +92,7 @@ in
 
     programs.firefox = {
       enable = true;
-      configPath = ".mozilla/firefox";
+      configPath = if pkgs.stdenv.isLinux then ".mozilla/firefox" else "Library/Application Support/Firefox";
       nativeMessagingHosts = [
         pkgs.tridactyl-native
         pkgs.keepassxc
@@ -341,9 +341,7 @@ in
               name = "misi";
               extensions.packages = with pkgs.nur.repos.rycee.firefox-addons; [
                 sponsorblock
-                old-reddit-redirect
                 youtube-nonstop
-                reddit-enhancement-suite
                 keepassxc-browser
                 dearrow
               ];
@@ -557,6 +555,14 @@ in
                       {
                         name = "tinzo 2000s mix";
                         url = "https://www.youtube.com/watch?v=CIiDf2xCO4g";
+                      }
+                      {
+                        name = "snts focus";
+                        url = "https://www.youtube.com/watch?v=UPhL0WkFTmo";
+                      }
+                      {
+                        name = "deep prog tech";
+                        url = "https://www.youtube.com/watch?v=dZ2NQ-xQINI";
                       }
                     ];
                   }

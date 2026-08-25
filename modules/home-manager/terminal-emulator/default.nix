@@ -32,6 +32,7 @@ in
   config = mkIf cfg.enable {
     programs.kitty = {
       enable = true;
+      themeFile = "Nord";
       font.name = "JetBrains Mono";
       font.package = pkgs.jetbrains-mono;
       settings = {
@@ -42,6 +43,10 @@ in
         copy_on_select = true;
         confirm_os_window_close = "0";
         enable_audio_bell = false;
+        hide_window_decorations = "titlebar-only";
+        macos_show_window_title_in = "none";
+        tab_bar_style = "hidden";
+	window_padding_width = "0 0 0 100";
       };
       keybindings = {
         "ctrl+enter" = "";
