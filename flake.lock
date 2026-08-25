@@ -856,15 +856,15 @@
         ]
       },
       "locked": {
-        "lastModified": 1786302363,
-        "narHash": "sha256-nTZSzF1gva8okIT/OeebCQkwR6bnndMYt4vjs7fOHNk=",
-        "owner": "viperML",
+        "lastModified": 1785695587,
+        "narHash": "sha256-GyjkIaU6RG4t/wy+IrpEgbhbiJI9gduwiNYvNLafkwY=",
+        "owner": "nix-community",
         "repo": "nh",
-        "rev": "769573044127841330cae023b07ea828758119b0",
+        "rev": "249c954e65acb251eb3ceb6bdf587701ce4705c9",
         "type": "github"
       },
       "original": {
-        "owner": "viperML",
+        "owner": "nix-community",
         "repo": "nh",
         "type": "github"
       }
