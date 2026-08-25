@@ -59,7 +59,12 @@ in
         notARepository = "quit";
         disableStartupPopups = true;
         promptToReturnFromSubprocess = false;
-        git.paging.externalDiffCommand = "${getExe pkgs.difftastic} --background=light --color=always --tab-width=2";
+        git.diffRenderers = [
+          {
+            type = "extDiff";
+            command = "${getExe pkgs.difftastic} --background=light --color=always --tab-width=2";
+          }
+        ];
         os.editPreset = "nvim-remote";
         gui.nerdFontsVersion = 3;
         customCommands = [
@@ -107,6 +112,12 @@ in
           }
         ];
       };
+    };
+
+    modules.shell.aliases = {
+      lg = "lazygit";
+      dm = "git diff origin/master HEAD";
+      nge = "nvim .git/info/exclude";
     };
   };
 }
