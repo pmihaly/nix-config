@@ -32,6 +32,25 @@
 
     server.enable = true;
 
+    # Public dashboard: the apex domain (skylake.mihaly.codes) serves this
+    # second homer instance (container homer-public, :8081 behind nginx,
+    # Let's Encrypt). Board links: it-tools + the public copyparty share.
+    # The private instance (modules.homer via the server use-case) is
+    # unchanged: tailnet root redirects to /homer (see the nginx module).
+    homer.public = {
+      enable = true;
+      services = {
+        Tools."IT Tools" = {
+          logo = "${pkgs.it-tools}/lib/android-chrome-512x512.png";
+          url = "https://it-tools.${vars.publicDomainName}";
+        };
+        Files."Public Files" = {
+          logo = ../../modules/nixos/copyparty/copyparty.svg;
+          url = "https://files.${vars.publicDomainName}";
+        };
+      };
+    };
+
     backup = {
       enable = true;
       machineId = "skylake";

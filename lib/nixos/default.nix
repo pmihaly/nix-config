@@ -46,6 +46,12 @@ let
       # service port on loopback. The service port itself stays tailnet-only.
       # Requires vars.publicDomainName and vars.acmeEmail on this machine.
       public ? false,
+      # Claim the apex domain: make the public vhost the default_server, so
+      # the bare domain (e.g. skylake.mihaly.codes) serves this service too.
+      # Only ONE service per machine may set this — nginx refuses to start
+      # with two default servers on the same listen socket. Ignored unless
+      # public = true.
+      apex ? false,
     }:
     let
       base = {
@@ -65,11 +71,15 @@ let
 
       publicConfig = lib.mkIf public {
         services.nginx.virtualHosts."${subdomain}.${vars.publicDomainName}" = {
-          # Also becomes the default server, so the apex domain (e.g.
-          # skylake.mihaly.codes) serves this service too. nginx -t fails
-          # loudly if a second public service is added without deciding what
-          # the apex should serve.
-          default = true;
+          # Only with apex = true does this vhost become the default_server
+          # and serve the apex domain (e.g. skylake.mihaly.codes) itself.
+          # nginx -t fails loudly if two vhosts claim the apex.
+          default = apex;
+          # The Let's Encrypt cert for this vhost covers serverName +
+          # serverAliases. With apex = true, add the bare domain as an alias
+          # so the apex actually gets a matching cert (without this, https
+          # on the apex would fail hostname verification).
+          serverAliases = lib.optional apex vars.publicDomainName;
           forceSSL = true;
           enableACME = true;
           # Explicit webroot for the HTTP-01 challenge; the ACME module
