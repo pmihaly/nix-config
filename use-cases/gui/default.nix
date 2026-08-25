@@ -55,7 +55,6 @@ in
             font-size = cfg.terminal-font-size;
           };
           newsboat.enable = true;
-          email.enable = false;
           keepassxc.enable = true;
         };
 

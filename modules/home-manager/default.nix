@@ -9,7 +9,6 @@
     ./mpv
     ./terminal-emulator
     ./newsboat
-    ./email
     ./hyprland
     ./discord
     ./minecraft
