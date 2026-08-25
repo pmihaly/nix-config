@@ -67,7 +67,7 @@
     };
     nh = {
       inputs.nixpkgs.follows = "nixpkgs";
-      url = "github:viperML/nh";
+      url = "github:nix-community/nh";
     };
     copyparty = {
       inputs.nixpkgs.follows = "nixpkgs";
@@ -292,8 +292,10 @@
           # every ssh invocation and to `nix copy` via NIX_SSHOPTS.
           hostname = "100.69.8.15";
           sshOpts = [
-            "-i" "/home/misi/.ssh/id_skylake_rescue"
-            "-o" "StrictHostKeyChecking=accept-new"
+            "-i"
+            "/home/misi/.ssh/id_skylake_rescue"
+            "-o"
+            "StrictHostKeyChecking=accept-new"
           ];
           profiles.system = {
             path = inputs.deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.skylake;

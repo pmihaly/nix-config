@@ -102,7 +102,7 @@ let
     flags: 
     d2t
     e2d
-    maxb: 1g,300
+    maxb: 10g,300
     maxn: 250,600
     scan: 60
     vmaxb: 100g

@@ -229,13 +229,18 @@ optionalAttrs platform.isLinux {
         };
       };
 
+      modules.persistence.files = [
+        ".pi/agent/auth.json"
+        ".pi/agent/models-store.json"
+      ];
+
       modules.persistence.directories = [
         ".config/aws"
         ".local/share/docker"
         ".config/opencode"
         ".local/share/opencode"
         ".local/state/opencode"
-        ".pi"
+        ".pi/agent/sessions"
       ];
     };
   };
