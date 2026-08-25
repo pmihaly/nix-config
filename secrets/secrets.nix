@@ -9,4 +9,5 @@ in
 {
   "backup/s3-access.age".publicKeys = allKeys;
   "backup/restic.age".publicKeys = allKeys;
+  "server/copyparty-misi.age".publicKeys = allKeys;
 }
