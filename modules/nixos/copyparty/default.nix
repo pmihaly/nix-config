@@ -5,52 +5,223 @@
   vars,
   ...
 }:
-
 with lib;
 let
   cfg = config.modules.copyparty;
+  storage = vars.storage;
+  package = pkgs.copyparty;
+  copypartyExe = "${lib.getExe package}";
+
+  # Two instances, two hand-rolled units. The 9001/copyparty flake NixOS
+  # module is deliberately NOT used (its unit sandbox is incompatible with
+  # this machine — see below); pkgs.copyparty from the flake overlay is
+  # still used.
+  #
+  # The flake module sandboxes its unit with TemporaryFileSystem =
+  # [ { directory = "/"; ... :ro } ] plus one read-only bind per volume. On
+  # this machine (tmpfs root) that clobbers every bind it emits: the
+  # service ends up in a namespace with an empty, read-only / and a
+  # read-only /persist, so a volume at / (and any hist dir under /persist)
+  # fails with EROFS and the instance starts with 0 volumes — the exact
+  # failure the old instance suffered.
+  #
+  # Private instance: whole filesystem, tailnet-only (mkService firewall),
+  # password auth, runs as root. No mount sandbox at all — it must see all
+  # of /, and with root + password there is nothing to sandbox from.
+  #
+  # Public instance: a single directory (${storage}/Public), world
+  # read/write, behind the public nginx vhost. Listens on loopback only
+  # (nginx is its only client; port 3211 is not in the firewall, and the
+  # NixOS firewall's default-drop keeps it closed even if that ever
+  # changes). Runs as the unprivileged `copyparty` user; ProtectSystem=
+  # full makes /usr /boot /etc read-only but leaves / and /persist
+  # writable — NOT strict, which would make / read-only too.
+
+  # The private password is injected at startup by replace-secret from the
+  # agenix materialized file, so it never lands in the Nix store or the
+  # unit file (pattern from the copyparty flake module). A *password*
+  # change does not restart the unit (the age secret is not a store path,
+  # so it can't be a restart trigger) — after re-encrypting and deploying:
+  # `systemctl restart copyparty-private`.
+  privateConf = pkgs.writeText "copyparty-private.conf" ''
+    [global]
+    i: 0.0.0.0
+    p: 3210
+    no-reload
+
+    [accounts]
+    ${vars.username}: {{copyparty-private}}
+
+    [/]
+    /
+    accs: 
+    A: ${vars.username}
+    flags: 
+    d2t
+    e2d
+    fk: 4
+    hist: ${storage}/Services/copyparty
+    nohash: .iso$
+    scan: 60
+  '';
+
+  # Anonymous rwmd (read/write/move/delete, no admin, no dotfiles).
+  # Upload limits are OFF by default in copyparty, so they are set
+  # explicitly: per-client maxn/maxb (burst abuse) and total volume caps
+  # vmaxb/vmaxn, so a public share cannot fill the 250G /persist (100g cap
+  # leaves headroom for everything else). No e2d → no database, no hidden
+  # state: the volume IS the entire server state.
+  publicConf = pkgs.writeText "copyparty-public.conf" ''
+    [global]
+    i: 127.0.0.1
+    p: 3211
+    no-reload
+
+    [/]
+    ${storage}/Public
+    accs: 
+    rwmd: *
+    flags: 
+    d2t
+    maxb: 1g,300
+    maxn: 250,600
+    scan: 60
+    vmaxb: 100g
+    vmaxn: 100k
+  '';
 in
 {
   options.modules.copyparty = {
-    enable = mkEnableOption "copyparty";
+    enable = mkEnableOption "copyparty (private tailnet instance + public share)";
   };
-  config = mkIf cfg.enable (mkService {
-    subdomain = "copyparty";
-    port = 3210;
-    dashboard = {
-      category = "Documents";
-      name = "Copyparty";
-      logo = ./copyparty.svg;
-    };
-    extraConfig.services.copyparty = {
-      enable = true;
-      user = "root";
-      group = "root";
-      settings = {
-        i = "0.0.0.0";
-        p = [
-          3210
-        ];
-        no-reload = true;
-        ignored-flag = false;
+
+  config = mkIf cfg.enable (mkMerge [
+    # --- user + self-healing persistent state ---------------------------
+    # `z` creates the dir if missing and re-applies mode/owner if present,
+    # so a /persist rebuild or a stray chown cannot silently strand the
+    # state (same convention as the ACME webroot rule; see
+    # machines/skylake/PUBLIC-ACCESS.md).
+    {
+      users.groups.copyparty = { };
+      users.users.copyparty = {
+        isSystemUser = true;
+        group = "copyparty";
+        home = "/nonexistent";
       };
 
-      volumes = {
-        "/" = {
-          path = "/";
-          access = {
-            A = "*";
-          };
-          flags = {
-            fk = 4;
-            scan = 60;
-            nohash = "\.iso$";
-            e2d = true;
-            d2t = true;
-            hist = "${vars.storage}/Services/copyparty";
-          };
+      systemd.tmpfiles.rules = [
+        "z ${storage}/Services/copyparty 0700 root root -"
+        "z ${storage}/Public 0755 copyparty copyparty -"
+      ];
+    }
+
+    # --- private instance: tailnet-only on 3210, root, password auth ----
+    {
+      systemd.services.copyparty-private = {
+        description = "Copyparty private (whole system, tailnet-only, password auth)";
+        wantedBy = [ "multi-user.target" ];
+        after = [
+          "network.target"
+          "local-fs.target"
+        ];
+        restartTriggers = [ privateConf ];
+        preStart = ''
+          install -m 600 ${privateConf} /run/copyparty-private/copyparty.conf
+          ${pkgs.replace-secret}/bin/replace-secret '{{copyparty-private}}' ${
+            config.age.secrets."server/copyparty-misi".path
+          } /run/copyparty-private/copyparty.conf
+        '';
+        serviceConfig = {
+          User = "root";
+          NoNewPrivileges = true;
+          ExecStart = "${copypartyExe} -c /run/copyparty-private/copyparty.conf";
+          RuntimeDirectory = "copyparty-private";
+          Restart = "on-failure";
         };
       };
-    };
-  });
+    }
+
+    # --- public instance: loopback-only behind nginx, unprivileged -----
+    {
+      systemd.services.copyparty-public = {
+        description = "Copyparty public share (loopback-only, proxied by nginx)";
+        wantedBy = [ "multi-user.target" ];
+        after = [
+          "network.target"
+          "local-fs.target"
+        ];
+        restartTriggers = [ publicConf ];
+        preStart = "install -m 600 ${publicConf} /run/copyparty-public/copyparty.conf";
+        serviceConfig = {
+          User = "copyparty";
+          Group = "copyparty";
+          NoNewPrivileges = true;
+          PrivateTmp = true;
+          # `full` (ro /usr /boot /etc) — NOT `strict`, which would also
+          # make / (and with it /persist) read-only.
+          ProtectSystem = "full";
+          ProtectHome = true;
+          ExecStart = "${copypartyExe} -c /run/copyparty-public/copyparty.conf";
+          RuntimeDirectory = "copyparty-public";
+          Restart = "on-failure";
+        };
+      };
+    }
+
+    # --- private: tailnet vhost + firewall (3210) + dashboard ----------
+    (mkService {
+      subdomain = "copyparty";
+      port = 3210;
+      dashboard = {
+        category = "Documents";
+        name = "Copyparty";
+        logo = ./copyparty.svg;
+      };
+      extraConfig = { };
+    })
+
+    # --- public: files.${publicDomainName} (nginx + Let's Encrypt) -----
+    # Hand-rolled rather than mkService: mkService's tailnet base would add
+    # /files → 301 http://<domain>:3211, but 3211 is loopback-only so that
+    # redirect would be dead. Overriding that same location from
+    # extraConfig is a hard conflict (two same-priority definitions of a
+    # declared sub-option), and mkForce would win wholesale at the
+    # virtualHosts level and clobber every other vhost. So: the public
+    # vhost (forceSSL + ACME; the module auto-generates the 443 vhost, the
+    # acme-challenge locations and the /var/lib/acme/<vhost>/ cert paths)
+    # plus a tailnet-vhost /files location pointing at the public site.
+    # No `default = true` — it-tools owns the apex default_server.
+    {
+      services.nginx.virtualHosts."files.${vars.publicDomainName}" = {
+        forceSSL = true;
+        enableACME = true;
+        acmeRoot = "/var/lib/acme/acme-challenge";
+        locations."/" = {
+          proxyPass = "http://127.0.0.1:3211";
+        };
+      };
+
+      # Same values it-tools' mkService contributes; duplicates merge
+      # cleanly (equal scalars, concatenated lists).
+      security.acme = {
+        acceptTerms = true;
+        defaults.email = vars.acmeEmail;
+      };
+      systemd.tmpfiles.rules = [
+        "d /var/lib/acme/acme-challenge 0750 acme nginx -"
+        "z /var/lib/acme/acme-challenge 0750 acme nginx -"
+      ];
+
+      # Tailnet: send /files to the public site (3211 is not reachable
+      # from the tailnet).
+      services.nginx.virtualHosts."${vars.domainName}".locations."/files" = {
+        return = "301 https://files.${vars.publicDomainName}/";
+      };
+
+      modules.homer.services.Documents."Public Files" = {
+        logo = ./copyparty.svg;
+        url = "https://files.${vars.publicDomainName}";
+      };
+    }
+  ]);
 }

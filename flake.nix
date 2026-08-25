@@ -224,7 +224,6 @@
           inputs.disko.nixosModules.disko
           inputs.nixvim.nixosModules.nixvim
           inputs.stylix.nixosModules.stylix
-          inputs.copyparty.nixosModules.default
           inputs.musnix.nixosModules.musnix
           {
             nixpkgs.overlays = [
@@ -270,7 +269,6 @@
           inputs.disko.nixosModules.disko
           inputs.nixvim.nixosModules.nixvim
           inputs.stylix.nixosModules.stylix
-          inputs.copyparty.nixosModules.default
           inputs.musnix.nixosModules.musnix
           {
             nixpkgs.overlays = [
