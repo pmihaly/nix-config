@@ -373,15 +373,15 @@ boot (sysinit, right after `firewall.service`).
 7. `modules/nixos/jellyfin/default.nix` — drop world-open UDP 7359 (SSDP
    discovery; pointless on a server).
 
-## Follow-ups (not done)
+## Follow-ups
 
-- Copyparty `A = "*"` anonymous access should be replaced with real auth
-  (it's tailnet-only now, but anonymous is still a bad habit).
+- Copyparty anonymous access — resolved by the 2026-08-25 rework: the public
+  instance is an rwmd share of a single directory and the private instance is
+  tailnet-only behind a password, so the old `A = "*"` root-fs exposure is
+  gone.
 - Real SSO story if wanted later: Authelia or oauth2-proxy in front of nginx
   with an OIDC provider.
-- The first public service is also the `default_server` on 80/443, so the
-  apex `skylake.mihaly.codes` currently serves it-tools (and `nginx -t`
-  fails loudly if a second public vhost is added without deciding the
-  default). Decide what should live at the apex.
-- Immich/paperless/jellyfin credentials are weak; worth rotating since the
+- Apex default_server — resolved: the apex now serves copyparty-public (the
+  `files.<publicDomain>` vhost is also the default server), not it-tools.
+- Immich/paperless credentials are weak; worth rotating since the
   apps were exposed for a while.

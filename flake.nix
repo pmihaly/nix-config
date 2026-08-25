@@ -57,10 +57,6 @@
       url = "https://img.shields.io/github/v/release/bastienwirtz/homer.json";
       flake = false;
     };
-    jellyfin-shield = {
-      url = "https://img.shields.io/github/v/release/linuxserver/docker-jellyfin.json";
-      flake = false;
-    };
     treefmt-nix = {
       inputs.nixpkgs.follows = "nixpkgs";
       url = "github:numtide/treefmt-nix";
