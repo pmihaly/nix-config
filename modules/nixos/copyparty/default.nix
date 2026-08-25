@@ -36,6 +36,15 @@ let
   # changes). Runs as the unprivileged `copyparty` user; ProtectSystem=
   # full makes /usr /boot /etc read-only but leaves / and /persist
   # writable — NOT strict, which would make / read-only too.
+  #
+  # XDG_CONFIG_HOME points at a persistent, copyparty-owned dir
+  # (${storage}/Services/copyparty-public): with home=/nonexistent
+  # copyparty falls back to /tmp for its runtime state, hits its
+  # untrusted-state failsafe (CRIT, sessions disabled) and refuses to
+  # register the volume. The dir must exist before start, and the
+  # unprivileged user cannot create it (its parent is root-owned), so
+  # preStart creates both it and the volume root — the tmpfiles `d`
+  # rules are the boot-time self-healing safety net only.
 
   # The private password is injected at startup by replace-secret from the
   # agenix materialized file, so it never lands in the Nix store or the
@@ -69,8 +78,17 @@ let
   # Upload limits are OFF by default in copyparty, so they are set
   # explicitly: per-client maxn/maxb (burst abuse) and total volume caps
   # vmaxb/vmaxn, so a public share cannot fill the 250G /persist (100g cap
-  # leaves headroom for everything else). No e2d → no database, no hidden
-  # state: the volume IS the entire server state.
+  # leaves headroom for everything else).
+  #
+  # e2d (embedded sqlite database) is REQUIRED, not optional: in
+  # v1.20 a `d2t` volume without `e2d` is silently dropped at startup
+  # (up2k logs "0 volumes", no CRIT, the server answers with its
+  # zero-volume info page) — verified on this exact build. State
+  # persists on /persist and survives reboots: the up2k db + upload-undo
+  # history in <volume>/.hist/, and the sessions db in the XDG config
+  # dir. (A share with no *visible* files shows copyparty's plain-text
+  # info page even to browsers; the full Web UI appears once the first
+  # file exists — cosmetic, by upstream design.)
   publicConf = pkgs.writeText "copyparty-public.conf" ''
     [global]
     i: 127.0.0.1
@@ -83,6 +101,7 @@ let
     rwmd: *
     flags: 
     d2t
+    e2d
     maxb: 1g,300
     maxn: 250,600
     scan: 60
@@ -97,10 +116,10 @@ in
 
   config = mkIf cfg.enable (mkMerge [
     # --- user + self-healing persistent state ---------------------------
-    # `z` creates the dir if missing and re-applies mode/owner if present,
-    # so a /persist rebuild or a stray chown cannot silently strand the
-    # state (same convention as the ACME webroot rule; see
-    # machines/skylake/PUBLIC-ACCESS.md).
+    # `d` rules re-create/repair ownership at every boot (and tmpfiles
+    # --create), so a /persist rebuild or a stray chown cannot silently
+    # strand the state. (`z` was tried first; on this machine it
+    # silently no-ops even when the parent exists, so `d` is used.)
     {
       users.groups.copyparty = { };
       users.users.copyparty = {
@@ -110,8 +129,9 @@ in
       };
 
       systemd.tmpfiles.rules = [
-        "z ${storage}/Services/copyparty 0700 root root -"
-        "z ${storage}/Public 0755 copyparty copyparty -"
+        "d ${storage}/Services/copyparty 0700 root root -"
+        "d ${storage}/Public 0755 copyparty copyparty -"
+        "d ${storage}/Services/copyparty-public 0700 copyparty copyparty -"
       ];
     }
 
@@ -130,6 +150,8 @@ in
           ${pkgs.replace-secret}/bin/replace-secret '{{copyparty-private}}' ${
             config.age.secrets."server/copyparty-misi".path
           } /run/copyparty-private/copyparty.conf
+          # Hist dir (deterministic; the tmpfiles `d` rule heals at boot).
+          install -d -m 0700 ${storage}/Services/copyparty
         '';
         serviceConfig = {
           User = "root";
@@ -151,10 +173,21 @@ in
           "local-fs.target"
         ];
         restartTriggers = [ publicConf ];
-        preStart = "install -m 600 ${publicConf} /run/copyparty-public/copyparty.conf";
+        preStart = ''
+          install -m 600 ${publicConf} /run/copyparty-public/copyparty.conf
+          # The volume root and the XDG config dir must exist before
+          # start: tmpfiles may run after this unit in mid-boot
+          # activations, and the unprivileged user cannot create them
+          # (both parents are root-owned).
+          install -d -m 0755 -o copyparty -g copyparty ${storage}/Public
+          install -d -m 0700 -o copyparty -g copyparty ${storage}/Services/copyparty-public
+        '';
         serviceConfig = {
           User = "copyparty";
           Group = "copyparty";
+          # Persistent config/keys; see the module header — the /tmp
+          # fallback trips copyparty's untrusted-state failsafe.
+          Environment = [ "XDG_CONFIG_HOME=${storage}/Services/copyparty-public" ];
           NoNewPrivileges = true;
           PrivateTmp = true;
           # `full` (ro /usr /boot /etc) — NOT `strict`, which would also
