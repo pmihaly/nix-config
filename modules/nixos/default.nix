@@ -2,7 +2,6 @@
 {
   imports = [
     ./nginx
-    ./jellyfin
     ./homer
     ./deluge
     ./paperless

@@ -116,7 +116,7 @@
   };
 
   # Hetzner cx23 (2 vCPU / 4 GB, downsized from cpx42 2026-10): steady-state usage
-  # (~4 GB with immich ML indexing + jellyfin peaks) can exceed RAM, so keep an
+  # (~4 GB with immich ML indexing peaks) can exceed RAM, so keep an
   # 8 GB swapfile on /persist. btrfs: NixOS's mkswap unit uses `btrfs filesystem
   # mkswapfile` (handles nodatacow) when the file doesn't exist yet.
   swapDevices = [

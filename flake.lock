@@ -828,18 +828,6 @@
         "type": "github"
       }
     },
-    "jellyfin-shield": {
-      "flake": false,
-      "locked": {
-        "narHash": "sha256-TFuFSYwkIiEoW5E0R2HAdxVp7vVKOcop/XN8BGQu+VY=",
-        "type": "file",
-        "url": "https://img.shields.io/github/v/release/linuxserver/docker-jellyfin.json"
-      },
-      "original": {
-        "type": "file",
-        "url": "https://img.shields.io/github/v/release/linuxserver/docker-jellyfin.json"
-      }
-    },
     "musnix": {
       "inputs": {
         "nixpkgs": [
@@ -1290,7 +1278,6 @@
         "img2theme": "img2theme",
         "immich-shield": "immich-shield",
         "impermanence": "impermanence",
-        "jellyfin-shield": "jellyfin-shield",
         "musnix": "musnix",
         "nh": "nh",
         "nix-gaming": "nix-gaming",

@@ -35,7 +35,6 @@ optionalAttrs platform.isLinux {
     {
       modules = {
         nginx.enable = true;
-        jellyfin.enable = true;
         homer.enable = true;
         deluge.enable = true;
         paperless.enable = true;
@@ -53,8 +52,8 @@ optionalAttrs platform.isLinux {
       # Why: podman/netavark implements published ports with DNAT, so traffic
       # to those host ports is *forwarded* to the podman bridge; the NixOS
       # INPUT firewall (nixos-fw) never sees it, and NixOS leaves the FORWARD
-      # policy at ACCEPT. Result: 0.0.0.0:<published> (jellyfin 8096, homer
-      # 8080, immich 2283, ...) was reachable from the WAN. Verified on
+      # policy at ACCEPT. Result: 0.0.0.0:<published> (homer 8080, immich
+      # 2283, ...) was reachable from the WAN. Verified on
       # 2026-08-24: the FORWARD policy accept counter was counting scan
       # traffic (270 pkts), and none of the chains had a rule covering
       # WAN->published ports.
