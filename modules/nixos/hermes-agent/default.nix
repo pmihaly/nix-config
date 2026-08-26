@@ -43,6 +43,19 @@ in
 {
   options.modules.hermes-agent = {
     enable = mkEnableOption "Hermes Agent (Nous Research) — agent gateway + web dashboard";
+
+    whatsapp = mkOption {
+      type = types.bool;
+      default = false;
+      description = ''
+        Enable the WhatsApp platform (self-chat mode): mirrors the
+        bridge into HERMES_HOME and sets WHATSAPP_ENABLED in the
+        runtime .env, arming the bundled whatsapp-platform adapter.
+        See the WhatsApp section in this module for pairing notes.
+        Leave off while unpaired — an armed-but-unpaired gateway
+        exit-loops with code 78 (harmless but noisy).
+      '';
+    };
   };
 
   config = mkIf cfg.enable (mkMerge [
@@ -82,23 +95,34 @@ in
         };
 
         # ── WhatsApp ────────────────────────────────────────────────
-        # WHATSAPP_ENABLED arms the bundled whatsapp-platform adapter
-        # (plugins/platforms/whatsapp/); the gateway reads it from
-        # $HERMES_HOME/.env, which this option populates. The defaults
-        # do the rest safely:
+        # whatsapp (option above) arms the bundled whatsapp-platform
+        # adapter: WHATSAPP_ENABLED lands in $HERMES_HOME/.env, which
+        # the gateway reads. The defaults do the rest safely:
         #   - mode stays "self-chat" (the agent links YOUR WhatsApp
         #     account — no second/bot number needed),
         #   - DM and group policy default to "pairing": nobody can
-        #     reach the agent until paired through the dashboard, so
-        #     arming the adapter ahead of pairing is safe.
+        #     reach the agent until paired through the dashboard.
+        #
+        # While enabled but UNPAIRED the gateway exits 78 and systemd
+        # restarts it in a loop (harmless — the dashboard runs in the
+        # separate backend service — but noisy), so flip this off
+        # again if you want a clean slate (also wipe the session dir
+        # under $HERMES_HOME/platforms/whatsapp to forget the creds).
+        #
+        # Gotcha when turning it OFF: the upstream state script only
+        # writes .env when environment/environmentFiles are non-empty
+        # (moduleCommon.nix, mkStateScript), so a stale
+        # WHATSAPP_ENABLED=true line SURVIVES a deploy and the plugin
+        # stays armed. Remove the line from $HERMES_HOME/.env and
+        # restart the gateway as part of the shutdown.
         #
         # extraPackages puts the bridge tree (above) into the system
         # closure for the activation script; the derivation has no
         # bin/, so nothing lands on the hermes user's PATH.
-        environment = {
+        environment = optionalAttrs cfg.whatsapp {
           WHATSAPP_ENABLED = "true";
         };
-        extraPackages = [ whatsappBridge ];
+        extraPackages = optional cfg.whatsapp whatsappBridge;
 
         # State on /persist: skylake's root is tmpfs (impermanence), so the
         # module's default /var/lib/hermes would vanish on every reboot.
@@ -141,7 +165,10 @@ in
       # (node_modules/ is created at runtime by `npm install` and
       # survives the copy; the bridge's script-hash check makes the
       # gateway restart a running bridge when the code changes).
-      system.activationScripts."hermes-whatsapp-bridge" = {
+      # Only present when whatsapp is on; the existing mirror on disk
+      # is left alone when it is turned off again (harmless — the
+      # plugin does not load without WHATSAPP_ENABLED).
+      system.activationScripts."hermes-whatsapp-bridge" = mkIf cfg.whatsapp {
         deps = [
           "users"
           "hermes-agent-setup"

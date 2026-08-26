@@ -44,6 +44,10 @@ optionalAttrs platform.isLinux {
         copyparty.enable = true;
         ntfy.enable = true;
         hermes-agent.enable = true;
+        # WhatsApp platform: off for now (reset after a botched
+        # pairing). To (re-)enable: set to true, deploy, then pair
+        # again — the bridge mirror and npm deps survive on /persist.
+        # hermes-agent.whatsapp = true;
       };
     }
 
