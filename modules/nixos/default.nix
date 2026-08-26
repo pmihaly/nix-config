@@ -10,6 +10,7 @@
     ./tailscale
     ./it-tools
     ./copyparty
+    ./ntfy
     ./local-llm
   ];
 }

@@ -5,4 +5,4 @@ update-finances:
 	nix flake lock --update-input finances
 
 skylake:
-	deploy -s .#skylake
+	./scripts/deploy-skylake.sh

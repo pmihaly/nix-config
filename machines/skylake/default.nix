@@ -34,7 +34,8 @@
 
     # Public dashboard: the apex domain (skylake.mihaly.codes) serves this
     # second homer instance (container homer-public, :8081 behind nginx,
-    # Let's Encrypt). Board links: it-tools + the public copyparty share.
+    # Let's Encrypt). Board links: it-tools + the public copyparty share
+    # + ntfy.
     # The private instance (modules.homer via the server use-case) is
     # unchanged: tailnet root redirects to /homer (see the nginx module).
     homer.public = {
@@ -47,6 +48,10 @@
         Files."Public Files" = {
           logo = ../../modules/nixos/copyparty/copyparty.svg;
           url = "https://files.${vars.publicDomainName}";
+        };
+        Notifications."ntfy" = {
+          logo = ../../modules/nixos/ntfy/ntfy.svg;
+          url = "https://ntfy.${vars.publicDomainName}";
         };
       };
     };
