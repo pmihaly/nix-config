@@ -165,7 +165,11 @@
    * and users give up mid-conversion.
    */
   var VCOPY = { h264: 1, hevc: 1, mpeg4: 1, av1: 1 };
-  var ACOPY = { aac: 1, mp3: 1, ac3: 1, eac3: 1, alac: 1 };
+  // must mirror th_srv.py conv_vrc: only aac/mp3 are copied into the mp4
+  // (universally decodable in browsers); e.g. eac3/ac3/alac/flac are
+  // transcoded to aac, because phones cannot decode eac3 in mp4 (silent
+  // video, dead volume control)
+  var ACOPY = { aac: 1, mp3: 1 };
 
   function convHint(doc, aIdx) {
     var v = doc.v && doc.v[0];
