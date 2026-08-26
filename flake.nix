@@ -86,6 +86,10 @@
       url = "github:pmihaly/cr";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    hermes-agent = {
+      url = "github:NousResearch/hermes-agent";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -267,6 +271,7 @@
           inputs.nixvim.nixosModules.nixvim
           inputs.stylix.nixosModules.stylix
           inputs.musnix.nixosModules.musnix
+          inputs.hermes-agent.nixosModules.default
           {
             nixpkgs.overlays = [
               inputs.nur.overlays.default
