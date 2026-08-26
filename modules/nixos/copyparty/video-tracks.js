@@ -154,6 +154,35 @@
     if (t.c) parts.push("(" + t.c + ")");
     return parts.join(" ");
   }
+  /* ---------- server-conversion status hint ----------
+   * Mirrors the server's codec decision (th_srv.py conv_vrc): the output
+   * is a pure remux only when the video codec is in VCOPY and the
+   * selected audio codec is in ACOPY; otherwise ffmpeg re-encodes the
+   * missing part, which takes a while for large files (e.g. a Japanese
+   * FLAC track -> AAC is a one-time ~minute for a 3GB episode). The
+   * result is cached server-side, so the wait only happens once per
+   * (file, audio track). Without this hint the video just sits at 0%
+   * and users give up mid-conversion.
+   */
+  var VCOPY = { h264: 1, hevc: 1, mpeg4: 1, av1: 1 };
+  var ACOPY = { aac: 1, mp3: 1, ac3: 1, eac3: 1, alac: 1 };
+
+  function convHint(doc, aIdx) {
+    var v = doc.v && doc.v[0];
+    var a = aIdx >= 0 && doc.a ? doc.a[aIdx] : null;
+    var vc = v ? String(v.c || "").toLowerCase() : "";
+    var ac = a ? String(a.c || "").toLowerCase() : "";
+    var vOk = !!VCOPY[vc];
+    var aOk = !a || !!ACOPY[ac];
+    if (vOk && aOk)
+      return "starting\u2026 (first play prepares the file on the server; it is cached afterwards)";
+    if (!vOk && !aOk)
+      return "transcoding on the server: " + (vc || "?") + "\u2192h264, " + (ac || "?") + "\u2192aac \u2014 can take several minutes; happens once, then cached";
+    if (!aOk)
+      return "converting audio on the server: " + (ac || "?") + "\u2192aac \u2014 first play may take up to a minute for large files; happens once, then cached";
+    return "transcoding video on the server: " + (vc || "?") + "\u2192h264 \u2014 can take several minutes; happens once, then cached";
+  }
+
   /* ---------- the player ---------- */
   var modal = null;
 
@@ -242,6 +271,21 @@
       big.style.display = "none";
     });
 
+    // the conversion hint is cleared as soon as real playback starts
+    video.addEventListener("playing", function () {
+      big.style.display = "none";
+      msg.textContent = "";
+    });
+
+    video.addEventListener("waiting", function () {
+      if (!msg.textContent) msg.textContent = "buffering\u2026";
+    });
+
+    video.addEventListener("error", function () {
+      if (video.error)
+        msg.textContent = "playback error (media error code " + video.error.code + ") \u2014 this file may not be decodable in this browser";
+    });
+
     col.appendChild(vidWrap);
 
     var bar = document.createElement("div");
@@ -320,6 +364,7 @@
         });
         aSel.addEventListener("change", function () {
           aIdx = parseInt(aSel.value, 10) || 0;
+          msg.textContent = convHint(doc, aIdx);
           if (started) applyTracks();
         });
       }
@@ -348,7 +393,7 @@
         });
         sIdx = -1;
       }
-      msg.textContent = "";
+      msg.textContent = convHint(doc, 0);
       aIdx = 0;
       applyTracks();
       started = true;
