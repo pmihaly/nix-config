@@ -71,8 +71,14 @@
       var row = rows[i];
       if (row.__vtDone) continue;
       row.__vtDone = true;
-      var a = row.querySelector("td a");
-      if (!a) continue;
+      // LAST <a> in the row is the filename link: copyparty's built-in
+      // MPlayer puts a (🎧) play link in the FIRST cell for any
+      // audio/video row, and querySelector("td a") would pick that up
+      // (href="#a<tid>", textContent="(🎧)") and fail the extension check
+      // — so no button would ever appear on exactly the rows we want.
+      var links = qsa("td a", row);
+      if (!links.length) continue;
+      var a = links[links.length - 1];
       var href = a.getAttribute("href") || "";
       if (!href || href.slice(-1) === "/" || href.indexOf("://") === 0) continue;
       var name = a.textContent || "";
