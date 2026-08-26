@@ -110,7 +110,10 @@ optionalAttrs platform.isLinux {
       systemd.services.fw-forward = {
         description = "FORWARD chain hardening (podman published ports off the WAN)";
         wantedBy = [ "sysinit.target" ];
-        after = [ "network-pre.target" "firewall.service" ];
+        after = [
+          "network-pre.target"
+          "firewall.service"
+        ];
         script = ''
           iptables -w -D FORWARD -i tailscale0 -j ACCEPT 2>/dev/null || true
           iptables -w -D FORWARD -i lo -j ACCEPT 2>/dev/null || true

@@ -104,19 +104,33 @@ in
                   (pkgs.formats.ini { }).generate "models.ini" {
                     "Qwen3.8-27B Q4 +MTP" = {
                       "hf-repo" = "unsloth/Qwen3.8-27B-GGUF";
-                      "hf-file" = "Qwen3.8-27B-Q4_0.gguf"; # or "Qwen3.8-27B-UD-Q4_K_XL.gguf" for the dynamic quant
+                      "hf-file" = "Qwen3.8-27B-UD-Q4_K_M.gguf";
                       "spec-type" = "draft-mtp";
                       ngl = "all";
                       fa = "on";
                       "cache-type-k" = "q4_0";
                       "cache-type-v" = "q4_0";
-                      "fit-target" = 19000;
                       "ctx-size" = 65536;
-                      "ubatch-size" = 1024;
-                      "batch-size" = 2048;
+                      "ubatch-size" = 512;
+                      "batch-size" = 1024;
                       "cache-reuse" = 256;
                       parallel = 1;
                     };
+                    # "Qwen3.8-27B Q4 +MTP" = {
+                    #   "hf-repo" = "unsloth/Qwen3.8-27B-GGUF";
+                    #   "hf-file" = "Qwen3.8-27B-Q4_0.gguf"; # or "Qwen3.8-27B-UD-Q4_K_XL.gguf" for the dynamic quant
+                    #   "spec-type" = "draft-mtp";
+                    #   ngl = "all";
+                    #   fa = "on";
+                    #   "cache-type-k" = "q4_0";
+                    #   "cache-type-v" = "q4_0";
+                    #   "fit-target" = 19000;
+                    #   "ctx-size" = 65536;
+                    #   "ubatch-size" = 1024;
+                    #   "batch-size" = 2048;
+                    #   "cache-reuse" = 256;
+                    #   parallel = 1;
+                    # };
                   }
                 }";
               checkEndpoint = "/health";

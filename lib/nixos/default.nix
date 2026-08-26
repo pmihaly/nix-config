@@ -12,25 +12,22 @@ let
   # ports on 127.0.0.1.)
   # IMPORTANT: the port must NOT also be in networking.firewall.allowedTCPPorts:
   # those rules accept any source and are evaluated before these.
-  tailnetRules =
-    ports:
-    {
-      # iptables backend (networking.firewall.backend = "iptables").
-      # Runs inside firewall-start, where ip46tables() and the nixos-fw /
-      # nixos-fw-accept chains already exist. ip46tables covers v4 + v6.
-      extraCommands =
-        lib.concatStringsSep "\n" (
-          lib.map (p: "ip46tables -A nixos-fw -i ${tailnetIface} -p tcp --dport ${builtins.toString p} -j nixos-fw-accept")
-          ports
-        );
+  tailnetRules = ports: {
+    # iptables backend (networking.firewall.backend = "iptables").
+    # Runs inside firewall-start, where ip46tables() and the nixos-fw /
+    # nixos-fw-accept chains already exist. ip46tables covers v4 + v6.
+    extraCommands = lib.concatStringsSep "\n" (
+      lib.map (
+        p:
+        "ip46tables -A nixos-fw -i ${tailnetIface} -p tcp --dport ${builtins.toString p} -j nixos-fw-accept"
+      ) ports
+    );
 
-      # nftables backend (inet table: no ip/ip6 family prefix needed).
-      extraInputRules =
-        lib.concatStringsSep "\n" (
-          lib.map (p: "iifname \"${tailnetIface}\" tcp dport { ${builtins.toString p} } accept")
-          ports
-        );
-    };
+    # nftables backend (inet table: no ip/ip6 family prefix needed).
+    extraInputRules = lib.concatStringsSep "\n" (
+      lib.map (p: "iifname \"${tailnetIface}\" tcp dport { ${builtins.toString p} } accept") ports
+    );
+  };
 
   mkService =
     {
@@ -119,7 +116,12 @@ let
     # module system (pushDownProperties) would then treat the whole result as
     # a conditional wrapper and keep only its `content` — silently dropping
     # the firewall rules, tailnet vhost and homer entry.
-    lib.mkMerge [ base dashboardConfig publicConfig extraConfig ];
+    lib.mkMerge [
+      base
+      dashboardConfig
+      publicConfig
+      extraConfig
+    ];
   getDockerVersionFromShield =
     githubTags:
     githubTags
