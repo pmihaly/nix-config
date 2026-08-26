@@ -12,8 +12,7 @@
 #
 # Self-contained: it also (re)provides `partftpy` through a python3
 # override, so this overlay works even if the upstream one is removed.
-final: prev:
-{
+final: prev: {
   python3 = prev.python3.override {
     packageOverrides = pyFinal: pyPrev: {
       partftpy = pyFinal.callPackage ./partftpy.nix { };
