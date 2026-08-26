@@ -5,12 +5,17 @@ Research) on skylake, declaratively via Nix, state under `/persist`, Web UI
 exposed **internally** (tailnet only, no login), LLM backend =
 **llama-swap on aesop**.
 
-## Status: READY TO DEPLOY (2026-08-26, post blank-page fix)
+## Status: READY TO DEPLOY (2026-08-26, blank-page fix + WhatsApp support)
 
 Config rewritten for a **login-free, single-user** dashboard and verified
 end-to-end, including the full nginx→app path against the real app (smoke
 tests below). Toplevel builds; generated nginx config validates. **Not yet
 deployed** — needs `make skylake` (interactive sudo password).
+
+WhatsApp support added on top (see below): the dashboard's WhatsApp pairing
+flow 500s out of the box because the installed package doesn't ship the
+bridge — the config now pre-populates the mirror location the runtime
+already knows how to use.
 
 The first deployed revision had a **blank white page**: the `/hermes` nginx
 location double-slashed upstream URIs (`//assets/…`), so the SPA catch-all
@@ -165,6 +170,65 @@ Gotchas (verified against hermes 0.20.5 source + live tests on skylake):
 - `hermes-backend.service` — dashboard:
   `hermes dashboard --host 127.0.0.1 --port 9119 --no-open`, user `hermes`.
 
+## WhatsApp support (added 2026-08-26, not yet deployed)
+
+Symptom (from the dashboard pairing endpoint after the first deploy):
+`500: WhatsApp bridge script was not found at
+/nix/store/…-hermes-agent-0.20.5/lib/python3.12/site-packages/scripts/whatsapp-bridge/bridge.js`.
+
+Root cause: the bridge is a small Node app in the repo at
+`scripts/whatsapp-bridge/`, but it is **not part of the installed package**
+— setuptools only packages Python modules, and the uv2nix venv inherits
+that. The runtime copes with read-only installs by design:
+`resolve_whatsapp_bridge_dir()` (`gateway/platforms/whatsapp_common.py`)
+falls back to a **mirror at `$HERMES_HOME/scripts/whatsapp-bridge`** when
+the install-tree copy is missing/writable-check fails. We just pre-populate
+that mirror — no patching.
+
+Changes in `modules/nixos/hermes-agent/default.nix`:
+
+- `whatsappBridge` — `pkgs.runCommand` that copies
+  `inputs.hermes-agent.sourceInfo/scripts/whatsapp-bridge/` into a store
+  path. A derivation (not a bare source sub-path) is **required**:
+  store paths embedded in activation-script strings are NOT part of the
+  toplevel closure, so a plain `cp ${…sourceInfo}/…` would fail on skylake
+  (verified: the source path is absent there). The drv + its source input
+  are in the built toplevel closure (checked with `nix path-info --recursive`).
+- `system.activationScripts."hermes-whatsapp-bridge"` — copies the bridge
+  into `/persist/opt/skylake-services/hermes/.hermes/scripts/whatsapp-bridge`,
+  `chown hermes:hermes` + `chmod u+rwX` (npm needs to write `node_modules/`).
+  `deps = [ "users" "hermes-agent-setup" ]` so the user and `$HERMES_HOME`
+  exist first. Re-copied on every switch → input bumps refresh the bridge;
+  `node_modules/` survives (it's created at runtime, not in the store).
+- `services.hermes-agent.environment.WHATSAPP_ENABLED = "true"` — arms the
+  bundled `whatsapp-platform` adapter (its `requires_env` gate reads
+  `$HERMES_HOME/.env`, which the upstream activation script writes from
+  `environment`). Verified in the built system: `hermes-env-base` =
+  `WHATSAPP_ENABLED=true`.
+- `services.hermes-agent.extraPackages = [ whatsappBridge ]` — the closure
+  hook (flows to `users.users.hermes.packages`; the derivation has no
+  `bin/`, so nothing lands on the PATH).
+
+Runtime behavior (verified against 0.20.5 source + docs):
+
+- **Self-chat mode is the default** (`WHATSAPP_MODE` unset) — the agent
+  links **your own** WhatsApp account; no second/bot number needed.
+- DM and group policy default to **`pairing`**: nobody can reach the agent
+  until you pair through the dashboard — arming the adapter ahead of time
+  is safe.
+- First pairing runs `npm install` in the bridge dir (needs writable dir ✓
+  and network ✓ — the service is not network-sandboxed; timeout 300 s).
+- node/npm resolution: `ExecStart` is the **wrapped** hermes binary, whose
+  env already puts `node`/`npm` on PATH and sets `HERMES_NODE` — both the
+  gateway and dashboard services spawn from it.
+- The Baileys session lives under the bridge dir in HERMES_HOME → on
+  `/persist`, survives reboots; re-scan only when the session is reset.
+- The bridge computes a script hash on start; the gateway restarts a
+  running bridge when the on-disk code changes (input bump → refresh).
+
+After deploy + pairing: send a WhatsApp DM to your own (linked) number to
+reach the agent; pairing QR comes from the dashboard's WhatsApp tab.
+
 ## Remaining user steps
 
 1. **Deploy:** `make skylake` in an interactive terminal (type the sudo
@@ -176,28 +240,29 @@ Gotchas (verified against hermes 0.20.5 source + live tests on skylake):
    - `journalctl -u hermes-backend -n 20` → expect
      `HERMES_DASHBOARD_READY port=9119`
    - `curl -s -o /dev/null -w '%{http_code}\n' -H 'Host: 127.0.0.1' \
- -H 'X-Forwarded-Prefix: /hermes' http://127.0.0.1:9119/` → 200
+-H 'X-Forwarded-Prefix: /hermes' http://127.0.0.1:9119/` → 200
    - From aesop (tailnet): `curl -s http://skylake.anaconda-snapper.ts.net/hermes/ \
- | grep -o '__HERMES_BASE_PATH__="/hermes"'`
+| grep -o '__HERMES_BASE_PATH__="/hermes"'`
    - Optionally from a **non-tailnet** device (phone on mobile data):
      `curl -s -o /dev/null -w '%{http_code}\n' \
- http://skylake.anaconda-snapper.ts.net/hermes/` → `000`/timeout (name
+http://skylake.anaconda-snapper.ts.net/hermes/` → `000`/timeout (name
      doesn't resolve off-tailnet) — and the nginx allow/deny covers anything
      that _does_ reach port 80 from outside.
 3. LLM end-to-end: on skylake
    `sudo runuser -u hermes -- /nix/store/…-hermes-agent-0.20.5/bin/hermes -z "ping"`
    (answers via aesop llama-swap), or just chat in the browser dashboard.
+4. **WhatsApp pairing** (one-time): open
+   `http://skylake.anaconda-snapper.ts.net/hermes/` → WhatsApp tab →
+   start pairing → scan the QR with the phone that should be the
+   agent's account. First start runs `npm install` (~1–2 min, one-time).
+   Verify: `ls /persist/opt/skylake-services/hermes/.hermes/scripts/whatsapp-bridge/node_modules`
+   exists and `journalctl -u hermes-backend | grep -i whatsapp` shows the
+   bridge starting. DM your own number to talk to the agent.
 
-## Git state (review before committing)
+## Git state
 
-New/modified for this task: `flake.nix`, `flake.lock`,
-`modules/nixos/hermes-agent/{default.nix,hermes.png}`,
-`modules/nixos/default.nix`, `use-cases/server/default.nix`,
-`secrets/{default.nix,secrets.nix}` (secret entry removed, `.age` deleted),
-`TASK.md`.
-
-The tree also still carries **older uncommitted work** from the previous ntfy
-task (`modules/nixos/ntfy/**`, `use-cases/dev/pi/ntfy-notify.ts`, …) plus
-other drift (`AGENTS.md`, `Makefile`, `.gitignore`, `machines/skylake/*`,
-untracked `scripts/`). Note this is exactly what `make skylake` would push —
-a deploy ships the whole tree, not just the hermes change.
+Committed: ntfy + deploy wiring (`2c52c2c`), Hermes install incl.
+blank-page fix (`fa6b64a`). Uncommitted now: the WhatsApp changes
+(`modules/nixos/hermes-agent/default.nix`, `TASK.md`) — to be committed
+as `hermes-agent:` after this round of verification. Only unrelated
+`modules/nixos/copyparty/UPGRADING.md` drift should remain after that.

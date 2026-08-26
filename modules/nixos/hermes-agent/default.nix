@@ -14,6 +14,31 @@ let
   # Hermes' built-in dashboard port (web_server.py default; the NixOS
   # module's backend.port also defaults to it).
   port = 9119;
+
+  # The service user/group and HERMES_HOME — where the runtime keeps
+  # .env, config.yaml, the WhatsApp session, and (for read-only
+  # installs) the WhatsApp bridge mirror (see whatsappBridge below).
+  hermesCfg = config.services.hermes-agent;
+  hermesHome = "${hermesCfg.stateDir}/.hermes";
+
+  # WhatsApp bridge: a small Node app that lives in the hermes-agent
+  # repo under scripts/whatsapp-bridge/ but is NOT shipped in the
+  # installed package — setuptools only packages Python modules, and
+  # the uv2nix venv inherits that. resolve_whatsapp_bridge_dir()
+  # (gateway/platforms/whatsapp_common.py) copes with read-only
+  # installs by falling back to a mirror at
+  # $HERMES_HOME/scripts/whatsapp-bridge when the install-tree copy is
+  # missing — this is that mirror (without it, the dashboard's WhatsApp
+  # pairing endpoint 500s with "bridge script was not found").
+  #
+  # A derivation (rather than the source sub-path directly) so the
+  # store path is a real dependency of the system: `make skylake`
+  # copies the toplevel's closure to skylake, and a path that merely
+  # appears in an activation-script string would not be in it.
+  whatsappBridge = pkgs.runCommand "hermes-whatsapp-bridge" { } ''
+    mkdir -p $out
+    cp -rT ${inputs.hermes-agent.sourceInfo}/scripts/whatsapp-bridge $out
+  '';
 in
 {
   options.modules.hermes-agent = {
@@ -56,6 +81,25 @@ in
           };
         };
 
+        # ── WhatsApp ────────────────────────────────────────────────
+        # WHATSAPP_ENABLED arms the bundled whatsapp-platform adapter
+        # (plugins/platforms/whatsapp/); the gateway reads it from
+        # $HERMES_HOME/.env, which this option populates. The defaults
+        # do the rest safely:
+        #   - mode stays "self-chat" (the agent links YOUR WhatsApp
+        #     account — no second/bot number needed),
+        #   - DM and group policy default to "pairing": nobody can
+        #     reach the agent until paired through the dashboard, so
+        #     arming the adapter ahead of pairing is safe.
+        #
+        # extraPackages puts the bridge tree (above) into the system
+        # closure for the activation script; the derivation has no
+        # bin/, so nothing lands on the hermes user's PATH.
+        environment = {
+          WHATSAPP_ENABLED = "true";
+        };
+        extraPackages = [ whatsappBridge ];
+
         # State on /persist: skylake's root is tmpfs (impermanence), so the
         # module's default /var/lib/hermes would vanish on every reboot.
         # vars.serviceConfig is already in the restic backup list
@@ -87,6 +131,27 @@ in
           host = "127.0.0.1";
           inherit port;
         };
+      };
+
+      # Pre-populate the WhatsApp bridge mirror in HERMES_HOME (see
+      # whatsappBridge above). deps: "users" — the chown needs the
+      # hermes user; "hermes-agent-setup" — the upstream script that
+      # creates $HERMES_HOME and writes .env. Re-copied on every
+      # switch, so a hermes-agent input bump refreshes the bridge
+      # (node_modules/ is created at runtime by `npm install` and
+      # survives the copy; the bridge's script-hash check makes the
+      # gateway restart a running bridge when the code changes).
+      system.activationScripts."hermes-whatsapp-bridge" = {
+        deps = [
+          "users"
+          "hermes-agent-setup"
+        ];
+        text = ''
+          mkdir -p ${hermesHome}/scripts
+          cp -rT ${whatsappBridge} ${hermesHome}/scripts/whatsapp-bridge
+          chown -R ${hermesCfg.user}:${hermesCfg.group} ${hermesHome}/scripts
+          chmod -R u+rwX ${hermesHome}/scripts/whatsapp-bridge
+        '';
       };
     }
 
