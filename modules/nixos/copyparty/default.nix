@@ -67,11 +67,10 @@ let
   # Read-only volume dir that serves the plugin. The store path changes
   # when video-tracks.js changes → the confs (which embed it) change →
   # restartTriggers restarts both units.
-  plugDir = pkgs.runCommand "copyparty-video-tracks" { }
-    ''
+  plugDir = pkgs.runCommand "copyparty-video-tracks" { } ''
     mkdir -p $out
     cp ${./video-tracks.js} $out/video-tracks.js
-    '';
+  '';
 
   # The private password is injected at startup by replace-secret from the
   # agenix materialized file, so it never lands in the Nix store or the
@@ -283,6 +282,19 @@ in
         acmeRoot = "/var/lib/acme/acme-challenge";
         locations."/" = {
           proxyPass = "http://127.0.0.1:3211";
+          # ?th= conversions take 1-2 minutes before the first response
+          # byte (one-time per file/track, cached afterwards). nginx's
+          # default 60s proxy_read_timeout killed the upstream connection
+          # mid-conversion: the phone got a 504 HTML page ("Can't play
+          # media (invalid MIME type)"), while the conversion kept running
+          # in the background — which is exactly why an immediate retry
+          # "just worked". Stream unbuffered so nginx does not also write
+          # a second copy of multi-GB files to disk.
+          extraConfig = ''
+            proxy_read_timeout 3600s;
+            proxy_send_timeout 3600s;
+            proxy_buffering off;
+          '';
         };
       };
 

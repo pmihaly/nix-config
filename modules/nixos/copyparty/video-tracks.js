@@ -24,6 +24,16 @@
  * autoplay (always true for first plays on phones) a big tap-to-play
  * overlay appears instead of a dead video.
  *
+ * Background warming: as soon as the metadata is known, the plugin fires a
+ * range-limited (8KB) request for every OTHER audio track and aborts it
+ * after a few seconds. A ?th= request starts the server-side conversion as
+ * soon as it arrives, and copyparty keeps converting after the client
+ * disconnects — so by the time the user switches tracks the file is (nearly)
+ * ready. The 8KB range means an already-converted file costs ~8KB, and a
+ * still-converting file costs nothing (the request is aborted before the
+ * conversion finishes). Conversion workers run in parallel (--th-mt), so
+ * the whole episode is ready shortly after the first track starts.
+ *
  * Security:
  *  - self-contained vanilla JS (no CDN, CSP-safe: loaded with the page
  *    nonce, no eval, styles injected via a <style> element)
@@ -38,9 +48,24 @@
   window.__copypartyVideoTracks = true;
 
   var VID_EXT = {
-    mp4: 1, m4v: 1, mkv: 1, webm: 1, mov: 1, avi: 1, wmv: 1,
-    mpg: 1, mpeg: 1, m2ts: 1, ts: 1, "3gp": 1, "3g2": 1, ogv: 1,
-    vob: 1, flv: 1, asf: 1, divx: 1,
+    mp4: 1,
+    m4v: 1,
+    mkv: 1,
+    webm: 1,
+    mov: 1,
+    avi: 1,
+    wmv: 1,
+    mpg: 1,
+    mpeg: 1,
+    m2ts: 1,
+    ts: 1,
+    "3gp": 1,
+    "3g2": 1,
+    ogv: 1,
+    vob: 1,
+    flv: 1,
+    asf: 1,
+    divx: 1,
   };
 
   function qsa(sel, root) {
@@ -181,10 +206,63 @@
     if (vOk && aOk)
       return "starting\u2026 (first play prepares the file on the server; it is cached afterwards)";
     if (!vOk && !aOk)
-      return "transcoding on the server: " + (vc || "?") + "\u2192h264, " + (ac || "?") + "\u2192aac \u2014 can take several minutes; happens once, then cached";
+      return (
+        "transcoding on the server: " +
+        (vc || "?") +
+        "\u2192h264, " +
+        (ac || "?") +
+        "\u2192aac \u2014 can take several minutes; happens once, then cached"
+      );
     if (!aOk)
-      return "converting audio on the server: " + (ac || "?") + "\u2192aac \u2014 first play may take up to a minute for large files; happens once, then cached";
-    return "transcoding video on the server: " + (vc || "?") + "\u2192h264 \u2014 can take several minutes; happens once, then cached";
+      return (
+        "converting audio on the server: " +
+        (ac || "?") +
+        "\u2192aac \u2014 first play may take up to a minute for large files; happens once, then cached"
+      );
+    return (
+      "transcoding video on the server: " +
+      (vc || "?") +
+      "\u2192h264 \u2014 can take several minutes; happens once, then cached"
+    );
+  }
+
+  /* ---------- background track warming (see header) ---------- */
+  var warm = (window.__vtWarm = window.__vtWarm || {});
+
+  function warmTracks(href, doc, skip) {
+    if (!doc || !doc.a || doc.a.length < 2) return;
+    try {
+      if (navigator.connection && navigator.connection.saveData) return;
+    } catch (_) {}
+    for (var i = 0; i < doc.a.length; i++) {
+      if (i === skip) continue;
+      var key = href + ":mp4:" + i;
+      if (warm[key]) continue;
+      warm[key] = 1;
+      var u = href + sepOf(href) + "th=mp4:" + i;
+      var ctl = null;
+      try {
+        ctl = new AbortController();
+      } catch (_) {
+        return;
+      }
+      try {
+        fetch(u, {
+          headers: { Range: "bytes=0-8191" },
+          signal: ctl.signal,
+          cache: "no-store",
+        }).catch(function () {
+          /* abort / network errors are expected here */
+        });
+      } catch (_) {
+        /* fetch unsupported */
+      }
+      setTimeout(function () {
+        try {
+          ctl.abort();
+        } catch (_) {}
+      }, 15000);
+    }
   }
 
   /* ---------- the player ---------- */
@@ -287,7 +365,10 @@
 
     video.addEventListener("error", function () {
       if (video.error)
-        msg.textContent = "playback error (media error code " + video.error.code + ") \u2014 this file may not be decodable in this browser";
+        msg.textContent =
+          "playback error (media error code " +
+          video.error.code +
+          ") \u2014 this file may not be decodable in this browser";
     });
 
     col.appendChild(vidWrap);
@@ -312,7 +393,8 @@
 
     function applyTracks() {
       var oldTracks = qsa("track", video);
-      for (var i = 0; i < oldTracks.length; i++) video.removeChild(oldTracks[i]);
+      for (var i = 0; i < oldTracks.length; i++)
+        video.removeChild(oldTracks[i]);
       var pos = video.currentTime || 0;
       var url = href + sep + "th=mp4" + (audios.length ? ":" + aIdx : "");
       if (sIdx >= 0 && subs[sIdx]) {
@@ -330,7 +412,7 @@
           function () {
             video.currentTime = pos;
           },
-          { once: true }
+          { once: true },
         );
       }
       video.load();
@@ -403,6 +485,8 @@
       started = true;
       if (aSel) aSel.value = "0";
       if (sSel) sSel.value = "-1";
+      // kick off the other audio tracks' conversions in the background
+      warmTracks(href, doc, aIdx);
     }
 
     msg.textContent = "loading metadata\u2026";
@@ -419,7 +503,9 @@
         var ct = res.headers.get("content-type") || "";
         if (ct.indexOf("application/json") < 0) {
           /* unpatched server: ?th=json came back as a jpeg thumbnail */
-          directPlay("conversion not available on this server; trying direct playback");
+          directPlay(
+            "conversion not available on this server; trying direct playback",
+          );
           return null;
         }
         return res.json();
@@ -428,7 +514,10 @@
         if (doc) setupTracks(doc);
       })
       .catch(function () {
-        if (!started) directPlay("metadata request failed (network error); trying direct playback");
+        if (!started)
+          directPlay(
+            "metadata request failed (network error); trying direct playback",
+          );
       });
   }
 
