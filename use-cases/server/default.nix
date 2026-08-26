@@ -53,6 +53,12 @@ optionalAttrs platform.isLinux {
         # hermes-agent (see the WhatsApp section in modules/nixos/
         # hermes-agent/default.nix).
         hermes-agent.whatsapp = true;
+        # QMD notes search (MCP): embedding index over the agent's own
+        # notes ($HERMES_HOME/memories) so it can find old notes as they
+        # accumulate. Lite 0.6B model profile (skylake has 4 GB); models
+        # download to /persist on first use, a daily timer re-embeds.
+        # See the QMD section in modules/nixos/hermes-agent/default.nix.
+        hermes-agent.qmdMemory = true;
       };
     }
 
