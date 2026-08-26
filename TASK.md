@@ -3,7 +3,16 @@
 Install [Hermes Agent](https://github.com/NousResearch/hermes-agent) (Nous
 Research) on skylake, declaratively via Nix, state under `/persist`, Web UI
 exposed **internally** (tailnet only, no login), LLM backend =
-**llama-swap on aesop**.
+**llama-swap on aesop**, notes search via **FlowState-QMD (MCP)**.
+
+## Status: QMD NOTES SEARCH — DEPLOYED & VERIFIED (2026-08-26)
+
+**FlowState-QMD** is live as the `qmd` MCP server: the collection
+`hermes-memories` tracks `$HERMES_HOME/.hermes/memories/`, the daily
+`hermes-qmd-embed` timer keeps the index/embeddings fresh, and the gateway
+spawns `qmd mcp` (verified: tools listed, lex + vec queries run as user
+`hermes`). Reranking is patched off (native crash, see below). See the QMD
+section for the full state.
 
 ## Status: DEPLOYED & VERIFIED (2026-08-26) — WhatsApp PAIRED & ENABLED
 
@@ -287,6 +296,143 @@ separate backend service) until `creds.json` exists.
   `sudo runuser -u hermes -- <hermes-bin> pairing approve whatsapp <code>`
   (or dashboard → pairing). Approved users persist across deploys.
 
+## Notes search: FlowState-QMD (MCP) — added 2026-08-26
+
+### Design
+
+Hermes' built-in memory = `MEMORY.md` + `USER.md` in
+`$HERMES_HOME/memories/`, loaded **in full** into the system prompt. As
+notes accumulate, QMD adds *search* over that corpus:
+
+- **Collection** `hermes-memories` → `$HERMES_HOME/memories` (the dir the
+  memory tool writes to; the agent can drop extra `*.md` notes there).
+- **MCP server** (stdio, spawned by the gateway): `qmd mcp` — tools
+  `query` (embeddings + rerank), `get`/`multi_get`, `status`,
+  `fetch_anticipatory_context` (falls back to a live query when the
+  anticipatory cache is cold — fine for notes).
+- **Lite model profile** (skylake = 2 vCPU / 4 GB — the repo defaults,
+  4B embed + 4B rerank + 1.7B query-expansion, don't fit):
+  - `QMD_EMBED_MODEL` = Qwen3-Embedding-0.6B Q8_0 (~0.7 GB).
+  - **Rerank is disabled by source patch** (crash, see below); the 0.6B
+    Q4_K_M rerank model is still pre-staged, so re-enabling = env var +
+    un-patch, no download.
+  - the 1.7B expansion model is **not** env-overridable, but it only
+    loads when the BM25 probe finds no lexical signal (rare for notes).
+  - models are **pre-staged at activation** (downloaded once from
+    HuggingFace into `$HERMES_HOME/.cache/qmd/models`, HOME on /persist)
+    so first use is offline and no service blocks on a multi-GB fetch.
+- **Build**: not on npm under this name (`@tobilu/qmd` is the upstream
+  base) → `buildNpmPackage` over the pinned source (flake input
+  `flowstate-qmd`, rev in the URL). npm (not bun) on purpose:
+  `bin/qmd` picks the runtime by lockfile (npm → `node`), and the native
+  modules (better-sqlite3, sqlite-vec, node-llama-cpp) install for the
+  build-time nodejs — the runtime `node` (nodejs-slim, same major as the
+  WhatsApp bridge) matches that ABI.
+- **Ops wiring** (all in `modules/nixos/hermes-agent/default.nix`,
+  gated by `modules.hermes-agent.qmdMemory`, set true for skylake in
+  `use-cases/server/default.nix`):
+  - `mcpServers.qmd` = `{ command = …/bin/qmd; args = [ "mcp" ]; env = … }`
+    (merged into `settings.mcp_servers` by the upstream module).
+  - The derivation also **rebuilds the launcher**: the npm bin script
+    resolves its package dir through the `$out` symlink chain, which
+    breaks in the nix store (the real package lives one level up under
+    `lib/node_modules`) — so `$out/bin/qmd` is a symlink to the package
+    bin, which `exec`s a **pinned** nodejs-slim binary (not `exec node`;
+    the service PATH has no node).
+  - activation script `hermes-qmd-memory`: creates + `chown`s the XDG
+    dirs (`.config/qmd`, `.cache/qmd` — a root-owned `.cache` from
+    pre-staging breaks `better-sqlite3`'s temp-file journaling with
+    `SQLITE_CANTOPEN`), pre-stages the GGUF models, then idempotent
+    `qmd collection add …/memories --name hermes-memories` as user
+    `hermes` (no model load → fast/offline).
+  - `hermes-qmd-embed.service` + daily timer (`Persistent`, +30 min
+    random delay): `qmd update && qmd embed` as a short-lived process —
+    `update` re-scans the collection (new/changed notes), `embed` fills
+    embeddings for changed content hashes only (model RAM released on
+    exit). The MCP `query` tool does **not** re-index (its `refresh`
+    option is anticipatory-cache only), so without the timer, new notes
+    would never be found.
+  - Steady-state cost: the MCP child holds the embed model (~0.7 GB)
+    once the first query loads it (kept warm 5 min per node-llama-cpp
+    lifecycle; no rerank model — patched off).
+
+### Build & runtime fixes (found by testing on skylake)
+
+1. **npm dep hash**: the pinned flake rev's commit was made before its
+   `package-lock.json` was updated (lock lacked `@vscode/ripgrep`'s
+   platform packages) → `buildNpmPackage`'s integrity check failed.
+   Fixed by vendoring the lockfile at `vendor/flowstate-qmd-package-lock.json`
+   (content verified against the published tarball's) and copying it over
+   in `postPatch`.
+2. **bin entry** + **node pinning**: as above (launcher section).
+3. **Model RAM**: see the rerank crash below — the repo-default 4B
+   reranker (~2.6 GB) cannot load on a 4 GB box.
+
+### The rerank crash (found 2026-08-26, fixed via patch)
+
+Symptom: the first MCP `query` that loads the rerank model aborted the
+MCP server process: exit 134 (SIGABRT), ~1.4 s into model load, native
+assertion `Assertion failed: (env) != nullptr` in
+`node::RemoveEnvironmentCleanupHook`, stack through `better-sqlite3`
+`Statement::~Statement()` — i.e. a native teardown race between
+better-sqlite3's per-Environment cleanup hooks and node-llama-cpp's model
+load, **not** an OOM kill. Facts established on skylake:
+
+- reproducible across rerank **and** embed model loads inside the
+  long-lived MCP server process (~25 % of load attempts abort;
+  initialize-only sessions never load a model and always exit clean);
+- the **CLI** path (short-lived process: load → query → exit) never
+  crashed in any test, rerank included;
+- the identical store path + node binary + models work over MCP on aesop
+  (8 GB) — so it's skylake-specific (2 vCPU / 4 GB, teardown timing);
+- disabling the query-expansion model was not enough (the crash is in the
+  rerank stage, and expansion isn't env-overridable anyway).
+
+Fix (in the derivation's source patch, `src/store.ts`):
+`structuredSearch()` skips the rerank stage entirely (lexical + vector
+results merged, no `rerankModel` load), and `QMD_RERANK_MODEL` is not set
+anywhere (MCP + timer env). Lex+vec over a notes corpus is the useful
+signal anyway; rerank quality is marginal at this scale.
+
+**Known residual**: the same native race can still abort the MCP server
+when the **embed** model loads (~25 %). Self-healing in practice: the
+hermes gateway's MCP client lazily respawns a dead stdio server on the
+next tool call (and any successful call — e.g. a lex-only query —
+"proves" the session and resets its rapid-drop budget), so the worst
+case is one failed tool call the agent retries. If it becomes a real
+problem in use, the robust fix is a thin MCP wrapper that delegates
+queries to short-lived `qmd query` CLI subprocesses (the crash-free path).
+
+### Verified live (2026-08-26, all as user `hermes` on skylake)
+
+- Collection: `hermes-memories` → `…/.hermes/memories`, pattern
+  `**/*.md` (the real runtime notes dir is `.hermes/memories`, not
+  `$HERMES_HOME/memories` — the activation script targets the former).
+- `qmd status`: index at `…/.cache/qmd/index.sqlite` (on /persist),
+  0 documents after the self-test note cleanup.
+- `qmd get`, CLI `query` (loads the 0.6B embed model from the
+  pre-staged cache) — clean.
+- MCP (`qmd mcp`, patched build): `initialize` + `tools/list` → 5 tools
+  (`query`, `get`, `multi_get`, `status`, `fetch_anticipatory_context`);
+  `query` lex-only → works, no model load; `query` vec → works, loads
+  the 0.6B embed model (empty index ⇒ legitimately empty results).
+- Gateway runtime config contains `mcp_servers.qmd` pointing at the
+  patched store path; the `qmd mcp` child is up under the gateway.
+- `hermes-qmd-embed.service`/`.timer` exist, timer `OnCalendar`
+  (inactive until the next elapse — correct).
+- Self-test note removed; `qmd update` cleaned the orphaned content
+  hash (1 orphaned vector remains in the DB — cosmetic, no docs).
+
+### Status
+
+- [x] Source + config investigated; Nix written; eval green.
+- [x] Derivation builds (vendored lockfile, symlinked bin, pinned node).
+- [x] Deployed; models pre-staged; collection registered on /persist.
+- [x] Rerank crash diagnosed + patched off; lex+vec verified over MCP.
+- [x] Timer service in place for daily re-index + re-embed.
+- [ ] Real-world check: after the agent writes a few notes, ask it to
+      find one via WhatsApp (semantic recall end-to-end).
+
 ## Remaining user steps
 
 1. ~~WhatsApp one-time DM pairing~~ — **done** (2026-08-26): self-chat
@@ -316,6 +462,8 @@ separate backend service) until `creds.json` exists.
 All committed: ntfy + deploy wiring (`2c52c2c`), Hermes install incl.
 blank-page fix (`fa6b64a`), WhatsApp bridge + adapter (`45667f8`),
 `TASK.md` update (`136cd23`), WhatsApp reset + `whatsapp` flag
-(`c0fd213`), WhatsApp re-enable + this `TASK.md` state (this commit).
+(`c0fd213`), WhatsApp re-enable + DM pairing (`67efb22`), QMD notes
+search (this commit: flake input + lock, derivation + vendored lockfile,
+ops wiring, `TASK.md`).
 Only unrelated `modules/nixos/copyparty/UPGRADING.md` drift remains
 uncommitted.

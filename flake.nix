@@ -90,6 +90,14 @@
       url = "github:NousResearch/hermes-agent";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # FlowState-QMD: anticipatory-memory MCP server over tobi/qmd
+    # (sqlite-vec markdown index). Used for search over Hermes' own
+    # notes. Not on npm under this name — built from source
+    # (modules/nixos/hermes-agent). Pinned to the latest main (the
+    # NODE_LLAMA_CPP_GPU=disable + config-path-fallback fixes) by
+    # embedding the rev in the URL, same style as
+    # nixpkgs-working-elektroid above.
+    flowstate-qmd.url = "github:amanning3390/flowstate-qmd/505f824218021bc2cdefe4ee202d0af3b2fd94fc";
   };
 
   outputs =

@@ -39,10 +39,123 @@ let
     mkdir -p $out
     cp -rT ${inputs.hermes-agent.sourceInfo}/scripts/whatsapp-bridge $out
   '';
+
+  # FlowState-QMD — "anticipatory memory" MCP server (a hackathon
+  # project built on tobi/qmd: a sqlite-vec embedding index over
+  # markdown). Here it earns its keep in its core job: making the
+  # agent's own notes ($HERMES_HOME/memories) searchable. Not on npm
+  # under this name (the npm `@tobilu/qmd` is the upstream base, not
+  # the fork), so it is built from the pinned source (flake input).
+  #
+  # Built with npm, NOT bun, on purpose: bin/qmd picks the runtime by
+  # lockfile (package-lock.json -> node), and the native modules
+  # (better-sqlite3, sqlite-vec, node-llama-cpp) are installed for the
+  # nodejs in the build env — the runtime `node` (nodejs-slim, same
+  # major as the WhatsApp bridge uses) must match that ABI.
+  qmd = pkgs.buildNpmPackage {
+    pname = "flowstate-qmd";
+    version = "1.0.0";
+    src = inputs.flowstate-qmd;
+    # better-sqlite3 falls back to a node-gyp compile when no prebuild
+    # matches the node ABI; keep the toolchain available for that.
+    nativeBuildInputs = [
+      pkgs.python3
+      pkgs.nodejs
+    ];
+    postPatch = ''
+        # Upstream ships bun.lock only (it is a bun project); buildNpmPackage
+        # requires an npm lockfile. Vendor one generated at the pinned rev
+        # so dependency versions (incl. the platform-specific node-llama-cpp
+        # prebuilds) stay exactly pinned.
+        cp ${./vendor/flowstate-qmd-package-lock.json} package-lock.json
+
+        # The MCP `query` tool accepts a `rerank` flag, but loading the rerank
+      # model inside the long-lived MCP *server* process aborts natively on
+      # skylake (better-sqlite3 teardown assertion
+      # `RemoveEnvironmentCleanupHook: (env) != nullptr`, reproduced 3/4
+      # runs, ~1.4 s into the model load; the same model + same node binary
+      # work fine via the `qmd` CLI and on a bigger machine, so it is a
+      # timing race in the native stack on this box). Force rerank off —
+      # which is also the upstream default ("disabled by default to keep
+      # MCP queries fast and local-only"). Semantic (vec) + lexical (lex)
+      # search are unaffected; reranking remains available via the CLI
+      # (set QMD_RERANK_MODEL ad hoc, see qmdLiteEnv below).
+      #
+      # Patches the TypeScript source: the build runs `tsc`, so the change
+      # lands in the shipped dist/mcp/server.js.
+        sed -i 's/^        rerank,$/        rerank: false, \/\/ patched by nix: rerank disabled/' src/mcp/server.ts
+    '';
+    postInstall = ''
+      # The npm build hook auto-generates a `node <binfile>` wrapper for
+      # the `qmd` bin entry — right for JS entries, wrong here: the
+      # repo's bin/qmd is a #!/bin/sh launcher (it picks node vs bun
+      # from the lockfile). Replace the wrapper with a symlink to the
+      # real script, like an npm global install does: the launcher
+      # resolves the package dir by following $0's symlinks, so a
+      # plain file at $out/bin/qmd would make it look for dist/cli/
+      # qmd.js next to the bin dir instead of in the package dir.
+      ln -sf ../lib/node_modules/flowstate-qmd/bin/qmd $out/bin/qmd
+      # The launcher execs `node` from PATH — fine inside the hermes
+      # service, but NOT in e.g. the NixOS activation environment
+      # (127: node: not found). Pin the node binary: this build has
+      # package-lock.json, so the launcher always takes the node
+      # branch.
+      sed -i "s|exec node |exec ${pkgs.nodejs-slim}/bin/node |" $out/lib/node_modules/flowstate-qmd/bin/qmd
+    '';
+    # Hash of the node_modules tree the lockfile resolves to (the
+    # npm-deps FOD). Without it the FOD is unhashable and a clean
+    # build (e.g. on skylake during deploy) fails with a hash
+    # mismatch; the registry contents for this pinned lockfile are
+    # immutable, so the hash is stable.
+    npmDepsHash = "sha256-ZSvXA2Huo1YG+Q37y9gKv3dJSMafOmXAaWDW9O6X+sg=";
+  };
+
+  # Lite model profile for skylake (2 vCPU / 4 GB). The repo defaults
+  # (llm.ts) are Qwen3-Embedding-4B + Qwen3-Reranker-4B plus a 1.7B
+  # query-expansion model — far too big for this box. The first two
+  # are overridable via env; the expansion model is hardcoded but only
+  # loads when the BM25 probe finds no strong lexical signal (rare for
+  # short notes). Models are downloaded from HuggingFace at runtime
+  # into $HOME/.cache/qmd/models (the hermes user's home is stateDir,
+  # on /persist).
+  #
+  # Reranker (CLI only): the 0.6B Qwen3-Reranker needs a classification
+  # (score) head tensor; the mradermacher GGUF is a plain generation
+  # quant without it, so node-llama-cpp's createRankingContext fails
+  # with "Failed to create any rerank context". The Voodisss GGUF
+  # carries the cls.output.weight score head and ranks correctly
+  # (verified: 0.9999 vs 0.0001 score separation, ~200 ms/doc). Reranking
+  # is patched out of the MCP server (see patchPhase above) and is NOT in
+  # this env — for manual CLI reranking add ad hoc:
+  #   QMD_RERANK_MODEL="hf:Voodisss/Qwen3-Reranker-0.6B-GGUF-llama_cpp/Qwen3-Reranker-0.6B-Q4_K_M.gguf"
+  #
+  # NOTE: QMD_EMBED_MODEL must be set on EVERY qmd invocation — without
+  # it the 4.28 GB 4B default starts downloading. This env feeds both
+  # the MCP server (mcpServers below) and the embed timer.
+  qmdLiteEnv = {
+    QMD_EMBED_MODEL = "hf:Qwen/Qwen3-Embedding-0.6B-GGUF/Qwen3-Embedding-0.6B-Q8_0.gguf";
+    NODE_LLAMA_CPP_GPU = "disable";
+  };
 in
 {
   options.modules.hermes-agent = {
     enable = mkEnableOption "Hermes Agent (Nous Research) — agent gateway + web dashboard";
+
+    qmdMemory = mkOption {
+      type = types.bool;
+      default = false;
+      description = ''
+        Expose the agent's notes ($HERMES_HOME/memories) as a
+        FlowState-QMD MCP server: semantic (embedding) + lexical
+        search over the note files (query/get/status tools).
+        Reranking is disabled in the MCP build (native crash on
+        skylake, see the patchPhase in qmd above) and stays
+        available via the CLI. Lite 0.6B embed model — the repo
+        defaults (4B embed/rerank + 1.7B expansion) do not fit
+        skylake's 4 GB. Models download to /persist on first use;
+        a daily timer re-embeds changed notes.
+      '';
+    };
 
     whatsapp = mkOption {
       type = types.bool;
@@ -122,7 +235,38 @@ in
         environment = optionalAttrs cfg.whatsapp {
           WHATSAPP_ENABLED = "true";
         };
-        extraPackages = optional cfg.whatsapp whatsappBridge;
+        extraPackages =
+          (optional cfg.whatsapp whatsappBridge)
+          # QMD: the CLI on PATH (for `qmd embed` in the timer and for
+          # ad-hoc use). The node binary is pinned inside the derivation
+          # (see the postInstall above), so no PATH dependency; node
+          # stays on the service PATH anyway for ad-hoc use.
+          ++ (optional cfg.qmdMemory qmd)
+          ++ (optional cfg.qmdMemory pkgs.nodejs-slim);
+
+        # ── QMD notes search (MCP) ────────────────────────────────────
+        # Registers FlowState-QMD as a stdio MCP server the gateway
+        # spawns; the agent gains `query`, `get`/`multi_get`, `status`
+        # (and `fetch_anticipatory_context`) tools over the
+        # `hermes-memories` collection, which the activation script
+        # below points at $HERMES_HOME/memories — the directory the
+        # built-in memory tool writes to. MEMORY.md/USER.md stay fully
+        # in-context via the normal system prompt; QMD adds search over
+        # the additional note files the agent accumulates there.
+        #
+        # Steady-state cost: the MCP child process holds the ~0.7 GB
+        # embed model in RAM once the first query loads it. Reranking
+        # is compiled out of the MCP build (see the qmd patchPhase),
+        # so no second model ever loads in that process. The daily
+        # re-embed runs as a separate short-lived process, so that
+        # cost is transient.
+        mcpServers = optionalAttrs cfg.qmdMemory {
+          qmd = {
+            command = "${qmd}/bin/qmd";
+            args = [ "mcp" ];
+            env = qmdLiteEnv;
+          };
+        };
 
         # State on /persist: skylake's root is tmpfs (impermanence), so the
         # module's default /var/lib/hermes would vanish on every reboot.
@@ -179,6 +323,75 @@ in
           chown -R ${hermesCfg.user}:${hermesCfg.group} ${hermesHome}/scripts
           chmod -R u+rwX ${hermesHome}/scripts/whatsapp-bridge
         '';
+      };
+
+      # Register the QMD notes collection once (idempotent across
+      # deploys). Runs as the hermes user so ~/.config/qmd and
+      # ~/.cache/qmd are owned by the service user. `collection add`
+      # does not load any model, so this stays fast and works offline;
+      # the model download + first embed happen on the first
+      # `qmd embed` (see the timer below) or the first MCP query.
+      system.activationScripts."hermes-qmd-memory" = mkIf cfg.qmdMemory {
+        deps = [
+          "users"
+          "hermes-agent-setup"
+        ];
+        # NOTE: no backslash line-continuations in this text — the
+        # activation-script rendering escapes them to `\\`, which the
+        # shell then passes to env as a literal `\\` argument
+        # ("env: '\\': No such file or directory").
+        text = ''
+          mkdir -p ${hermesHome}/memories
+          chown ${hermesCfg.user}:${hermesCfg.group} ${hermesHome}/memories
+          # qmd keeps its config in $HOME/.config/qmd and its index
+          # databases + model cache in $HOME/.cache/qmd. Ensure the
+          # service user owns the XDG dirs — they are root-owned when
+          # the models were pre-staged out-of-band (as on skylake),
+          # which makes the DB open fail with SQLITE_CANTOPEN.
+          mkdir -p ${hermesCfg.stateDir}/.config/qmd ${hermesCfg.stateDir}/.cache/qmd
+          chown ${hermesCfg.user}:${hermesCfg.group} ${hermesCfg.stateDir}/.config ${hermesCfg.stateDir}/.config/qmd ${hermesCfg.stateDir}/.cache ${hermesCfg.stateDir}/.cache/qmd
+          QMD_COLLECTIONS=$(runuser -u ${hermesCfg.user} -- env HOME=${hermesCfg.stateDir} ${qmd}/bin/qmd collection list 2>/dev/null)
+          if ! printf '%s' "$QMD_COLLECTIONS" | grep -q hermes-memories; then
+            runuser -u ${hermesCfg.user} -- env HOME=${hermesCfg.stateDir} ${qmd}/bin/qmd collection add ${hermesHome}/memories --name hermes-memories
+          fi
+        '';
+      };
+
+      # Refresh the notes index daily as a short-lived separate
+      # process (the models are released on exit), keeping QMD's
+      # steady-state RAM in the gateway's MCP child only. Persistent +
+      # randomised so a box that was off at the scheduled time catches
+      # up after boot.
+      #
+      # Both steps are needed: `update` re-scans the collection for
+      # new/changed/deleted files (collection add only does this once,
+      # and the MCP `query` tool never re-indexes), `embed` then
+      # embeds whatever changed.
+      systemd.services."hermes-qmd-embed" = mkIf cfg.qmdMemory {
+        description = "Hermes QMD: re-index + re-embed notes";
+        path = [
+          qmd
+          pkgs.nodejs-slim
+          pkgs.coreutils
+        ];
+        environment = qmdLiteEnv // {
+          HOME = hermesCfg.stateDir;
+        };
+        script = "${qmd}/bin/qmd update && ${qmd}/bin/qmd embed";
+        serviceConfig = {
+          User = hermesCfg.user;
+          Group = hermesCfg.group;
+          WorkingDirectory = hermesCfg.stateDir;
+        };
+      };
+
+      systemd.timers."hermes-qmd-embed" = mkIf cfg.qmdMemory {
+        wantedBy = [ "timers.target" ];
+        timerConfig = {
+          OnCalendar = "daily";
+          RandomizedDelaySec = "30min";
+          Persistent = true;
+        };
       };
     }
 
