@@ -1,6 +1,6 @@
 diff -ruN a/copyparty/authsrv.py b/copyparty/authsrv.py
---- a/copyparty/authsrv.py	2026-08-04 00:32:26.000000000 +0200
-+++ b/copyparty/authsrv.py	2026-08-26 00:22:49.333865720 +0200
+--- a/copyparty/authsrv.py	2026-08-26 07:00:53.790231065 +0200
++++ b/copyparty/authsrv.py	2026-08-26 07:00:53.793955679 +0200
 @@ -2477,7 +2477,7 @@
                  if k in vol.flags:
                      vol.flags[k] = int(vol.flags[k])
@@ -11,8 +11,8 @@ diff -ruN a/copyparty/authsrv.py b/copyparty/authsrv.py
                  if k in vol.flags:
                      vol.flags[k] = float(vol.flags[k])
 diff -ruN a/copyparty/cfg.py b/copyparty/cfg.py
---- a/copyparty/cfg.py	2026-08-04 00:32:26.000000000 +0200
-+++ b/copyparty/cfg.py	2026-08-26 00:22:49.328865625 +0200
+--- a/copyparty/cfg.py	2026-08-26 07:00:53.790117320 +0200
++++ b/copyparty/cfg.py	2026-08-26 07:00:53.794006966 +0200
 @@ -92,6 +92,7 @@
      """argv-to-volflag: simple values"""
      ret = {
@@ -30,8 +30,8 @@ diff -ruN a/copyparty/cfg.py b/copyparty/cfg.py
          "ext_th=s=/b.png": "use /b.png as thumbnail for file-extension s",
          "th_pregen=w,wf": "pregenerate thumbs for these formats",
 diff -ruN a/copyparty/httpcli.py b/copyparty/httpcli.py
---- a/copyparty/httpcli.py	2026-08-04 00:32:26.000000000 +0200
-+++ b/copyparty/httpcli.py	2026-08-26 00:55:01.268728121 +0200
+--- a/copyparty/httpcli.py	2026-08-26 07:00:53.789987665 +0200
++++ b/copyparty/httpcli.py	2026-08-26 07:00:53.794022766 +0200
 @@ -7127,7 +7127,10 @@
  
                  if th_fmt == "p":
@@ -45,8 +45,8 @@ diff -ruN a/copyparty/httpcli.py b/copyparty/httpcli.py
  
                  return self.tx_ico(rem)
 diff -ruN a/copyparty/__main__.py b/copyparty/__main__.py
---- a/copyparty/__main__.py	2026-08-04 00:32:26.000000000 +0200
-+++ b/copyparty/__main__.py	2026-08-26 00:22:56.076992683 +0200
+--- a/copyparty/__main__.py	2026-08-26 07:00:53.790284657 +0200
++++ b/copyparty/__main__.py	2026-08-26 07:00:53.794097247 +0200
 @@ -1809,6 +1809,7 @@
      ap2.add_argument("--th-mt", metavar="CORES", type=int, default=CORES, help="num cpu cores to use for generating thumbnails")
      ap2.add_argument("--th-convt", metavar="SEC", type=float, default=60.0, help="convert-to-image timeout in seconds (volflag=convt)")
@@ -63,15 +63,9 @@ diff -ruN a/copyparty/__main__.py b/copyparty/__main__.py
  
  
  def add_tail(ap):
-Binary files a/copyparty/__pycache__/authsrv.cpython-314.pyc and b/copyparty/__pycache__/authsrv.cpython-314.pyc differ
-Binary files a/copyparty/__pycache__/cfg.cpython-314.pyc and b/copyparty/__pycache__/cfg.cpython-314.pyc differ
-Binary files a/copyparty/__pycache__/httpcli.cpython-314.pyc and b/copyparty/__pycache__/httpcli.cpython-314.pyc differ
-Binary files a/copyparty/__pycache__/__main__.cpython-314.pyc and b/copyparty/__pycache__/__main__.cpython-314.pyc differ
-Binary files a/copyparty/__pycache__/th_srv.cpython-314.pyc and b/copyparty/__pycache__/th_srv.cpython-314.pyc differ
-Binary files a/copyparty/__pycache__/util.cpython-314.pyc and b/copyparty/__pycache__/util.cpython-314.pyc differ
 diff -ruN a/copyparty/th_cli.py b/copyparty/th_cli.py
---- a/copyparty/th_cli.py	2026-08-04 00:32:26.000000000 +0200
-+++ b/copyparty/th_cli.py	2026-08-26 00:55:01.266728083 +0200
+--- a/copyparty/th_cli.py	2026-08-26 07:00:53.789460807 +0200
++++ b/copyparty/th_cli.py	2026-08-26 07:00:53.794147813 +0200
 @@ -86,7 +86,9 @@
              return os.path.join(ptop, rem)
  
@@ -84,8 +78,8 @@ diff -ruN a/copyparty/th_cli.py b/copyparty/th_cli.py
              if sfmt == "j" and self.args.th_no_jpg:
                  sfmt = "w"
 diff -ruN a/copyparty/th_srv.py b/copyparty/th_srv.py
---- a/copyparty/th_srv.py	2026-08-04 00:32:26.000000000 +0200
-+++ b/copyparty/th_srv.py	2026-08-26 01:17:02.068944158 +0200
+--- a/copyparty/th_srv.py	2026-08-26 07:00:53.789437933 +0200
++++ b/copyparty/th_srv.py	2026-08-26 07:00:53.794159686 +0200
 @@ -3,6 +3,7 @@
  
  import hashlib
@@ -94,19 +88,37 @@ diff -ruN a/copyparty/th_srv.py b/copyparty/th_srv.py
  import logging
  import os
  import re
-@@ -66,6 +67,7 @@
+@@ -66,6 +67,10 @@
  
  EXTS_TH = set(["jpg", "webp", "jxl", "png"])
  EXTS_AC = set(["opus", "owa", "caf", "mp3", "flac", "wav"])
 +EXTS_VR = set(["mp4", "vtt", "json"])
++# version of the vr conversion codec policy (conv_vrc); part of the vr
++# cache key so outputs built under an old policy are never served
++VR_POLICY = "v2"
  EXTS_SPEC_SAFE = set("aif aiff flac mp3 opus wav".split())
  
  PTN_TS = re.compile("^-?[0-9a-f]{8,10}$")
-@@ -255,8 +257,12 @@
-     h = hashlib.sha512(afsenc(fn)).digest()
-     fn = ub64enc(h).decode("ascii")[:24]
+@@ -240,8 +245,16 @@
+     if not rd:
+         rd = "\ntop"
  
 +    vbase = fmt.split(":", 1)[0]
++    # vr conversions: tag the cache key with VR_POLICY so that changing the
++    # codec policy in conv_vrc invalidates cached outputs (e.g. eac3/ac3/alac
++    # were once copied into the mp4 untranscoded, which phones cannot decode)
++    if vbase in EXTS_VR:
++        rd_key = rd + "\n" + fmt + "\n" + VR_POLICY
++    else:
++        rd_key = rd + "\n" + fmt
++
+     dcache = th_dir_cache
+-    rd_key = rd + "\n" + fmt
+     rd = dcache.get(rd_key)
+     if not rd:
+         h = hashlib.sha512(afsenc(rd_key)).digest()
+@@ -257,6 +270,9 @@
+ 
      if fmt in EXTS_AC:
          cat = "ac"
 +    elif vbase in EXTS_VR:
@@ -115,7 +127,7 @@ diff -ruN a/copyparty/th_srv.py b/copyparty/th_srv.py
      else:
          fmt = TH_CH[fmt[:1]]
          cat = "th"
-@@ -567,7 +573,9 @@
+@@ -567,7 +583,9 @@
                          ext in self.fmt_ffa or ext in self.fmt_ffv
                      )
  
@@ -126,7 +138,7 @@ diff -ruN a/copyparty/th_srv.py b/copyparty/th_srv.py
                          funs.append(self.conv_pil)
                      elif (
                          lib == "vips"
-@@ -1190,6 +1198,164 @@
+@@ -1190,6 +1208,168 @@
          # fmt: on
          self._run_ff(cmd, vn, "aconvt", oom=300)
  
@@ -255,7 +267,11 @@ diff -ruN a/copyparty/th_srv.py b/copyparty/th_srv.py
 +                has_a = idx >= 0
 +            acodec = aidx[idx].get("codec_name") or "" if has_a else ""
 +            vcopy = v0.get("codec_name") in ("h264", "hevc", "mpeg4", "av1")
-+            acopy = has_a and acodec in ("aac", "mp3", "ac3", "eac3", "alac")
++            # copy the audio only if every major browser can decode it
++            # (aac, mp3); everything else (flac, ac3, eac3, alac, ...) is
++            # transcoded to aac -- e.g. eac3 remuxes into mp4 fine but
++            # phones cannot decode it (silent video, volume control dead)
++            acopy = has_a and acodec in ("aac", "mp3")
 +
 +            vmap = ("0:%s" % (v0.get("index") or "0",)).encode("ascii")
 +            cmd = [
@@ -291,7 +307,7 @@ diff -ruN a/copyparty/th_srv.py b/copyparty/th_srv.py
      def conv_flac(self, abspath: str, tpath: str, fmt: str, vn: VFS) -> None:
          if self.args.no_acode or not self.args.allow_flac:
              raise Exception("flac not permitted in server config")
-@@ -1481,7 +1647,7 @@
+@@ -1481,7 +1661,7 @@
              shutil.rmtree(zs)
  
          ret = 0
@@ -300,7 +316,7 @@ diff -ruN a/copyparty/th_srv.py b/copyparty/th_srv.py
              top = os.path.join(histpath, cat)
              if not bos.path.isdir(top):
                  continue
-@@ -1492,7 +1658,7 @@
+@@ -1492,7 +1672,7 @@
  
      def _clean(self, cat: str, thumbpath: str) -> int:
          # self.log("cln {}".format(thumbpath))
@@ -310,8 +326,8 @@ diff -ruN a/copyparty/th_srv.py b/copyparty/th_srv.py
          now = time.time()
          prev_b64 = None
 diff -ruN a/copyparty/util.py b/copyparty/util.py
---- a/copyparty/util.py	2026-08-04 00:32:26.000000000 +0200
-+++ b/copyparty/util.py	2026-08-26 00:22:49.328865625 +0200
+--- a/copyparty/util.py	2026-08-26 07:00:53.789329929 +0200
++++ b/copyparty/util.py	2026-08-26 07:00:53.794181787 +0200
 @@ -514,7 +514,7 @@
      # `mimetypes` is woefully unpopulated on windows
      # but will be used as fallback on linux
