@@ -42,6 +42,7 @@ optionalAttrs platform.isLinux {
         tailscale.enable = true;
         it-tools.enable = true;
         copyparty.enable = true;
+        ntfy.enable = true;
       };
     }
 

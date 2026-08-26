@@ -196,6 +196,11 @@ optionalAttrs platform.isLinux {
       };
 
       home.file = {
+        ".pi/agent/extensions/ntfy-notify.ts" = {
+          force = true;
+          source = ./pi/ntfy-notify.ts;
+        };
+
         ".pi/agent/models.json" = {
           force = true;
           text = toJSON {

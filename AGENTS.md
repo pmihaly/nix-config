@@ -23,8 +23,26 @@
 - Format: `nix fmt`
 - Update all inputs: `make update` (runs `./update.nu`; excludes `finances` from parallel lock updates)
 - Update finances input only: `make update-finances`
-- Deploy skylake server: `make skylake` (runs `deploy -s .#skylake`)
+- Deploy skylake server: `make skylake` (runs `./scripts/deploy-skylake.sh` — wraps `deploy -s .#skylake` and auto-feeds the sudo password; see Deploying Skylake below)
 - Build aesop (test Nix changes): `nix build .#nixosConfigurations.aesop.config.system.build.toplevel`
+
+## Deploying Skylake
+
+`make skylake` is fully wired via `deploy.nodes.skylake` in `flake.nix` and works unattended (no TTY, no manual typing) — it runs `./scripts/deploy-skylake.sh`, which wraps `deploy -s .#skylake` and auto-answers the sudo prompt:
+
+```
+make skylake
+# → (sudo for 100.69.8.15) Password:   (auto-filled from machines/skylake/sudo-password)
+```
+
+How it works:
+
+- Connects to the Tailscale IP `100.69.8.15`. Port 22 on the public Hetzner IP (`157.180.77.226`) is firewalled (only nginx 80/443 is public), and `~/.ssh/config` `Host skylake` still points at that blocked IP — so a bare `ssh root@skylake` from aesop times out. The flake config overrides the hostname and passes the key explicitly.
+- SSH auth is key-based as user `misi`: `~/.ssh/id_skylake_rescue` (authorized for `misi` on skylake). No password for the SSH login itself.
+- `user = "root"` + `interactiveSudo = true`: deploy-rs rewrites the remote command to `sudo -S -p ""` and prompts for the sudo password locally via rpassword, which reads from `/dev/tty`. That means the password cannot be fed via stdin/pipe — a plain pipe into `deploy` never reaches the prompt.
+- The sudo password lives in the gitignored file `machines/skylake/sudo-password` (chmod 600, same local-secrets policy as `RESCUE.md`). `scripts/deploy-skylake.sh` runs deploy under util-linux `script` (which provides a pty) and feeds that file's content in up front: the line is queued in the pty's line discipline and consumed when rpassword opens `/dev/tty` minutes later. `script -e` propagates deploy's exit code, so `make skylake` fails correctly on activation failure.
+- Known cosmetic quirk: the password is echoed once at the top of the deploy output (the pty is in echo mode until rpassword turns echo off). Local-terminal-only exposure, same as typing it by hand.
+- On activation failure, deploy-rs revokes the deploy and rolls back to the previous generation.
 
 ## Nix Search
 

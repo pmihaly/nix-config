@@ -11,9 +11,10 @@ ports 80/443. Everything else stays tailnet-only.
 | `homer-public.skylake.mihaly.codes` | **public Homer** dashboard    | same instance, subdomain name                                                                                                                                      |
 | `it-tools.skylake.mihaly.codes`     | it-tools (IT tool collection) |                                                                                                                                                                    |
 | `files.skylake.mihaly.codes`        | public copyparty              | anonymous `rwmd` share; in-browser video player with audio/subtitle track selection (patched copyparty + `video-tracks.js` plugin, see `modules/nixos/copyparty/`) |
+| `ntfy.skylake.mihaly.codes`         | ntfy push notifications       | self-hosted [ntfy](https://docs.ntfy.sh), in-memory (no storage), default read-write topics (ntfy.sh model) — see `modules/nixos/ntfy/`                            |
 
-The public Homer board lists the two public services (it-tools, public
-files); the private Homer board (on the tailnet) lists the rest.
+The public Homer board lists the public services (it-tools, public files,
+ntfy); the private Homer board (on the tailnet) lists the rest.
 
 ## Tailnet
 
@@ -44,6 +45,7 @@ homer, homer-public) are only reachable from the `tailscale0` interface.
 - `homer-public.skylake.mihaly.codes` + `skylake.mihaly.codes` (one cert)
 - `it-tools.skylake.mihaly.codes`
 - `files.skylake.mihaly.codes`
+- `ntfy.skylake.mihaly.codes`
 - Account: `mihaly@mihaly.codes`
 
 First activation with a new cert name orders a new certificate; until
