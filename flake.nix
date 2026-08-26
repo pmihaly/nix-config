@@ -225,6 +225,7 @@
             nixpkgs.overlays = [
               inputs.nur.overlays.default
               inputs.copyparty.overlays.default
+              (import ./modules/nixos/copyparty/overlay.nix)
             ];
           }
           {
@@ -270,6 +271,7 @@
             nixpkgs.overlays = [
               inputs.nur.overlays.default
               inputs.copyparty.overlays.default
+              (import ./modules/nixos/copyparty/overlay.nix)
             ];
           }
           {

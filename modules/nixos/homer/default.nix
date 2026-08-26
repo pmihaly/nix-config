@@ -52,7 +52,8 @@ let
         title = title;
         services = mappedServices;
         footer = false;
-      } // homerConfig;
+      }
+      // homerConfig;
 
       container = {
         image = "docker.io/b4bz/homer:${getDockerVersionFromShield inputs.homer-shield}";
@@ -62,7 +63,10 @@ let
         ]
         ++ logoVolumes;
         # SUBFOLDER omitted entirely when serving at / — the image default.
-        environment = { INIT_ASSETS = "0"; } // (optionalAttrs (subfolder != null) { SUBFOLDER = subfolder; });
+        environment = {
+          INIT_ASSETS = "0";
+        }
+        // (optionalAttrs (subfolder != null) { SUBFOLDER = subfolder; });
       };
     in
     mkService {

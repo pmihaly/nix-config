@@ -46,6 +46,33 @@ let
   # preStart creates both it and the volume root — the tmpfiles `d`
   # rules are the boot-time self-healing safety net only.
 
+  # Video tracks: pkgs.copyparty on this machine is the PATCHED build
+  # (modules/nixos/copyparty/overlay.nix shadows the upstream flake
+  # overlay; the patch adds ?th=json|mp4|vtt:K conversion endpoints, see
+  # patches/video-tracks.patch). The client side is a self-contained
+  # vanilla-JS plugin (video-tracks.js) served from a read-only [/plug]
+  # volume (a store dir, so anonymous users on the public instance can
+  # never modify it) and injected into every file-browser page via
+  # --js-browser (the URL is nonce-wrapped by copyparty's template).
+  #
+  # Every volume gets an explicit `hist:` — copyparty forbids two
+  # volumes sharing one hist dir, and a volume whose default
+  # <vol>/.hist sits inside a read-only store dir would fail to create
+  # it. The public instance's main hist is additionally moved OUT of
+  # the anonymously-writable volume on purpose: with rwmd, any visitor
+  # could overwrite <vol>/.hist/vr/*.json (cache of track metadata that
+  # the plugin JSON.parses and renders) — cache poisoning = XSS. Outside
+  # the volume (copyparty-owned 0700 dir) it is unreachable via HTTP.
+
+  # Read-only volume dir that serves the plugin. The store path changes
+  # when video-tracks.js changes → the confs (which embed it) change →
+  # restartTriggers restarts both units.
+  plugDir = pkgs.runCommand "copyparty-video-tracks" { }
+    ''
+    mkdir -p $out
+    cp ${./video-tracks.js} $out/video-tracks.js
+    '';
+
   # The private password is injected at startup by replace-secret from the
   # agenix materialized file, so it never lands in the Nix store or the
   # unit file (pattern from the copyparty flake module). A *password*
@@ -57,6 +84,7 @@ let
     i: 0.0.0.0
     p: 3210
     no-reload
+    js-browser: /plug/video-tracks.js
 
     [accounts]
     ${vars.username}: {{copyparty-private}}
@@ -72,6 +100,13 @@ let
     hist: ${storage}/Services/copyparty
     nohash: .iso$
     scan: 60
+
+    [/plug]
+    ${plugDir}
+    accs: 
+    r: *
+    flags: 
+    hist: ${storage}/Services/copyparty-plug
   '';
 
   # Anonymous rwmd (read/write/move/delete, no admin, no dotfiles).
@@ -94,6 +129,7 @@ let
     i: 127.0.0.1
     p: 3211
     no-reload
+    js-browser: /plug/video-tracks.js
 
     [/]
     ${storage}/Public
@@ -107,6 +143,16 @@ let
     scan: 60
     vmaxb: 100g
     vmaxn: 100k
+    # Kept OUT of the rwmd volume: see the header comment (cache
+    # poisoning = XSS).
+    hist: ${storage}/Services/copyparty-public-hist
+
+    [/plug]
+    ${plugDir}
+    accs: 
+    r: *
+    flags: 
+    hist: ${storage}/Services/copyparty-public-plug
   '';
 in
 {
@@ -130,8 +176,11 @@ in
 
       systemd.tmpfiles.rules = [
         "d ${storage}/Services/copyparty 0700 root root -"
+        "d ${storage}/Services/copyparty-plug 0700 root root -"
         "d ${storage}/Public 0755 copyparty copyparty -"
         "d ${storage}/Services/copyparty-public 0700 copyparty copyparty -"
+        "d ${storage}/Services/copyparty-public-hist 0700 copyparty copyparty -"
+        "d ${storage}/Services/copyparty-public-plug 0700 copyparty copyparty -"
       ];
     }
 
@@ -150,8 +199,9 @@ in
           ${pkgs.replace-secret}/bin/replace-secret '{{copyparty-private}}' ${
             config.age.secrets."server/copyparty-misi".path
           } /run/copyparty-private/copyparty.conf
-          # Hist dir (deterministic; the tmpfiles `d` rule heals at boot).
+          # Hist dirs (deterministic; the tmpfiles `d` rules heal at boot).
           install -d -m 0700 ${storage}/Services/copyparty
+          install -d -m 0700 ${storage}/Services/copyparty-plug
         '';
         serviceConfig = {
           User = "root";
@@ -181,6 +231,8 @@ in
           # (both parents are root-owned).
           install -d -m 0755 -o copyparty -g copyparty ${storage}/Public
           install -d -m 0700 -o copyparty -g copyparty ${storage}/Services/copyparty-public
+          install -d -m 0700 -o copyparty -g copyparty ${storage}/Services/copyparty-public-hist
+          install -d -m 0700 -o copyparty -g copyparty ${storage}/Services/copyparty-public-plug
         '';
         serviceConfig = {
           User = "copyparty";

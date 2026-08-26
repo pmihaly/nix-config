@@ -5,12 +5,12 @@ ports 80/443. Everything else stays tailnet-only.
 
 ## What is public
 
-| Hostname | Service | Notes |
-| --- | --- | --- |
-| `skylake.mihaly.codes` | **public Homer** dashboard | apex, served by the `homer-public` default_server vhost |
-| `homer-public.skylake.mihaly.codes` | **public Homer** dashboard | same instance, subdomain name |
-| `it-tools.skylake.mihaly.codes` | it-tools (IT tool collection) | |
-| `files.skylake.mihaly.codes` | public copyparty | token in `secrets/server/copyparty-misi.age` |
+| Hostname                            | Service                       | Notes                                                   |
+| ----------------------------------- | ----------------------------- | ------------------------------------------------------- |
+| `skylake.mihaly.codes`              | **public Homer** dashboard    | apex, served by the `homer-public` default_server vhost |
+| `homer-public.skylake.mihaly.codes` | **public Homer** dashboard    | same instance, subdomain name                           |
+| `it-tools.skylake.mihaly.codes`     | it-tools (IT tool collection) |                                                         |
+| `files.skylake.mihaly.codes`        | public copyparty              | anonymous `rwmd` share; in-browser video player with audio/subtitle track selection (patched copyparty + `video-tracks.js` plugin, see `modules/nixos/copyparty/`) |
 
 The public Homer board lists the two public services (it-tools, public
 files); the private Homer board (on the tailnet) lists the rest.
