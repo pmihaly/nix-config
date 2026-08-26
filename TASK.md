@@ -289,13 +289,14 @@ separate backend service) until `creds.json` exists.
 
 ## Remaining user steps
 
-1. **WhatsApp one-time DM pairing:** send yourself a message on WhatsApp
-   (self-chat). The bot replies with a pairing code; approve it once
-   (dashboard → pairing, or `hermes pairing approve whatsapp <code>`).
-   After that, self-chat messages reach the agent.
-2. LLM end-to-end sanity (optional): chat in the browser dashboard, or on
-   skylake `sudo runuser -u hermes -- <hermes-bin> -z "ping"` (answers via
-   aesop llama-swap).
+1. ~~WhatsApp one-time DM pairing~~ — **done** (2026-08-26): self-chat
+   message triggered the handshake, the code was approved via
+   `hermes pairing approve whatsapp` (user "Mihaly", persisted in the
+   PairingStore JSON under `$HERMES_HOME`). Self-chat messages now reach
+   the agent.
+2. LLM end-to-end sanity (optional): send a self-chat message and check
+   the agent answers via aesop llama-swap, or chat in the browser
+   dashboard.
 
 ## Already verified live (2026-08-26, post re-enable)
 
@@ -307,6 +308,8 @@ separate backend service) until `creds.json` exists.
   for tailnet sources (loopback source → 403, ACL working).
 - `$HERMES_HOME/.env` = `WHATSAPP_ENABLED=true`; session tree owner
   `hermes:hermes`.
+- DM pairing approved (1 user, whatsapp platform) — no pending requests;
+  approval persists across deploys.
 
 ## Git state
 
