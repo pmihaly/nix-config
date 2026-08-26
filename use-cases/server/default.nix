@@ -44,10 +44,15 @@ optionalAttrs platform.isLinux {
         copyparty.enable = true;
         ntfy.enable = true;
         hermes-agent.enable = true;
-        # WhatsApp platform: off for now (reset after a botched
-        # pairing). To (re-)enable: set to true, deploy, then pair
-        # again — the bridge mirror and npm deps survive on /persist.
-        # hermes-agent.whatsapp = true;
+        # WhatsApp platform (self-chat mode). Paired 2026-08-26 via the
+        # dashboard — session creds live in
+        # /persist/opt/skylake-services/hermes/.hermes/platforms/whatsapp/session,
+        # so the gateway reconnects without a fresh QR. To reset:
+        # set to false, deploy, remove the stale WHATSAPP_ENABLED line
+        # from $HERMES_HOME/.env, wipe the session dir, restart
+        # hermes-agent (see the WhatsApp section in modules/nixos/
+        # hermes-agent/default.nix).
+        hermes-agent.whatsapp = true;
       };
     }
 

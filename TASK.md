@@ -5,15 +5,15 @@ Research) on skylake, declaratively via Nix, state under `/persist`, Web UI
 exposed **internally** (tailnet only, no login), LLM backend =
 **llama-swap on aesop**.
 
-## Status: DEPLOYED & VERIFIED (2026-08-26) — WhatsApp reset (off)
+## Status: DEPLOYED & VERIFIED (2026-08-26) — WhatsApp PAIRED & ENABLED
 
 Everything is live on skylake: login-free dashboard behind the tailnet-only
 `/hermes` proxy (blank-page fix in), llama-swap backend. **WhatsApp is
-armed-off**: a botched pairing left a half-linked state (Web UI said
-"connected", phone showed nothing, bridge got logged out), so it was
-reset — config flag off, session/creds wiped, gateway up with **no
-messaging platforms** (see WhatsApp section for the reset + re-pairing
-recipe).
+paired and armed**: the QR pairing succeeded (creds saved to the canonical
+session path), the `whatsapp` flag is on, and the gateway's bridge
+reconnected with the saved session — **no second QR needed** (bridge.log:
+"✅ WhatsApp connected!"). One step left for the user: the one-time **DM
+pairing approval** (see Remaining user steps).
 
 The first deployed revision had a **blank white page**: the `/hermes` nginx
 location double-slashed upstream URIs (`//assets/…`), so the SPA catch-all
@@ -168,7 +168,31 @@ Gotchas (verified against hermes 0.20.5 source + live tests on skylake):
 - `hermes-backend.service` — dashboard:
   `hermes dashboard --host 127.0.0.1 --port 9119 --no-open`, user `hermes`.
 
-## WhatsApp support (added 2026-08-26) — currently OFF (reset 2026-08-26)
+## WhatsApp support (added 2026-08-26) — PAIRED & ENABLED (2026-08-26)
+
+### Final state (after reset + re-pair, verified live)
+
+- `hermes-agent.whatsapp = true` in `use-cases/server/default.nix`;
+  `$HERMES_HOME/.env` = `WHATSAPP_ENABLED=true`.
+- Pairing via **dashboard QR** after the reset linked cleanly (phone shows
+  "hermes" under linked devices). Full Baileys session (creds + 1300+ auth
+  files) in `$HERMES_HOME/platforms/whatsapp/session/`, owner `hermes`.
+- Post-deploy gateway (PID 85530) loaded the adapter, spawned the bridge as
+  a child (`node bridge.js --port 3000 --session …/whatsapp/session
+  --mode self-chat`); `bridge.log` → "✅ WhatsApp connected!" 18:20:06.
+  Stable — no restart loop. Proctitle quirk: the bridge process shows as
+  `node-MainThread`, so `pgrep -x node` does not match it.
+- The "enabled but not paired" message seen after scanning was **stale**
+  (last emitted 17:56, pre-reset). The post-reset gateway had the platform
+  off entirely — pairing had succeeded, but the flag was still off.
+- DM layer: policy `pairing` (default), empty allowlist → first
+  self-chat message triggers the DM pairing handshake (bot replies with a
+  pairing code; approve once). Approved users persist in the PairingStore
+  JSON under `$HERMES_HOME` — survives deploys (only `.env` is rewritten
+  by the upstream state script).
+- The dashboard onboarding session is in-memory in `hermes-backend`;
+  the deploy restart dropped it, so the UI's "Apply" step is gone. The
+  gateway-side pairing handshake is the remaining path (no new QR).
 
 ### Why the bridge mirror exists
 
@@ -248,44 +272,47 @@ separate backend service) until `creds.json` exists.
   while `whatsapp = true`, but the npm deps survive either way, so no
   2-minute `npm install` before pairing.
 
-### To (re-)enable and pair
+### To reset / (re-)enable
 
-1. `use-cases/server/default.nix`: uncomment
-   `hermes-agent.whatsapp = true;` (the line is there, commented).
-2. `make skylake`.
-3. Pair — dashboard → WhatsApp → QR, **or** the pairing-code flow
-   (phone: Settings → Linked devices → Link with pairing code). Codes
-   expire ~3 min after issuance (401), so the phone must enter one in
-   time.
-4. While enabled but unpaired: the gateway restart-loops (harmless, see
-   above) until `creds.json` exists; then it connects on its own.
-5. If a pairing goes sideways again: reset = flip the flag off, deploy,
-   remove the stale `WHATSAPP_ENABLED` line from `$HERMES_HOME/.env`
-   (the gotcha above), `rm -rf $HERMES_HOME/platforms/whatsapp`, restart
-   `hermes-agent`.
+- **Reset** (if a pairing goes sideways): flip `hermes-agent.whatsapp`
+  to `false`, `make skylake`, remove the stale `WHATSAPP_ENABLED` line
+  from `$HERMES_HOME/.env` (the gotcha above),
+  `rm -rf $HERMES_HOME/platforms/whatsapp`, restart `hermes-agent`.
+- **(Re-)enable**: flag `true` + `make skylake`; pair via dashboard QR
+  (pairing-code-flow codes expire ~3 min server-side). While enabled but
+  unpaired the gateway exit-78 restart-loops (harmless) until
+  `creds.json` exists; then it connects on its own.
+- **One-time DM pairing** (the remaining step): send yourself a message
+  on WhatsApp → the bot replies with a pairing code → approve:
+  `sudo runuser -u hermes -- <hermes-bin> pairing approve whatsapp <code>`
+  (or dashboard → pairing). Approved users persist across deploys.
 
 ## Remaining user steps
 
-1. **WhatsApp (optional, when wanted):** re-pair via the recipe above —
-   the config is off and the slate is clean; nothing is pending.
-2. LLM end-to-end sanity (optional): on skylake
-   `sudo runuser -u hermes -- /nix/store/…-hermes-agent-0.20.5/bin/hermes -z "ping"`
-   (answers via aesop llama-swap), or just chat in the browser dashboard.
+1. **WhatsApp one-time DM pairing:** send yourself a message on WhatsApp
+   (self-chat). The bot replies with a pairing code; approve it once
+   (dashboard → pairing, or `hermes pairing approve whatsapp <code>`).
+   After that, self-chat messages reach the agent.
+2. LLM end-to-end sanity (optional): chat in the browser dashboard, or on
+   skylake `sudo runuser -u hermes -- <hermes-bin> -z "ping"` (answers via
+   aesop llama-swap).
 
-## Already verified live (2026-08-26, post-reset)
+## Already verified live (2026-08-26, post re-enable)
 
-- `systemctl is-active hermes-agent hermes-backend` → active/active,
-  gateway up **without** any messaging platform ("No messaging platforms
-  enabled.").
-- Dashboard `/api/health` → 200; `HERMES_DASHBOARD_READY port=9119` in
-  `hermes-backend` log.
-- Via the ts.net name: `/hermes/` → 200 with
-  `__HERMES_BASE_PATH__="/hermes"`; JS asset → `200 text/javascript`.
+- `systemctl is-active hermes-agent hermes-backend` → active/active.
+- WhatsApp bridge child of the gateway (PID 85653 ← 85530), session =
+  canonical path, `--mode self-chat`; `bridge.log` "✅ WhatsApp
+  connected!"; no restart loop.
+- Dashboard `/api/health` → 200 (loopback); ts.net vhost `/hermes/` → 200
+  for tailnet sources (loopback source → 403, ACL working).
+- `$HERMES_HOME/.env` = `WHATSAPP_ENABLED=true`; session tree owner
+  `hermes:hermes`.
 
 ## Git state
 
 All committed: ntfy + deploy wiring (`2c52c2c`), Hermes install incl.
 blank-page fix (`fa6b64a`), WhatsApp bridge + adapter (`45667f8`),
-`TASK.md` update (`136cd23`), WhatsApp reset + `whatsapp` flag (this
-commit). Only unrelated `modules/nixos/copyparty/UPGRADING.md` drift
-remains uncommitted.
+`TASK.md` update (`136cd23`), WhatsApp reset + `whatsapp` flag
+(`c0fd213`), WhatsApp re-enable + this `TASK.md` state (this commit).
+Only unrelated `modules/nixos/copyparty/UPGRADING.md` drift remains
+uncommitted.
