@@ -43,6 +43,7 @@ optionalAttrs platform.isLinux {
         it-tools.enable = true;
         copyparty.enable = true;
         ntfy.enable = true;
+        hermes-agent.enable = true;
       };
     }
 

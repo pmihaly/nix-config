@@ -12,5 +12,6 @@
     ./copyparty
     ./ntfy
     ./local-llm
+    ./hermes-agent
   ];
 }
