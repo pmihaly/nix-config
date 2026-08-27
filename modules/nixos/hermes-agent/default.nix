@@ -110,6 +110,25 @@ let
     npmDepsHash = "sha256-ZSvXA2Huo1YG+Q37y9gKv3dJSMafOmXAaWDW9O6X+sg=";
   };
 
+  # Wrapper that lets the agent deploy skylake itself: one ssh
+  # connection to the hermes-deploy user on aesop, whose forced command
+  # (machines/aesop/default.nix) fast-forwards a dedicated deploy
+  # checkout from this machine's checkout and runs
+  # scripts/deploy-skylake.sh — building on aesop, activating skylake
+  # remotely, exactly like `make skylake` (including rollback on
+  # failure). No shell, no other commands, no forwarding possible with
+  # that key (restrict + command=).
+  #
+  # The private key is an agenix secret at the default materialized
+  # location /run/agenix/server/skylake-deploy-ssh (hermes:hermes 400).
+  # /run/agenix.d is 751 root:keys and its generation dir likewise, so
+  # the hermes user can traverse to the file without being able to list
+  # the other secrets. known_hosts lives in the service user's home
+  # (the .ssh dir is created by the activation script below).
+  deploySkylake = pkgs.writeShellScriptBin "deploy-skylake" ''
+    exec ${pkgs.openssh}/bin/ssh -o BatchMode=yes -o ConnectTimeout=15 -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=${hermesCfg.stateDir}/.ssh/known_hosts -i /run/agenix/server/skylake-deploy-ssh hermes-deploy@aesop.anaconda-snapper.ts.net deploy
+  '';
+
   # Lite model profile for skylake (2 vCPU / 4 GB). The repo defaults
   # (llm.ts) are Qwen3-Embedding-4B + Qwen3-Reranker-4B plus a 1.7B
   # query-expansion model — far too big for this box. The first two
@@ -138,6 +157,19 @@ let
   };
 in
 {
+  imports = [
+    # The upstream services.hermes-agent option. Importing it here —
+    # rather than in a machine's flake module list — keeps this module
+    # evaluable on every machine that imports it (modules/nixos pulls it
+    # in for all of them). The config below defines services.hermes-agent.*
+    # and a definition for an option that doesn't exist breaks evaluation
+    # even when mkIf guards it: the module system checks unmatched
+    # definitions before it discharges mkIf conditions.
+    # Upstream is inert unless services.hermes-agent.enable is set,
+    # which we do only under modules.hermes-agent.enable below.
+    inputs.hermes-agent.nixosModules.default
+  ];
+
   options.modules.hermes-agent = {
     enable = mkEnableOption "Hermes Agent (Nous Research) — agent gateway + web dashboard";
 
@@ -269,7 +301,13 @@ in
           # `nixcfg`, machines/skylake). Explicit rather than relying on
           # the transitive dep the package pulls in today, so an upstream
           # bump can't silently break that.
-          ++ [ pkgs.git ];
+          # The ssh client for the deploy wrapper (and ad-hoc tailnet use),
+          # plus the deploy wrapper itself (see deploySkylake above).
+          ++ [
+            pkgs.git
+            pkgs.openssh
+            deploySkylake
+          ];
 
         # ── QMD notes search (MCP) ────────────────────────────────────
         # Registers FlowState-QMD as a stdio MCP server the gateway
@@ -326,6 +364,27 @@ in
           host = "127.0.0.1";
           inherit port;
         };
+      };
+
+      # Private key for the deploy path (see deploySkylake above).
+      # Materialized at the default /run/agenix/server/skylake-deploy-ssh.
+      age.secrets."server/skylake-deploy-ssh" = {
+        file = ../../../secrets/server/skylake-deploy-ssh.age;
+        owner = hermesCfg.user;
+        group = hermesCfg.group;
+        mode = "400";
+      };
+
+      # known_hosts dir for the deploy wrapper's ssh (UserKnownHostsFile
+      # points at the service user's home, so accept-new can pin aesop's
+      # host key on first use).
+      system.activationScripts."hermes-deploy-ssh" = {
+        deps = [ "users" ];
+        text = ''
+          mkdir -p ${hermesCfg.stateDir}/.ssh
+          chown ${hermesCfg.user}:${hermesCfg.group} ${hermesCfg.stateDir}/.ssh
+          chmod 700 ${hermesCfg.stateDir}/.ssh
+        '';
       };
 
       # Pre-populate the WhatsApp bridge mirror in HERMES_HOME (see
