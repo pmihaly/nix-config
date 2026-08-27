@@ -212,16 +212,20 @@ in
             # dies at finish_reason=length.
             #
             # Why not pin the real 65536? hermes' compression threshold is
-            # floored at 64k, so a 65536 pin lets a session grow to ~64k
-            # before compacting — and a session that large is unrecoverable
-            # on a 64k window: the summarizer must re-read the middle of the
-            # history, which no longer fits. Pinning 49152 makes the
-            # threshold trip at 85% of the window (~41.8k): turns always fit
-            # the real context even when a compression attempt times out,
-            # and the compression prompt itself stays small enough to
-            # prefill inside hermes' 120s no-progress timer on this slow
-            # (partly CPU-offloaded) backend.
-            context_length = 49152;
+            # floored at 64k (MINIMUM_CONTEXT_LENGTH), so a 65536 pin lets a
+            # session grow to ~64k before compacting — and a session that
+            # large is unrecoverable on a 64k window: the summarizer must
+            # re-read the middle of the history, which no longer fits.
+            #
+            # 64000 is the smallest value hermes accepts (agent init rejects
+            # anything below 64k). At exactly 64000 the floored threshold
+            # meets the window, which switches the trigger to 85% of the
+            # window (~54.4k): sessions compress well below the real 65,536
+            # wall, turns always fit the real context even when a compression
+            # attempt times out, and the compression prompt itself stays
+            # small enough to prefill inside hermes' 120s no-progress timer
+            # on this slow (partly CPU-offloaded) backend.
+            context_length = 64000;
           };
         };
 
