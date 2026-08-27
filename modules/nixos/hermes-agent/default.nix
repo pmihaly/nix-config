@@ -204,6 +204,15 @@ in
           model = {
             default = "Qwen3.8-27B Q4 +MTP";
             provider = "custom:local";
+            # Must match llama-server's real --ctx-size (the models preset in
+            # modules/nixos/local-llm). Without this pin, hermes can't probe
+            # the custom endpoint and falls back to the catalog default for
+            # "qwen" (131,072) — double the real window. The context
+            # compressor never fires, the prompt outgrows the 64k context,
+            # and every response dies at finish_reason=length ("Response
+            # remained truncated after 4 continuation attempts"), because
+            # each continuation re-sends the oversized history.
+            context_length = 65536;
           };
         };
 
