@@ -555,34 +555,36 @@ general aesop access**:
   conflicting way — then copies the gitignored
   `machines/skylake/sudo-password` in and runs the same
   `scripts/deploy-skylake.sh` as `make skylake` (build on aesop,
-  activate skylake remotely, rollback on failure). The main aesop
-  checkout is never written to.
-- **aesop** (`machines/aesop/default.nix`): the user, `deploy-rs` +
+  activate skylake remotely, rollback on failure). It fetches the
+  skylake checkout's `HEAD` (whatever branch hermes is on — the
+  skylake checkout is on `master`, not `vibecode`), ff-only. The main
+  aesop checkout is never written to.
+- **aesop** (`machines/aesop/default.nix`): the user (home
+  `/var/lib/hermes-deploy`, so ssh can pin host keys), `deploy-rs` +
   `git` + `openssh` in `systemPackages` (the script also pins its own
   PATH — sshd_config has no Path option; the first build attempt
   proved it), traverse-only ACLs for
   `hermes-deploy` on `/home/misi` and `/home/misi/.ssh` (tmpfiles +
-  activation self-heal; the two read files are `hermes-deploy` 640,
-  one-time chgrp/chmod noted in the file), and an activation script
-  that inits the deploy checkout once (idempotent).
+  activation self-heal), and an activation script that inits the
+  deploy checkout once AND self-heals the group-read permissions
+  (640 hermes-deploy) on the two files it reads — no manual one-time
+  steps.
 - **skylake** (`modules/nixos/hermes-agent`): `deploy-skylake`
   wrapper on the hermes service PATH (pins ssh + key +
-  `UserKnownHostsFile=$HERMES_HOME/../.ssh/known_hosts`,
-  `BatchMode`) — the agent just runs `deploy-skylake` from the
-  checkout; `.ssh` dir is created by an activation script.
+  `UserKnownHostsFile=<stateDir>/.ssh/known_hosts`, `BatchMode`) —
+  the agent just runs `deploy-skylake` from the checkout; `.ssh` dir
+  is created by an activation script.
 
 Docs: AGENTS.md "Deploying Skylake → Deploying from skylake (hermes)".
 
-**One-time steps the user must run on aesop after the next aesop
-rebuild** (group must exist first):
+**No manual steps** — the `hermes-deploy-repo` activation script does
+the group/chmod (idempotent) on every aesop activation.
 
-```
-chgrp hermes-deploy /home/misi/.nix-config/machines/skylake/sudo-password && chmod 640 /home/misi/.nix-config/machines/skylake/sudo-password
-chgrp hermes-deploy /home/misi/.ssh/id_skylake_rescue && chmod 640 /home/misi/.ssh/id_skylake_rescue
-```
-
-Status: committed; aesop toplevel build + eval of both machines pass;
-goes live with the next `make skylake` (skylake side) and the next
-aesop rebuild (aesop side — the forced command is inert on skylake
-until then, and hermes-deploy can't do anything until the user's
-rebuild).
+Status: **skylake half is live** (deployed 2026-08-27, verified on the
+box: agenix secret readable by hermes + key matches the aesop
+authorized key, `.ssh` in place, `deploy-skylake` on the service
+PATH, services restarted OK). The **aesop half goes live with the
+next aesop rebuild** (`nixos-rebuild switch` on aesop) — until then
+the `hermes-deploy` user doesn't exist there and the wrapper's ssh
+just fails. After that rebuild, the path is end-to-end usable:
+hermes commits in its checkout and runs `deploy-skylake`.

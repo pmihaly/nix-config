@@ -146,7 +146,12 @@
   users.users."hermes-deploy" = {
     isSystemUser = true;
     group = "hermes-deploy";
-    home = "/nonexistent";
+    # Real home (the deploy checkout lives under it) so ssh can pin host
+    # keys in ~/.ssh/known_hosts on first use — the activation script
+    # creates the dir; createHome stays off so NixOS doesn't pre-create
+    # an empty one.
+    home = "/var/lib/hermes-deploy";
+    createHome = false;
     shell = pkgs.bash;
     openssh.authorizedKeys.keys = [
       # restrict = no-pty, no agent/port/X11 forwarding, no rhosts.
@@ -166,10 +171,10 @@
 
   # hermes-deploy must read two files inside the 0700 home without being
   # able to list it (or .ssh): the gitignored sudo password and the
-  # id_skylake_rescue key. Both are chgrp'd to hermes-deploy + 640
-  # (one-time on-disk steps below, files persist); the ACLs grant traverse
-  # only, re-applied on every activation (the mask on a 0700 home
-  # collapses to --- whenever the home is re-chmod'ed).
+  # id_skylake_rescue key. Both are chgrp'd to hermes-deploy + 640 by the
+  # hermes-deploy-repo activation script below (idempotent, self-healing);
+  # the ACLs grant traverse only, re-applied on every activation (the mask
+  # on a 0700 home collapses to --- whenever the home is re-chmod'ed).
   systemd.tmpfiles.rules = [
     "a /home/misi - - - - u:hermes-deploy:x,m::x"
     "a /home/misi/.ssh - - - - u:hermes-deploy:x,m::x"
@@ -179,25 +184,33 @@
     ${pkgs.acl}/bin/setfacl -m u:hermes-deploy:x,m::x /home/misi/.ssh
   '';
 
-  # One-time on-disk steps (misi-owned files; persist across rebuilds).
-  # Run after this config is first activated (the group must exist):
-  #   chgrp hermes-deploy /home/misi/.nix-config/machines/skylake/sudo-password
-  #   chmod 640 /home/misi/.nix-config/machines/skylake/sudo-password
-  #   chgrp hermes-deploy /home/misi/.ssh/id_skylake_rescue
-  #   chmod 640 /home/misi/.ssh/id_skylake_rescue
-
   # Dedicated deploy checkout, ff-only synced from the skylake checkout
   # by scripts/hermes-deploy.sh (never force-pushed, never rewritten).
+  # Also self-heals the group-read permissions on the two files the
+  # script reads inside misi's home (no manual one-time steps).
   system.activationScripts."hermes-deploy-repo" = {
     deps = [ "users" ];
     # No `path` attribute on activation scripts — pin the store git.
     text = ''
-      mkdir -p /var/lib/hermes-deploy
-      chown hermes-deploy:hermes-deploy /var/lib/hermes-deploy
-      chmod 700 /var/lib/hermes-deploy
+      # Group-read the two files hermes-deploy needs (idempotent).
+      if [ -f /home/misi/.ssh/id_skylake_rescue ]; then
+        chgrp hermes-deploy /home/misi/.ssh/id_skylake_rescue
+        chmod 640 /home/misi/.ssh/id_skylake_rescue
+      fi
+      if [ -f /home/misi/.nix-config/machines/skylake/sudo-password ]; then
+        chgrp hermes-deploy /home/misi/.nix-config/machines/skylake/sudo-password
+        chmod 640 /home/misi/.nix-config/machines/skylake/sudo-password
+      fi
+      # Home + .ssh so the first ssh (git fetch / deploy-rs) can pin host
+      # keys, then init the checkout once (owned by hermes-deploy; the
+      # first fetch happens on hermes's first deploy).
+      mkdir -p /var/lib/hermes-deploy/.ssh
+      chown -R hermes-deploy:hermes-deploy /var/lib/hermes-deploy
+      chmod 700 /var/lib/hermes-deploy /var/lib/hermes-deploy/.ssh
       if [ ! -d /var/lib/hermes-deploy/nix-config/.git ]; then
         ${pkgs.git}/bin/git init -q /var/lib/hermes-deploy/nix-config
         ${pkgs.git}/bin/git -C /var/lib/hermes-deploy/nix-config remote add origin ssh://misi@100.69.8.15/home/misi/.nix-config
+        chown -R hermes-deploy:hermes-deploy /var/lib/hermes-deploy/nix-config
       fi
     '';
   };
