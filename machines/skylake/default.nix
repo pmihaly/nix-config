@@ -53,6 +53,24 @@
           logo = ../../modules/nixos/ntfy/ntfy.svg;
           url = "https://ntfy.${vars.publicDomainName}";
         };
+        # Cross-link to the private (tailnet-only) board. Only resolvable
+        # from the tailnet — visitors on the internet get a dead link, which
+        # is intended.
+        Dashboards."Private Dashboard" = {
+          logo = ../../modules/nixos/homer/homer.svg;
+          url = "http://${vars.domainName}/homer/";
+        };
+      };
+    };
+
+    # Cross-link on the private (tailnet) board to the public board.
+    # Everything else on the private board arrives via each service's
+    # mkService `dashboard` self-registration; this static group is the
+    # single entry that doesn't.
+    homer.services = {
+      Dashboards."Public Dashboard" = {
+        logo = ../../modules/nixos/homer/homer.svg;
+        url = "https://${vars.publicDomainName}/";
       };
     };
 
