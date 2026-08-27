@@ -279,7 +279,6 @@
           inputs.nixvim.nixosModules.nixvim
           inputs.stylix.nixosModules.stylix
           inputs.musnix.nixosModules.musnix
-          inputs.hermes-agent.nixosModules.default
           {
             nixpkgs.overlays = [
               inputs.nur.overlays.default

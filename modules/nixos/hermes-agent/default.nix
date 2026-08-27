@@ -138,6 +138,19 @@ let
   };
 in
 {
+  imports = [
+    # The upstream services.hermes-agent option. Importing it here —
+    # rather than in a machine's flake module list — keeps this module
+    # evaluable on every machine that imports it (modules/nixos pulls it
+    # in for all of them). The config below defines services.hermes-agent.*
+    # and a definition for an option that doesn't exist breaks evaluation
+    # even when mkIf guards it: the module system checks unmatched
+    # definitions before it discharges mkIf conditions.
+    # Upstream is inert unless services.hermes-agent.enable is set,
+    # which we do only under modules.hermes-agent.enable below.
+    inputs.hermes-agent.nixosModules.default
+  ];
+
   options.modules.hermes-agent = {
     enable = mkEnableOption "Hermes Agent (Nous Research) — agent gateway + web dashboard";
 
