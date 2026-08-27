@@ -507,3 +507,24 @@ and `skylake-boot-debug.md` untouched.
 Push path to GitHub: from aesop (the skylake checkout has no push
 credential; hermes commits land in the local checkout and get pushed
 from aesop, or synced via a bundle when needed).
+
+### Evaluation regression on aesop + fix (2026-08-27)
+
+The wrapper's `services.hermes-agent.*` definitions (guarded by `mkIf
+modules.hermes-agent.enable`) broke evaluation on **every** machine that
+imports `modules/nixos` without the upstream module — aesop first hit it.
+The module system checks definitions for option existence *before*
+discharging `mkIf` conditions (the `mkIf`/`mkMerge` wrappers are lazy
+markers; the inner config is collected regardless), so a guarded
+definition of a non-existent option still throws in
+`checkUnmatchedOptions`. The upstream `services.hermes-agent` option only
+existed on skylake (imported in the flake module list).
+
+Fix (`092faf6`): import `inputs.hermes-agent.nixosModules.default`
+inside the wrapper's `imports`, and drop the flake-level import — the
+upstream module is inert unless `services.hermes-agent.enable` is set
+(which only happens under `modules.hermes-agent.enable`), so it is safe
+everywhere; keeping both import paths fails with "option already
+declared". Verified: aesop and skylake toplevels both evaluate. The
+running aesop generation predates the wrapper, so nothing live was
+broken — this unblocks the next aesop rebuild.
