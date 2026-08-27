@@ -242,7 +242,12 @@ in
           # (see the postInstall above), so no PATH dependency; node
           # stays on the service PATH anyway for ad-hoc use.
           ++ (optional cfg.qmdMemory qmd)
-          ++ (optional cfg.qmdMemory pkgs.nodejs-slim);
+          ++ (optional cfg.qmdMemory pkgs.nodejs-slim)
+          # The agent edits the nix-config checkout on skylake (group
+          # `nixcfg`, machines/skylake). Explicit rather than relying on
+          # the transitive dep the package pulls in today, so an upstream
+          # bump can't silently break that.
+          ++ [ pkgs.git ];
 
         # ── QMD notes search (MCP) ────────────────────────────────────
         # Registers FlowState-QMD as a stdio MCP server the gateway

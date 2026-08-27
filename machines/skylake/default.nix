@@ -83,6 +83,38 @@
 
   users.mutableUsers = false;
 
+  # The hermes agent (system user `hermes`, modules.hermes-agent) edits
+  # this repo's checkout at /home/misi/.nix-config. The checkout itself is
+  # a plain git clone on the persistent /home (not Nix-managed); Nix
+  # manages the group that owns it, hermes's membership in it, and the ACL
+  # that lets hermes traverse the 0700 /home/misi. One-time on-disk steps
+  # already applied (persist; survive rebuilds) — re-run
+  # scripts/nixcfg-heal.sh after any pull/commit done by root or misi, who
+  # would otherwise create files without the group write bit:
+  #   chgrp -R nixcfg /home/misi/.nix-config
+  #   chmod -R g+rwX /home/misi/.nix-config
+  #   find /home/misi/.nix-config -type d -exec chmod g+s {} +
+  #   git -C /home/misi/.nix-config config core.sharedRepository group
+  users.groups.nixcfg = { };
+  users.users.hermes.extraGroups = [ "nixcfg" ];
+  systemd.tmpfiles.rules = [
+    # Traverse /home/misi without listing it, to reach .nix-config.
+    # Column order is Type Path Mode User Group Age Argument — five dashes,
+    # then the ACL (one dash short puts the ACL in the Age column).
+    # m::x is explicit: without it the mask collapses to the file's group
+    # bits (--- on this 0700 home), making the named entry ineffective.
+    "a /home/misi - - - - u:hermes:x,m::x"
+  ];
+
+  # Git refuses to operate on a repo owned by another user ("dubious
+  # ownership"). The checkout is owned by misi but edited by the hermes
+  # system user (and occasionally root), so whitelist it in the system
+  # git config — safe.directory is only honored in system/global config.
+  environment.etc."gitconfig".text = ''
+    [safe]
+        directory = /home/misi/.nix-config
+  '';
+
   # /root is NOT in the persistence list (only /home is), so /root/.ssh vanishes
   # on every boot (root = tmpfs). Declare the key here so it is recreated from
   # the store each activation. (2026-08-23: after the migration to the new
