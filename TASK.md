@@ -467,3 +467,43 @@ search (this commit: flake input + lock, derivation + vendored lockfile,
 ops wiring, `TASK.md`).
 Only unrelated `modules/nixos/copyparty/UPGRADING.md` drift remains
 uncommitted.
+
+## hermes agent: edit access to the nix-config checkout (2026-08-27)
+
+The hermes system user edits the live checkout at `/home/misi/.nix-config`
+on skylake directly (per user request — no GitHub token/PR flow).
+
+Nix-managed (`machines/skylake`):
+- `nixcfg` group owns the checkout; `hermes` is a member.
+- tmpfiles ACL: `a /home/misi - - - - u:hermes:x,m::x` — traverse the
+  0700 home dir (x only, no listing). Two gotchas hit: column order is
+  `Type Path Mode User Group Age Argument` (five dashes before the ACL —
+  one short puts the ACL in the Age column), and the mask must be
+  explicit (`m::x`) or it collapses to the file's group bits (`---`),
+  making the named entry ineffective.
+- `/etc/gitconfig` carries `safe.directory = /home/misi/.nix-config`
+  (git's dubious-ownership check; only honored in system/global config).
+- `pkgs.git` on the hermes service PATH (`modules/nixos/hermes-agent`).
+
+On-disk (persistent /home, NOT in Nix): `chgrp -R nixcfg`,
+`chmod -R g+rwX`, setgid on all dirs, `core.sharedRepository=group` —
+scripted in `scripts/nixcfg-heal.sh`. Re-run it after any pull/commit by
+root or misi (their umask drops the group write bit on new files).
+
+Verified as `hermes`: cd into the checkout, file write, `git status` —
+all work.
+
+Repo topology gotcha (found while doing this): the skylake checkout sat
+on `master` at `d5b93e8` (swapfile commit) — the merge-base of the
+deployed `vibecode` line (`d5b93e8 → … → 4994dc4 (GitHub master) → … →
+da5a3ac → d029399`). The checkout's 14-file uncommitted WIP turned out
+to be fully subsumed by the deployed line (earlier sessions had committed
+the same work) — the only genuinely new hunk (nginx `allowedTCPPorts +22`)
+pre-dated the tailnet-only SSH hardening and was reverted as a security
+regression. Checkout is now clean at the deployed commit; untracked
+`RECOVERY.md`/`RESCUE.md` (gitignored secret docs, out of git by policy)
+and `skylake-boot-debug.md` untouched.
+
+Push path to GitHub: from aesop (the skylake checkout has no push
+credential; hermes commits land in the local checkout and get pushed
+from aesop, or synced via a bundle when needed).
