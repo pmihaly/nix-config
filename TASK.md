@@ -188,7 +188,7 @@ Gotchas (verified against hermes 0.20.5 source + live tests on skylake):
   files) in `$HERMES_HOME/platforms/whatsapp/session/`, owner `hermes`.
 - Post-deploy gateway (PID 85530) loaded the adapter, spawned the bridge as
   a child (`node bridge.js --port 3000 --session …/whatsapp/session
-  --mode self-chat`); `bridge.log` → "✅ WhatsApp connected!" 18:20:06.
+--mode self-chat`); `bridge.log` → "✅ WhatsApp connected!" 18:20:06.
   Stable — no restart loop. Proctitle quirk: the bridge process shows as
   `node-MainThread`, so `pgrep -x node` does not match it.
 - The "enabled but not paired" message seen after scanning was **stale**
@@ -302,7 +302,7 @@ separate backend service) until `creds.json` exists.
 
 Hermes' built-in memory = `MEMORY.md` + `USER.md` in
 `$HERMES_HOME/memories/`, loaded **in full** into the system prompt. As
-notes accumulate, QMD adds *search* over that corpus:
+notes accumulate, QMD adds _search_ over that corpus:
 
 - **Collection** `hermes-memories` → `$HERMES_HOME/memories` (the dir the
   memory tool writes to; the agent can drop extra `*.md` notes there).
@@ -474,6 +474,7 @@ The hermes system user edits the live checkout at `/home/misi/.nix-config`
 on skylake directly (per user request — no GitHub token/PR flow).
 
 Nix-managed (`machines/skylake`):
+
 - `nixcfg` group owns the checkout; `hermes` is a member.
 - tmpfiles ACL: `a /home/misi - - - - u:hermes:x,m::x` — traverse the
   0700 home dir (x only, no listing). Two gotchas hit: column order is
@@ -513,7 +514,7 @@ from aesop, or synced via a bundle when needed).
 The wrapper's `services.hermes-agent.*` definitions (guarded by `mkIf
 modules.hermes-agent.enable`) broke evaluation on **every** machine that
 imports `modules/nixos` without the upstream module — aesop first hit it.
-The module system checks definitions for option existence *before*
+The module system checks definitions for option existence _before_
 discharging `mkIf` conditions (the `mkIf`/`mkMerge` wrappers are lazy
 markers; the inner config is collected regardless), so a guarded
 definition of a non-existent option still throws in
@@ -528,3 +529,60 @@ everywhere; keeping both import paths fails with "option already
 declared". Verified: aesop and skylake toplevels both evaluate. The
 running aesop generation predates the wrapper, so nothing live was
 broken — this unblocks the next aesop rebuild.
+
+## Deploy path: hermes deploys skylake itself (2026-08-27)
+
+The agent asked to deploy its own config changes and the only path was
+`make skylake` from a human aesop session. Gave hermes a real,
+least-privilege deploy path — **one restricted ssh call, no shells, no
+general aesop access**:
+
+- **Key**: dedicated ed25519 pair; private half is agenix secret
+  `server/skylake-deploy-ssh` (skylake, materialized
+  `/run/agenix/server/skylake-deploy-ssh`, `hermes:hermes 400` —
+  hermes traverses `/run/agenix.d` (751) without listing siblings).
+  Public half is in `authorized_keys` of a new `hermes-deploy`
+  system user on **aesop** with `restrict,command=` — every
+  connection, whatever is requested, runs
+  `scripts/hermes-deploy.sh`; no pty/agent/port/X11 forwarding, no
+  rhosts.
+- **`scripts/hermes-deploy.sh`** (runs on aesop as `hermes-deploy`):
+  fast-forwards a dedicated deploy checkout
+  `/var/lib/hermes-deploy/nix-config` from the **skylake** checkout
+  (`ssh://misi@100.69.8.15/home/misi/.nix-config` — reuses
+  `id_skylake_rescue`, no new skylake authorized key) — **ff-only**,
+  aborts if the branches diverged or the worktree is dirty in a
+  conflicting way — then copies the gitignored
+  `machines/skylake/sudo-password` in and runs the same
+  `scripts/deploy-skylake.sh` as `make skylake` (build on aesop,
+  activate skylake remotely, rollback on failure). The main aesop
+  checkout is never written to.
+- **aesop** (`machines/aesop/default.nix`): the user, `deploy-rs` +
+  `git` + `openssh` in `systemPackages` (the script also pins its own
+  PATH — sshd_config has no Path option; the first build attempt
+  proved it), traverse-only ACLs for
+  `hermes-deploy` on `/home/misi` and `/home/misi/.ssh` (tmpfiles +
+  activation self-heal; the two read files are `hermes-deploy` 640,
+  one-time chgrp/chmod noted in the file), and an activation script
+  that inits the deploy checkout once (idempotent).
+- **skylake** (`modules/nixos/hermes-agent`): `deploy-skylake`
+  wrapper on the hermes service PATH (pins ssh + key +
+  `UserKnownHostsFile=$HERMES_HOME/../.ssh/known_hosts`,
+  `BatchMode`) — the agent just runs `deploy-skylake` from the
+  checkout; `.ssh` dir is created by an activation script.
+
+Docs: AGENTS.md "Deploying Skylake → Deploying from skylake (hermes)".
+
+**One-time steps the user must run on aesop after the next aesop
+rebuild** (group must exist first):
+
+```
+chgrp hermes-deploy /home/misi/.nix-config/machines/skylake/sudo-password && chmod 640 /home/misi/.nix-config/machines/skylake/sudo-password
+chgrp hermes-deploy /home/misi/.ssh/id_skylake_rescue && chmod 640 /home/misi/.ssh/id_skylake_rescue
+```
+
+Status: committed; aesop toplevel build + eval of both machines pass;
+goes live with the next `make skylake` (skylake side) and the next
+aesop rebuild (aesop side — the forced command is inert on skylake
+until then, and hermes-deploy can't do anything until the user's
+rebuild).

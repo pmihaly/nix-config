@@ -44,6 +44,23 @@ How it works:
 - Known cosmetic quirk: the password is echoed once at the top of the deploy output (the pty is in echo mode until rpassword turns echo off). Local-terminal-only exposure, same as typing it by hand.
 - On activation failure, deploy-rs revokes the deploy and rolls back to the previous generation.
 
+### Deploying from skylake (hermes)
+
+The hermes agent on skylake can deploy skylake itself — no aesop session needed. From the skylake side (as the `hermes` user, or `runuser -u hermes -- deploy-skylake` for manual testing):
+
+```
+deploy-skylake
+```
+
+What it does (all least-privilege, one restricted ssh call):
+
+- `deploy-skylake` (on the hermes service PATH, `modules/nixos/hermes-agent`) ssh's to `hermes-deploy@aesop` with a dedicated key (`server/skylake-deploy-ssh` agenix secret, materialized at `/run/agenix/server/skylake-deploy-ssh`, hermes-owned 400).
+- That key is `restrict` + `command=` only: every connection runs `scripts/hermes-deploy.sh` as a forced command — no shell, no other commands, no forwarding, no rhosts (see `machines/aesop/default.nix`).
+- `scripts/hermes-deploy.sh` (runs on aesop as `hermes-deploy`) fast-forwards a dedicated deploy checkout at `/var/lib/hermes-deploy/nix-config` from the skylake checkout (`ssh://misi@100.69.8.15/home/misi/.nix-config`), ff-only — it refuses to deploy if the branches diverged. Then it copies the gitignored `machines/skylake/sudo-password` into that checkout and runs the same `scripts/deploy-skylake.sh` as `make skylake`.
+- So: build happens on aesop, activation on skylake, same rollback-on-failure. Output streams back over the ssh connection. Deploys whatever commit is on `vibecode` in the **skylake** checkout — commit there first.
+- The main aesop checkout `/home/misi/.nix-config` is never written to by this path; hermes-deploy only reads the script and the sudo password (640 hermes-deploy, one-time chgrp/chmod noted in `machines/aesop/default.nix`).
+- Don't run `deploy-skylake` and `make skylake` at the same time — two concurrent deploy-rs runs against skylake will fight over the boot.
+
 ## Nix Search
 
 - Search packages: `nix search nixpkgs <query> 2>/dev/null | grep -i "<query>"`

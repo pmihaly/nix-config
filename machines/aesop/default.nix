@@ -132,6 +132,76 @@
     };
   };
 
+  # ------------------------------------------------------------------
+  # hermes -> skylake deploy path
+  #
+  # hermes on skylake deploys skylake by ssh'ing here as hermes-deploy.
+  # Every connection with that key runs scripts/hermes-deploy.sh as a
+  # forced command (no shell, no other commands, no forwarding): it
+  # fast-forwards a dedicated deploy checkout from the skylake checkout
+  # and runs scripts/deploy-skylake.sh — building on aesop and
+  # activating skylake remotely, exactly like `make skylake`.
+  # See AGENTS.md "Deploying Skylake".
+  users.groups."hermes-deploy" = { };
+  users.users."hermes-deploy" = {
+    isSystemUser = true;
+    group = "hermes-deploy";
+    home = "/nonexistent";
+    shell = pkgs.bash;
+    openssh.authorizedKeys.keys = [
+      # restrict = no-pty, no agent/port/X11 forwarding, no rhosts.
+      # command= forces the deploy script regardless of what is requested.
+      "restrict,command=\"/home/misi/.nix-config/scripts/hermes-deploy.sh\" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKUB8cq8NYHwWjMZVB+PYsH5uok54fEc5M/M7eMNhZ9A hermes@skylake"
+    ];
+  };
+
+  # Tools the deploy script needs on the session PATH (deploy-rs is
+  # otherwise only in misi's home packages). The script pins its own
+  # PATH too, so this is belt-and-braces.
+  environment.systemPackages = [
+    pkgs.deploy-rs
+    pkgs.git
+    pkgs.openssh
+  ];
+
+  # hermes-deploy must read two files inside the 0700 home without being
+  # able to list it (or .ssh): the gitignored sudo password and the
+  # id_skylake_rescue key. Both are chgrp'd to hermes-deploy + 640
+  # (one-time on-disk steps below, files persist); the ACLs grant traverse
+  # only, re-applied on every activation (the mask on a 0700 home
+  # collapses to --- whenever the home is re-chmod'ed).
+  systemd.tmpfiles.rules = [
+    "a /home/misi - - - - u:hermes-deploy:x,m::x"
+    "a /home/misi/.ssh - - - - u:hermes-deploy:x,m::x"
+  ];
+  system.activationScripts."hermes-deploy-traversal".text = ''
+    ${pkgs.acl}/bin/setfacl -m u:hermes-deploy:x,m::x /home/misi
+    ${pkgs.acl}/bin/setfacl -m u:hermes-deploy:x,m::x /home/misi/.ssh
+  '';
+
+  # One-time on-disk steps (misi-owned files; persist across rebuilds).
+  # Run after this config is first activated (the group must exist):
+  #   chgrp hermes-deploy /home/misi/.nix-config/machines/skylake/sudo-password
+  #   chmod 640 /home/misi/.nix-config/machines/skylake/sudo-password
+  #   chgrp hermes-deploy /home/misi/.ssh/id_skylake_rescue
+  #   chmod 640 /home/misi/.ssh/id_skylake_rescue
+
+  # Dedicated deploy checkout, ff-only synced from the skylake checkout
+  # by scripts/hermes-deploy.sh (never force-pushed, never rewritten).
+  system.activationScripts."hermes-deploy-repo" = {
+    deps = [ "users" ];
+    # No `path` attribute on activation scripts — pin the store git.
+    text = ''
+      mkdir -p /var/lib/hermes-deploy
+      chown hermes-deploy:hermes-deploy /var/lib/hermes-deploy
+      chmod 700 /var/lib/hermes-deploy
+      if [ ! -d /var/lib/hermes-deploy/nix-config/.git ]; then
+        ${pkgs.git}/bin/git init -q /var/lib/hermes-deploy/nix-config
+        ${pkgs.git}/bin/git -C /var/lib/hermes-deploy/nix-config remote add origin ssh://misi@100.69.8.15/home/misi/.nix-config
+      fi
+    '';
+  };
+
   time.timeZone = vars.timeZone;
   i18n.defaultLocale = "en_US.UTF-8";
   i18n.extraLocaleSettings = {
