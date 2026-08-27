@@ -581,11 +581,28 @@ Docs: AGENTS.md "Deploying Skylake → Deploying from skylake (hermes)".
 **No manual steps** — the `hermes-deploy-repo` activation script does
 the group/chmod (idempotent) on every aesop activation.
 
-Status: **skylake half is live** (deployed 2026-08-27, verified on the
-box: agenix secret readable by hermes + key matches the aesop
-authorized key, `.ssh` in place, `deploy-skylake` on the service
-PATH, services restarted OK). The **aesop half goes live with the
-next aesop rebuild** (`nixos-rebuild switch` on aesop) — until then
-the `hermes-deploy` user doesn't exist there and the wrapper's ssh
-just fails. After that rebuild, the path is end-to-end usable:
-hermes commits in its checkout and runs `deploy-skylake`.
+Status: **DEPLOYED & END-TO-END VERIFIED (2026-08-28)**. The aesop
+half went live via `make aesop` (scripts/switch-aesop.sh); the first
+real `deploy-skylake` run as hermes (on skylake) fetched skylake
+HEAD, built on aesop, and activated skylake — "Activation succeeded!".
+
+Two bugs the e2e run caught and fixed:
+
+1. **Group-readable key broke the owner**: the first self-heal made
+   `~/.ssh/id_skylake_rescue` 640 (group hermes-deploy) — ssh ignores
+   group-readable private keys for the owner, so misi's own ssh broke.
+   Now: the activation installs a private 600 *copy* under
+   `/var/lib/hermes-deploy/.ssh/`, original stays 600.
+2. **Key unreadable by hermes-deploy → ssh password prompt ate the
+   pty-fed sudo password** and the deploy hung at
+   "(misi@100.69.8.15) Password:". The flake's `sshOpts` now passes
+   both `-i` paths (misi's original + hermes-deploy's copy); ssh uses
+   the one the running user can read. Without a readable key there is
+   no graceful fallback — deploy-rs has no BatchMode, so the login
+   prompt appears and consumes the only queued pty line.
+
+Also fixed during bring-up: skylake's checkout had root-owned `.git`
+objects (sudo `chown -R misi` on the whole checkout), and skylake
+master had diverged from vibecode (homer cross-link vs deploy path)
+— merged via a push to `refs/tmp/vibecode` on skylake (skylake has
+no GitHub access), so master now carries both.
