@@ -204,15 +204,24 @@ in
           model = {
             default = "Qwen3.8-27B Q4 +MTP";
             provider = "custom:local";
-            # Must match llama-server's real --ctx-size (the models preset in
-            # modules/nixos/local-llm). Without this pin, hermes can't probe
-            # the custom endpoint and falls back to the catalog default for
-            # "qwen" (131,072) — double the real window. The context
-            # compressor never fires, the prompt outgrows the 64k context,
-            # and every response dies at finish_reason=length ("Response
-            # remained truncated after 4 continuation attempts"), because
-            # each continuation re-sends the oversized history.
-            context_length = 65536;
+            # Deliberately BELOW llama-server's real --ctx-size (65536, see
+            # the models preset in modules/nixos/local-llm). Without a pin,
+            # hermes can't probe the custom endpoint and falls back to the
+            # catalog default for "qwen" (131,072) — the compressor never
+            # fires, the prompt outgrows the real window, and every response
+            # dies at finish_reason=length.
+            #
+            # Why not pin the real 65536? hermes' compression threshold is
+            # floored at 64k, so a 65536 pin lets a session grow to ~64k
+            # before compacting — and a session that large is unrecoverable
+            # on a 64k window: the summarizer must re-read the middle of the
+            # history, which no longer fits. Pinning 49152 makes the
+            # threshold trip at 85% of the window (~41.8k): turns always fit
+            # the real context even when a compression attempt times out,
+            # and the compression prompt itself stays small enough to
+            # prefill inside hermes' 120s no-progress timer on this slow
+            # (partly CPU-offloaded) backend.
+            context_length = 49152;
           };
         };
 
