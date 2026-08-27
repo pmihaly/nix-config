@@ -6,4 +6,5 @@ api-token
 machines/skylake/RESCUE.md
 machines/skylake/RECOVERY.md
 machines/skylake/sudo-password
+machines/aesop/sudo-password
 skylake-boot-debug.md

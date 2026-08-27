@@ -6,3 +6,6 @@ update-finances:
 
 skylake:
 	./scripts/deploy-skylake.sh
+
+aesop:
+	./scripts/switch-aesop.sh

@@ -563,12 +563,13 @@ general aesop access**:
   `/var/lib/hermes-deploy`, so ssh can pin host keys), `deploy-rs` +
   `git` + `openssh` in `systemPackages` (the script also pins its own
   PATH — sshd_config has no Path option; the first build attempt
-  proved it), traverse-only ACLs for
-  `hermes-deploy` on `/home/misi` and `/home/misi/.ssh` (tmpfiles +
-  activation self-heal), and an activation script that inits the
-  deploy checkout once AND self-heals the group-read permissions
-  (640 hermes-deploy) on the two files it reads — no manual one-time
-  steps.
+  proved it), a traverse-only ACL for `hermes-deploy` on `/home/misi`
+  (tmpfiles + activation self-heal), and an activation script that
+  inits the deploy checkout once AND self-heals the sudo password's
+  group-read (640 hermes-deploy) plus installs a private `600` copy of
+  `id_skylake_rescue` into the user's home (the original stays `600` —
+  ssh ignores group-readable private keys for the owner) — no manual
+  one-time steps.
 - **skylake** (`modules/nixos/hermes-agent`): `deploy-skylake`
   wrapper on the hermes service PATH (pins ssh + key +
   `UserKnownHostsFile=<stateDir>/.ssh/known_hosts`, `BatchMode`) —

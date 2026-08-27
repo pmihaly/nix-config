@@ -15,8 +15,8 @@
 #   2. Copy the gitignored skylake sudo password into the deploy checkout.
 #   3. Run the same deploy-skylake.sh that `make skylake` uses.
 #
-# The main checkout /home/misi/.nix-config is only ever read for the script
-# and the sudo password; hermes-deploy has no write access to it.
+# The main checkout /home/misi/.nix-config is only ever read for the
+# sudo password; hermes-deploy has no write access to it.
 set -eu
 
 # Self-contained PATH: forced commands run under a minimal environment
@@ -27,7 +27,10 @@ export PATH
 DEPLOY_REPO=/var/lib/hermes-deploy/nix-config
 SKYLAKE_HOST=100.69.8.15
 SKYLAKE_REPO=/home/misi/.nix-config
-SKYLAKE_SSH_KEY=/home/misi/.ssh/id_skylake_rescue
+# Private copy of the skylake key, maintained by the hermes-deploy-repo
+# activation script (the original stays 600 — ssh ignores group-readable
+# private keys for the owner).
+SKYLAKE_SSH_KEY=/var/lib/hermes-deploy/.ssh/id_skylake_rescue
 PASSWORD_SRC=/home/misi/.nix-config/machines/skylake/sudo-password
 
 if [ ! -d "$DEPLOY_REPO/.git" ]; then
