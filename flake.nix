@@ -306,8 +306,17 @@
           # every ssh invocation and to `nix copy` via NIX_SSHOPTS.
           hostname = "100.69.8.15";
           sshOpts = [
+            # Both key paths: `make skylake` runs deploy as misi and reads
+            # the original; the hermes deploy path runs deploy as
+            # hermes-deploy, which reads the private 600 copy installed by
+            # the aesop activation script. ssh skips a key it cannot read
+            # (warning) and uses the other. Without a readable key ssh
+            # falls back to password auth and the pty-fed sudo password
+            # gets eaten by the login prompt — so this matters.
             "-i"
             "/home/misi/.ssh/id_skylake_rescue"
+            "-i"
+            "/var/lib/hermes-deploy/.ssh/id_skylake_rescue"
             "-o"
             "StrictHostKeyChecking=accept-new"
           ];
