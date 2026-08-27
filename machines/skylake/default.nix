@@ -106,6 +106,17 @@
     "a /home/misi - - - - u:hermes:x,m::x"
   ];
 
+  # The rule above only runs at boot (systemd-tmpfiles-setup). In between,
+  # the mask on /home/misi got zeroed — anything that re-chmods the 0700
+  # home sets the group bits, which *are* the ACL mask once a named entry
+  # exists — silently disabling the traversal grant until the next reboot.
+  # Re-apply on every activation so `make skylake` heals it too. Idempotent.
+  system.activationScripts.hermes-nixcfg-traversal.text = ''
+    if [ -d /home/misi ]; then
+      ${pkgs.acl}/bin/setfacl -m u:hermes:x,m::x /home/misi
+    fi
+  '';
+
   # Git refuses to operate on a repo owned by another user ("dubious
   # ownership"). The checkout is owned by misi but edited by the hermes
   # system user (and occasionally root), so whitelist it in the system
