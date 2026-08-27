@@ -10,8 +10,8 @@
 #
 # Flow:
 #   1. Update the dedicated deploy checkout /var/lib/hermes-deploy/nix-config
-#      (owned by hermes-deploy) from the skylake checkout over ssh+git,
-#      fast-forward only.
+#      (owned by hermes-deploy) from the skylake checkout's HEAD (whatever
+#      branch it is on) over ssh+git, fast-forward only.
 #   2. Copy the gitignored skylake sudo password into the deploy checkout.
 #   3. Run the same deploy-skylake.sh that `make skylake` uses.
 #
@@ -37,17 +37,19 @@ fi
 
 export GIT_SSH_COMMAND="ssh -i $SKYLAKE_SSH_KEY -o BatchMode=yes -o StrictHostKeyChecking=accept-new"
 
-echo "== fetching skylake vibecode -> $DEPLOY_REPO (ff-only)"
-git -C "$DEPLOY_REPO" fetch origin vibecode
+# fetch origin HEAD: the skylake checkout's current branch, whatever it is
+# called (hermes commits land there; commit before deploying).
+echo "== fetching skylake HEAD -> $DEPLOY_REPO (ff-only)"
+git -C "$DEPLOY_REPO" fetch origin HEAD
 
-if git -C "$DEPLOY_REPO" rev-parse -q --verify refs/heads/vibecode >/dev/null 2>&1; then
+if git -C "$DEPLOY_REPO" rev-parse -q --verify refs/heads/deploy >/dev/null 2>&1; then
   if ! git -C "$DEPLOY_REPO" merge --ff-only FETCH_HEAD; then
-    echo "error: skylake vibecode has diverged from the deploy checkout; refusing to deploy" >&2
+    echo "error: skylake HEAD has diverged from the deploy checkout; refusing to deploy" >&2
     echo "hint: resolve on skylake (git -C $SKYLAKE_REPO pull --ff-only) and re-run" >&2
     exit 3
   fi
 else
-  git -C "$DEPLOY_REPO" checkout -q -b vibecode FETCH_HEAD
+  git -C "$DEPLOY_REPO" checkout -q -b deploy FETCH_HEAD
 fi
 echo "== deploy checkout at: $(git -C "$DEPLOY_REPO" rev-parse --short HEAD)"
 
