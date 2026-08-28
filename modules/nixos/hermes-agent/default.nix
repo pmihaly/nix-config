@@ -252,12 +252,43 @@ in
             # 64000 is the smallest value hermes accepts (agent init rejects
             # anything below 64k). At exactly 64000 the floored threshold
             # meets the window, which switches the trigger to 85% of the
-            # window (~54.4k): sessions compress well below the real 65,536
-            # wall, turns always fit the real context even when a compression
-            # attempt times out, and the compression prompt itself stays
-            # small enough to prefill inside hermes' 120s no-progress timer
-            # on this slow (partly CPU-offloaded) backend.
+            # window (~54.4k) — but 54.4k is TOO LATE: a compaction call at
+            # that size leaves ~11k of the 65,536 window for the summary, so
+            # the summary itself truncates, the session barely shrinks, and
+            # every normal response dies at finish_reason=length. The real
+            # trigger control lives in `compression` below
+            # (threshold_tokens bypasses the 64k floor).
             context_length = 64000;
+          };
+          # ── Compression ─────────────────────────────────────────
+          # The `threshold` PERCENT knob is neutered at context_length=64000:
+          # hermes floors the computed threshold at MINIMUM_CONTEXT_LENGTH
+          # (64k, hardcoded in agent/model_metadata.py), which equals the
+          # pinned window, so the degenerate-window branch always wins and
+          # compaction only fires at 85% (~54.4k). No config value can move
+          # the percent threshold — but `threshold_tokens` is an ABSOLUTE
+          # cap: the effective trigger is min(ratio-threshold, cap), so it
+          # escapes the floor.
+          #
+          # 40k: the compaction prompt (≈40k history) leaves ~25k of the
+          # real 65,536 window for the summary — enough for an effective
+          # one — and the next regular call gets ≥25k of output budget,
+          # which ends the finish_reason=length truncations.
+          compression = {
+            threshold_tokens = 40000;
+            # Per-episode compaction budget (rearmed once the provider
+            # confirms the prompt fell back under the threshold). 10 was
+            # exhausted by the 54.4k death-spiral; 20 buys headroom for
+            # the more frequent (and effective) 40k compactions.
+            max_attempts = 20;
+            # Cheap no-model-call pass: once the session exceeds 35k,
+            # truncate stale tool results >8k chars (the main bloat source
+            # — file reads, long terminal output). The agent can re-read
+            # files / re-run commands, so nothing is truly lost. Keeps most
+            # prompts under the 40k compaction line so the expensive pass
+            # (and its max_attempts budget) fires less often. Set to 0 to
+            # disable.
+            proactive_prune_tokens = 35000;
           };
         };
 
