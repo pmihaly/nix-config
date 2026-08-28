@@ -215,7 +215,16 @@ in
         # is missing. Rebuild-time difference is substantial. Add groups
         # back via `package = ... .override { extraDependencyGroups = [...]; }`
         # if a specific integration (e.g. `messaging`) is ever wanted.
-        package = inputs.hermes-agent.packages.${pkgs.stdenv.system}.minimal;
+        #
+        # `firecrawl` group (firecrawl-py 4.17.0): web search/extract via
+        # the bundled firecrawl plugin. Keyless mode (public cloud API,
+        # round-robin with exa/parallel/tavily/keenable) works from the
+        # core app alone; this group provides the SDK for the keyed
+        # path (FIRECRAWL_API_KEY / FIRECRAWL_API_URL) and the lazy
+        # `ensure("search.firecrawl")` import path.
+        package = inputs.hermes-agent.packages.${pkgs.stdenv.system}.minimal.override {
+          extraDependencyGroups = [ "firecrawl" ];
+        };
 
         # LLM backend: llama-swap on aesop over the tailnet (OpenAI
         # compatible, model `Qwen3.8-27B Q4 +MTP` served by llama-cpp-rocm).
