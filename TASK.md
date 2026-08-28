@@ -5,6 +5,37 @@ Research) on skylake, declaratively via Nix, state under `/persist`, Web UI
 exposed **internally** (tailnet only, no login), LLM backend =
 **llama-swap on aesop**, notes search via **FlowState-QMD (MCP)**.
 
+## Status: COMPACTION DEATH-SPIRAL FIXED (2026-08-28)
+
+Symptom: every hermes response in a long session died with “Response
+remained truncated after 4 continuation attempts.” Root cause: the
+`context_length = 64000` pin (smallest hermes accepts; real llama.cpp
+window is 65,536) neuters the compression `threshold` percent knob —
+hermes floors the computed threshold at `MINIMUM_CONTEXT_LENGTH` (64k,
+hardcoded in `agent/model_metadata.py`), so the degenerate-window branch
+always wins and compaction only fires at 85% (~54.4k). A compaction call
+at 54.4k leaves ~11k of the window for the summary → the summary itself
+truncates → the session barely shrinks → `max_attempts` exhausts → the
+session is unrecoverable, and even normal calls sit at ~97% of the window
+so every response hits `finish_reason=length`.
+
+Fix (Nix config, `modules/nixos/hermes-agent/default.nix`):
+`compression.threshold_tokens = 40000` — an **absolute** cap
+(effective trigger = min(ratio-threshold, cap), so it escapes the 64k
+floor): compact at 40k, where the summary fits (~25k of headroom) and
+regular calls get ≥25k of output budget. Plus
+`proactive_prune_tokens = 35000` (cheap no-model-call truncation of stale
+>8k-char tool results) and `max_attempts = 10` (the parser's hard cap —
+`agent_init.py` clamps anything larger, so a higher value would be a
+silent no-op).
+Hermes had independently raised `max_attempts` 3 → 10 on skylake (same
+diagnosis, no `threshold_tokens`); the merge kept both.
+
+Note: the pinned 64000 is **not** wrong on its own — it keeps hermes'
+context accounting under the true 65,536 window. What was fatal was the
+combination of the floor + a 54.4k trigger. The currently broken session
+is not healed by config; start a fresh one (`/new`).
+
 ## Status: QMD NOTES SEARCH — DEPLOYED & VERIFIED (2026-08-26)
 
 **FlowState-QMD** is live as the `qmd` MCP server: the collection
