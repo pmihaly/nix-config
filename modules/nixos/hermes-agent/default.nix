@@ -259,6 +259,17 @@ in
             # on this slow (partly CPU-offloaded) backend.
             context_length = 64000;
           };
+          # Retry rounds before a turn gives up with "max compression
+          # attempts reached" (the #62605 failure class: incompressible
+          # tool schemas keep the estimate above threshold even though
+          # the messages compress fine). Default 3 is too tight on the
+          # slow local backend, where a timed-out attempt still burns a
+          # round. 10 is the parser's hard cap (agent_init.py clamps
+          # anything larger); there is no "unlimited" value in config —
+          # that would need an upstream patch.
+          compression = {
+            max_attempts = 10;
+          };
         };
 
         # ── WhatsApp ────────────────────────────────────────────────
