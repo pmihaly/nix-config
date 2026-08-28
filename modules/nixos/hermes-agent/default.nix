@@ -279,6 +279,19 @@ in
           compression = {
             max_attempts = 10;
           };
+          # Web search/extract backend. Explicit config wins over the
+          # availability-filtered legacy walk (agent/web_search_registry.py),
+          # which — with no FIRECRAWL_API_KEY — would otherwise only let
+          # firecrawl join the 5-vendor keyless round-robin (~1/5 of traffic).
+          # Pinned: today it serves via the keyless public cloud API
+          # (raw httpx, no SDK), failing over to exa/parallel/tavily on
+          # rate limits; once FIRECRAWL_API_URL/FIRECRAWL_API_KEY exist in
+          # $HERMES_HOME/.env, _use_keyless_ring() flips to false and the
+          # keyed firecrawl-py SDK path (installed via the `firecrawl`
+          # dependency group above) takes over automatically.
+          web = {
+            backend = "firecrawl";
+          };
         };
 
         # ── WhatsApp ────────────────────────────────────────────────
