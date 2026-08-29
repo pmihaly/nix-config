@@ -1,34 +1,17 @@
 #!/usr/bin/env sh
-# Deploy skylake, auto-answering deploy-rs's interactive sudo prompt.
+# Deploy skylake with deploy-rs.
 #
-# deploy-rs (interactiveSudo = true; see deploy.nodes.skylake in flake.nix)
-# rewrites the remote command to `sudo -S -p ""` and asks for the sudo
-# password locally via rpassword, which reads from /dev/tty — so the
-# password cannot be fed through stdin or a pipe.
+# deploy-rs connects as root over the tailnet (deploy.nodes.skylake in
+# flake.nix: sshUser=user=root, no interactive sudo) — so no password
+# prompt and no pty tricks. Only the ssh key matters: `make skylake`
+# (misi on aesop) reads ~/.ssh/id_skylake_rescue; the skylake-auto-deploy
+# timer (hermes-deploy) reads the same keypair via the agenix secret
+# /run/agenix/server/skylake-activate-ssh.
 #
-# This wrapper runs deploy under util-linux `script`, which gives it a
-# pseudo-terminal, and feeds the password from the gitignored file
-# machines/skylake/sudo-password. The line is queued in the pty's line
-# discipline and consumed when rpassword opens /dev/tty a few minutes
-# later. `script -e` propagates deploy's exit code.
-#
-# Caveat: the password is echoed once at the top of the output (the pty is
-# in echo mode until rpassword turns it off). That is local-terminal-only
-# exposure, the same as typing it by hand.
-#
-# Usage:
-#   scripts/deploy-skylake.sh              # deploy .#skylake
-#   scripts/deploy-skylake.sh CMD [ARGS]   # run CMD under the pty (testing)
-
+# Used by `make skylake` and by scripts/skylake-auto-deploy.sh (which
+# runs it from the deploy checkout as hermes-deploy).
 set -eu
 
 cd "$(dirname "$0")/.."
-PW_FILE="machines/skylake/sudo-password"
 
-if [ ! -s "$PW_FILE" ]; then
-    echo "error: $PW_FILE is missing or empty" >&2
-    exit 2
-fi
-
-cmd="${*:-deploy -s .#skylake}"
-{ cat "$PW_FILE"; echo; } | script -q -e -c "$cmd" /dev/null
+exec deploy -s .#skylake

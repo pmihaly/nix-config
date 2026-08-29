@@ -306,29 +306,28 @@
           # every ssh invocation and to `nix copy` via NIX_SSHOPTS.
           hostname = "100.69.8.15";
           sshOpts = [
-            # Both key paths: `make skylake` runs deploy as misi and reads
-            # the original; the hermes deploy path runs deploy as
-            # hermes-deploy, which reads the private 600 copy installed by
-            # the aesop activation script. ssh skips a key it cannot read
-            # (warning) and uses the other. Without a readable key ssh
-            # falls back to password auth and the pty-fed sudo password
-            # gets eaten by the login prompt — so this matters.
+            # Root activation over the tailnet: root's authorized key on
+            # skylake is the rescue key (declared in machines/skylake, so
+            # it survives impermanence). `make skylake` runs as misi and
+            # reads the original; the skylake-auto-deploy timer runs as
+            # hermes-deploy and reads the same keypair via the agenix
+            # secret. ssh tries each key it can read.
             "-i"
             "/home/misi/.ssh/id_skylake_rescue"
             "-i"
-            "/var/lib/hermes-deploy/.ssh/id_skylake_rescue"
+            "/run/agenix/server/skylake-activate-ssh"
             "-o"
             "StrictHostKeyChecking=accept-new"
           ];
           profiles.system = {
             path = inputs.deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.skylake;
-            sshUser = "misi";
+            sshUser = "root";
             user = "root";
             magicRollback = false;
             autoRollback = false;
-            # Prompt for the sudo password on the local terminal and pipe
-            # it in; the activation itself runs as root.
-            interactiveSudo = true;
+            # No interactive sudo: activation runs as root directly, so
+            # there is no password prompt (and no pty dance in
+            # scripts/deploy-skylake.sh) for either caller.
           };
         };
       };
