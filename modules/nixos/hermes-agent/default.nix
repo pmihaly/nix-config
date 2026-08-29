@@ -625,7 +625,14 @@ in
         # the chat view never mounts (blank page). The backend serves /assets/*
         # directly at / on port 9119, so proxy it the same way as /hermes/.
         "/assets/" = {
-          proxyPass = "http://127.0.0.1:${toString port}/";
+          # NOTE: proxy_pass has NO URI part here (vs /hermes/ which uses
+          # "…9119/"). A trailing-slash proxy_pass would STRIP the /assets/
+          # prefix (the documented trap above) and send /assets/xterm.css as
+          # /xterm.css — which the backend treats as an unknown path and
+          # serves the SPA index.html (HTTP 200, wrong content-type). Passing
+          # the URI verbatim (no slash) keeps /assets/xterm-*.css intact, which
+          # the backend's static mount serves correctly.
+          proxyPass = "http://127.0.0.1:${toString port}";
           proxyWebsockets = false;
 
           # Same Host-header rewrite the /hermes/ location uses, so the
