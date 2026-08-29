@@ -18,7 +18,10 @@ export PATH
 DEPLOY_REPO=/var/lib/hermes-deploy/nix-config
 GITHUB_URL=https://github.com/pmihaly/nix-config
 BRANCH=vibecode
-LOCK=/run/lock/skylake-auto-deploy.lock
+# Lock file must live where hermes-deploy can write (/run/lock is
+# root-owned); it only guards concurrent timer ticks — a manual
+# `make skylake` racing the timer is still operator's business.
+LOCK=/var/lib/hermes-deploy/.auto-deploy.lock
 
 if [ ! -d "$DEPLOY_REPO/.git" ]; then
   echo "error: $DEPLOY_REPO is not a git repository (created by the hermes-deploy-repo activation script)" >&2
