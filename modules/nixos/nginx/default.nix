@@ -103,12 +103,18 @@ in
         chmod 644 "$LOG"
         after=$(cksum ${tsCert} 2>/dev/null || true)
         if [ "$before" != "$after" ]; then
-          # Clear the failure rate limiter (activation may have hit
-          # start-limit-hit while the cert was missing); nginx may not be
-          # running yet on a fresh boot, try-restart only reloads when it
-          # is active.
-          systemctl reset-failed nginx.service || true
-          systemctl try-restart nginx.service || true
+          # Renewal path (timer): nginx is already running and must pick up
+          # the new cert. Clear the failure limiter first (activation may
+          # have tripped start-limit-hit while the cert was missing), then
+          # try-restart. MUST be gated on nginx being active: during boot /
+          # deploy-activation nginx is still inactive and waiting on this
+          # oneshot via After=/wants= — an unconditional try-restart here
+          # deadlocks (nginx waits on this service, this service waits on
+          # the nginx job).
+          if systemctl is-active --quiet nginx.service; then
+            systemctl reset-failed nginx.service || true
+            systemctl try-restart nginx.service || true
+          fi
         fi
       '';
     };
