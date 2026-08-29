@@ -90,9 +90,15 @@ in
     # Fed by every service's mkService `dashboard` self-registration.
     # Defaults to {} — an empty board — rather than null: when no service
     # self-registers (e.g. aesop), builtins.attrValues would choke on null.
+    #
+    # attrsOf anything (deep merge), NOT plain `attrs`: `attrs` merges
+    # multiple definitions with shallow `//`, so when several modules
+    # register cards in the same category (e.g. copyparty's "Public Files"
+    # / "Void" next to paperless's "Paperless-ngx" in Documents) only the
+    # last one would survive. anything merges attribute sets recursively.
     services = mkOption {
       default = { };
-      type = types.attrs;
+      type = types.attrsOf types.anything;
     };
 
     # Optional second instance, served publicly on the apex domain
@@ -112,10 +118,10 @@ in
       # Board content for the public instance only — same shape as
       # `services` above (groups of { logo, url } entries), but NOT the
       # private board (that one is fed by every service's mkService
-      # `dashboard` self-registration).
+      # `dashboard` self-registration). Deep merge, see `services` above.
       services = mkOption {
         default = { };
-        type = types.attrs;
+        type = types.attrsOf types.anything;
       };
       homerConfig = mkOption {
         default = { };

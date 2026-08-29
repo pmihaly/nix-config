@@ -45,7 +45,7 @@
           logo = "${pkgs.it-tools}/lib/android-chrome-512x512.png";
           url = "https://it-tools.${vars.publicDomainName}";
         };
-        Files."Public Files" = {
+        Files."copyparty" = {
           logo = ../../modules/nixos/copyparty/copyparty.svg;
           url = "https://files.${vars.publicDomainName}";
         };

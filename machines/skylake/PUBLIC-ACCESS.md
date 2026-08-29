@@ -5,13 +5,13 @@ ports 80/443. Everything else stays tailnet-only.
 
 ## What is public
 
-| Hostname                            | Service                       | Notes                                                                                                                                                              |
-| ----------------------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `skylake.mihaly.codes`              | **public Homer** dashboard    | apex, served by the `homer-public` default_server vhost                                                                                                            |
-| `homer-public.skylake.mihaly.codes` | **public Homer** dashboard    | same instance, subdomain name                                                                                                                                      |
-| `it-tools.skylake.mihaly.codes`     | it-tools (IT tool collection) |                                                                                                                                                                    |
-| `files.skylake.mihaly.codes`        | public copyparty              | anonymous `rwmd` share (`/drop` volume is write-only drop box); in-browser video player with audio/subtitle track selection (patched copyparty + `video-tracks.js` plugin, see `modules/nixos/copyparty/`) |
-| `ntfy.skylake.mihaly.codes`         | ntfy push notifications       | self-hosted [ntfy](https://docs.ntfy.sh), in-memory (no storage), default read-write topics (ntfy.sh model) — see `modules/nixos/ntfy/`                            |
+| Hostname                            | Service                       | Notes                                                                                                                                                                                                                 |
+| ----------------------------------- | ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `skylake.mihaly.codes`              | **public Homer** dashboard    | apex, served by the `homer-public` default_server vhost                                                                                                                                                               |
+| `homer-public.skylake.mihaly.codes` | **public Homer** dashboard    | same instance, subdomain name                                                                                                                                                                                         |
+| `it-tools.skylake.mihaly.codes`     | it-tools (IT tool collection) |                                                                                                                                                                                                                       |
+| `files.skylake.mihaly.codes`        | public copyparty              | anonymous `rwmd` share (`/void` volume = write-only, unlistable drop-box); in-browser video player with audio/subtitle track selection (patched copyparty + `video-tracks.js` plugin, see `modules/nixos/copyparty/`) |
+| `ntfy.skylake.mihaly.codes`         | ntfy push notifications       | self-hosted [ntfy](https://docs.ntfy.sh), in-memory (no storage), default read-write topics (ntfy.sh model) — see `modules/nixos/ntfy/`                                                                               |
 
 The public Homer board lists the public services (it-tools, public files,
 ntfy); the private Homer board (on the tailnet) lists the rest.
