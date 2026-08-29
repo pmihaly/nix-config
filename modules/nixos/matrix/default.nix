@@ -1,5 +1,6 @@
 {
   lib,
+  pkgs,
   config,
   vars,
   ...
@@ -21,6 +22,19 @@ let
   # (tailnetRules) and closed to the WAN (default-DROP input policy) — the
   # internet only ever sees 80/443, exactly like the other public services.
   port = 6167;
+
+  # The web client (Element Web) served at the vhost root. Its shipped
+  # config.json defaults to matrix.org; `conf` is deep-merged over it
+  # (jq `.[0] * $conf`), so we only pin the homeserver and keep the rest
+  # of the defaults (identity server, integrations, ...).
+  elementWeb = pkgs.element-web.override {
+    conf = {
+      default_server_config."m.homeserver" = {
+        base_url = "https://${serverName}";
+        server_name = serverName;
+      };
+    };
+  };
 in
 {
   options.modules.matrix = {
@@ -59,6 +73,24 @@ in
         nginx defaults client_max_body_size to 1 MiB, so without this
         files larger than 1 MiB would fail at the proxy.
       '';
+    };
+
+    elementWeb = {
+      enable = mkOption {
+        type = types.bool;
+        default = true;
+        description = ''
+          Serve the Element Web client at the vhost root. Element X's
+          account-creation flow requires the Matrix Authentication
+          Service (MAS, /_matrix/client/v1/register), which Conduit
+          does not implement — its in-app "create account" therefore
+          fails with "your homeserver needs to be upgraded...".
+          Element Web uses the legacy /_matrix/client/v3/register flow
+          Conduit supports, so it can create the first account (which
+          Conduit grants admin). With this on,
+          https://matrix.<publicDomain>/ is the login/register page.
+        '';
+      };
     };
   };
 
@@ -134,17 +166,32 @@ in
               return 200 '{"m.homeserver":{"base_url":"https://${serverName}"}}';
             '';
           };
-          # Everything else (_matrix/..., covering client API, federation,
-          # media, sliding sync) reverse-proxies to Conduit. Keep the
-          # upgrade headers + unbuffered request so WebSocket endpoints
-          # and large uploads work through the proxy.
-          "/" = {
+          # Matrix API (client-server + federation + media + sliding
+          # sync): reverse-proxy to Conduit. Keep the upgrade headers +
+          # unbuffered request so WebSocket endpoints and large uploads
+          # work through the proxy.
+          "/_matrix" = {
+            proxyPass = "http://127.0.0.1:${toString port}";
             extraConfig = ''
               proxy_http_version 1.1;
               proxy_set_header Upgrade $http_upgrade;
               proxy_set_header Connection "upgrade";
               proxy_request_buffering off;
             '';
+          };
+          # Element Web at the vhost root (see the elementWeb option).
+          # Serve the web client statically; mkService's publicConfig had
+          # wired "/" to proxy to the service port, so that proxyPass is
+          # neutralized with mkForce. Every other path (well-known,
+          # /_matrix) has a longer prefix and wins over "/".
+          "/" = mkIf cfg.elementWeb.enable {
+            proxyPass = lib.mkForce null;
+            recommendedProxySettings = false;
+            root = elementWeb;
+            index = "index.html";
+            # Element Web is a SPA: fall back to index.html for any path
+            # that is not a real file (1.12+ uses browser-history routing).
+            tryFiles = "$uri $uri/ /index.html";
           };
         };
       };
