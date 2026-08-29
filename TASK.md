@@ -3,7 +3,8 @@
 Install [Hermes Agent](https://github.com/NousResearch/hermes-agent) (Nous
 Research) on skylake, declaratively via Nix, state under `/persist`, Web UI
 exposed **internally** (tailnet only, no login), LLM backend =
-**llama-swap on aesop**, notes search via **FlowState-QMD (MCP)**.
+**OpenRouter (deepseek/deepseek-v4-flash-0731)**, notes search via
+**FlowState-QMD (MCP)**.
 
 ## Status: COMPACTION DEATH-SPIRAL FIXED (2026-08-28)
 
@@ -48,7 +49,7 @@ section for the full state.
 ## Status: DEPLOYED & VERIFIED (2026-08-26) — WhatsApp PAIRED & ENABLED
 
 Everything is live on skylake: login-free dashboard behind the tailnet-only
-`/hermes` proxy (blank-page fix in), llama-swap backend. **WhatsApp is
+`/hermes` proxy (blank-page fix in). **WhatsApp is
 paired and armed**: the QR pairing succeeded (creds saved to the canonical
 session path), the `whatsapp` flag is on, and the gateway's bridge
 reconnected with the saved session — **no second QR needed** (bridge.log:
@@ -151,34 +152,26 @@ Two locations on `skylake.anaconda-snapper.ts.net` (HTTP vhost):
 - Old bookmarks to `:9119` / `mihaly.codes/hermes` stop working by design —
   the vhost redirect location is gone.
 
-## LLM backend: llama-swap on aesop (unchanged)
+## LLM backend: OpenRouter (deepseek/deepseek-v4-flash-0731)
 
 `modules/nixos/hermes-agent/default.nix` → `services.hermes-agent.settings`
 (deep-merged into `$HERMES_HOME/.hermes/config.yaml` at activation):
 
-```yaml
-providers:
-  local:
-    api: http://aesop.anaconda-snapper.ts.net:8081/v1 # llama-swap, tailnet
-    api_key: local
-model:
-  default: "Qwen3.8-27B Q4 +MTP"
-  provider: "custom:local"
-```
+The model runs on OpenRouter (hermes' built-in `openrouter` provider),
+deepseek/deepseek-v4-flash-0731 — same model pi and opencode on aesop use.
+The old local backend (llama-swap on aesop serving Qwen3.8-27B) is
+**removed**: the `modules/nixos/local-llm` service has been deleted from the
+repo entirely, so there is no local LLM to point at anymore.
 
-Nothing secret here (tailnet name is in this repo; llama-swap doesn't enforce
-auth), so it lives in Nix `settings`, not in an agenix secret.
+The API key (`$HERMES_HOME/.env` → `OPENROUTER_API_KEY`) comes from the
+agenix secret `openrouter-api-key` (see environmentFiles above) — it does
+not live in Nix `settings`.
 
 Gotchas (verified against hermes 0.20.5 source + live tests on skylake):
 
-- A bare `model: "custom:local:…"` string is NOT enough for runtime provider
-  resolution ("No inference provider configured"). The dict form above
-  (`model.default` + `model.provider: custom:local`) is what works.
 - **Re-assertion on activation:** the merge script gives Nix keys priority, so
-  a `make skylake` re-asserts `model`/`providers.local` over dashboard edits.
+  a `make skylake` re-asserts `model` over dashboard edits.
   Change the default model here, not in the runtime config.
-- If the llama-swap model is swapped on aesop, update
-  `settings.model.default` (ts.net name survives IP changes).
 
 ## What's in the repo
 
@@ -194,7 +187,7 @@ Gotchas (verified against hermes 0.20.5 source + live tests on skylake):
     this path is in the restic backup list).
   - `backend = { mode = "dashboard"; host = "127.0.0.1"; port = 9119; }` —
     loopback ⇒ no auth gate ⇒ no login (see table above).
-  - `settings` — the llama-swap provider/model wiring above.
+  - `settings` — the OpenRouter model wiring above.
   - nginx `location /hermes/` proxy (+ `location = /hermes` 301) with
     `allow 100.64.0.0/10; deny all;` (the only exposure) + Homer card
     (AI › Hermes, `hermes.png`).
@@ -472,8 +465,8 @@ queries to short-lived `qmd query` CLI subprocesses (the crash-free path).
    PairingStore JSON under `$HERMES_HOME`). Self-chat messages now reach
    the agent.
 2. LLM end-to-end sanity (optional): send a self-chat message and check
-   the agent answers via aesop llama-swap, or chat in the browser
-   dashboard.
+   the agent answers via the OpenRouter model (deepseek-v4-flash-0731), or
+   chat in the browser dashboard.
 
 ## Already verified live (2026-08-26, post re-enable)
 
