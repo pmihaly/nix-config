@@ -82,7 +82,7 @@ in
         before=$(cksum ${tsCert} 2>/dev/null || true)
         for attempt in $(seq 1 20); do
           if "$TSBIN" cert \
-            --min-validity=30d \
+            --min-validity=720h \
             --cert-file=${tsCert} \
             --key-file=${tsKey} \
             ${vars.domainName} >>"$LOG" 2>&1; then
