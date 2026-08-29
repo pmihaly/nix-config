@@ -11,7 +11,6 @@
     ./it-tools
     ./copyparty
     ./ntfy
-    ./local-llm
     ./hermes-agent
   ];
 }

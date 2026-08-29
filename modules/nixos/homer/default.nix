@@ -89,8 +89,7 @@ in
 
     # Fed by every service's mkService `dashboard` self-registration.
     # Defaults to {} — an empty board — rather than null: when no service
-    # self-registers (e.g. aesop, whose only dashboard entries were the
-    # local-llm stack), builtins.attrValues would choke on null.
+    # self-registers (e.g. aesop), builtins.attrValues would choke on null.
     services = mkOption {
       default = { };
       type = types.attrs;

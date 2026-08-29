@@ -18,14 +18,10 @@ optionalAttrs platform.isLinux {
   };
   imports = [ ../../modules/nixos ];
   config = mkIf cfg.enable {
-    # local-llm (llama-swap + Open WebUI + SearXNG on aesop) is DISABLED:
-    # the local Qwen3.8-27B backend was the point of the module, and
-    # running it is what we wanted to stop (power). Its consumers now use
-    # OpenRouter instead — hermes (skylake, see
-    # modules/nixos/hermes-agent) and pi/opencode below (same model,
-    # qwen/qwen3.8-27b, hosted). Re-enable to bring the local stack back;
-    # the module itself is unchanged.
-    # modules.local-llm.enable = true;
+    # local-llm service (llama-swap + Open WebUI + SearXNG on aesop) has
+    # been removed entirely. All consumers (hermes on skylake, pi/opencode
+    # below, and opencode on aesop) use OpenRouter, model
+    # deepseek/deepseek-v4-flash-0731, keyed via OPENROUTER_API_KEY.
 
     virtualisation.docker = {
       enable = true;
@@ -73,23 +69,23 @@ optionalAttrs platform.isLinux {
             port = 4096;
             hostname = "0.0.0.0";
           };
-          # Qwen via OpenRouter (the local llama-swap backend on aesop is
-          # gone — local-llm disabled to save power). Same model as before
-          # (qwen/qwen3.8-27b), now hosted. The key comes from the
-          # environment: opencode interpolates {env:…} in provider options,
-          # and OPENROUTER_API_KEY is exported by programs.bash below from
-          # the agenix secret. The models map key must be the real
-          # OpenRouter model id (that is what goes in the API request), so
-          # the agent references below are provider/key =
-          # qwen/qwen/qwen3.8-27b.
-          provider.qwen = {
-            name = "Qwen (OpenRouter)";
+          # DeepSeek via OpenRouter (the local llama-swap backend on aesop
+          # is gone — local-llm service removed). Same model as pi and
+          # hermes (deepseek/deepseek-v4-flash-0731), hosted. The key comes
+          # from the environment: opencode interpolates {env:…} in provider
+          # options, and OPENROUTER_API_KEY is exported by programs.bash
+          # below from the agenix secret. The models map key must be the
+          # real OpenRouter model id (that is what goes in the API request),
+          # so the agent references below are provider/key =
+          # deepseek/deepseek/deepseek-v4-flash-0731.
+          provider.deepseek = {
+            name = "DeepSeek (OpenRouter)";
             npm = "@ai-sdk/openai-compatible";
             options = {
               baseURL = "https://openrouter.ai/api/v1";
               apiKey = "{env:OPENROUTER_API_KEY}";
             };
-            models."qwen/qwen3.8-27b".name = "Qwen3.8-27B (OpenRouter)";
+            models."deepseek/deepseek-v4-flash-0731".name = "DeepSeek V4 Flash 0731 (OpenRouter)";
           };
         };
         agents = {
@@ -97,7 +93,7 @@ optionalAttrs platform.isLinux {
             ---
             description: System architecture and design decisions
             mode: subagent
-            model: qwen/qwen/qwen3.8-27b
+            model: deepseek/deepseek/deepseek-v4-flash-0731
             temperature: 0.2
             permission:
               edit: deny
@@ -128,7 +124,7 @@ optionalAttrs platform.isLinux {
             ---
             description: Implementation and code writing
             mode: subagent
-            model: qwen/qwen/qwen3.8-27b
+            model: deepseek/deepseek/deepseek-v4-flash-0731
             temperature: 0.1
             ---
             You are a coder agent. Implement features, fix bugs, and write clean code.
@@ -156,7 +152,7 @@ optionalAttrs platform.isLinux {
             ---
             description: Codebase exploration and research
             mode: subagent
-            model: qwen/qwen/qwen3.8-27b
+            model: deepseek/deepseek/deepseek-v4-flash-0731
             temperature: 0.1
             permission:
               edit: deny
@@ -183,7 +179,7 @@ optionalAttrs platform.isLinux {
             ---
             description: Writing and running tests
             mode: subagent
-            model: qwen/qwen/qwen3.8-27b
+            model: deepseek/deepseek/deepseek-v4-flash-0731
             temperature: 0.1
             ---
             You are a tester agent. Write tests and verify code correctness.
@@ -217,45 +213,11 @@ optionalAttrs platform.isLinux {
           source = ./pi/ntfy-notify.ts;
         };
 
-        # pi's (pi-mono) models.json: upserts qwen/qwen3.8-27b into pi's
-        # BUILT-IN openrouter provider. Per docs/models.md, a models array
-        # under an existing provider merges — the built-in catalog stays,
-        # this model is added by id. (The bundled catalog is generated at
-        # build time and predates qwen3.8-27b, so it must be declared.)
-        # Auth is the built-in behaviour: the openrouter provider reads
-        # OPENROUTER_API_KEY from the environment, which programs.bash
-        # below exports from the agenix secret. Same session envelope as
-        # the old local llama-swap setup (65536/8192) so behaviour is
-        # unchanged; OpenRouter itself allows up to 1M context.
-        ".pi/agent/models.json" = {
-          force = true;
-          text = toJSON {
-            providers.openrouter.models = [
-              {
-                id = "qwen/qwen3.8-27b";
-                name = "Qwen3.8-27B (OpenRouter)";
-                reasoning = true;
-                input = [ "text" ];
-                contextWindow = 65536;
-                maxTokens = 8192;
-                # $/M tokens from the OpenRouter /models API (2025-08):
-                # prompt $0.425, completion $2.55 (no cache pricing).
-                cost = {
-                  input = 0.425;
-                  output = 2.55;
-                  cacheRead = 0;
-                  cacheWrite = 0;
-                };
-              }
-            ];
-          };
-        };
-
         ".pi/agent/settings.json" = {
           force = true;
           text = toJSON {
             defaultProvider = "openrouter";
-            defaultModel = "qwen/qwen3.8-27b";
+            defaultModel = "deepseek/deepseek-v4-flash-0731";
             theme = "dark";
             lastChangelogVersion = pkgs.pi-coding-agent.version;
           };

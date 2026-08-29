@@ -226,13 +226,13 @@ in
           extraDependencyGroups = [ "firecrawl" ];
         };
 
-        # LLM backend: OpenRouter (built-in provider), same model as before
-        # (qwen/qwen3.8-27b). The old backend — llama-swap on aesop over the
-        # tailnet, `Qwen3.8-27B Q4 +MTP` served by llama-cpp-rocm — is gone:
-        # local-llm is disabled on aesop to save power, so the model now
-        # runs in the cloud. The API key is the agenix secret
-        # openrouter-api-key (env-file format, appended to
-        # $HERMES_HOME/.env at activation — see environmentFiles below);
+        # LLM backend: OpenRouter (built-in provider), model
+        # deepseek/deepseek-v4-flash-0731 (same as pi and opencode on aesop).
+        # The old backend — llama-swap on aesop over the tailnet serving
+        # Qwen3.8-27B locally — is gone: the local-llm service has been
+        # removed entirely, so the model now runs in the cloud. The API key
+        # is the agenix secret openrouter-api-key (env-file format, appended
+        # to $HERMES_HOME/.env at activation — see environmentFiles below);
         # nothing secret lands in this repo or the Nix store.
         #
         # NOTE on merge direction: the activation script deep-merges these
@@ -242,12 +242,12 @@ in
         # Update `settings` here to change the default model.
         settings = {
           model = {
-            default = "qwen/qwen3.8-27b";
+            default = "deepseek/deepseek-v4-flash-0731";
             provider = "openrouter";
-            # Kept from the local-llm days, and still the right shape for
-            # cloud usage. OpenRouter's catalog reports a 1M window for this
-            # model, but the compression settings below were tuned against a
-            # 64k-class window — with the 1M window a session would grow
+            # Kept from the old local-llm days, and still the right shape
+            # for cloud usage. OpenRouter's catalog reports a 1M window for
+            # this model, but the compression settings below were tuned
+            # against a 64k-class window — with the 1M window a session would grow
             # until compaction no longer helps and cost runs away. The pin
             # wins over the 1M metadata: get_model_context_length() treats
             # it as "explicit config override — user knows best" (step 0).
