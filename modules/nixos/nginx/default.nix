@@ -70,13 +70,37 @@ in
         RemainAfterExit = true;
       };
       script = ''
+        set -e
         mkdir -p ${tsCertDir}
+        # Tailscale cert fetches from the control plane, which needs
+        # tailscaled to be connected first — a plain `After=tailscaled`
+        # isn't enough (the daemon unit is active before the first netmap
+        # sync). Retry until the cert is present or we give up.
+        TSBIN=${config.services.tailscale.package}/bin/tailscale
+        LOG=/var/log/tailscale-cert.log
+        : > "$LOG"
         before=$(cksum ${tsCert} 2>/dev/null)
-        ${config.services.tailscale.package}/bin/tailscale cert \
-          --min-validity=30d \
-          --cert-file=${tsCert} \
-          --key-file=${tsKey} \
-          ${vars.domainName}
+        for attempt in $(seq 1 20); do
+          if "$TSBIN" cert \
+            --min-validity=30d \
+            --cert-file=${tsCert} \
+            --key-file=${tsKey} \
+            ${vars.domainName} >>"$LOG" 2>&1; then
+            break
+          fi
+          echo "attempt $attempt failed, retrying in 5s" >>"$LOG"
+          sleep 5
+        done
+
+        # If the cert still isn't there after all attempts, fail loudly so
+        # the operator sees why (ACL denied, tailnet not upgraded, ...).
+        if [ ! -s ${tsCert} ]; then
+          echo "FATAL: no cert after 20 attempts; last error above" >>"$LOG"
+          cat "$LOG" >&2
+          exit 1
+        fi
+
+        chmod 644 "$LOG"
         after=$(cksum ${tsCert} 2>/dev/null)
         if [ "$before" != "$after" ]; then
           # nginx may not be running yet on a fresh boot; try-restart only
