@@ -447,6 +447,17 @@ in
         mode = "400";
       };
 
+      # Matrix bot credentials (env-file: MATRIX_HOMESERVER,
+      # MATRIX_BOT_USER, MATRIX_ACCESS_TOKEN, MATRIX_HOME_ROOM). Same
+      # env-file format as openrouter above; the matrix adapter reads it
+      # from $HERMES_HOME/.env once wired in (downstream task).
+      age.secrets."matrix-bot" = {
+        file = ../../../secrets/matrix-bot.age;
+        owner = hermesCfg.user;
+        group = hermesCfg.group;
+        mode = "400";
+      };
+
       # known_hosts dir for the deploy wrapper's ssh (UserKnownHostsFile
       # points at the service user's home, so accept-new can pin aesop's
       # host key on first use).
