@@ -26,8 +26,8 @@ let
   # failure the old instance suffered.
   #
   # Private instance: whole filesystem, tailnet-only (mkService firewall),
-  # password auth, runs as root. No mount sandbox at all — it must see all
-  # of /, and with root + password there is nothing to sandbox from.
+  # open (no auth — the password was removed on request), runs as root. No
+  # mount sandbox at all — it must see all of /.
   #
   # Public instance: a single directory (${storage}/Public), world
   # read/write, behind the public nginx vhost. Listens on loopback only
@@ -72,12 +72,11 @@ let
     cp ${./video-tracks.js} $out/video-tracks.js
   '';
 
-  # The private password is injected at startup by replace-secret from the
-  # agenix materialized file, so it never lands in the Nix store or the
-  # unit file (pattern from the copyparty flake module). A *password*
-  # change does not restart the unit (the age secret is not a store path,
-  # so it can't be a restart trigger) — after re-encrypting and deploying:
-  # `systemctl restart copyparty-private`.
+  # No auth on the private instance: it is tailnet-only (mkService
+  # firewall) and runs as root, so any device on the tailnet can read the
+  # whole filesystem. The former password auth (replace-secret injecting
+  # the agenix secret `server/copyparty-misi`) was removed on request; the
+  # secret itself was retired (see git history).
   privateConf = pkgs.writeText "copyparty-private.conf" ''
     [global]
     i: 0.0.0.0
@@ -85,13 +84,10 @@ let
     no-reload
     js-browser: /plug/video-tracks.js
 
-    [accounts]
-    ${vars.username}: {{copyparty-private}}
-
     [/]
     /
     accs: 
-    A: ${vars.username}
+    rwmd: *
     flags: 
     d2t
     e2d
@@ -148,10 +144,27 @@ let
 
     [/plug]
     ${plugDir}
+    # g = get: downloadable by exact URL (the js-browser script tag
+    # /plug/video-tracks.js needs) but NOT listable — stays out of the
+    # public file browser; r would expose the directory tree.
     accs: 
-    r: *
+    g: *
     flags: 
     hist: ${storage}/Services/copyparty-public-plug
+
+    [/void]
+    ${storage}/Void
+    accs: 
+    w: *
+    flags: 
+    d2t
+    e2d
+    maxb: 10g,300
+    maxn: 250,600
+    scan: 60
+    vmaxb: 100g
+    vmaxn: 100k
+    hist: ${storage}/Services/copyparty-public-void
   '';
 in
 {
@@ -177,16 +190,18 @@ in
         "d ${storage}/Services/copyparty 0700 root root -"
         "d ${storage}/Services/copyparty-plug 0700 root root -"
         "d ${storage}/Public 0755 copyparty copyparty -"
+        "d ${storage}/Void 0755 copyparty copyparty -"
         "d ${storage}/Services/copyparty-public 0700 copyparty copyparty -"
         "d ${storage}/Services/copyparty-public-hist 0700 copyparty copyparty -"
         "d ${storage}/Services/copyparty-public-plug 0700 copyparty copyparty -"
+        "d ${storage}/Services/copyparty-public-void 0700 copyparty copyparty -"
       ];
     }
 
-    # --- private instance: tailnet-only on 3210, root, password auth ----
+    # --- private instance: tailnet-only on 3210, root, open (no auth) ----
     {
       systemd.services.copyparty-private = {
-        description = "Copyparty private (whole system, tailnet-only, password auth)";
+        description = "Copyparty private (whole system, tailnet-only, open)";
         wantedBy = [ "multi-user.target" ];
         after = [
           "network.target"
@@ -195,9 +210,6 @@ in
         restartTriggers = [ privateConf ];
         preStart = ''
           install -m 600 ${privateConf} /run/copyparty-private/copyparty.conf
-          ${pkgs.replace-secret}/bin/replace-secret '{{copyparty-private}}' ${
-            config.age.secrets."server/copyparty-misi".path
-          } /run/copyparty-private/copyparty.conf
           # Hist dirs (deterministic; the tmpfiles `d` rules heal at boot).
           install -d -m 0700 ${storage}/Services/copyparty
           install -d -m 0700 ${storage}/Services/copyparty-plug
@@ -229,9 +241,11 @@ in
           # activations, and the unprivileged user cannot create them
           # (both parents are root-owned).
           install -d -m 0755 -o copyparty -g copyparty ${storage}/Public
+          install -d -m 0755 -o copyparty -g copyparty ${storage}/Void
           install -d -m 0700 -o copyparty -g copyparty ${storage}/Services/copyparty-public
           install -d -m 0700 -o copyparty -g copyparty ${storage}/Services/copyparty-public-hist
           install -d -m 0700 -o copyparty -g copyparty ${storage}/Services/copyparty-public-plug
+          install -d -m 0700 -o copyparty -g copyparty ${storage}/Services/copyparty-public-void
         '';
         serviceConfig = {
           User = "copyparty";
@@ -318,6 +332,16 @@ in
       modules.homer.services.Documents."Public Files" = {
         logo = ./copyparty.svg;
         url = "https://files.${vars.publicDomainName}";
+      };
+
+      # Void directory (public write-only drop-box): surface an explicit
+      # link so /void is discoverable. Config-only — no copyparty source
+      # patch; anonymous upload to /void is ALLOWED (w: *), the volume
+      # itself cannot be listed or downloaded (no r). Placed next to the
+      # public-files card on the operator board.
+      modules.homer.services.Documents."Void" = {
+        logo = ./copyparty.svg;
+        url = "https://files.${vars.publicDomainName}/void";
       };
     }
   ]);
