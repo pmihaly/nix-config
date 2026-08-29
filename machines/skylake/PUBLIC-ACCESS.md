@@ -12,9 +12,10 @@ ports 80/443. Everything else stays tailnet-only.
 | `it-tools.skylake.mihaly.codes`     | it-tools (IT tool collection) |                                                                                                                                                                                                                       |
 | `files.skylake.mihaly.codes`        | public copyparty              | anonymous `rwmd` share (`/void` volume = write-only, unlistable drop-box); in-browser video player with audio/subtitle track selection (patched copyparty + `video-tracks.js` plugin, see `modules/nixos/copyparty/`) |
 | `ntfy.skylake.mihaly.codes`         | ntfy push notifications       | self-hosted [ntfy](https://docs.ntfy.sh), in-memory (no storage), default read-write topics (ntfy.sh model) — see `modules/nixos/ntfy/`                                                                               |
+| `matrix.skylake.mihaly.codes`        | **Matrix** homeserver         | [Conduit](https://conduit.rs) (Rust, chosen over Synapse for skylake's 4 GB). Open registration (set a token in `modules.matrix.registrationToken` to gate it against bots). Federation via well-known delegation on this vhost — no extra public port. DB+media in `/var/lib/private/matrix-conduit` (persisted). Admin = invite to the `@conduit:matrix.skylake.mihaly.codes` admin room. See `modules/nixos/matrix/` |
 
 The public Homer board lists the public services (it-tools, public files,
-ntfy); the private Homer board (on the tailnet) lists the rest.
+ntfy, matrix); the private Homer board (on the tailnet) lists the rest.
 
 ## Tailnet
 
@@ -46,6 +47,7 @@ homer, homer-public) are only reachable from the `tailscale0` interface.
 - `it-tools.skylake.mihaly.codes`
 - `files.skylake.mihaly.codes`
 - `ntfy.skylake.mihaly.codes`
+- `matrix.skylake.mihaly.codes`
 - Account: `mihaly@mihaly.codes`
 
 First activation with a new cert name orders a new certificate; until
