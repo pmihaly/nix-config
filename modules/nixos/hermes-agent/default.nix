@@ -244,42 +244,48 @@ in
           model = {
             default = "deepseek/deepseek-v4-flash-0731";
             provider = "openrouter";
-            # Kept from the old local-llm days, and still the right shape
-            # for cloud usage. OpenRouter's catalog reports a 1M window for
-            # this model, but the compression settings below were tuned
-            # against a 64k-class window — with the 1M window a session would grow
-            # until compaction no longer helps and cost runs away. The pin
-            # wins over the 1M metadata: get_model_context_length() treats
-            # it as "explicit config override — user knows best" (step 0).
+            # Window for the OpenRouter deepseek-v4-flash-0731 backend.
+            # The model's real window is 1M; 128k pins the *accounting*
+            # to a sane ceiling while giving each turn 3x the headroom of
+            # the old 64k pin. The window is NOT the session-size knob
+            # anymore: `compression.threshold_tokens` (40k) is an absolute
+            # cap that wins over the percent trigger for any window >= ~48k
+            # (context_compressor._apply_threshold_tokens_cap — the cap is
+            # min(cap, context_length), so it's a no-op here). The summary
+            # budget derives from the trigger (40k × 0.20 ≈ 8k), not the
+            # window. So compaction fires at 40k whether the window is 64k
+            # or 128k — the pin only controls the output headroom left at
+            # that moment (~88k vs ~24k), which ends the
+            # finish_reason=length truncation class the old 64k window
+            # caused.
             #
-            # (History: 64000 is also the smallest value hermes accepts —
-            # agent init rejects anything below 64k. The real trigger
-            # control lives in `compression` below, where threshold_tokens
-            # bypasses the 64k MINIMUM_CONTEXT_LENGTH floor that otherwise
-            # pins the percent threshold to 85% of the window.)
-            context_length = 64000;
+            # (History: 64000 was the smallest value hermes accepts — agent
+            # init rejects below 64k — and matched the old llama.cpp 65k
+            # window. With the 40k cap in place, the degenerate-window
+            # branch (MINIMUM_CONTEXT_LENGTH floor pinning the percent
+            # trigger to 85%) never engages above ~48k, so 128k is fully
+            # in the normal branch.)
+            context_length = 131072;
           };
           # Retry rounds before a turn gives up with "max compression
           # attempts reached" (the #62605 failure class: incompressible
           # tool schemas keep the estimate above threshold even though
-          # the messages compress fine). Default 3 is too tight on the
-          # slow local backend, where a timed-out attempt still burns a
-          # round. 10 is the parser's hard cap (agent_init.py clamps
-          # anything larger); there is no "unlimited" value in config —
-          # that would need an upstream patch.
+          # the messages compress fine). Default 3 can still be tight
+          # when a timed-out attempt burns a round. 10 is the parser's
+          # hard cap (agent_init.py clamps anything larger); there is no
+          # "unlimited" value in config — that would need an upstream
+          # patch.
           #
-          # threshold_tokens: the `threshold` PERCENT knob is neutered at
-          # context_length=64000 — hermes floors the computed threshold at
-          # MINIMUM_CONTEXT_LENGTH (64k, hardcoded in
-          # agent/model_metadata.py), which equals the pinned window, so
-          # the degenerate-window branch always wins and compaction only
-          # fires at 85% (~54.4k). No config value can move the percent
-          # threshold, but threshold_tokens is an ABSOLUTE cap: the
-          # effective trigger is min(ratio-threshold, cap), so it escapes
-          # the floor. At 40k the compaction prompt leaves ~24k of the
-          # pinned 64k window for the summary (enough for an effective
-          # one), and the next regular call gets >=24k of output budget —
-          # which ends the finish_reason=length truncations.
+          # threshold_tokens: the `threshold` PERCENT knob is a ratio of
+          # the window (75% for <512k models — see
+          # _effective_threshold_percent), which at 128k would defer
+          # compaction to ~96k, where a summary+output still fit but the
+          # session is huge. threshold_tokens is an ABSOLUTE cap: the
+          # effective trigger is min(ratio-threshold, cap), so it wins
+          # and compaction fires at 40k regardless of the window. At 40k
+          # the compaction prompt leaves ~88k of the 128k window for the
+          # summary + following turns — no finish_reason=length
+          # truncations.
           compression = {
             threshold_tokens = 40000;
             max_attempts = 10;
