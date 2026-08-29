@@ -60,8 +60,20 @@
           logo = ../../modules/nixos/homer/homer.svg;
           url = "http://${vars.domainName}/homer/";
         };
+        Chat."Matrix" = {
+          logo = ../../modules/nixos/matrix/matrix.svg;
+          url = "https://matrix.${vars.publicDomainName}";
+        };
       };
     };
+
+    # Public Matrix homeserver (Conduit, Rust). Served at
+    # https://matrix.skylake.mihaly.codes over the existing nginx 80/443
+    # front (Let's Encrypt); federation uses the well-known delegation on
+    # the same vhost, so no extra public port is opened. Data lives in
+    # /var/lib/private/matrix-conduit (persisted below). See
+    # modules/nixos/matrix/ and PUBLIC-ACCESS.md.
+    matrix.enable = true;
 
     # Cross-link on the private (tailnet) board to the public board.
     # Everything else on the private board arrives via each service's
@@ -188,6 +200,10 @@
       # re-order certificates (rate limits!), and nginx would serve the
       # minica self-signed bootstrap cert again.
       "/var/lib/acme"
+      # Conduit DB + media (systemd DynamicUser puts the StateDirectory
+      # under /var/lib/private/matrix-conduit). tmpfs /var would lose all
+      # rooms/users on every reboot without this.
+      "/var/lib/private/matrix-conduit"
     ];
     files = [ "/etc/machine-id" ];
     users.${vars.username} = {

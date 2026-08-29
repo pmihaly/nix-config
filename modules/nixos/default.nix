@@ -9,6 +9,7 @@
     ./immich
     ./tailscale
     ./it-tools
+    ./matrix
     ./copyparty
     ./ntfy
     ./hermes-agent

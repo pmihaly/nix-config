@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Public Matrix homeserver (Conduit). Green-on-dark Matrix "M",
+       adapted from the Matrix.org brand mark. -->
+  <rect width="64" height="64" rx="14" fill="#111418"/>
+  <g fill="#0dbd8b">
+    <path d="M11 9h6.4l-1.7 48H9.3z"/>
+    <path d="M46.6 9H53l1.7 48h-6.4z"/>
+    <path d="M17.4 9h29.2L32 50z"/>
+  </g>
+</svg>
