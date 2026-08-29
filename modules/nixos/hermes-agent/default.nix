@@ -113,21 +113,14 @@ let
   # Wrapper that lets the agent deploy skylake itself: one ssh
   # connection to the hermes-deploy user on aesop, whose forced command
   # (machines/aesop/default.nix) fast-forwards a dedicated deploy
-  # checkout from this machine's checkout and runs
-  # scripts/deploy-skylake.sh — building on aesop, activating skylake
-  # remotely, exactly like `make skylake` (including rollback on
-  # failure). No shell, no other commands, no forwarding possible with
-  # that key (restrict + command=).
+  # checkout and pushes it to GitHub — her ONLY ssh channel (the
+  # hermes-github-ssh key below, git@github.com:pmihaly/nix-config). She
+  # never ssh's to aesop or anywhere else; deployment is gitops: the
+  # skylake-auto-deploy timer on aesop (machines/aesop/default.nix)
+  # watches the public repo, pulls, builds and activates skylake.
   #
-  # The private key is an agenix secret at the default materialized
-  # location /run/agenix/server/skylake-deploy-ssh (hermes:hermes 400).
-  # /run/agenix.d is 751 root:keys and its generation dir likewise, so
-  # the hermes user can traverse to the file without being able to list
-  # the other secrets. known_hosts lives in the service user's home
-  # (the .ssh dir is created by the activation script below).
-  deploySkylake = pkgs.writeShellScriptBin "deploy-skylake" ''
-    exec ${pkgs.openssh}/bin/ssh -o BatchMode=yes -o ConnectTimeout=15 -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=${hermesCfg.stateDir}/.ssh/known_hosts -i /run/agenix/server/skylake-deploy-ssh hermes-deploy@aesop.anaconda-snapper.ts.net deploy
-  '';
+  # known_hosts lives in the service user's home (the .ssh dir is
+  # created by the activation script below).
 
   # Lite model profile for skylake (2 vCPU / 4 GB). The repo defaults
   # (llm.ts) are Qwen3-Embedding-4B + Qwen3-Reranker-4B plus a 1.7B
@@ -362,12 +355,10 @@ in
           # `nixcfg`, machines/skylake). Explicit rather than relying on
           # the transitive dep the package pulls in today, so an upstream
           # bump can't silently break that.
-          # The ssh client for the deploy wrapper (and ad-hoc tailnet use),
-          # plus the deploy wrapper itself (see deploySkylake above).
+          # The ssh client for the GitHub push (and ad-hoc tailnet use).
           ++ [
             pkgs.git
             pkgs.openssh
-            deploySkylake
           ];
 
         # ── QMD notes search (MCP) ────────────────────────────────────
@@ -427,10 +418,17 @@ in
         };
       };
 
-      # Private key for the deploy path (see deploySkylake above).
-      # Materialized at the default /run/agenix/server/skylake-deploy-ssh.
-      age.secrets."server/skylake-deploy-ssh" = {
-        file = ../../../secrets/server/skylake-deploy-ssh.age;
+      # GitHub SSH key for hermes (git push/fetch over ssh): "skylake's
+      # key" — the mihaly@mihaly.codes keypair, which is also skylake's
+      # ssh HOST key (machines/skylake persists it at
+      # /persist/etc/ssh/ssh_host_ed25519_key; secrets/secrets.nix lists
+      # the same pubkey under both names) and is registered on GitHub as
+      # pmihaly. Materialized at the default
+      # /run/agenix/server/hermes-github-ssh (400, hermes-owned), decrypted
+      # on skylake via the host-key identity. The ssh client config
+      # that points git at it lives in the activation script below.
+      age.secrets."server/hermes-github-ssh" = {
+        file = ../../../secrets/server/hermes-github-ssh.age;
         owner = hermesCfg.user;
         group = hermesCfg.group;
         mode = "400";
@@ -447,15 +445,42 @@ in
         mode = "400";
       };
 
-      # known_hosts dir for the deploy wrapper's ssh (UserKnownHostsFile
-      # points at the service user's home, so accept-new can pin aesop's
-      # host key on first use).
-      system.activationScripts."hermes-deploy-ssh" = {
+      # known_hosts dir for hermes' ssh client (UserKnownHostsFile
+      # points at the service user's home, so accept-new can pin
+      # github.com's host key on hermes's first push).
+      system.activationScripts."hermes-ssh" = {
         deps = [ "users" ];
         text = ''
           mkdir -p ${hermesCfg.stateDir}/.ssh
           chown ${hermesCfg.user}:${hermesCfg.group} ${hermesCfg.stateDir}/.ssh
           chmod 700 ${hermesCfg.stateDir}/.ssh
+        '';
+      };
+
+      # Git-over-ssh for hermes: pin GitHub to the hermes-github-ssh key
+      # (agenix secret above) via hermes' ~/.ssh/config. HOME is the
+      # service user's stateDir (upstream sets it on every hermes unit), so
+      # ssh reads this config for every `git push`/`git fetch` hermes runs.
+      # known_hosts is the file "hermes-ssh" created; github.com's
+      # host key is pinned on first use (accept-new). BatchMode keeps
+      # pushes non-interactive.
+      system.activationScripts."hermes-github-ssh" = {
+        deps = [
+          "users"
+          "hermes-ssh"
+        ];
+        text = ''
+          ssh_dir=${hermesCfg.stateDir}/.ssh
+          cat > "$ssh_dir/config" <<'EOF'
+          Host github.com
+            IdentityFile /run/agenix/server/hermes-github-ssh
+            IdentitiesOnly yes
+            UserKnownHostsFile ${hermesCfg.stateDir}/.ssh/known_hosts
+            StrictHostKeyChecking accept-new
+            BatchMode yes
+          EOF
+          chmod 600 "$ssh_dir/config"
+          chown ${hermesCfg.user}:${hermesCfg.group} "$ssh_dir/config"
         '';
       };
 

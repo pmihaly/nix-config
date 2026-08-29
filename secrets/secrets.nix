@@ -10,7 +10,16 @@ in
   "email/password/mihaly_mihaly.codes.age".publicKeys = allKeys;
   "backup/s3-access.age".publicKeys = allKeys;
   "backup/restic.age".publicKeys = allKeys;
-  "server/skylake-deploy-ssh.age".publicKeys = allKeys;
+  # SSH key for the deploy-rs activation hop (root@skylake over the
+  # tailnet): the id_skylake_rescue keypair (original is the gitignored
+  # ~/.ssh/id_skylake_rescue on aesop). hermes-deploy reads it via agenix
+  # — no on-disk copies anywhere. Encrypted for both keys, like the rest.
+  "server/skylake-activate-ssh.age".publicKeys = allKeys;
+  # GitHub SSH key for hermes on skylake (git push over ssh): the
+  # mihaly@mihaly.codes keypair, which is also skylake's ssh host key
+  # and is registered on GitHub as pmihaly. Encrypted for both keys, like
+  # the rest — on skylake it decrypts via the host key.
+  "server/hermes-github-ssh.age".publicKeys = allKeys;
   # OpenRouter API key, used by hermes (skylake) and by pi/opencode
   # (aesop). Encrypted for both keys, like the rest.
   "openrouter-api-key.age".publicKeys = allKeys;
