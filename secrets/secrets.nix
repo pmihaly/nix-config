@@ -12,4 +12,7 @@ in
   "backup/restic.age".publicKeys = allKeys;
   "server/copyparty-misi.age".publicKeys = allKeys;
   "server/skylake-deploy-ssh.age".publicKeys = allKeys;
+  # OpenRouter API key, used by hermes (skylake) and by pi/opencode
+  # (aesop). Encrypted for both keys, like the rest.
+  "openrouter-api-key.age".publicKeys = allKeys;
 }

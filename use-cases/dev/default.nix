@@ -18,7 +18,14 @@ optionalAttrs platform.isLinux {
   };
   imports = [ ../../modules/nixos ];
   config = mkIf cfg.enable {
-    modules.local-llm.enable = true;
+    # local-llm (llama-swap + Open WebUI + SearXNG on aesop) is DISABLED:
+    # the local Qwen3.8-27B backend was the point of the module, and
+    # running it is what we wanted to stop (power). Its consumers now use
+    # OpenRouter instead — hermes (skylake, see
+    # modules/nixos/hermes-agent) and pi/opencode below (same model,
+    # qwen/qwen3.8-27b, hosted). Re-enable to bring the local stack back;
+    # the module itself is unchanged.
+    # modules.local-llm.enable = true;
 
     virtualisation.docker = {
       enable = true;
@@ -66,14 +73,23 @@ optionalAttrs platform.isLinux {
             port = 4096;
             hostname = "0.0.0.0";
           };
-          provider.llama = {
-            name = "llama.cpp (local)";
+          # Qwen via OpenRouter (the local llama-swap backend on aesop is
+          # gone — local-llm disabled to save power). Same model as before
+          # (qwen/qwen3.8-27b), now hosted. The key comes from the
+          # environment: opencode interpolates {env:…} in provider options,
+          # and OPENROUTER_API_KEY is exported by programs.bash below from
+          # the agenix secret. The models map key must be the real
+          # OpenRouter model id (that is what goes in the API request), so
+          # the agent references below are provider/key =
+          # qwen/qwen/qwen3.8-27b.
+          provider.qwen = {
+            name = "Qwen (OpenRouter)";
             npm = "@ai-sdk/openai-compatible";
             options = {
-              baseURL = "http://127.0.0.1:8081/v1";
-              apiKey = "local";
+              baseURL = "https://openrouter.ai/api/v1";
+              apiKey = "{env:OPENROUTER_API_KEY}";
             };
-            models."Qwen3.8-27B Q4 +MTP".name = "Qwen3.8-27B Q4 +MTP";
+            models."qwen/qwen3.8-27b".name = "Qwen3.8-27B (OpenRouter)";
           };
         };
         agents = {
@@ -81,7 +97,7 @@ optionalAttrs platform.isLinux {
             ---
             description: System architecture and design decisions
             mode: subagent
-            model: llama/Qwen3.8-27B Q4 +MTP
+            model: qwen/qwen/qwen3.8-27b
             temperature: 0.2
             permission:
               edit: deny
@@ -112,7 +128,7 @@ optionalAttrs platform.isLinux {
             ---
             description: Implementation and code writing
             mode: subagent
-            model: llama/Qwen3.8-27B Q4 +MTP
+            model: qwen/qwen/qwen3.8-27b
             temperature: 0.1
             ---
             You are a coder agent. Implement features, fix bugs, and write clean code.
@@ -140,7 +156,7 @@ optionalAttrs platform.isLinux {
             ---
             description: Codebase exploration and research
             mode: subagent
-            model: llama/Qwen3.8-27B Q4 +MTP
+            model: qwen/qwen/qwen3.8-27b
             temperature: 0.1
             permission:
               edit: deny
@@ -167,7 +183,7 @@ optionalAttrs platform.isLinux {
             ---
             description: Writing and running tests
             mode: subagent
-            model: llama/Qwen3.8-27B Q4 +MTP
+            model: qwen/qwen/qwen3.8-27b
             temperature: 0.1
             ---
             You are a tester agent. Write tests and verify code correctness.
@@ -201,38 +217,86 @@ optionalAttrs platform.isLinux {
           source = ./pi/ntfy-notify.ts;
         };
 
+        # pi's (pi-mono) models.json: upserts qwen/qwen3.8-27b into pi's
+        # BUILT-IN openrouter provider. Per docs/models.md, a models array
+        # under an existing provider merges — the built-in catalog stays,
+        # this model is added by id. (The bundled catalog is generated at
+        # build time and predates qwen3.8-27b, so it must be declared.)
+        # Auth is the built-in behaviour: the openrouter provider reads
+        # OPENROUTER_API_KEY from the environment, which programs.bash
+        # below exports from the agenix secret. Same session envelope as
+        # the old local llama-swap setup (65536/8192) so behaviour is
+        # unchanged; OpenRouter itself allows up to 1M context.
         ".pi/agent/models.json" = {
           force = true;
           text = toJSON {
-            providers."llama-swap" = {
-              baseUrl = "http://127.0.0.1:8081/v1";
-              api = "openai-completions";
-              apiKey = "local";
-              compat.supportsDeveloperRole = false;
-              models = [
-                {
-                  id = "Qwen3.8-27B Q4 +MTP";
-                  name = "Qwen3.8-27B Q4 +MTP (local)";
-                  reasoning = true;
-                  input = [ "text" ];
-                  contextWindow = 65536;
-                  maxTokens = 8192;
-                }
-              ];
-            };
+            providers.openrouter.models = [
+              {
+                id = "qwen/qwen3.8-27b";
+                name = "Qwen3.8-27B (OpenRouter)";
+                reasoning = true;
+                input = [ "text" ];
+                contextWindow = 65536;
+                maxTokens = 8192;
+                # $/M tokens from the OpenRouter /models API (2025-08):
+                # prompt $0.425, completion $2.55 (no cache pricing).
+                cost = {
+                  input = 0.425;
+                  output = 2.55;
+                  cacheRead = 0;
+                  cacheWrite = 0;
+                };
+              }
+            ];
           };
         };
 
         ".pi/agent/settings.json" = {
           force = true;
           text = toJSON {
-            defaultProvider = "llama-swap";
-            defaultModel = "Qwen3.8-27B Q4 +MTP";
+            defaultProvider = "openrouter";
+            defaultModel = "qwen/qwen3.8-27b";
             theme = "dark";
             lastChangelogVersion = pkgs.pi-coding-agent.version;
           };
         };
       };
+
+      # ── OpenRouter secret (agenix, user level) ────────────────────
+      # The same .age hermes uses (secrets/openrouter-api-key.age),
+      # materialized by the agenix user service (agenix.service, WantedBy
+      # default.target) into $XDG_RUNTIME_DIR/agenix/openrouter-api-key
+      # (0400, user-owned) at every login. pi and opencode read
+      # OPENROUTER_API_KEY from the environment; the export below wires
+      # the two together.
+      #
+      # identityPaths MUST be set explicitly: the module default
+      # (~/.ssh/id_ed25519 + ~/.ssh/id_rsa) matches no key on this machine
+      # (the key is ~/.ssh/mihaly@mihaly.codes) — with the default,
+      # user-level agenix can't decrypt ANY secret (the email one included;
+      # its mount dir was silently empty until this fix).
+      age = {
+        identityPaths = [
+          "${config.users.users.${vars.username}.home}/.ssh/mihaly@mihaly.codes"
+        ];
+        secrets."openrouter-api-key" = {
+          file = ../../secrets/openrouter-api-key.age;
+          mode = "0400";
+        };
+      };
+
+      programs.bash.initExtra = ''
+        # OPENROUTER_API_KEY for pi / opencode / anything else that reads
+        # it from the environment. The agenix user service materializes
+        # the secret into $XDG_RUNTIME_DIR/agenix at login; the file is an
+        # env snippet (OPENROUTER_API_KEY=…), so sourcing it sets the
+        # variable. Silent no-op when it is not (yet) materialized — e.g.
+        # a shell started before the user service ran.
+        if [ -r "${"$"}XDG_RUNTIME_DIR/agenix/openrouter-api-key" ]; then
+          . "${"$"}XDG_RUNTIME_DIR/agenix/openrouter-api-key"
+          export OPENROUTER_API_KEY
+        fi
+      '';
 
       modules.persistence.files = [
         ".pi/agent/auth.json"
