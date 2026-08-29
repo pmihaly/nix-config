@@ -148,9 +148,12 @@ let
 
     [/plug]
     ${plugDir}
-    accs: 
-    r: *
-    flags: 
+    # g = get: downloadable by exact URL (the js-browser script tag
+    # /plug/video-tracks.js needs), but NOT listable — the volume stays
+    # out of the public file browser. r would expose the directory tree.
+    accs:
+    g: *
+    flags:
     hist: ${storage}/Services/copyparty-public-plug
   '';
 in
