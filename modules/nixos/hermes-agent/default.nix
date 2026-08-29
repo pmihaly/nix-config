@@ -647,6 +647,13 @@ in
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
+            # The SPA loads the xterm chunk via a <link rel=preload
+            # crossOrigin=...> (react-vendor's runtime preload sets
+            # i.crossOrigin=""), which forces a CORS-mode request even
+            # though the URL is same-origin. Without ACAO the preload
+            # fires 'error' -> "Unable to preload CSS". * is fine here:
+            # this tailnet-only vhost serves no credentialed data.
+            add_header Access-Control-Allow-Origin * always;
           '';
         };
       };
