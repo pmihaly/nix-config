@@ -155,6 +155,20 @@ let
     g: *
     flags:
     hist: ${storage}/Services/copyparty-public-plug
+
+    [/drop]
+    ${storage}/Drop
+    accs:
+    w: *
+    flags:
+    d2t
+    e2d
+    maxb: 10g,300
+    maxn: 250,600
+    scan: 60
+    vmaxb: 100g
+    vmaxn: 100k
+    hist: ${storage}/Services/copyparty-public-drop
   '';
 in
 {
@@ -180,9 +194,11 @@ in
         "d ${storage}/Services/copyparty 0700 root root -"
         "d ${storage}/Services/copyparty-plug 0700 root root -"
         "d ${storage}/Public 0755 copyparty copyparty -"
+        "d ${storage}/Drop 0755 copyparty copyparty -"
         "d ${storage}/Services/copyparty-public 0700 copyparty copyparty -"
         "d ${storage}/Services/copyparty-public-hist 0700 copyparty copyparty -"
         "d ${storage}/Services/copyparty-public-plug 0700 copyparty copyparty -"
+        "d ${storage}/Services/copyparty-public-drop 0700 copyparty copyparty -"
       ];
     }
 
@@ -232,9 +248,11 @@ in
           # activations, and the unprivileged user cannot create them
           # (both parents are root-owned).
           install -d -m 0755 -o copyparty -g copyparty ${storage}/Public
+          install -d -m 0755 -o copyparty -g copyparty ${storage}/Drop
           install -d -m 0700 -o copyparty -g copyparty ${storage}/Services/copyparty-public
           install -d -m 0700 -o copyparty -g copyparty ${storage}/Services/copyparty-public-hist
           install -d -m 0700 -o copyparty -g copyparty ${storage}/Services/copyparty-public-plug
+          install -d -m 0700 -o copyparty -g copyparty ${storage}/Services/copyparty-public-drop
         '';
         serviceConfig = {
           User = "copyparty";
@@ -321,6 +339,17 @@ in
       modules.homer.services.Documents."Public Files" = {
         logo = ./copyparty.svg;
         url = "https://files.${vars.publicDomainName}";
+      };
+
+      # Void directory (public write-only drop-box): per the void-directory
+      # spec §8, surface an explicit "Drop files" link so the /drop target
+      # is discoverable. Config-only — no copyparty source patch, and upload
+      # to /drop is intentionally ALLOWED for anonymous visitors (w: *); the
+      # volume itself cannot be listed/downloaded (no r). Placed next to
+      # "Public Files" so operators can copy the drop URL.
+      modules.homer.services.Documents."Drop files" = {
+        logo = ./copyparty.svg;
+        url = "https://files.${vars.publicDomainName}/drop";
       };
     }
   ]);
