@@ -50,7 +50,14 @@ if git -C "$DEPLOY_REPO" rev-parse -q --verify refs/heads/deploy >/dev/null 2>&1
     exit 3
   fi
 else
+  # First run: seed the deploy branch from GitHub's current tip WITHOUT
+  # deploying. This protects a machine that is already ahead of the repo
+  # (e.g. after a local bootstrap) from being rolled back to the last
+  # pushed rev — the first real deploy only happens once the branch
+  # advances past this baseline.
   git -C "$DEPLOY_REPO" checkout -q -b deploy FETCH_HEAD
+  echo "== seeded deploy baseline at $(git -C "$DEPLOY_REPO" rev-parse --short deploy); will deploy when $BRANCH advances past it"
+  exit 0
 fi
 
 echo "== deploying $(git -C "$DEPLOY_REPO" rev-parse --short HEAD) ($BRANCH)"

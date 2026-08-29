@@ -49,8 +49,9 @@ Hermes never ssh's to deploy. Deployment is push-based:
 1. Hermes commits in the skylake checkout (`/home/misi/.nix-config`) and **pushes** to `git@github.com:pmihaly/nix-config` (branch: `vibecode`) — that push is her *only* ssh channel, authenticated by the `server/hermes-github-ssh` agenix secret + her `~/.ssh/config` (both from `modules/nixos/hermes-agent`). She cannot trigger a deploy any other way: there is no ssh channel to aesop at all anymore.
 2. On aesop, the `skylake-auto-deploy` systemd timer (`machines/aesop/default.nix`, every 10 min) runs `scripts/skylake-auto-deploy.sh` as `hermes-deploy`. It fetches the **public** repo over anonymous https into the dedicated deploy checkout at `/var/lib/hermes-deploy/nix-config`, fast-forwards the local `deploy` branch (ff-only — a rewrite refuses to deploy), and — only if something moved — runs the same `scripts/deploy-skylake.sh`, which builds on aesop and activates skylake as root.
 3. Nothing is copied between machines and no gitignored/`600` keys sit under `/var/lib`: the only credential on the path is the `server/skylake-activate-ssh` agenix secret, materialized by aesop itself. The old forced-command ssh channel (`hermes-deploy` authorized key, `scripts/hermes-deploy.sh`, key copies, ACLs) is gone.
-4. Result visibility: the timer logs to aesop's journal (`journalctl -u skylake-auto-deploy`); on skylake, the deploy shows up as a new generation in `nixos-rebuild list-generations`.
-5. Don't push (or `make skylake`) twice concurrently — the timer's `flock` skips overlapping ticks, but a human deploy racing the timer is still one deploy-rs run too many.
+4. First run only **seeds** the deploy baseline (no deploy!): skylake can never be rolled *back* to the last pushed rev by a stale repo. The first actual deploy happens on the next push past the baseline — so after enabling the timer, push once to establish it.
+5. Result visibility: the timer logs to aesop's journal (`journalctl -u skylake-auto-deploy`); on skylake, the deploy shows up as a new generation in `nixos-rebuild list-generations`.
+6. Don't push (or `make skylake`) twice concurrently — the timer's `flock` skips overlapping ticks, but a human deploy racing the timer is still one deploy-rs run too many.
 
 ### gitops and secrets — keep in mind
 
