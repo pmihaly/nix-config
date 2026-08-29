@@ -17,4 +17,8 @@ in
   # OpenRouter API key, used by hermes (skylake) and by pi/opencode
   # (aesop). Encrypted for both keys, like the rest.
   "openrouter-api-key.age".publicKeys = allKeys;
+  # Matrix bot credentials (env-file: homeserver, user, access token,
+  # home room). Created for the Hermes matrix channel task; used by
+  # hermes on skylake.
+  "matrix-bot.age".publicKeys = allKeys;
 }
