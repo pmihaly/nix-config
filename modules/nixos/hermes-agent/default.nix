@@ -226,11 +226,14 @@ in
           extraDependencyGroups = [ "firecrawl" ];
         };
 
-        # LLM backend: llama-swap on aesop over the tailnet (OpenAI
-        # compatible, model `Qwen3.8-27B Q4 +MTP` served by llama-cpp-rocm).
-        # Nothing here is secret: the tailnet hostname is in this repo and
-        # llama-swap doesn't enforce auth (api_key is a formality). The
-        # ts.net name survives aesop tailnet-IP changes.
+        # LLM backend: OpenRouter (built-in provider), same model as before
+        # (qwen/qwen3.8-27b). The old backend — llama-swap on aesop over the
+        # tailnet, `Qwen3.8-27B Q4 +MTP` served by llama-cpp-rocm — is gone:
+        # local-llm is disabled on aesop to save power, so the model now
+        # runs in the cloud. The API key is the agenix secret
+        # openrouter-api-key (env-file format, appended to
+        # $HERMES_HOME/.env at activation — see environmentFiles below);
+        # nothing secret lands in this repo or the Nix store.
         #
         # NOTE on merge direction: the activation script deep-merges these
         # settings INTO the runtime config.yaml with Nix keys winning
@@ -238,50 +241,35 @@ in
         # dashboard, the next `make skylake` re-asserts the value below.
         # Update `settings` here to change the default model.
         settings = {
-          providers.local = {
-            api = "http://aesop.anaconda-snapper.ts.net:8081/v1";
-            api_key = "local";
-          };
           model = {
-            default = "Qwen3.8-27B Q4 +MTP";
-            provider = "custom:local";
-            # Deliberately BELOW llama-server's real --ctx-size (65536, see
-            # the models preset in modules/nixos/local-llm). Without a pin,
-            # hermes can't probe the custom endpoint and falls back to the
-            # catalog default for "qwen" (131,072) — the compressor never
-            # fires, the prompt outgrows the real window, and every response
-            # dies at finish_reason=length.
+            default = "qwen/qwen3.8-27b";
+            provider = "openrouter";
+            # Kept from the local-llm days, and still the right shape for
+            # cloud usage. OpenRouter's catalog reports a 1M window for this
+            # model, but the compression settings below were tuned against a
+            # 64k-class window — with the 1M window a session would grow
+            # until compaction no longer helps and cost runs away. The pin
+            # wins over the 1M metadata: get_model_context_length() treats
+            # it as "explicit config override — user knows best" (step 0).
             #
-            # Why not pin the real 65536? hermes' compression threshold is
-            # floored at 64k (MINIMUM_CONTEXT_LENGTH), so a 65536 pin lets a
-            # session grow to ~64k before compacting — and a session that
-            # large is unrecoverable on a 64k window: the summarizer must
-            # re-read the middle of the history, which no longer fits.
-            #
-            # 64000 is the smallest value hermes accepts (agent init rejects
-            # anything below 64k). At exactly 64000 the floored threshold
-            # meets the window, which switches the trigger to 85% of the
-            # window (~54.4k) — but 54.4k is TOO LATE: a compaction call at
-            # that size leaves ~11k of the 65,536 window for the summary, so
-            # the summary itself truncates, the session barely shrinks, and
-            # every normal response dies at finish_reason=length. The real
-            # trigger control lives in `compression` below
-            # (threshold_tokens bypasses the 64k floor).
+            # (History: 64000 is also the smallest value hermes accepts —
+            # agent init rejects anything below 64k. The real trigger
+            # control lives in `compression` below, where threshold_tokens
+            # bypasses the 64k MINIMUM_CONTEXT_LENGTH floor that otherwise
+            # pins the percent threshold to 85% of the window.)
             context_length = 64000;
           };
-          # ── Compression ─────────────────────────────────────────
-          # The `threshold` PERCENT knob is neutered at context_length=64000:
-          # hermes floors the computed threshold at MINIMUM_CONTEXT_LENGTH
-          # (64k, hardcoded in agent/model_metadata.py), which equals the
-          # pinned window, so the degenerate-window branch always wins and
-          # compaction only fires at 85% (~54.4k). No config value can move
-          # the percent threshold — but `threshold_tokens` is an ABSOLUTE
-          # cap: the effective trigger is min(ratio-threshold, cap), so it
-          # escapes the floor.
-          #
-          # 40k: the compaction prompt (≈40k history) leaves ~25k of the
-          # real 65,536 window for the summary — enough for an effective
-          # one — and the next regular call gets ≥25k of output budget,
+          # threshold_tokens: the `threshold` PERCENT knob is neutered at
+          # context_length=64000 — hermes floors the computed threshold at
+          # MINIMUM_CONTEXT_LENGTH (64k, hardcoded in
+          # agent/model_metadata.py), which equals the pinned window, so
+          # the degenerate-window branch always wins and compaction only
+          # fires at 85% (~54.4k). No config value can move the percent
+          # threshold, but threshold_tokens is an ABSOLUTE cap: the
+          # effective trigger is min(ratio-threshold, cap), so it escapes
+          # the floor. At 40k the compaction prompt leaves ~24k of the
+          # pinned 64k window for the summary (enough for an effective
+          # one), and the next regular call gets >=24k of output budget —
           # which ends the finish_reason=length truncations.
           compression = {
             threshold_tokens = 40000;
@@ -345,6 +333,15 @@ in
         environment = optionalAttrs cfg.whatsapp {
           WHATSAPP_ENABLED = "true";
         };
+
+        # OpenRouter API key (agenix; the file is env-snippet format,
+        # OPENROUTER_API_KEY=…). environmentFiles are appended to
+        # $HERMES_HOME/.env at ACTIVATION time (mkEnvScript cats each file
+        # in), so the key never lands in the Nix store — only the .age in
+        # secrets/ is committed. Hermes' built-in openrouter provider reads
+        # OPENROUTER_API_KEY from $HERMES_HOME/.env at startup
+        # (credential_pool.py prefers the dotenv over the service env).
+        environmentFiles = [ config.age.secrets."openrouter-api-key".path ];
         extraPackages =
           (optional cfg.whatsapp whatsappBridge)
           # QMD: the CLI on PATH (for `qmd embed` in the timer and for
@@ -426,6 +423,17 @@ in
       # Materialized at the default /run/agenix/server/skylake-deploy-ssh.
       age.secrets."server/skylake-deploy-ssh" = {
         file = ../../../secrets/server/skylake-deploy-ssh.age;
+        owner = hermesCfg.user;
+        group = hermesCfg.group;
+        mode = "400";
+      };
+
+      # OpenRouter API key (see environmentFiles above). Materialized at the
+      # default /run/agenix/openrouter-api-key, readable only by the hermes
+      # user. Env-file format because the activation script appends the raw
+      # file content to $HERMES_HOME/.env.
+      age.secrets."openrouter-api-key" = {
+        file = ../../../secrets/openrouter-api-key.age;
         owner = hermesCfg.user;
         group = hermesCfg.group;
         mode = "400";
