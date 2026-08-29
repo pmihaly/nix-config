@@ -87,9 +87,13 @@ in
       type = types.attrs;
     };
 
+    # Fed by every service's mkService `dashboard` self-registration.
+    # Defaults to {} — an empty board — rather than null: when no service
+    # self-registers (e.g. aesop, whose only dashboard entries were the
+    # local-llm stack), builtins.attrValues would choke on null.
     services = mkOption {
-      default = null;
-      type = types.nullOr types.anything;
+      default = { };
+      type = types.attrs;
     };
 
     # Optional second instance, served publicly on the apex domain
