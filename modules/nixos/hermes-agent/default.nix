@@ -638,6 +638,33 @@ in
             proxy_send_timeout 3600s;
           '';
         };
+
+        # The SPA's dynamic chunks (its xterm/terminal module) request bare
+        # /assets/* — absolute paths baked into the JS bundle by Vite, NOT
+        # rewritten by the X-Forwarded-Prefix HTML mount (that only rewrites
+        # <script>/<link> tags in index.html). Without this location, a bare
+        # /assets/xterm-*.css falls into the vhost's catch-all `location /`
+        # (301 -> /homer/... -> 301 http://:8080 -> mixed-content block) and
+        # the chat view never mounts (blank page). The backend serves /assets/*
+        # directly at / on port 9119, so proxy it the same way as /hermes/.
+        "/assets/" = {
+          proxyPass = "http://127.0.0.1:${toString port}/";
+          proxyWebsockets = false;
+
+          # Same Host-header rewrite the /hermes/ location uses, so the
+          # loopback DNS-rebinding guard accepts these requests too.
+          recommendedProxySettings = false;
+
+          extraConfig = ''
+            allow 100.64.0.0/10;
+            deny all;
+            proxy_set_header Host 127.0.0.1;
+            proxy_set_header Origin "";
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+          '';
+        };
       };
 
       # Card on the private Homer board.
