@@ -79,7 +79,7 @@ in
         TSBIN=${config.services.tailscale.package}/bin/tailscale
         LOG=/var/log/tailscale-cert.log
         : > "$LOG"
-        before=$(cksum ${tsCert} 2>/dev/null)
+        before=$(cksum ${tsCert} 2>/dev/null || true)
         for attempt in $(seq 1 20); do
           if "$TSBIN" cert \
             --min-validity=30d \
@@ -101,13 +101,24 @@ in
         fi
 
         chmod 644 "$LOG"
-        after=$(cksum ${tsCert} 2>/dev/null)
+        after=$(cksum ${tsCert} 2>/dev/null || true)
         if [ "$before" != "$after" ]; then
-          # nginx may not be running yet on a fresh boot; try-restart only
-          # reloads when it is active.
+          # Clear the failure rate limiter (activation may have hit
+          # start-limit-hit while the cert was missing); nginx may not be
+          # running yet on a fresh boot, try-restart only reloads when it
+          # is active.
+          systemctl reset-failed nginx.service || true
           systemctl try-restart nginx.service || true
         fi
       '';
+    };
+
+    # On boot AND on deploy-activation restarts of nginx, wait for the cert
+    # oneshot to have produced the certificate before nginx's `nginx -t`
+    # pre-start runs — otherwise nginx refuses to start (missing ssl cert).
+    systemd.services.nginx = mkIf ts.enable {
+      after = [ "tailscale-cert-${vars.domainName}.service" ];
+      wants = [ "tailscale-cert-${vars.domainName}.service" ];
     };
 
     systemd.timers."tailscale-cert-${vars.domainName}" = mkIf ts.enable {
