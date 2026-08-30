@@ -110,14 +110,12 @@ let
     npmDepsHash = "sha256-ZSvXA2Huo1YG+Q37y9gKv3dJSMafOmXAaWDW9O6X+sg=";
   };
 
-  # Wrapper that lets the agent deploy skylake itself: one ssh
-  # connection to the hermes-deploy user on aesop, whose forced command
-  # (machines/aesop/default.nix) fast-forwards a dedicated deploy
-  # checkout and pushes it to GitHub — her ONLY ssh channel (the
-  # hermes-github-ssh key below, git@github.com:pmihaly/nix-config). She
-  # never ssh's to aesop or anywhere else; deployment is gitops: the
-  # skylake-auto-deploy timer on aesop (machines/aesop/default.nix)
-  # watches the public repo, pulls, builds and activates skylake.
+  # Git-over-ssh for hermes: her only ssh channel is `git push`/`git
+  # fetch` to github.com (hermes-github-ssh key below,
+  # git@github.com:pmihaly/nix-config), so she can publish the changes
+  # she makes in the skylake nix-config checkout. She has no ssh
+  # channel to aesop or anywhere else; deploying skylake stays a
+  # human-run `make skylake` on aesop.
   #
   # known_hosts lives in the service user's home (the .ssh dir is
   # created by the activation script below).

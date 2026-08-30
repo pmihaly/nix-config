@@ -29,35 +29,23 @@
 
 ## Deploying Skylake
 
-`make skylake` is fully wired via `deploy.nodes.skylake` in `flake.nix` and works unattended — it runs `./scripts/deploy-skylake.sh`, a thin wrapper around `deploy -s .#skylake`:
+`make skylake` is fully wired via `deploy.nodes.skylake` in `flake.nix` and works unattended (no TTY, no manual typing) — it runs `./scripts/deploy-skylake.sh`, which wraps `deploy -s .#skylake` and auto-answers the sudo prompt:
 
 ```
 make skylake
+# → (sudo for 100.69.8.15) Password:   (auto-filled from machines/skylake/sudo-password)
 ```
 
 How it works:
 
 - Connects to the Tailscale IP `100.69.8.15`. Port 22 on the public Hetzner IP (`157.180.77.226`) is firewalled (only nginx 80/443 is public), and `~/.ssh/config` `Host skylake` still points at that blocked IP — so a bare `ssh root@skylake` from aesop times out. The flake config overrides the hostname and passes the key explicitly.
-- deploy-rs activates as **root** (`sshUser = user = "root"`): root's authorized key on skylake is the rescue key, declared in `machines/skylake/default.nix` (so it survives the tmpfs root — no impermanence surprise). No sudo prompt — hence no pty/password dance in `deploy-skylake.sh`.
-- `sshOpts` passes two paths to the same rescue keypair: `~/.ssh/id_skylake_rescue` (misi, for `make skylake`) and `/run/agenix/server/skylake-activate-ssh` (the hermes-deploy user, for the auto-deploy timer). ssh tries each key it can read and skips the others.
+- SSH auth is key-based as user `misi`: `~/.ssh/id_skylake_rescue` (authorized for `misi` on skylake). No password for the SSH login itself.
+- `user = "root"` + `interactiveSudo = true`: deploy-rs rewrites the remote command to `sudo -S -p ""` and prompts for the sudo password locally via rpassword, which reads from `/dev/tty`. `scripts/deploy-skylake.sh` runs deploy under util-linux `script` (pty) and feeds the gitignored `machines/skylake/sudo-password` in up front; `script -e` propagates the exit code. Known cosmetic quirk: the password is echoed once at the top (local-terminal-only).
 - On activation failure, deploy-rs revokes the deploy and rolls back to the previous generation.
 
-### Deploying from skylake (hermes) — gitops, no ssh
+### Hermes and deployment
 
-Hermes never ssh's to deploy. Deployment is push-based:
-
-1. Hermes commits in the skylake checkout (`/home/misi/.nix-config`) and **pushes** to `git@github.com:pmihaly/nix-config` (branch: `vibecode`) — that push is her *only* ssh channel, authenticated by the `server/hermes-github-ssh` agenix secret + her `~/.ssh/config` (both from `modules/nixos/hermes-agent`). She cannot trigger a deploy any other way: there is no ssh channel to aesop at all anymore.
-2. On aesop, the `skylake-auto-deploy` systemd timer (`machines/aesop/default.nix`, every 10 min) runs `scripts/skylake-auto-deploy.sh` as `hermes-deploy`. It fetches the **public** repo over anonymous https into the dedicated deploy checkout at `/var/lib/hermes-deploy/nix-config`, fast-forwards the local `deploy` branch (ff-only — a rewrite refuses to deploy), and — only if something moved — runs the same `scripts/deploy-skylake.sh`, which builds on aesop and activates skylake as root.
-3. Nothing is copied between machines and no gitignored/`600` keys sit under `/var/lib`: the only credential on the path is the `server/skylake-activate-ssh` agenix secret, materialized by aesop itself. The old forced-command ssh channel (`hermes-deploy` authorized key, `scripts/hermes-deploy.sh`, key copies, ACLs) is gone.
-4. First run only **seeds** the deploy baseline (no deploy!): skylake can never be rolled *back* to the last pushed rev by a stale repo. The first actual deploy happens on the next push past the baseline — so after enabling the timer, push once to establish it.
-5. Result visibility: the timer logs to aesop's journal (`journalctl -u skylake-auto-deploy`); on skylake, the deploy shows up as a new generation in `nixos-rebuild list-generations`.
-6. Don't push (or `make skylake`) twice concurrently — the timer's `flock` skips overlapping ticks, but a human deploy racing the timer is still one deploy-rs run too many.
-
-### gitops and secrets — keep in mind
-
-- The aesop side needs no GitHub credentials (public repo). If the repo ever goes private, `skylake-auto-deploy.sh` needs a way to authenticate the fetch.
-- The deploy only sees what is **pushed**. Committing on skylake without pushing deploys nothing — unlike the pre-gitops forced command, which fetched the skylake checkout's local `HEAD`.
-- `server/skylake-activate-ssh` (id_skylake_rescue) is registered in `secrets/secrets.nix`; rotate by re-encrypting the `.age` and updating root's authorized key in `machines/skylake/default.nix`.
+Hermes on skylake edits the `/home/misi/.nix-config` checkout and has **one ssh channel only**: `git push`/`git fetch` to `git@github.com:pmihaly/nix-config`, authenticated by the `server/hermes-github-ssh` agenix secret + her `~/.ssh/config` (both from `modules/nixos/hermes-agent`). She cannot deploy or reach aesop over ssh — the old forced-command `hermes-deploy` channel, its key copies, and the gitops auto-deploy timer are all gone. Deploying skylake is a human `make skylake` on aesop that builds and activates whatever is in the local checkout (aesop's — the machine doing the deploy).
 
 ## Nix Search
 

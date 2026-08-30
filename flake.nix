@@ -306,28 +306,23 @@
           # every ssh invocation and to `nix copy` via NIX_SSHOPTS.
           hostname = "100.69.8.15";
           sshOpts = [
-            # Root activation over the tailnet: root's authorized key on
-            # skylake is the rescue key (declared in machines/skylake, so
-            # it survives impermanence). `make skylake` runs as misi and
-            # reads the original; the skylake-auto-deploy timer runs as
-            # hermes-deploy and reads the same keypair via the agenix
-            # secret. ssh tries each key it can read.
+            # `make skylake` runs deploy as misi, reading the rescue key
+            # directly (no other key paths — the hermes-deploy copies are
+            # gone).
             "-i"
             "/home/misi/.ssh/id_skylake_rescue"
-            "-i"
-            "/run/agenix/server/skylake-activate-ssh"
             "-o"
             "StrictHostKeyChecking=accept-new"
           ];
           profiles.system = {
             path = inputs.deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.skylake;
-            sshUser = "root";
+            sshUser = "misi";
             user = "root";
             magicRollback = false;
             autoRollback = false;
-            # No interactive sudo: activation runs as root directly, so
-            # there is no password prompt (and no pty dance in
-            # scripts/deploy-skylake.sh) for either caller.
+            # Prompt for the sudo password on the local terminal and pipe
+            # it in; the activation itself runs as root.
+            interactiveSudo = true;
           };
         };
       };
