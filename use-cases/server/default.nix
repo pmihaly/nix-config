@@ -43,7 +43,6 @@ optionalAttrs platform.isLinux {
         it-tools.enable = true;
         copyparty.enable = true;
         ntfy.enable = true;
-        pinchflat.enable = true;
         hermes-agent.enable = true;
         # WhatsApp platform: DISABLED 2026-08-30 at the operator's
         # request (self-chat channel removed). The gateway was restarted
