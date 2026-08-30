@@ -228,6 +228,7 @@
   # exactly these two units AND the start verb — never manage-any-unit.
   # Note the parens: && binds tighter than ||, so each unit check must
   # be wrapped or the rule would fire for ANY action.
+  security.polkit.enable = true;
   security.polkit.extraConfig = ''
     polkit.addRule(function(action, subject) {
       if (subject.user == "hermes" &&
