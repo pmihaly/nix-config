@@ -93,7 +93,7 @@ let
           # /.well-known delegation path stays allowed — federation is
           # server-to-server and never consults robots.txt).
           locations."=/robots.txt" = {
-            return = "200 User-agent: *\nDisallow: /\n";
+            return = ''200 "User-agent: *\nDisallow: /\n"'';
           };
           locations."=/agents.txt" = {
             return = "200 out:all\n";

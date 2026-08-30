@@ -314,7 +314,7 @@ in
         # (mirrors the mkService robots.txt/agents.txt on the other public
         # vhosts — this one is hand-rolled, see the comment above).
         locations."=/robots.txt" = {
-          return = "200 User-agent: *\nDisallow: /\n";
+          return = ''200 "User-agent: *\nDisallow: /\n"'';
         };
         locations."=/agents.txt" = {
           return = "200 out:all\n";
