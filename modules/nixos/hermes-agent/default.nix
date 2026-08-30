@@ -348,12 +348,32 @@ in
         # operator @misi — is rejected as "unauthorized user" and the channel
         # is inert. mautrix must be present for the adapter to load at all
         # (the `matrix` dependency group above).
+        #
+        # MATRIX_E2EE_MODE enables Matrix end-to-end encryption (olm/megolm).
+        # The adapter defaults to OFF; "optional" turns on the OlmMachine so
+        # the bot decrypts incoming encrypted events and auto-encrypts its
+        # replies in encrypted rooms (mautrix 0.21 auto-encrypts outgoing
+        # when room state requests it, after share_keys). "required" is the
+        # same but hard-fails the whole channel if crypto init or device-key
+        # verification fails at connect; "optional" degrades to plaintext
+        # instead of bricking the bridge — the right choice here since the
+        # operator's own @misi room may be plaintext. Deps (mautrix
+        # [encryption] group, python-olm, aiosqlite, PgCryptoStore sqlite
+        # backend) are bundled via the `matrix` group above, so optional
+        # actually engages. MATRIX_DEVICE_ID is deliberately NOT set: unset,
+        # the adapter uses the login token's own device_id, which is stable
+        # (the token persists) and keyed in the SQLite crypto store at
+        # $HERMES_HOME/platforms/matrix/store/crypto.db — forcing a different id
+        # would reset the Olm identity and force re-verification.
+        # NOTE: the gateway reads .env into its process env at startup, so a
+        # gateway (re)start is required for this to take effect.
         environment =
           (optionalAttrs cfg.whatsapp {
             WHATSAPP_ENABLED = "true";
           })
           // {
             MATRIX_ALLOWED_USERS = "@misi:matrix.skylake.mihaly.codes";
+            MATRIX_E2EE_MODE = "optional";
           };
 
         # OpenRouter API key + Matrix bot credentials (agenix; env-snippet
