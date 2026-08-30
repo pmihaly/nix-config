@@ -205,9 +205,7 @@
   };
 
   # The ONLY sudo hermes gets: passwordless start of those two fixed
-  # services. Matching is on the canonicalized path (sudo resolves
-  # symlinks), so hermes' `sudo systemctl start ...` (which resolves to
-  # /run/current-system/sw/bin/systemctl) matches the rule.
+  # services.
   security.sudo.extraRules = [
     {
       users = [ "hermes" ];
@@ -223,6 +221,24 @@
       ];
     }
   ];
+
+  # Same two services via polkit, so hermes can start them from INSIDE
+  # her hardened agent (NoNewPrivileges=true blocks sudo there, but a
+  # non-root `systemctl start` over D-Bus only needs polkit). Scoped to
+  # exactly these two units AND the start verb — never manage-any-unit.
+  # Note the parens: && binds tighter than ||, so each unit check must
+  # be wrapped or the rule would fire for ANY action.
+  security.polkit.extraConfig = ''
+    polkit.addRule(function(action, subject) {
+      if (subject.user == "hermes" &&
+          action.id == "org.freedesktop.systemd1.manage-units" &&
+          (action.lookup("unit") == "hermes-config-apply.service" ||
+           action.lookup("unit") == "hermes-config-apply-rollback.service") &&
+          action.lookup("verb") == "start") {
+        return polkit.Result.YES;
+      }
+    });
+  '';
 
   # /root is NOT in the persistence list (only /home is), so /root/.ssh vanishes
   # on every boot (root = tmpfs). Declare the key here so it is recreated from
