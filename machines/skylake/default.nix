@@ -172,10 +172,12 @@
   # checkout, so the real trust boundary is what she commits).
   #
   # Usage (as hermes, on skylake):
-  #   git -C /home/misi/.nix-config pull --ff-only origin vibecode
-  #   sudo /run/current-system/sw/bin/systemctl start hermes-config-apply.service
+  #   git -C /home/misi/.nix-config pull --ff-only origin vibecode    (or just: git pull)
+  #   systemctl start hermes-config-apply.service                     (polkit — no sudo needed)
+  # The apply service itself fetch+pulls first, so a stale checkout can
+  # never be applied; hermes must push to origin before starting it.
   # status/logs:  journalctl -u hermes-config-apply -n 200
-  # rollback:     sudo /run/current-system/sw/bin/systemctl start hermes-config-apply-rollback.service
+  # rollback:     systemctl start hermes-config-apply-rollback.service
   systemd.services."hermes-config-apply" = {
     description = "Apply hermes' nix-config on skylake (nixos-rebuild switch)";
     serviceConfig.Type = "oneshot";
@@ -188,6 +190,14 @@
     ];
     script = ''
       cd /home/misi/.nix-config
+      # Hermes pushes to origin, then starts this service. Fetch +
+      # fast-forward so we always apply the latest origin — fails loudly
+      # (does not clobber) if the checkout is dirty or diverged. The
+      # system gitconfig whitelists this dir (safe.directory) and the
+      # repo uses core.sharedRepository=group, so root's pull keeps the
+      # checkout group-writable for hermes.
+      git fetch origin
+      git pull --ff-only origin vibecode
       nixos-rebuild switch --flake .#skylake
     '';
   };
