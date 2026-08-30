@@ -126,7 +126,10 @@
   #   find /home/misi/.nix-config -type d -exec chmod g+s {} +
   #   git -C /home/misi/.nix-config config core.sharedRepository group
   users.groups.nixcfg = { };
-  users.users.hermes.extraGroups = [ "nixcfg" ];
+  users.users.hermes.extraGroups = [
+    "nixcfg"
+    "systemd-journal"
+  ];
   systemd.tmpfiles.rules = [
     # Traverse /home/misi without listing it, to reach .nix-config.
     # Column order is Type Path Mode User Group Age Argument — five dashes,
@@ -155,6 +158,71 @@
     [safe]
         directory = /home/misi/.nix-config
   '';
+
+  # ------------------------------------------------------------------
+  # Hermes self-apply (the single root thing hermes can do).
+  #
+  # Hermes edits /home/misi/.nix-config and pushes to GitHub, but she
+  # has no way to ACTIVATE her config on skylake (her service runs under
+  # ProtectSystem=strict + no root). These two root oneshot services are
+  # the apply path: hermes runs exactly one allowed sudo command, which
+  # only STARTS the service — root then builds + activates the checkout
+  # with nixos-rebuild. No arbitrary command, no shell, no raw
+  # nixos-rebuild flags (defense-in-depth: she already writes the
+  # checkout, so the real trust boundary is what she commits).
+  #
+  # Usage (as hermes, on skylake):
+  #   git -C /home/misi/.nix-config pull --ff-only origin vibecode
+  #   sudo /run/current-system/sw/bin/systemctl start hermes-config-apply.service
+  # status/logs:  journalctl -u hermes-config-apply -n 200
+  # rollback:     sudo /run/current-system/sw/bin/systemctl start hermes-config-apply-rollback.service
+  systemd.services."hermes-config-apply" = {
+    description = "Apply hermes' nix-config on skylake (nixos-rebuild switch)";
+    serviceConfig.Type = "oneshot";
+    # root by default; Path is declared via `path` below. Build runs on
+    # skylake itself (same as a local `nixos-rebuild switch`).
+    path = [
+      pkgs.nixos-rebuild
+      pkgs.git
+      pkgs.coreutils
+    ];
+    script = ''
+      cd /home/misi/.nix-config
+      nixos-rebuild switch --flake . --hostname skylake
+    '';
+  };
+  systemd.services."hermes-config-apply-rollback" = {
+    description = "Roll back the last hermes nix-config apply";
+    serviceConfig.Type = "oneshot";
+    path = [
+      pkgs.nixos-rebuild
+      pkgs.coreutils
+    ];
+    # --rollback needs no flake/args: switches to the previous generation.
+    script = ''
+      nixos-rebuild switch --rollback
+    '';
+  };
+
+  # The ONLY sudo hermes gets: passwordless start of those two fixed
+  # services. Matching is on the canonicalized path (sudo resolves
+  # symlinks), so hermes' `sudo systemctl start ...` (which resolves to
+  # /run/current-system/sw/bin/systemctl) matches the rule.
+  security.sudo.extraRules = [
+    {
+      users = [ "hermes" ];
+      commands = [
+        {
+          command = "/run/current-system/sw/bin/systemctl start hermes-config-apply.service";
+          options = [ "NOPASSWD" ];
+        }
+        {
+          command = "/run/current-system/sw/bin/systemctl start hermes-config-apply-rollback.service";
+          options = [ "NOPASSWD" ];
+        }
+      ];
+    }
+  ];
 
   # /root is NOT in the persistence list (only /home is), so /root/.ssh vanishes
   # on every boot (root = tmpfs). Declare the key here so it is recreated from
