@@ -188,7 +188,7 @@
     ];
     script = ''
       cd /home/misi/.nix-config
-      nixos-rebuild switch --flake . --hostname skylake
+      nixos-rebuild switch --flake .#skylake
     '';
   };
   systemd.services."hermes-config-apply-rollback" = {
