@@ -12,6 +12,7 @@
     ./matrix
     ./copyparty
     ./ntfy
+    ./pinchflat
     ./hermes-agent
   ];
 }

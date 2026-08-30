@@ -53,6 +53,10 @@
           logo = ../../modules/nixos/ntfy/ntfy.svg;
           url = "https://ntfy.${vars.publicDomainName}";
         };
+        Media."Pinchflat" = {
+          logo = ../../modules/nixos/pinchflat/pinchflat.png;
+          url = "https://pinchflat.${vars.publicDomainName}";
+        };
         # Cross-link to the private (tailnet-only) board. Only resolvable
         # from the tailnet — visitors on the internet get a dead link, which
         # is intended.
