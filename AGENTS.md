@@ -45,7 +45,15 @@ How it works:
 
 ### Hermes and deployment
 
-Hermes on skylake edits the `/home/misi/.nix-config` checkout and has **one ssh channel only**: `git push`/`git fetch` to `git@github.com:pmihaly/nix-config`, authenticated by the `server/hermes-github-ssh` agenix secret + her `~/.ssh/config` (both from `modules/nixos/hermes-agent`). She cannot deploy or reach aesop over ssh — the old forced-command `hermes-deploy` channel, its key copies, and the gitops auto-deploy timer are all gone. Deploying skylake is a human `make skylake` on aesop that builds and activates whatever is in the local checkout (aesop's — the machine doing the deploy).
+Hermes on skylake edits the `/home/misi/.nix-config` checkout and has **one ssh channel only**: `git push`/`git fetch` to `git@github.com:pmihaly/nix-config`, authenticated by the `server/hermes-github-ssh` agenix secret + her `~/.ssh/config` (both from `modules/nixos/hermes-agent`). She cannot reach aesop over ssh — the old forced-command `hermes-deploy` channel, its key copies, and the gitops auto-deploy timer are all gone. Deploying skylake is a human `make skylake` on aesop that builds and activates whatever is in the local checkout (aesop's — the machine doing the deploy).
+
+Hermes CAN apply her own skylake config once deployed (machines/skylake):
+
+```
+sudo /run/current-system/sw/bin/systemctl start hermes-config-apply.service
+```
+
+That is her ONLY root capability — a passwordless sudo rule (`security.sudo.extraRules`) lets her start two fixed root oneshot services (`hermes-config-apply`, and `hermes-config-apply-rollback` for `nixos-rebuild switch --rollback`); no arbitrary command. The apply service runs `nixos-rebuild switch --flake . --hostname skylake` from `/home/misi/.nix-config`, so she should `git pull --ff-only origin vibecode` first. Logs: `journalctl -u hermes-config-apply`.
 
 ## Nix Search
 
