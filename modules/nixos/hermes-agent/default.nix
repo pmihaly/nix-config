@@ -213,8 +213,19 @@ in
         # core app alone; this group provides the SDK for the keyed
         # path (FIRECRAWL_API_KEY / FIRECRAWL_API_URL) and the lazy
         # `ensure("search.firecrawl")` import path.
+        #
+        # `matrix` group (mautrix[encryption] 0.21.1): the Matrix gateway
+        # adapter (plugins/platforms/matrix/adapter.py) requires mautrix at
+        # import time — WITHOUT it check_matrix_requirements() returns False
+        # and the channel degrades to stubs. mautrix was verified missing
+        # from the deployed hermes-agent-env (task t_991da13d), so `matrix`
+        # must be in the group list for the MATRIX_* env vars (below) to take
+        # effect. Added alongside this task's credential wiring.
         package = inputs.hermes-agent.packages.${pkgs.stdenv.system}.minimal.override {
-          extraDependencyGroups = [ "firecrawl" ];
+          extraDependencyGroups = [
+            "firecrawl"
+            "matrix"
+          ];
         };
 
         # LLM backend: OpenRouter (built-in provider), model
@@ -333,14 +344,19 @@ in
           WHATSAPP_ENABLED = "true";
         };
 
-        # OpenRouter API key (agenix; the file is env-snippet format,
-        # OPENROUTER_API_KEY=…). environmentFiles are appended to
-        # $HERMES_HOME/.env at ACTIVATION time (mkEnvScript cats each file
-        # in), so the key never lands in the Nix store — only the .age in
-        # secrets/ is committed. Hermes' built-in openrouter provider reads
-        # OPENROUTER_API_KEY from $HERMES_HOME/.env at startup
-        # (credential_pool.py prefers the dotenv over the service env).
-        environmentFiles = [ config.age.secrets."openrouter-api-key".path ];
+        # OpenRouter API key + Matrix bot credentials (agenix; env-snippet
+        # format, OPENROUTER_API_KEY=… / MATRIX_HOMESERVER=… etc).
+        # environmentFiles are appended to $HERMES_HOME/.env at ACTIVATION
+        # time (mkEnvScript cats each file in), so the keys never land in the
+        # Nix store — only the .age files in secrets/ are committed. Hermes'
+        # built-in openrouter provider reads OPENROUTER_API_KEY from
+        # $HERMES_HOME/.env at startup (credential_pool.py prefers the dotenv
+        # over the service env); the matrix adapter reads the MATRIX_* vars
+        # the same way (requires the `matrix` group — see package above).
+        environmentFiles = [
+          config.age.secrets."openrouter-api-key".path
+          config.age.secrets."matrix-bot".path
+        ];
         extraPackages =
           (optional cfg.whatsapp whatsappBridge)
           # QMD: the CLI on PATH (for `qmd embed` in the timer and for
@@ -438,6 +454,18 @@ in
       # file content to $HERMES_HOME/.env.
       age.secrets."openrouter-api-key" = {
         file = ../../../secrets/openrouter-api-key.age;
+        owner = hermesCfg.user;
+        group = hermesCfg.group;
+        mode = "400";
+      };
+
+      # Matrix bot credentials (env-file: MATRIX_HOMESERVER,
+      # MATRIX_BOT_USER, MATRIX_ACCESS_TOKEN, MATRIX_HOME_ROOM — and
+      # MATRIX_BOT_PASSWORD if a password login is used). Same
+      # env-file format as openrouter above; the matrix adapter reads it
+      # from $HERMES_HOME/.env (appended via environmentFiles above).
+      age.secrets."matrix-bot" = {
+        file = ../../../secrets/matrix-bot.age;
         owner = hermesCfg.user;
         group = hermesCfg.group;
         mode = "400";
@@ -636,6 +664,47 @@ in
             # Agent runs / LLM calls can be long; don't cut them off.
             proxy_read_timeout 3600s;
             proxy_send_timeout 3600s;
+          '';
+        };
+
+        # The SPA's dynamic chunks (its xterm/terminal module) request bare
+        # /assets/* — absolute paths baked into the JS bundle by Vite, NOT
+        # rewritten by the X-Forwarded-Prefix HTML mount (that only rewrites
+        # <script>/<link> tags in index.html). Without this location, a bare
+        # /assets/xterm-*.css falls into the vhost's catch-all `location /`
+        # (301 -> /homer/... -> 301 http://:8080 -> mixed-content block) and
+        # the chat view never mounts (blank page). The backend serves /assets/*
+        # directly at / on port 9119, so proxy it the same way as /hermes/.
+        "/assets/" = {
+          # NOTE: proxy_pass has NO URI part here (vs /hermes/ which uses
+          # "…9119/"). A trailing-slash proxy_pass would STRIP the /assets/
+          # prefix (the documented trap above) and send /assets/xterm.css as
+          # /xterm.css — which the backend treats as an unknown path and
+          # serves the SPA index.html (HTTP 200, wrong content-type). Passing
+          # the URI verbatim (no slash) keeps /assets/xterm-*.css intact, which
+          # the backend's static mount serves correctly.
+          proxyPass = "http://127.0.0.1:${toString port}";
+          proxyWebsockets = false;
+
+          # Same Host-header rewrite the /hermes/ location uses, so the
+          # loopback DNS-rebinding guard accepts these requests too.
+          recommendedProxySettings = false;
+
+          extraConfig = ''
+            allow 100.64.0.0/10;
+            deny all;
+            proxy_set_header Host 127.0.0.1;
+            proxy_set_header Origin "";
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            # The SPA loads the xterm chunk via a <link rel=preload
+            # crossOrigin=...> (react-vendor's runtime preload sets
+            # i.crossOrigin=""), which forces a CORS-mode request even
+            # though the URL is same-origin. Without ACAO the preload
+            # fires 'error' -> "Unable to preload CSS". * is fine here:
+            # this tailnet-only vhost serves no credentialed data.
+            add_header Access-Control-Allow-Origin * always;
           '';
         };
       };
