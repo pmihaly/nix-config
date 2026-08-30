@@ -43,6 +43,7 @@ optionalAttrs platform.isLinux {
         it-tools.enable = true;
         copyparty.enable = true;
         ntfy.enable = true;
+        pinchflat.enable = true;
         hermes-agent.enable = true;
         # WhatsApp platform (self-chat mode). Paired 2026-08-26 via the
         # dashboard — session creds live in
