@@ -86,6 +86,18 @@ let
           locations."/" = {
             proxyPass = "http://127.0.0.1:${builtins.toString port}";
           };
+          # Block web crawlers and AI agents from scraping/ingesting this
+          # public site. Served at the nginx layer so it works regardless of
+          # backend (homer container, ntfy, conduit, ...). Exact-match
+          # locations take precedence over "/"; coalesces for Matrix (the
+          # /.well-known delegation path stays allowed — federation is
+          # server-to-server and never consults robots.txt).
+          locations."=/robots.txt" = {
+            return = "200 User-agent: *\nDisallow: /\n";
+          };
+          locations."=/agents.txt" = {
+            return = "200 out:all\n";
+          };
         };
 
         # Let's Encrypt account + ToS (only pulled in when a service is public).
