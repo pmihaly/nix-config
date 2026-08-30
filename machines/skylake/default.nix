@@ -186,6 +186,7 @@
     path = [
       pkgs.nixos-rebuild
       pkgs.git
+      pkgs.openssh
       pkgs.coreutils
     ];
     script = ''
