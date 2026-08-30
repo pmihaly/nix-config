@@ -337,9 +337,21 @@ in
         # extraPackages puts the bridge tree (above) into the system
         # closure for the activation script; the derivation has no
         # bin/, so nothing lands on the hermes user's PATH.
-        environment = optionalAttrs cfg.whatsapp {
-          WHATSAPP_ENABLED = "true";
-        };
+        # Matrix operator allowlist (plaintext setting — NOT a secret).
+        # Both the gateway governance gate (startup warning: "No env user
+        # allowlists configured … will deny unknown senders") and the matrix
+        # adapter's trigger gate check the sender against MATRIX_ALLOWED_USERS
+        # (full "@user:server" form). Without it every sender — including the
+        # operator @misi — is rejected as "unauthorized user" and the channel
+        # is inert. mautrix must be present for the adapter to load at all
+        # (the `matrix` dependency group above).
+        environment =
+          (optionalAttrs cfg.whatsapp {
+            WHATSAPP_ENABLED = "true";
+          })
+          // {
+            MATRIX_ALLOWED_USERS = "@misi:matrix.skylake.mihaly.codes";
+          };
 
         # OpenRouter API key + Matrix bot credentials (agenix; env-snippet
         # format, OPENROUTER_API_KEY=… / MATRIX_HOMESERVER=… etc).
