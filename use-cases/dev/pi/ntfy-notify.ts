@@ -61,7 +61,9 @@ export default function (pi: ExtensionAPI) {
       method: "POST",
       headers: {
         Title: `${titles[kind]}: ${name}`,
-        Priority: needsInput ? "high" : "default",
+        // Always ntfy default (3 = medium). Hermes: pi must only ever send
+        // medium priority — no "high" even when needs input.
+        Priority: "default",
         Tags: tags[kind],
         Click: WEB_URL,
       },
