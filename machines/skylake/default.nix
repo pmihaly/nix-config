@@ -188,17 +188,19 @@
       pkgs.git
       pkgs.openssh
       pkgs.coreutils
+      pkgs.util-linux
     ];
     script = ''
       cd /home/misi/.nix-config
-      # Hermes pushes to origin, then starts this service. Fetch +
-      # fast-forward so we always apply the latest origin — fails loudly
-      # (does not clobber) if the checkout is dirty or diverged. The
-      # system gitconfig whitelists this dir (safe.directory) and the
-      # repo uses core.sharedRepository=group, so root's pull keeps the
-      # checkout group-writable for hermes.
-      git fetch origin
-      git pull --ff-only origin vibecode
+      # Pull as hermes — she owns the GitHub key + known_hosts (root's
+      # /root/.ssh is tmpfs and has no GitHub access). runuser is
+      # available (util-linux) and resets env, so resolve git's store
+      # path from the service PATH first. Hermes must push to origin
+      # before starting this service; fetch + ff fails loudly on a
+      # dirty/diverged checkout instead of clobbering.
+      GIT=$(command -v git)
+      runuser -u hermes -- "$GIT" -C /home/misi/.nix-config fetch origin
+      runuser -u hermes -- "$GIT" -C /home/misi/.nix-config pull --ff-only origin vibecode
       nixos-rebuild switch --flake .#skylake
     '';
   };
