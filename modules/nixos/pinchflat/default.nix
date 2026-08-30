@@ -41,19 +41,26 @@ in
 
     extraConfig = {
       # Native nixpkgs NixOS module (package bundles yt-dlp + apprise).
-      # NOT selfhosted: a real SECRET_KEY_BASE + basic auth come from the
-      # agenix secret below (the module asserts secretsFile != null when
-      # selfhosted = false). Basic auth is set on purpose — the service is
-      # public, and an unauthenticated public pinchflat is a free YouTube/
-      # bandwidth/disk-abuse vector for anyone on the internet.
+      # NOT selfhosted: a real SECRET_KEY_BASE comes from the agenix
+      # secret below (the module asserts secretsFile != null when
+      # selfhosted = false).
+      #
+      # NOTE (2026-08-30): basic auth (BASIC_AUTH_USERNAME/PASSWORD) was
+      # REMOVED at the operator's request — the public UI at
+      # pinchflat.${publicDomainName} is now unauthenticated. Trade-off:
+      # an open public pinchflat is a free YouTube/bandwidth/disk-abuse
+      # vector for anyone on the internet; if that ever becomes a problem,
+      # re-add BASIC_AUTH_* to the secret env-file (re-encrypt
+      # secrets/server/pinchflat.age) or restrict the public vhost
+      # (machines/skylake/PUBLIC-ACCESS.md).
       services.pinchflat = {
         enable = true;
         mediaDir = ytDir;
         secretsFile = config.age.secrets."server/pinchflat".path;
       };
 
-      # agenix secret (env-file): SECRET_KEY_BASE (64+ bytes), plus
-      # BASIC_AUTH_USERNAME / BASIC_AUTH_PASSWORD for the public UI.
+      # agenix secret (env-file): SECRET_KEY_BASE (64+ bytes) only —
+      # BASIC_AUTH_USERNAME/PASSWORD were removed 2026-08-30 (see above).
       # `file` defaults to /run/agenix/server/pinchflat; readable by
       # systemd (EnvironmentFile for the pinchflat unit).
       age.secrets."server/pinchflat" = {

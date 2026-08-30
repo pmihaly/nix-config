@@ -23,9 +23,11 @@ in
   # hermes on skylake.
   "matrix-bot.age".publicKeys = allKeys;
   # Pinchflat (YouTube media manager): SECRET_KEY_BASE (minimum 64 bytes)
-  # + BASIC_AUTH_USERNAME/PASSWORD. Env-file format, materialized by the
-  # pinchflat module as an EnvironmentFile for the systemd unit (not for
-  # hermes). Encrypted for both keys, like the rest — on skylake it
-  # decrypts via the host key.
+  # only — BASIC_AUTH_USERNAME/PASSWORD were dropped 2026-08-30 at the
+  # operator's request (public UI is now open; see modules/nixos/
+  # pinchflat). Env-file format, materialized by the pinchflat module as
+  # an EnvironmentFile for the systemd unit (not for hermes). Encrypted
+  # for both keys, like the rest — on skylake it decrypts via the host
+  # key.
   "server/pinchflat.age".publicKeys = allKeys;
 }

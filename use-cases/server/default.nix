@@ -45,15 +45,16 @@ optionalAttrs platform.isLinux {
         ntfy.enable = true;
         pinchflat.enable = true;
         hermes-agent.enable = true;
-        # WhatsApp platform (self-chat mode). Paired 2026-08-26 via the
-        # dashboard — session creds live in
-        # /persist/opt/skylake-services/hermes/.hermes/platforms/whatsapp/session,
-        # so the gateway reconnects without a fresh QR. To reset:
-        # set to false, deploy, remove the stale WHATSAPP_ENABLED line
-        # from $HERMES_HOME/.env, wipe the session dir, restart
-        # hermes-agent (see the WhatsApp section in modules/nixos/
-        # hermes-agent/default.nix).
-        hermes-agent.whatsapp = true;
+        # WhatsApp platform: DISABLED 2026-08-30 at the operator's
+        # request (self-chat channel removed). The gateway was restarted
+        # with the stale WHATSAPP_ENABLED line purged from $HERMES_HOME/
+        # .env (stale lines survive deploys — see the WhatsApp section in
+        # modules/nixos/hermes-agent/default.nix). The paired WhatsApp
+        # session dir is left in place so the channel can be re-enabled
+        # without a fresh QR; wipe
+        # /persist/opt/skylake-services/hermes/.hermes/platforms/
+        # whatsapp/session to forget the creds for good.
+        hermes-agent.whatsapp = false;
         # QMD notes search (MCP): embedding index over the agent's own
         # notes ($HERMES_HOME/memories) so it can find old notes as they
         # accumulate. Lite 0.6B model profile (skylake has 4 GB); models
