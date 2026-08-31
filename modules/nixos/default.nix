@@ -13,5 +13,6 @@
     ./copyparty
     ./ntfy
     ./hermes-agent
+    ./matrix-vision-bot
   ];
 }

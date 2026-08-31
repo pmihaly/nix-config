@@ -75,6 +75,17 @@
     # modules/nixos/matrix/ and PUBLIC-ACCESS.md.
     matrix.enable = true;
 
+    # Matrix vision bot: reacts to m.image messages on the Conduit
+    # homeserver, runs each image through an OpenAI-compatible vision model
+    # (OpenRouter), replies with the description. Reuses the matrix-bot.age
+    # + openrouter-api-key.age secrets (see modules/nixos/matrix-vision-bot).
+    matrix-vision-bot = {
+      enable = true;
+      # Restrict analysis to this account. Drop this block to let any user
+      # in any room trigger it.
+      allowedUsers = [ "@${vars.username}:matrix.${vars.publicDomainName}" ];
+    };
+
     # Cross-link on the private (tailnet) board to the public board.
     # Everything else on the private board arrives via each service's
     # mkService `dashboard` self-registration; this static group is the
