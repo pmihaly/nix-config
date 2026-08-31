@@ -762,7 +762,7 @@
     "homer-shield": {
       "flake": false,
       "locked": {
-        "narHash": "sha256-UBYFjxjEYxjqwtUmjVctl9Re9/bIlUzFWD34NuE6dSc=",
+        "narHash": "sha256-7JM6brmPvdqVaF/3oX69sN9TfxhrZ69Y/4IqVh9yJjM=",
         "type": "file",
         "url": "https://img.shields.io/github/v/release/bastienwirtz/homer.json"
       },
