@@ -274,6 +274,7 @@ async def process_image(
 
 
 def _make_handlers(
+    client: nio.AsyncClient,
     cfg: BotConfig,
     semaphore: asyncio.Semaphore,
     limiter: RateLimiter,
@@ -321,14 +322,21 @@ async def _run(cfg: BotConfig) -> int:
         device_id=cfg.device_id,
     )
 
-    on_image, on_encryption = _make_handlers(cfg, semaphore, limiter)
+    on_image, on_encryption = _make_handlers(client, cfg, semaphore, limiter)
     client.add_event_callback(on_image, nio.RoomMessageImage)
     client.add_event_callback(on_encryption, nio.RoomEncryptedMedia)
 
-    login_resp = await client.login(token=cfg.access_token)
-    if isinstance(login_resp, nio.LoginError):
-        log.error("login failed: %s", login_resp.message)
-        return 2
+    # The access token is already issued (see secrets/matrix-bot.age) — do
+    # NOT call the /login endpoint. Conduit rejects `m.login.token` ("Token
+    # login is not supported"), and nio's login() would POST it there.
+    # restore_login() just attaches the token so the client authenticates
+    # via the `Authorization: Bearer` header on every request, matching how
+    # the main hermes Matrix adapter connects.
+    client.restore_login(
+        user_id=cfg.user_id,
+        device_id=cfg.device_id or "matrix-vision-bot",
+        access_token=cfg.access_token,
+    )
 
     log.info("connected as %s to %s", cfg.user_id, cfg.homeserver)
     await client.sync_forever(timeout=30000, full_state=False)
