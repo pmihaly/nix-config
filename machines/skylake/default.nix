@@ -32,6 +32,8 @@
 
     server.enable = true;
 
+    syncthing.enable = true;
+
     # Public dashboard: the apex domain (skylake.mihaly.codes) serves this
     # second homer instance (container homer-public, :8081 behind nginx,
     # Let's Encrypt). Board links: it-tools + the public copyparty share

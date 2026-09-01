@@ -14,5 +14,6 @@
     ./ntfy
     ./hermes-agent
     ./matrix-vision-bot
+    ./syncthing
   ];
 }
