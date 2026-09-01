@@ -79,18 +79,20 @@ in
       "d ${vars.storage}/syncthing 0770 ${vars.username} multimedia -"
     ];
 
-    # Named-user ACL so the hermes service user can read/write the synced
-    # folder -- immediate (per-process), no agent restart needed. Group
-    # membership alone only takes effect at process spawn, and the
-    # already-running hermes agent wouldn't pick up `multimedia` until a
-    # restart. (`z` tmpfiles rules don't accept ACL args -- systemd ignores
-    # them -- so use setfacl, this repo's proven pattern for the same problem.
-    # Also set a DEFAULT ACL so newly synced files (created as
-    # misi:multimedia at umask 022) still inherit read/write for the
-    # multimedia group -> hermes.
+    # Named-user + group ACL so the hermes service user can read/write
+    # the synced folder. -R: applies already to EVERY existing file+dir under
+    # the sync root (catches files that synced in earlier). g:multimedia:rwX:
+    # hermes (a member of multimedia) gets rw on existing files; X
+    # grants execute to dirs only (files don't get x). d: default ACLs
+    # cascade onto newly-created files+dirs (incl. peer-pulled content),
+    # so future synced files inherit the same access. Group membership alone
+    # only applies at process spawn (stale for the running agent), so set
+    # the ACL directly -- immediate per-process effect, no agent restart. (`z`
+    # tmpfiles rules ignore ACL args -- systemd doesn't support them -- so setfacl,
+    # this repo's proven pattern.)
     system.activationScripts.hermes-syncthing-acl.text = ''
       if [ -d ${vars.storage}/syncthing ]; then
-        ${pkgs.acl}/bin/setfacl -m u:hermes:rwX,d:g:multimedia:rwX,d:u:hermes:rwX,d:m::rwx,m::rwx ${vars.storage}/syncthing
+        ${pkgs.acl}/bin/setfacl -R -m g:multimedia:rwX,d:g:multimedia:rwX,d:u:hermes:rwX,d:m::rwx,m::rwx ${vars.storage}/syncthing
       fi
     '';
 
