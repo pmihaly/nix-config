@@ -771,10 +771,18 @@ in
     {
       # Grant the hermes agent shell read-write access to the synced folder
       # (the ACLs/group cover the host; this exposes the same path rw INSIDE
-      # the agent's sandbox (ProtectSystem=strict whitelists ReadWritePaths⟩).
+      # the agent's sandbox (ProtectSystem=strict whitelists ReadWritePaths).
       # The upstream unit defaults the list to hermes' own dirs; this concat-merges
       # (systemd option of list-of-str concatenates across modules) adding the sync root.
       systemd.services.hermes-agent.serviceConfig.ReadWritePaths = [
+        "/persist/opt/skylake-storage/syncthing"
+      ];
+      # Same for the hermes-backend unit, which is what the file/terminal tools
+      # actually execute under (the backend spawns the tool shell). Without this,
+      # the backend sees /persist read-only (ProtectSystem=strict) and file edits
+      # fail with "Read-only file system", even though the agent process itself
+      # has the rw bind from the grant above. Keep it narrow to the sync tree.
+      systemd.services.hermes-backend.serviceConfig.ReadWritePaths = [
         "/persist/opt/skylake-storage/syncthing"
       ];
     }
