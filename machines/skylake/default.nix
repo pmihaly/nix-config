@@ -142,6 +142,7 @@
   users.users.hermes.extraGroups = [
     "nixcfg"
     "systemd-journal"
+    "multimedia"
   ];
   systemd.tmpfiles.rules = [
     # Traverse /home/misi without listing it, to reach .nix-config.

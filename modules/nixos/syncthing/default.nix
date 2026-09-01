@@ -72,10 +72,18 @@ in
       # for the "Sync" folder) lives directly under ${vars.storage} -- NOT
       # under Services/. The parent /persist/opt/skylake-storage is
       # root-owned, so the service (running as misi) cannot mkdir it itself:
-      # it must exist before syncthing starts. Create it as misi:multimedia
-      # (the group syncthing runs as). Also under ${vars.storage}, so it is
-      # already covered by the restic include.
-      "d ${vars.storage}/syncthing 0700 ${vars.username} multimedia -"
+      # it must exist before syncthing starts. Create it as misi:multimedia.
+      # Mode 0770: owner (misi) and group (multimedia) rwx. hermes is in the
+      # multimedia group, so it can read/write the synced files. Also under
+      # ${vars.storage}, so it is already covered by the restic include.
+      "d ${vars.storage}/syncthing 0770 ${vars.username} multimedia -"
+      # Explicit ACL for the hermes service user (immediate, no relogin):
+      # group membership only applies at process spawn, so the long-running
+      # hermes agent wouldn't pick up multimedia until restarted. A named
+      # user ACL works right away. Also set a DEFAULT ACL so newly synced
+      # files (created as misi:multimedia at umask 022) still inherit group
+      # r+wX for hermes.
+      "z ${vars.storage}/syncthing - - - - u:hermes:rwX,d:g:multimedia:rwX,m::rwx"
     ];
 
     # One-time migration from the old datadir location
