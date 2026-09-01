@@ -231,6 +231,22 @@
     '';
   };
 
+  # Lets hermes restart its own agent service from inside the sandbox.
+
+  # Needed because the agent cannot polkit/sudo-restart itself and adding
+  # a ReadWritePaths grant requires a fresh process to pick it up.
+
+  systemd.services."hermes-agent-restart" = {
+    description = "Restart the hermes agent service; lets a fresh process pick up unit changes (ReadWritePaths etc.) without sudo";
+    serviceConfig.Type = "oneshot";
+    serviceConfig.RemainAfterExit = true;
+    path = [ pkgs.systemd ];
+    script = ''
+      /run/current-system/sw/bin/systemctl restart hermes-agent.service
+    '';
+  };
+
+
   # The ONLY sudo hermes gets: passwordless start of those two fixed
   # services.
   security.sudo.extraRules = [
@@ -245,14 +261,18 @@
           command = "/run/current-system/sw/bin/systemctl start hermes-config-apply-rollback.service";
           options = [ "NOPASSWD" ];
         }
+        {
+          command = "/run/current-system/sw/bin/systemctl start hermes-agent-restart.service";
+          options = [ "NOPASSWD" ];
+        }
       ];
     }
   ];
 
-  # Same two services via polkit, so hermes can start them from INSIDE
+  # Same three services via polkit, so hermes can start them from INSIDE
   # her hardened agent (NoNewPrivileges=true blocks sudo there, but a
   # non-root `systemctl start` over D-Bus only needs polkit). Scoped to
-  # exactly these two units AND the start verb — never manage-any-unit.
+  # exactly these three units AND the start verb — never manage-any-unit.
   # Note the parens: && binds tighter than ||, so each unit check must
   # be wrapped or the rule would fire for ANY action.
   security.polkit.enable = true;
@@ -261,7 +281,8 @@
       if (subject.user == "hermes" &&
           action.id == "org.freedesktop.systemd1.manage-units" &&
           (action.lookup("unit") == "hermes-config-apply.service" ||
-           action.lookup("unit") == "hermes-config-apply-rollback.service") &&
+           action.lookup("unit") == "hermes-config-apply-rollback.service" ||
+           action.lookup("unit") == "hermes-agent-restart.service") &&
           action.lookup("verb") == "start") {
         return polkit.Result.YES;
       }
