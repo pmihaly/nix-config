@@ -92,7 +92,7 @@ in
     # this repo's proven pattern.)
     system.activationScripts.hermes-syncthing-acl.text = ''
       if [ -d ${vars.storage}/syncthing ]; then
-        ${pkgs.acl}/bin/setfacl -R -m g:multimedia:rwX,d:g:multimedia:rwX,d:u:hermes:rwX,d:m::rwx,m::rwx ${vars.storage}/syncthing
+        ${pkgs.acl}/bin/setfacl -R -m u:hermes:rwX,g:multimedia:rwX,d:g:multimedia:rwX,d:u:hermes:rwX,d:m::rwx,m::rwx ${vars.storage}/syncthing
       fi
     '';
 
