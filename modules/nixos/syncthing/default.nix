@@ -10,11 +10,13 @@ with lib;
 let
   cfg = config.modules.syncthing;
 
-  # Syncthing's own state (config.xml + device cert/key + folder DB)lane
-  # payload. /persist (vars.persistDir) outlives a host rebuild;vars.serviceConfig
-  # is IN the restic include list (see the `backup` module set in
-  # machines/skylake/default.nix), so the state is both persisted and backed up.
-  dataDir = "${vars.serviceConfig}/syncthing";
+  # Syncthing's own state (config.xml + device cert/key + folder DB)
+  # payload. Lives under ${vars.storage}/Services (not the services dir):
+  # ${vars.storage} is in the restic include list (see the `backup` module
+  # set in machines/skylake/default.nix), so the state is both persisted
+  # and backed up -- while ${vars.serviceConfig} (config-only, operator
+  # doesn't want it backed up) does NOT hold it.
+  dataDir = "${vars.storage}/Services/syncthing";
 
   # Web GUI port (tailnet-only, fronted by the nginx redirect at /syncthing).
   guiPort = 8384;
@@ -57,12 +59,43 @@ in
       openDefaultPorts = false;
     };
 
-    # Create the datadir if missing (purged datadir, fresh node)? No `z`
-    # heal:forcing ownership on an existing install would claim files the
+    # Create the datadir if missing (purged datadir, fresh node). No `z`
+    # heal: forcing ownership on an existing install would claim files the
     # operator may have chowned differently (e.g. a service user).
+    # Group is `multimedia`, NOT ${vars.username}: there is no group named
+    # after misi (primary group is "users"), so `0700 misi misi` would make
+    # systemd-tmpfiles fail on the group. multimedia is the group the
+    # service runs as, so it owns the datadir too.
     systemd.tmpfiles.rules = [
-      "d ${dataDir} 0700 ${vars.username} ${vars.username} -"
+      "d ${dataDir} 0700 ${vars.username} multimedia -"
     ];
+
+    # One-time migration from the old datadir location
+    # (${vars.serviceConfig}/syncthing) into the new storage path. Runs as
+    # root before syncthing starts on the first boot after this change;
+    # moves the existing config.xml + certs + folder DB across, so the
+    # device keeps its identity and peers don't need re-adding. A fresh
+    # install (no old datadir) is a no-op, and once migrated it never runs
+    # again (old dir is gone).
+    systemd.services.syncthing-migrate = {
+      description = "Migrate syncthing datadir to ${vars.storage}/Services (one-time)";
+      wantedBy = [ "syncthing.service" ];
+      before = [ "syncthing.service" ];
+      after = [ "systemd-tmpfiles-setup.service" ];
+      serviceConfig.Type = "oneshot";
+      script = ''
+        old=${vars.serviceConfig}/syncthing
+        new=${dataDir}
+        if [ -d "$old" ] && [ ! -e "$new/config.xml" ]; then
+          echo "migrating $old -> $new"
+          shopt -s dotglob
+          mv "$old/"* "$new/"
+          chown -R ${vars.username}:multimedia "$new"
+          chmod 0700 "$new"
+          echo "migrated ${dataDir}"
+        fi
+      '';
+    };
 
     # Tailnet-only reachability. skylake's WAN input policy is default-DROP;
     # only the tailscale interface may reach these ports. Mirrors the
