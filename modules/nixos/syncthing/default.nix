@@ -26,12 +26,16 @@ in
   config = mkIf cfg.enable {
     services.syncthing = {
       enable = true;
-      # Run as the machine owner:the historic datadir (and its 600-mode
+      # Run as the machine owner: the historic datadir (and its 600-mode
       # config.xml/certs) is owned by ${vars.username}, and the sync folder
       # destinations share his UID. A dedicated `syncthing` system user
       # would have to chown an existing state -- avoid that.
       user = vars.username;
-      group = vars.username;
+      # misi's primary group is "users"; there is NO group named after the
+      # user (so User=misi:Group=misi fails at runtime -- systemd can't resolve
+      # Group "misi"). The datadir is group multimedia (997, assigned to misi
+      # in the server use-case), so run as that group to match ownership.
+      group = "multimedia";
 
       # The datadir uses the legacy flat layout (config + db + keys all in
       # one dir) rather than the post-19.03 ${dataDir}/.config/syncthing
