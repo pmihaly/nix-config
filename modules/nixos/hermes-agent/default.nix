@@ -280,22 +280,27 @@ in
           # _effective_threshold_percent), which at 128k would defer
           # compaction to ~96k, where a summary+output still fit but the
           # session is huge. threshold_tokens is an ABSOLUTE cap: the
-          # effective trigger is min(ratio-threshold, cap), so it wins
-          # and compaction fires at 40k regardless of the window. At 40k
-          # the compaction prompt leaves ~88k of the 128k window for the
-          # summary + following turns — no finish_reason=length
-          # truncations.
+          # effective trigger is min(ratio-threshold, cap). Raised 40k →
+          # 90k (2026-09-01, user request) so the long tool-heavy
+          # sessions (deploy work) compact ~2.3x less often. At 90k the
+          # effective trigger = min(96k, 90k) = 90k, leaving ~38k of the
+          # 128k window for the summary + following turns — still clear
+          # of finish_reason=length truncation (summary budget = 90k ×
+          # 0.20 ≈ 18k). Pushing toward 120k would squeeze that headroom
+          # back toward the degenerate-window risk; 90k is the balanced
+          # point.
           compression = {
-            threshold_tokens = 40000;
+            threshold_tokens = 90000;
             max_attempts = 10;
-            # Cheap no-model-call pass: once the session exceeds 35k,
+            # Cheap no-model-call pass: once the session exceeds 85k,
             # truncate stale tool results >8k chars (the main bloat source
             # — file reads, long terminal output). The agent can re-read
-            # files / re-run commands, so nothing is truly lost. Keeps most
-            # prompts under the 40k compaction line so the expensive pass
-            # (and its max_attempts budget) fires less often. Set to 0 to
-            # disable.
-            proactive_prune_tokens = 35000;
+            # files / re-run commands, so nothing is truly lost. Raised
+            # 35k → 85k to track the new 90k compaction line (2026-09-01).
+            # Keeps most prompts under the 90k threshold so the expensive
+            # pass (and its max_attempts budget) fires less often. Set to
+            # 0 to disable.
+            proactive_prune_tokens = 85000;
           };
           # Web search/extract backend. Explicit config wins over the
           # availability-filtered legacy walk (agent/web_search_registry.py),
