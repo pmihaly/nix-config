@@ -1,5 +1,6 @@
 {
   lib,
+  pkgs,
   config,
   vars,
   ...
@@ -88,6 +89,15 @@ in
 
     services.nginx.virtualHosts."${vars.domainName}".locations."/syncthing" = {
       return = "301 http://${vars.domainName}:${builtins.toString guiPort}";
+    };
+
+    # Register a card on the Homer dashboard. Services normally self-register
+    # via mkService's `dashboard` attr; syncthing defines its service directly
+    # (no mkService), so register the card here to keep the board populated.
+    # The GUI is the only reachable surface (tailnet-only firewall).
+    modules.homer.services."Files"."Syncthing" = {
+      logo = "${pkgs.syncthing}/share/icons/hicolor/512x512/apps/syncthing.png";
+      url = "http://${vars.domainName}:${builtins.toString guiPort}";
     };
   };
 }
