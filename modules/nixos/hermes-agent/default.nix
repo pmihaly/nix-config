@@ -313,6 +313,21 @@ in
           web = {
             backend = "firecrawl";
           };
+          # Matrix verbosity: only show final results in chat, not the
+          # intermediate tool-call bubbles / mid-turn commentary / heartbeat
+          # messages. tool_progress=off kills the per-tool "[terminal] ran…"
+          # stream; interim_assistant_messages=false drops mid-turn
+          # "Let me check…" commentary; long_running_notifications=false drops
+          # the "⏳ Working — N min" heartbeat.
+          display = {
+            platforms = {
+              matrix = {
+                tool_progress = "off";
+                interim_assistant_messages = false;
+                long_running_notifications = false;
+              };
+            };
+          };
         };
 
         # ── WhatsApp ────────────────────────────────────────────────
