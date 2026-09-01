@@ -762,10 +762,21 @@ in
       };
 
       # Card on the private Homer board.
+
       modules.homer.services.AI.Hermes = {
         logo = ./hermes.png;
         url = "http://${vars.domainName}/hermes/";
       };
+    }
+    {
+      # Grant the hermes agent shell read-write access to the synced folder
+      # (the ACLs/group cover the host; this exposes the same path rw INSIDE
+      # the agent's sandbox (ProtectSystem=strict whitelists ReadWritePaths⟩).
+      # The upstream unit defaults the list to hermes' own dirs; this concat-merges
+      # (systemd option of list-of-str concatenates across modules) adding the sync root.
+      systemd.services.hermes-agent.serviceConfig.ReadWritePaths = [
+        "/persist/opt/skylake-storage/syncthing"
+      ];
     }
   ]);
 }
