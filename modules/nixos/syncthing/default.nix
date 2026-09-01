@@ -68,6 +68,14 @@ in
     # service runs as, so it owns the datadir too.
     systemd.tmpfiles.rules = [
       "d ${dataDir} 0700 ${vars.username} multimedia -"
+      # The sync FOLDER root (the actual share, configured inside Syncthing
+      # for the "Sync" folder) lives directly under ${vars.storage} -- NOT
+      # under Services/. The parent /persist/opt/skylake-storage is
+      # root-owned, so the service (running as misi) cannot mkdir it itself:
+      # it must exist before syncthing starts. Create it as misi:multimedia
+      # (the group syncthing runs as). Also under ${vars.storage}, so it is
+      # already covered by the restic include.
+      "d ${vars.storage}/syncthing 0700 ${vars.username} multimedia -"
     ];
 
     # One-time migration from the old datadir location
