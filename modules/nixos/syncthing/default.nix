@@ -77,14 +77,22 @@ in
       # multimedia group, so it can read/write the synced files. Also under
       # ${vars.storage}, so it is already covered by the restic include.
       "d ${vars.storage}/syncthing 0770 ${vars.username} multimedia -"
-      # Explicit ACL for the hermes service user (immediate, no relogin):
-      # group membership only applies at process spawn, so the long-running
-      # hermes agent wouldn't pick up multimedia until restarted. A named
-      # user ACL works right away. Also set a DEFAULT ACL so newly synced
-      # files (created as misi:multimedia at umask 022) still inherit group
-      # r+wX for hermes.
-      "z ${vars.storage}/syncthing - - - - u:hermes:rwX,d:g:multimedia:rwX,m::rwx"
     ];
+
+    # Named-user ACL so the hermes service user can read/write the synced
+    # folder -- immediate (per-process), no agent restart needed. Group
+    # membership alone only takes effect at process spawn, and the
+    # already-running hermes agent wouldn't pick up `multimedia` until a
+    # restart. (`z` tmpfiles rules don't accept ACL args -- systemd ignores
+    # them -- so use setfacl, this repo's proven pattern for the same problem.
+    # Also set a DEFAULT ACL so newly synced files (created as
+    # misi:multimedia at umask 022) still inherit read/write for the
+    # multimedia group -> hermes.
+    system.activationScripts.hermes-syncthing-acl.text = ''
+      if [ -d ${vars.storage}/syncthing ]; then
+        ${pkgs.acl}/bin/setfacl -m u:hermes:rwX,d:g:multimedia:rwX,d:u:hermes:rwX,d:m::rwx,m::rwx ${vars.storage}/syncthing
+      fi
+    '';
 
     # One-time migration from the old datadir location
     # (${vars.serviceConfig}/syncthing) into the new storage path. Runs as
