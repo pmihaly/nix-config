@@ -27,9 +27,9 @@ in
         { url = "https://feeds.feedburner.com/ThePragmaticEngineer"; }
         { url = "https://programming.dev/feeds/c/linux.xml?sort=Active"; }
         { url = "https://programming.dev/feeds/c/nix.xml?sort=Active"; }
-        { url = "https://reddit.com/r/escapehungary.rss"; }
-        { url = "https://reddit.com/r/kiszamolo.rss"; }
-        { url = "https://reddit.com/r/programminghungary.rss"; }
+        { url = "https://old.reddit.com/r/escapehungary.rss"; }
+        { url = "https://old.reddit.com/r/kiszamolo.rss"; }
+        { url = "https://old.reddit.com/r/programminghungary.rss"; }
         { url = "https://nushell.sh/rss.xml"; }
       ];
       extraConfig = ''

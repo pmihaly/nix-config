@@ -51,7 +51,7 @@ in
 
       set searchurls.g     https://google.com/search?q=
       set searchurls.ddg   https://duckduckgo.com/?q=
-      set searchurls.r     https://reddit.com/r/
+      set searchurls.r     https://old.reddit.com/r/
       set searchurls.dh    https://hub.docker.com/search?q=
       set searchurls.map   https://google.com/maps/search/
       set searchurls.maps  https://google.com/maps/search/
@@ -345,7 +345,9 @@ in
               name = "misi";
               extensions.packages = with pkgs.nur.repos.rycee.firefox-addons; [
                 sponsorblock
+                old-reddit-redirect
                 youtube-nonstop
+                reddit-enhancement-suite
                 keepassxc-browser
                 dearrow
               ];
