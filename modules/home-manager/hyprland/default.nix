@@ -20,7 +20,15 @@ in
       nemo
       inputs.hyprland-qtutils.packages.${pkgs.stdenv.hostPlatform.system}.default
       imv # image viewer
+      bibata-cursors # cursor theme (X11 format; Hyprland uses it via XCURSOR_* env)
     ];
+
+    home.pointerCursor = {
+      name = "Bibata-Modern-Classic";
+      package = pkgs.bibata-cursors;
+      size = 24;
+      gtk.enable = true;
+    };
 
     services.gammastep = {
       enable = true;
@@ -55,7 +63,12 @@ in
         "exec-once" = "${getExe pkgs.swaybg} --image ${../../../wallpaper.png}";
         env = [
           "WLR_DRM_NO_ATOMIC,1"
+          "XCURSOR_THEME, Bibata-Modern-Classic"
+          "XCURSOR_SIZE, 24"
         ];
+
+        # bibata-cursors ships only X11 format, so let Hyprland use that instead of hyprcursor
+        cursor.enable_hyprcursor = false;
         input = {
           kb_model = "pc105";
           kb_layout = "us";
