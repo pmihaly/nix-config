@@ -24,11 +24,15 @@ optionalAttrs platform.isLinux {
       home.sessionVariables.NIXOS_OZONE_WL = "1"; # run electron apps without xwayland
 
       modules = {
-        hyprland.enable = true;
+        niri.enable = true;
       };
     };
 
-    programs.hyprland.enable = true;
+    programs.niri.enable = true;
+
+    # programs.niri defaults gnome-keyring on; disable it to keep the
+    # old behavior and avoid clashing with programs.ssh.startAgent.
+    services.gnome.gnome-keyring.enable = false;
 
     modules = {
       qemu.enable = true;
@@ -53,7 +57,7 @@ optionalAttrs platform.isLinux {
       enable = true;
       settings = {
         default_session = {
-          command = "${getExe pkgs.tuigreet} --time --remember --cmd start-hyprland";
+          command = "${getExe pkgs.tuigreet} --time --remember --cmd ${pkgs.niri}/bin/niri-session";
           user = "greeter";
         };
       };

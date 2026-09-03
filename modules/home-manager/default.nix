@@ -9,7 +9,7 @@
     ./mpv
     ./terminal-emulator
     ./newsboat
-    ./hyprland
+    ./niri
     ./discord
     ./minecraft
     ./keepassxc

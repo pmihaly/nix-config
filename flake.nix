@@ -61,10 +61,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
       url = "github:numtide/treefmt-nix";
     };
-    hyprland-qtutils = {
-      inputs.nixpkgs.follows = "nixpkgs";
-      url = "github:hyprwm/hyprland-qtutils";
-    };
     nh = {
       inputs.nixpkgs.follows = "nixpkgs";
       url = "github:nix-community/nh";
@@ -170,8 +166,8 @@
       homeConfigurations.aesop = home-manager.lib.homeManagerConfiguration {
         pkgs = nixpkgs.legacyPackages.x86_64-linux;
         modules = [
-          inputs.nixvim.homeManagerModules.nixvim
-          inputs.stylix.homeManagerModules.stylix
+          inputs.nixvim.homeModules.nixvim
+          inputs.stylix.homeModules.stylix
           {
             nixpkgs.overlays = [
               inputs.nur.overlays.default
