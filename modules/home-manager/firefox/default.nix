@@ -18,7 +18,7 @@ in
     binary = mkOption {
       type = types.str;
       default =
-        if pkgs.stdenv.isLinux then
+        if pkgs.stdenv.hostPlatform.isLinux then
           getExe pkgs.firefox
         else
           "${pkgs.firefox}/Applications/Firefox.app/Contents/MacOS/firefox";
@@ -33,7 +33,7 @@ in
 
     modules.persistence.directories = [ ".mozilla" ];
 
-    home.packages = with pkgs; if stdenv.isLinux then [ widevine-cdm ] else [ ];
+    home.packages = with pkgs; if stdenv.hostPlatform.isLinux then [ widevine-cdm ] else [ ];
 
     xdg.configFile."tridactyl/tridactylrc".text = ''
       bind gd tabdetach
@@ -92,7 +92,11 @@ in
 
     programs.firefox = {
       enable = true;
-      configPath = if pkgs.stdenv.isLinux then ".mozilla/firefox" else "Library/Application Support/Firefox";
+      configPath =
+        if pkgs.stdenv.hostPlatform.isLinux then
+          ".mozilla/firefox"
+        else
+          "Library/Application Support/Firefox";
       nativeMessagingHosts = [
         pkgs.tridactyl-native
         pkgs.keepassxc
