@@ -175,8 +175,8 @@ in
           Mod+S hotkey-overlay-title="Screenshot a region" { spawn-sh "slurp | xargs -I{} ${pkgs.grim}/bin/grim -g {}"; }
 
           // ── focus cycling (was cyclenext / cyclenext, prev) ──
-          Mod+N { focus-column-right-or-first; }
-          Mod+M { focus-column-left-or-last; }
+          Mod+N { focus-column-left-or-last; }
+          Mod+M { focus-column-right-or-first; }
 
           // ── swap with neighbour (was swapnext / swapnext, prev) ──
           Mod+Ctrl+N { swap-window-right; }
