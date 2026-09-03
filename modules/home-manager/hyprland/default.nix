@@ -59,7 +59,7 @@ in
       settings = {
         ecosystem.no_update_news = true;
         monitor = [
-          "DP-1, 2560x1440@144, 0x0, 1"
+          "DP-2, 2560x1440@144, 0x0, 1"
         ];
         "exec-once" = "${getExe pkgs.swaybg} --image ${../../../wallpaper.png}";
         env = [
