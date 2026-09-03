@@ -73,24 +73,10 @@ in
 
     programs.direnv.enableNushellIntegration = true;
 
+    # fzf colors now come from the stylix palette (modules/styling),
+    # which sets programs.fzf.colors from the base16 scheme.
     programs.fzf = {
       enable = true;
-      colors = {
-        # Nord
-        fg = "#e5e9f0";
-        bg = "#3b4252";
-        hl = "#81a1c1";
-        "fg+" = "#e5e9f0";
-        "bg+" = "#4c566a";
-        "hl+" = "#81a1c1";
-        info = "#ebcb8b";
-        prompt = "#bf616a";
-        pointer = "#b48ead";
-        marker = "#a3be8c";
-        spinner = "#b48ead";
-        header = "#a3be8c";
-        border = "#4c566a";
-      };
     };
 
     home.sessionPath = [
@@ -123,7 +109,9 @@ in
     programs.btop = {
       enable = true;
       settings = {
-        theme_background = false;
+        # mkDefault so stylix's btop target (which also sets this based on
+        # terminal opacity) doesn't collide; result stays false either way.
+        theme_background = mkDefault false;
         true_color = true;
         update_ms = 100;
         vim_keys = true;

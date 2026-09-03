@@ -17,7 +17,11 @@ optionalAttrs platform.isLinux {
     username = mkOption { type = types.str; };
   };
 
+  imports = [ ../../modules/styling ];
+
   config = mkIf cfg.enable {
+    modules.styling.enable = true;
+
     home-manager.users.${vars.username} = {
       imports = [ ../../modules/home-manager ];
 
