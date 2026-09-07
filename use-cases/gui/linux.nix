@@ -27,6 +27,14 @@ optionalAttrs platform.isLinux {
 
       home.sessionVariables.NIXOS_OZONE_WL = "1"; # run electron apps without xwayland
 
+      home.packages = with pkgs; [
+        transmission_4-gtk
+      ];
+
+      modules.persistence.directories = [
+        ".config/transmission"
+      ];
+
       modules = {
         niri.enable = true;
       };
