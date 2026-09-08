@@ -117,6 +117,8 @@
   services.blueman.enable = true;
   services.pulseaudio.package = pkgs.pulseaudioFull; # extra bluetooth codecs
 
+  services.logind.settings.Login.HandlePowerKey = "poweroff";
+
   services.keyd = {
     enable = true;
     keyboards.default = {
