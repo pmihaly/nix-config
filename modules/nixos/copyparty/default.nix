@@ -36,6 +36,11 @@ let
   # changes). Runs as the unprivileged `copyparty` user; ProtectSystem=
   # full makes /usr /boot /etc read-only but leaves / and /persist
   # writable — NOT strict, which would make / read-only too.
+  # rproxy: -1 makes bans associate with the real visitor IP (the last
+  # X-Forwarded-For hop, appended by nginx) instead of 127.0.0.1 —
+  # without it one abusive client gets "thank you for playing" (the
+  # default --banmsg) sent to the ENTIRE share, since every request
+  # arrives from loopback and the ban lands on 127.0.0.1.
   #
   # XDG_CONFIG_HOME points at a persistent, copyparty-owned dir
   # (${storage}/Services/copyparty-public): with home=/nonexistent
@@ -125,6 +130,11 @@ let
     p: 3211
     no-reload
     js-browser: /plug/video-tracks.js
+    # nginx is the only client and appends the real visitor IP last to
+    # X-Forwarded-For (default xff-hdr name matches nginx's default
+    # header) — trust that hop so bans hit the actual client, never
+    # 127.0.0.1 (which would block the whole share; see header comment).
+    rproxy: -1
 
     [/]
     ${storage}/Public
