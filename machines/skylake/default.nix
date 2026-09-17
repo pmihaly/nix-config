@@ -32,6 +32,8 @@
 
     server.enable = true;
 
+    syncthing.enable = true;
+
     # Public dashboard: the apex domain (skylake.mihaly.codes) serves this
     # second homer instance (container homer-public, :8081 behind nginx,
     # Let's Encrypt). Board links: it-tools + the public copyparty share
@@ -45,7 +47,7 @@
           logo = "${pkgs.it-tools}/lib/android-chrome-512x512.png";
           url = "https://it-tools.${vars.publicDomainName}";
         };
-        Files."Public Files" = {
+        Files."copyparty" = {
           logo = ../../modules/nixos/copyparty/copyparty.svg;
           url = "https://files.${vars.publicDomainName}";
         };
@@ -60,7 +62,30 @@
           logo = ../../modules/nixos/homer/homer.svg;
           url = "http://${vars.domainName}/homer/";
         };
+        Chat."Matrix" = {
+          logo = ../../modules/nixos/matrix/matrix.svg;
+          url = "https://matrix.${vars.publicDomainName}";
+        };
       };
+    };
+
+    # Public Matrix homeserver (Conduit, Rust). Served at
+    # https://matrix.skylake.mihaly.codes over the existing nginx 80/443
+    # front (Let's Encrypt); federation uses the well-known delegation on
+    # the same vhost, so no extra public port is opened. Data lives in
+    # /var/lib/private/matrix-conduit (persisted below). See
+    # modules/nixos/matrix/ and PUBLIC-ACCESS.md.
+    matrix.enable = true;
+
+    # Matrix vision bot: reacts to m.image messages on the Conduit
+    # homeserver, runs each image through an OpenAI-compatible vision model
+    # (OpenRouter), replies with the description. Reuses the matrix-bot.age
+    # + openrouter-api-key.age secrets (see modules/nixos/matrix-vision-bot).
+    matrix-vision-bot = {
+      enable = true;
+      # Restrict analysis to this account. Drop this block to let any user
+      # in any room trigger it.
+      allowedUsers = [ "@${vars.username}:matrix.${vars.publicDomainName}" ];
     };
 
     # Cross-link on the private (tailnet) board to the public board.
@@ -114,7 +139,11 @@
   #   find /home/misi/.nix-config -type d -exec chmod g+s {} +
   #   git -C /home/misi/.nix-config config core.sharedRepository group
   users.groups.nixcfg = { };
-  users.users.hermes.extraGroups = [ "nixcfg" ];
+  users.users.hermes.extraGroups = [
+    "nixcfg"
+    "systemd-journal"
+    "multimedia"
+  ];
   systemd.tmpfiles.rules = [
     # Traverse /home/misi without listing it, to reach .nix-config.
     # Column order is Type Path Mode User Group Age Argument — five dashes,
@@ -142,6 +171,122 @@
   environment.etc."gitconfig".text = ''
     [safe]
         directory = /home/misi/.nix-config
+  '';
+
+  # ------------------------------------------------------------------
+  # Hermes self-apply (the single root thing hermes can do).
+  #
+  # Hermes edits /home/misi/.nix-config and pushes to GitHub, but she
+  # has no way to ACTIVATE her config on skylake (her service runs under
+  # ProtectSystem=strict + no root). These two root oneshot services are
+  # the apply path: hermes runs exactly one allowed sudo command, which
+  # only STARTS the service — root then builds + activates the checkout
+  # with nixos-rebuild. No arbitrary command, no shell, no raw
+  # nixos-rebuild flags (defense-in-depth: she already writes the
+  # checkout, so the real trust boundary is what she commits).
+  #
+  # Usage (as hermes, on skylake):
+  #   git -C /home/misi/.nix-config pull --ff-only origin vibecode    (or just: git pull)
+  #   systemctl start hermes-config-apply.service                     (polkit — no sudo needed)
+  # The apply service itself fetch+pulls first, so a stale checkout can
+  # never be applied; hermes must push to origin before starting it.
+  # status/logs:  journalctl -u hermes-config-apply -n 200
+  # rollback:     systemctl start hermes-config-apply-rollback.service
+  systemd.services."hermes-config-apply" = {
+    description = "Apply hermes' nix-config on skylake (nixos-rebuild switch)";
+    serviceConfig.Type = "oneshot";
+    # root by default; Path is declared via `path` below. Build runs on
+    # skylake itself (same as a local `nixos-rebuild switch`).
+    path = [
+      pkgs.nixos-rebuild
+      pkgs.git
+      pkgs.openssh
+      pkgs.coreutils
+      pkgs.util-linux
+    ];
+    script = ''
+      cd /home/misi/.nix-config
+      # Pull as hermes — she owns the GitHub key + known_hosts (root's
+      # /root/.ssh is tmpfs and has no GitHub access). runuser is
+      # available (util-linux) and resets env, so resolve git's store
+      # path from the service PATH first. Hermes must push to origin
+      # before starting this service; fetch + ff fails loudly on a
+      # dirty/diverged checkout instead of clobbering.
+      GIT=$(command -v git)
+      runuser -u hermes -- "$GIT" -C /home/misi/.nix-config fetch origin
+      runuser -u hermes -- "$GIT" -C /home/misi/.nix-config pull --ff-only origin vibecode
+      nixos-rebuild switch --flake .#skylake
+    '';
+  };
+  systemd.services."hermes-config-apply-rollback" = {
+    description = "Roll back the last hermes nix-config apply";
+    serviceConfig.Type = "oneshot";
+    path = [
+      pkgs.nixos-rebuild
+      pkgs.coreutils
+    ];
+    # --rollback needs no flake/args: switches to the previous generation.
+    script = ''
+      nixos-rebuild switch --rollback
+    '';
+  };
+
+  # Lets hermes restart its own agent service from inside the sandbox.
+
+  # Needed because the agent cannot polkit/sudo-restart itself and adding
+  # a ReadWritePaths grant requires a fresh process to pick it up.
+
+  systemd.services."hermes-agent-restart" = {
+    description = "Restart the hermes agent service; lets a fresh process pick up unit changes (ReadWritePaths etc.) without sudo";
+    serviceConfig.Type = "oneshot";
+    serviceConfig.RemainAfterExit = true;
+    path = [ pkgs.systemd ];
+    script = ''
+      /run/current-system/sw/bin/systemctl restart hermes-agent.service
+    '';
+  };
+
+
+  # The ONLY sudo hermes gets: passwordless start of those two fixed
+  # services.
+  security.sudo.extraRules = [
+    {
+      users = [ "hermes" ];
+      commands = [
+        {
+          command = "/run/current-system/sw/bin/systemctl start hermes-config-apply.service";
+          options = [ "NOPASSWD" ];
+        }
+        {
+          command = "/run/current-system/sw/bin/systemctl start hermes-config-apply-rollback.service";
+          options = [ "NOPASSWD" ];
+        }
+        {
+          command = "/run/current-system/sw/bin/systemctl start hermes-agent-restart.service";
+          options = [ "NOPASSWD" ];
+        }
+      ];
+    }
+  ];
+
+  # Same three services via polkit, so hermes can start them from INSIDE
+  # her hardened agent (NoNewPrivileges=true blocks sudo there, but a
+  # non-root `systemctl start` over D-Bus only needs polkit). Scoped to
+  # exactly these three units AND the start verb — never manage-any-unit.
+  # Note the parens: && binds tighter than ||, so each unit check must
+  # be wrapped or the rule would fire for ANY action.
+  security.polkit.enable = true;
+  security.polkit.extraConfig = ''
+    polkit.addRule(function(action, subject) {
+      if (subject.user == "hermes" &&
+          action.id == "org.freedesktop.systemd1.manage-units" &&
+          (action.lookup("unit") == "hermes-config-apply.service" ||
+           action.lookup("unit") == "hermes-config-apply-rollback.service" ||
+           action.lookup("unit") == "hermes-agent-restart.service") &&
+          action.lookup("verb") == "start") {
+        return polkit.Result.YES;
+      }
+    });
   '';
 
   # /root is NOT in the persistence list (only /home is), so /root/.ssh vanishes
@@ -188,6 +333,10 @@
       # re-order certificates (rate limits!), and nginx would serve the
       # minica self-signed bootstrap cert again.
       "/var/lib/acme"
+      # Conduit DB + media (systemd DynamicUser puts the StateDirectory
+      # under /var/lib/private/matrix-conduit). tmpfs /var would lose all
+      # rooms/users on every reboot without this.
+      "/var/lib/private/matrix-conduit"
     ];
     files = [ "/etc/machine-id" ];
     users.${vars.username} = {

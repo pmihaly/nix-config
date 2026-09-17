@@ -28,7 +28,6 @@ in
           experimental-features = "nix-command flakes pipe-operators";
           trusted-users = [ vars.username ];
         };
-        gc.automatic = true;
       };
 
       nix.registry.nixpkgs.flake = inputs.nixpkgs;
@@ -41,7 +40,7 @@ in
         imports = [
           inputs.agenix.homeManagerModules.default
           inputs.nixvim.homeModules.default
-          inputs.nix-index-database.hmModules.nix-index
+          inputs.nix-index-database.homeModules.nix-index
           ../../secrets/home-manager
         ];
 

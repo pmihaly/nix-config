@@ -61,10 +61,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
       url = "github:numtide/treefmt-nix";
     };
-    hyprland-qtutils = {
-      inputs.nixpkgs.follows = "nixpkgs";
-      url = "github:hyprwm/hyprland-qtutils";
-    };
     nh = {
       inputs.nixpkgs.follows = "nixpkgs";
       url = "github:nix-community/nh";
@@ -170,8 +166,8 @@
       homeConfigurations.aesop = home-manager.lib.homeManagerConfiguration {
         pkgs = nixpkgs.legacyPackages.x86_64-linux;
         modules = [
-          inputs.nixvim.homeManagerModules.nixvim
-          inputs.stylix.homeManagerModules.stylix
+          inputs.nixvim.homeModules.nixvim
+          inputs.stylix.homeModules.stylix
           {
             nixpkgs.overlays = [
               inputs.nur.overlays.default
@@ -306,17 +302,11 @@
           # every ssh invocation and to `nix copy` via NIX_SSHOPTS.
           hostname = "100.69.8.15";
           sshOpts = [
-            # Both key paths: `make skylake` runs deploy as misi and reads
-            # the original; the hermes deploy path runs deploy as
-            # hermes-deploy, which reads the private 600 copy installed by
-            # the aesop activation script. ssh skips a key it cannot read
-            # (warning) and uses the other. Without a readable key ssh
-            # falls back to password auth and the pty-fed sudo password
-            # gets eaten by the login prompt — so this matters.
+            # `make skylake` runs deploy as misi, reading the rescue key
+            # directly (no other key paths — the hermes-deploy copies are
+            # gone).
             "-i"
             "/home/misi/.ssh/id_skylake_rescue"
-            "-i"
-            "/var/lib/hermes-deploy/.ssh/id_skylake_rescue"
             "-o"
             "StrictHostKeyChecking=accept-new"
           ];

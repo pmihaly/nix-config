@@ -9,9 +9,11 @@
     ./immich
     ./tailscale
     ./it-tools
+    ./matrix
     ./copyparty
     ./ntfy
-    ./local-llm
     ./hermes-agent
+    ./matrix-vision-bot
+    ./syncthing
   ];
 }

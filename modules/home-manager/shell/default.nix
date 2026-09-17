@@ -20,6 +20,14 @@ in
       default = { };
       type = types.attrs;
     };
+    aliases = mkOption {
+      default = { };
+      type = types.attrs;
+    };
+    env = mkOption {
+      default = { };
+      type = types.attrs;
+    };
     rebuildSwitch = mkOption { type = types.str; };
   };
   config = mkIf cfg.enable {
@@ -65,7 +73,11 @@ in
 
     programs.direnv.enableNushellIntegration = true;
 
-    programs.fzf.enable = true;
+    # fzf colors now come from the stylix palette (modules/styling),
+    # which sets programs.fzf.colors from the base16 scheme.
+    programs.fzf = {
+      enable = true;
+    };
 
     home.sessionPath = [
       "/Users/$USER/.local/bin"
@@ -84,7 +96,9 @@ in
         cn = c + "; nvim .";
         p = "cd `find ~/personaldev/ -mindepth 1 -maxdepth 1 | fzf`";
       }
+      // cfg.aliases
       // (bookmarksToAliases cfg.bookmarks);
+      sessionVariables = cfg.env;
     };
 
     programs.direnv = {
@@ -95,7 +109,9 @@ in
     programs.btop = {
       enable = true;
       settings = {
-        theme_background = false;
+        # mkDefault so stylix's btop target (which also sets this based on
+        # terminal opacity) doesn't collide; result stays false either way.
+        theme_background = mkDefault false;
         true_color = true;
         update_ms = 100;
         vim_keys = true;

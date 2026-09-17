@@ -18,7 +18,10 @@ optionalAttrs platform.isLinux {
   };
   imports = [ ../../modules/nixos ];
   config = mkIf cfg.enable {
-    modules.local-llm.enable = true;
+    # local-llm service (llama-swap + Open WebUI + SearXNG on aesop) has
+    # been removed entirely. All consumers (hermes on skylake, pi/opencode
+    # below, and opencode on aesop) use OpenRouter, model
+    # deepseek/deepseek-v4-flash-0731, keyed via OPENROUTER_API_KEY.
 
     virtualisation.docker = {
       enable = true;
@@ -66,14 +69,23 @@ optionalAttrs platform.isLinux {
             port = 4096;
             hostname = "0.0.0.0";
           };
-          provider.llama = {
-            name = "llama.cpp (local)";
+          # DeepSeek via OpenRouter (the local llama-swap backend on aesop
+          # is gone — local-llm service removed). Same model as pi and
+          # hermes (deepseek/deepseek-v4-flash-0731), hosted. The key comes
+          # from the environment: opencode interpolates {env:…} in provider
+          # options, and OPENROUTER_API_KEY is exported by programs.bash
+          # below from the agenix secret. The models map key must be the
+          # real OpenRouter model id (that is what goes in the API request),
+          # so the agent references below are provider/key =
+          # deepseek/deepseek/deepseek-v4-flash-0731.
+          provider.deepseek = {
+            name = "DeepSeek (OpenRouter)";
             npm = "@ai-sdk/openai-compatible";
             options = {
-              baseURL = "http://127.0.0.1:8081/v1";
-              apiKey = "local";
+              baseURL = "https://openrouter.ai/api/v1";
+              apiKey = "{env:OPENROUTER_API_KEY}";
             };
-            models."Qwen3.8-27B Q4 +MTP".name = "Qwen3.8-27B Q4 +MTP";
+            models."deepseek/deepseek-v4-flash-0731".name = "DeepSeek V4 Flash 0731 (OpenRouter)";
           };
         };
         agents = {
@@ -81,7 +93,7 @@ optionalAttrs platform.isLinux {
             ---
             description: System architecture and design decisions
             mode: subagent
-            model: llama/Qwen3.8-27B Q4 +MTP
+            model: deepseek/deepseek/deepseek-v4-flash-0731
             temperature: 0.2
             permission:
               edit: deny
@@ -112,7 +124,7 @@ optionalAttrs platform.isLinux {
             ---
             description: Implementation and code writing
             mode: subagent
-            model: llama/Qwen3.8-27B Q4 +MTP
+            model: deepseek/deepseek/deepseek-v4-flash-0731
             temperature: 0.1
             ---
             You are a coder agent. Implement features, fix bugs, and write clean code.
@@ -140,7 +152,7 @@ optionalAttrs platform.isLinux {
             ---
             description: Codebase exploration and research
             mode: subagent
-            model: llama/Qwen3.8-27B Q4 +MTP
+            model: deepseek/deepseek/deepseek-v4-flash-0731
             temperature: 0.1
             permission:
               edit: deny
@@ -167,7 +179,7 @@ optionalAttrs platform.isLinux {
             ---
             description: Writing and running tests
             mode: subagent
-            model: llama/Qwen3.8-27B Q4 +MTP
+            model: deepseek/deepseek/deepseek-v4-flash-0731
             temperature: 0.1
             ---
             You are a tester agent. Write tests and verify code correctness.
@@ -201,38 +213,52 @@ optionalAttrs platform.isLinux {
           source = ./pi/ntfy-notify.ts;
         };
 
-        ".pi/agent/models.json" = {
-          force = true;
-          text = toJSON {
-            providers."llama-swap" = {
-              baseUrl = "http://127.0.0.1:8081/v1";
-              api = "openai-completions";
-              apiKey = "local";
-              compat.supportsDeveloperRole = false;
-              models = [
-                {
-                  id = "Qwen3.8-27B Q4 +MTP";
-                  name = "Qwen3.8-27B Q4 +MTP (local)";
-                  reasoning = true;
-                  input = [ "text" ];
-                  contextWindow = 65536;
-                  maxTokens = 8192;
-                }
-              ];
-            };
-          };
-        };
-
         ".pi/agent/settings.json" = {
           force = true;
           text = toJSON {
-            defaultProvider = "llama-swap";
-            defaultModel = "Qwen3.8-27B Q4 +MTP";
+            defaultProvider = "openrouter";
+            defaultModel = "deepseek/deepseek-v4-flash-0731";
             theme = "dark";
             lastChangelogVersion = pkgs.pi-coding-agent.version;
           };
         };
       };
+
+      # ── OpenRouter secret (agenix, user level) ────────────────────
+      # The same .age hermes uses (secrets/openrouter-api-key.age),
+      # materialized by the agenix user service (agenix.service, WantedBy
+      # default.target) into $XDG_RUNTIME_DIR/agenix/openrouter-api-key
+      # (0400, user-owned) at every login. pi and opencode read
+      # OPENROUTER_API_KEY from the environment; the export below wires
+      # the two together.
+      #
+      # identityPaths MUST be set explicitly: the module default
+      # (~/.ssh/id_ed25519 + ~/.ssh/id_rsa) matches no key on this machine
+      # (the key is ~/.ssh/mihaly@mihaly.codes) — with the default,
+      # user-level agenix can't decrypt ANY secret (the email one included;
+      # its mount dir was silently empty until this fix).
+      age = {
+        identityPaths = [
+          "${config.users.users.${vars.username}.home}/.ssh/mihaly@mihaly.codes"
+        ];
+        secrets."openrouter-api-key" = {
+          file = ../../secrets/openrouter-api-key.age;
+          mode = "0400";
+        };
+      };
+
+      programs.bash.initExtra = ''
+        # OPENROUTER_API_KEY for pi / opencode / anything else that reads
+        # it from the environment. The agenix user service materializes
+        # the secret into $XDG_RUNTIME_DIR/agenix at login; the file is an
+        # env snippet (OPENROUTER_API_KEY=…), so sourcing it sets the
+        # variable. Silent no-op when it is not (yet) materialized — e.g.
+        # a shell started before the user service ran.
+        if [ -r "${"$"}XDG_RUNTIME_DIR/agenix/openrouter-api-key" ]; then
+          . "${"$"}XDG_RUNTIME_DIR/agenix/openrouter-api-key"
+          export OPENROUTER_API_KEY
+        fi
+      '';
 
       modules.persistence.files = [
         ".pi/agent/auth.json"

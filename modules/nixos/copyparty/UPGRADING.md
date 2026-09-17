@@ -7,15 +7,15 @@ patched server's `?th=` conversion endpoint.
 
 ## Layout
 
-| File                 | Purpose                                                                 |
-| -------------------- | ----------------------------------------------------------------------- |
-| `pin.json`           | Pinned sdist: URL + version + sha256 (base64). **The** upgrade point.    |
-| `package.nix`        | Vendored from upstream `contrib/package/nix`, minus the git/unstable branch; adds `patches`. |
-| `overlay.nix`        | Puts the patched copyparty (and its `partftpy` dep) on the NixOS build path. |
-| `patches/`           | `video-tracks.patch` — server-side patch (`diff -ruN a/ b/`, applied with `-p1`). |
-| `video-tracks.js`    | Browser plugin, served read-only via the `[/plug]` volume. No coupling to copyparty internals beyond the `?th=` HTTP API. |
-| `default.nix`        | NixOS module: `copyparty-public` / `copyparty-private` units, nginx vhosts, persistent dirs. |
-| `partftpy.nix`, `partftpy-pin.json` | FTP server dep (also patched, see below). |
+| File                                | Purpose                                                                                                                   |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `pin.json`                          | Pinned sdist: URL + version + sha256 (base64). **The** upgrade point.                                                     |
+| `package.nix`                       | Vendored from upstream `contrib/package/nix`, minus the git/unstable branch; adds `patches`.                              |
+| `overlay.nix`                       | Puts the patched copyparty (and its `partftpy` dep) on the NixOS build path.                                              |
+| `patches/`                          | `video-tracks.patch` — server-side patch (`diff -ruN a/ b/`, applied with `-p1`).                                         |
+| `video-tracks.js`                   | Browser plugin, served read-only via the `[/plug]` volume. No coupling to copyparty internals beyond the `?th=` HTTP API. |
+| `default.nix`                       | NixOS module: `copyparty-public` / `copyparty-private` units, nginx vhosts, persistent dirs.                              |
+| `partftpy.nix`, `partftpy-pin.json` | FTP server dep (also patched, see below).                                                                                 |
 
 ## The `?th=` contract (what the plugin relies on)
 

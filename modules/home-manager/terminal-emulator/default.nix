@@ -32,8 +32,14 @@ in
   config = mkIf cfg.enable {
     programs.kitty = {
       enable = true;
-      font.name = "JetBrains Mono";
-      font.package = pkgs.jetbrains-mono;
+      themeFile = "Nord";
+      # mkDefault: when modules/styling (stylix) is active it sets
+      # programs.kitty.font itself (monospace + sizes.terminal); this is
+      # the fallback for machines without stylix (e.g. work/darwin).
+      font = mkDefault {
+        name = "JetBrains Mono";
+        package = pkgs.jetbrains-mono;
+      };
       settings = {
         macos_option_as_alt = true;
         macos_quit_when_last_window_closed = true;
@@ -42,6 +48,10 @@ in
         copy_on_select = true;
         confirm_os_window_close = "0";
         enable_audio_bell = false;
+        hide_window_decorations = "titlebar-only";
+        macos_show_window_title_in = "none";
+        tab_bar_style = "hidden";
+        window_padding_width = "0 0 0 100";
       };
       keybindings = {
         "ctrl+enter" = "";

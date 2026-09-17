@@ -110,24 +110,15 @@ let
     npmDepsHash = "sha256-ZSvXA2Huo1YG+Q37y9gKv3dJSMafOmXAaWDW9O6X+sg=";
   };
 
-  # Wrapper that lets the agent deploy skylake itself: one ssh
-  # connection to the hermes-deploy user on aesop, whose forced command
-  # (machines/aesop/default.nix) fast-forwards a dedicated deploy
-  # checkout from this machine's checkout and runs
-  # scripts/deploy-skylake.sh — building on aesop, activating skylake
-  # remotely, exactly like `make skylake` (including rollback on
-  # failure). No shell, no other commands, no forwarding possible with
-  # that key (restrict + command=).
+  # Git-over-ssh for hermes: her only ssh channel is `git push`/`git
+  # fetch` to github.com (hermes-github-ssh key below,
+  # git@github.com:pmihaly/nix-config), so she can publish the changes
+  # she makes in the skylake nix-config checkout. She has no ssh
+  # channel to aesop or anywhere else; deploying skylake stays a
+  # human-run `make skylake` on aesop.
   #
-  # The private key is an agenix secret at the default materialized
-  # location /run/agenix/server/skylake-deploy-ssh (hermes:hermes 400).
-  # /run/agenix.d is 751 root:keys and its generation dir likewise, so
-  # the hermes user can traverse to the file without being able to list
-  # the other secrets. known_hosts lives in the service user's home
-  # (the .ssh dir is created by the activation script below).
-  deploySkylake = pkgs.writeShellScriptBin "deploy-skylake" ''
-    exec ${pkgs.openssh}/bin/ssh -o BatchMode=yes -o ConnectTimeout=15 -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=${hermesCfg.stateDir}/.ssh/known_hosts -i /run/agenix/server/skylake-deploy-ssh hermes-deploy@aesop.anaconda-snapper.ts.net deploy
-  '';
+  # known_hosts lives in the service user's home (the .ssh dir is
+  # created by the activation script below).
 
   # Lite model profile for skylake (2 vCPU / 4 GB). The repo defaults
   # (llm.ts) are Qwen3-Embedding-4B + Qwen3-Reranker-4B plus a 1.7B
@@ -215,13 +206,33 @@ in
         # is missing. Rebuild-time difference is substantial. Add groups
         # back via `package = ... .override { extraDependencyGroups = [...]; }`
         # if a specific integration (e.g. `messaging`) is ever wanted.
-        package = inputs.hermes-agent.packages.${pkgs.stdenv.system}.minimal;
+        #
+        # `firecrawl` group (firecrawl-py 4.17.0): web search/extract via
+        # the bundled firecrawl plugin. Keyless mode (public cloud API,
+        # round-robin with exa/parallel/tavily/keenable) works from the
+        # core app alone; this group provides the SDK for the keyed
+        # path (FIRECRAWL_API_KEY / FIRECRAWL_API_URL) and the lazy
+        # `ensure("search.firecrawl")` import path.
+        #
+        # `matrix` group (mautrix[encryption] 0.21.1): the Matrix gateway
+        # adapter (plugins/platforms/matrix/adapter.py) requires mautrix at
+        # import time — WITHOUT it check_matrix_requirements() returns False
+        # and the channel degrades to stubs. mautrix was verified missing
+        # from the deployed hermes-agent-env (task t_991da13d), so `matrix`
+        # must be in the group list for the MATRIX_* env vars (below) to take
+        # effect. Added alongside this task's credential wiring.
+        package = inputs.hermes-agent.packages.${pkgs.stdenv.system}.minimal.override {
+          extraDependencyGroups = [ "firecrawl" "matrix" ];
+        };
 
-        # LLM backend: llama-swap on aesop over the tailnet (OpenAI
-        # compatible, model `Qwen3.8-27B Q4 +MTP` served by llama-cpp-rocm).
-        # Nothing here is secret: the tailnet hostname is in this repo and
-        # llama-swap doesn't enforce auth (api_key is a formality). The
-        # ts.net name survives aesop tailnet-IP changes.
+        # LLM backend: OpenRouter (built-in provider), model
+        # deepseek/deepseek-v4-flash-0731 (same as pi and opencode on aesop).
+        # The old backend — llama-swap on aesop over the tailnet serving
+        # Qwen3.8-27B locally — is gone: the local-llm service has been
+        # removed entirely, so the model now runs in the cloud. The API key
+        # is the agenix secret openrouter-api-key (env-file format, appended
+        # to $HERMES_HOME/.env at activation — see environmentFiles below);
+        # nothing secret lands in this repo or the Nix store.
         #
         # NOTE on merge direction: the activation script deep-merges these
         # settings INTO the runtime config.yaml with Nix keys winning
@@ -229,35 +240,95 @@ in
         # dashboard, the next `make skylake` re-asserts the value below.
         # Update `settings` here to change the default model.
         settings = {
-          providers.local = {
-            api = "http://aesop.anaconda-snapper.ts.net:8081/v1";
-            api_key = "local";
-          };
           model = {
-            default = "Qwen3.8-27B Q4 +MTP";
-            provider = "custom:local";
-            # Deliberately BELOW llama-server's real --ctx-size (65536, see
-            # the models preset in modules/nixos/local-llm). Without a pin,
-            # hermes can't probe the custom endpoint and falls back to the
-            # catalog default for "qwen" (131,072) — the compressor never
-            # fires, the prompt outgrows the real window, and every response
-            # dies at finish_reason=length.
+            default = "deepseek/deepseek-v4-flash-0731";
+            provider = "openrouter";
+            # Window for the OpenRouter deepseek-v4-flash-0731 backend.
+            # The model's real window is 1M; 128k pins the *accounting*
+            # to a sane ceiling while giving each turn 3x the headroom of
+            # the old 64k pin. The window is NOT the session-size knob
+            # anymore: `compression.threshold_tokens` (40k) is an absolute
+            # cap that wins over the percent trigger for any window >= ~48k
+            # (context_compressor._apply_threshold_tokens_cap — the cap is
+            # min(cap, context_length), so it's a no-op here). The summary
+            # budget derives from the trigger (40k × 0.20 ≈ 8k), not the
+            # window. So compaction fires at 40k whether the window is 64k
+            # or 128k — the pin only controls the output headroom left at
+            # that moment (~88k vs ~24k), which ends the
+            # finish_reason=length truncation class the old 64k window
+            # caused.
             #
-            # Why not pin the real 65536? hermes' compression threshold is
-            # floored at 64k (MINIMUM_CONTEXT_LENGTH), so a 65536 pin lets a
-            # session grow to ~64k before compacting — and a session that
-            # large is unrecoverable on a 64k window: the summarizer must
-            # re-read the middle of the history, which no longer fits.
-            #
-            # 64000 is the smallest value hermes accepts (agent init rejects
-            # anything below 64k). At exactly 64000 the floored threshold
-            # meets the window, which switches the trigger to 85% of the
-            # window (~54.4k): sessions compress well below the real 65,536
-            # wall, turns always fit the real context even when a compression
-            # attempt times out, and the compression prompt itself stays
-            # small enough to prefill inside hermes' 120s no-progress timer
-            # on this slow (partly CPU-offloaded) backend.
-            context_length = 64000;
+            # (History: 64000 was the smallest value hermes accepts — agent
+            # init rejects below 64k — and matched the old llama.cpp 65k
+            # window. With the 40k cap in place, the degenerate-window
+            # branch (MINIMUM_CONTEXT_LENGTH floor pinning the percent
+            # trigger to 85%) never engages above ~48k, so 128k is fully
+            # in the normal branch.)
+            context_length = 131072;
+          };
+          # Retry rounds before a turn gives up with "max compression
+          # attempts reached" (the #62605 failure class: incompressible
+          # tool schemas keep the estimate above threshold even though
+          # the messages compress fine). Default 3 can still be tight
+          # when a timed-out attempt burns a round. 10 is the parser's
+          # hard cap (agent_init.py clamps anything larger); there is no
+          # "unlimited" value in config — that would need an upstream
+          # patch.
+          #
+          # threshold_tokens: the `threshold` PERCENT knob is a ratio of
+          # the window (75% for <512k models — see
+          # _effective_threshold_percent), which at 128k would defer
+          # compaction to ~96k, where a summary+output still fit but the
+          # session is huge. threshold_tokens is an ABSOLUTE cap: the
+          # effective trigger is min(ratio-threshold, cap). Raised 40k →
+          # 90k (2026-09-01, user request) so the long tool-heavy
+          # sessions (deploy work) compact ~2.3x less often. At 90k the
+          # effective trigger = min(96k, 90k) = 90k, leaving ~38k of the
+          # 128k window for the summary + following turns — still clear
+          # of finish_reason=length truncation (summary budget = 90k ×
+          # 0.20 ≈ 18k). Pushing toward 120k would squeeze that headroom
+          # back toward the degenerate-window risk; 90k is the balanced
+          # point.
+          compression = {
+            threshold_tokens = 90000;
+            max_attempts = 10;
+            # Cheap no-model-call pass: once the session exceeds 85k,
+            # truncate stale tool results >8k chars (the main bloat source
+            # — file reads, long terminal output). The agent can re-read
+            # files / re-run commands, so nothing is truly lost. Raised
+            # 35k → 85k to track the new 90k compaction line (2026-09-01).
+            # Keeps most prompts under the 90k threshold so the expensive
+            # pass (and its max_attempts budget) fires less often. Set to
+            # 0 to disable.
+            proactive_prune_tokens = 85000;
+          };
+          # Web search/extract backend. Explicit config wins over the
+          # availability-filtered legacy walk (agent/web_search_registry.py),
+          # which — with no FIRECRAWL_API_KEY — would otherwise only let
+          # firecrawl join the 5-vendor keyless round-robin (~1/5 of traffic).
+          # Pinned: today it serves via the keyless public cloud API
+          # (raw httpx, no SDK), failing over to exa/parallel/tavily on
+          # rate limits; once FIRECRAWL_API_URL/FIRECRAWL_API_KEY exist in
+          # $HERMES_HOME/.env, _use_keyless_ring() flips to false and the
+          # keyed firecrawl-py SDK path (installed via the `firecrawl`
+          # dependency group above) takes over automatically.
+          web = {
+            backend = "firecrawl";
+          };
+          # Matrix verbosity: only show final results in chat, not the
+          # intermediate tool-call bubbles / mid-turn commentary / heartbeat
+          # messages. tool_progress=off kills the per-tool "[terminal] ran…"
+          # stream; interim_assistant_messages=false drops mid-turn
+          # "Let me check…" commentary; long_running_notifications=false drops
+          # the "⏳ Working — N min" heartbeat.
+          display = {
+            platforms = {
+              matrix = {
+                tool_progress = "off";
+                interim_assistant_messages = false;
+                long_running_notifications = false;
+              };
+            };
           };
         };
 
@@ -286,9 +357,55 @@ in
         # extraPackages puts the bridge tree (above) into the system
         # closure for the activation script; the derivation has no
         # bin/, so nothing lands on the hermes user's PATH.
-        environment = optionalAttrs cfg.whatsapp {
-          WHATSAPP_ENABLED = "true";
-        };
+        # Matrix operator allowlist (plaintext setting — NOT a secret).
+        # Both the gateway governance gate (startup warning: "No env user
+        # allowlists configured … will deny unknown senders") and the matrix
+        # adapter's trigger gate check the sender against MATRIX_ALLOWED_USERS
+        # (full "@user:server" form). Without it every sender — including the
+        # operator @misi — is rejected as "unauthorized user" and the channel
+        # is inert. mautrix must be present for the adapter to load at all
+        # (the `matrix` dependency group above).
+        #
+        # MATRIX_E2EE_MODE enables Matrix end-to-end encryption (olm/megolm).
+        # The adapter defaults to OFF; "optional" turns on the OlmMachine so
+        # the bot decrypts incoming encrypted events and auto-encrypts its
+        # replies in encrypted rooms (mautrix 0.21 auto-encrypts outgoing
+        # when room state requests it, after share_keys). "required" is the
+        # same but hard-fails the whole channel if crypto init or device-key
+        # verification fails at connect; "optional" degrades to plaintext
+        # instead of bricking the bridge — the right choice here since the
+        # operator's own @misi room may be plaintext. Deps (mautrix
+        # [encryption] group, python-olm, aiosqlite, PgCryptoStore sqlite
+        # backend) are bundled via the `matrix` group above, so optional
+        # actually engages. MATRIX_DEVICE_ID is deliberately NOT set: unset,
+        # the adapter uses the login token's own device_id, which is stable
+        # (the token persists) and keyed in the SQLite crypto store at
+        # $HERMES_HOME/platforms/matrix/store/crypto.db — forcing a different id
+        # would reset the Olm identity and force re-verification.
+        # NOTE: the gateway reads .env into its process env at startup, so a
+        # gateway (re)start is required for this to take effect.
+        environment =
+          (optionalAttrs cfg.whatsapp {
+            WHATSAPP_ENABLED = "true";
+          })
+          // {
+            MATRIX_ALLOWED_USERS = "@misi:matrix.skylake.mihaly.codes";
+            MATRIX_E2EE_MODE = "optional";
+          };
+
+        # OpenRouter API key + Matrix bot credentials (agenix; env-snippet
+        # format, OPENROUTER_API_KEY=… / MATRIX_HOMESERVER=… etc).
+        # environmentFiles are appended to $HERMES_HOME/.env at ACTIVATION
+        # time (mkEnvScript cats each file in), so the keys never land in the
+        # Nix store — only the .age files in secrets/ are committed. Hermes'
+        # built-in openrouter provider reads OPENROUTER_API_KEY from
+        # $HERMES_HOME/.env at startup (credential_pool.py prefers the dotenv
+        # over the service env); the matrix adapter reads the MATRIX_* vars
+        # the same way (requires the `matrix` group — see package above).
+        environmentFiles = [
+          config.age.secrets."openrouter-api-key".path
+          config.age.secrets."matrix-bot".path
+        ];
         extraPackages =
           (optional cfg.whatsapp whatsappBridge)
           # QMD: the CLI on PATH (for `qmd embed` in the timer and for
@@ -301,12 +418,10 @@ in
           # `nixcfg`, machines/skylake). Explicit rather than relying on
           # the transitive dep the package pulls in today, so an upstream
           # bump can't silently break that.
-          # The ssh client for the deploy wrapper (and ad-hoc tailnet use),
-          # plus the deploy wrapper itself (see deploySkylake above).
+          # The ssh client for the GitHub push (and ad-hoc tailnet use).
           ++ [
             pkgs.git
             pkgs.openssh
-            deploySkylake
           ];
 
         # ── QMD notes search (MCP) ────────────────────────────────────
@@ -366,24 +481,81 @@ in
         };
       };
 
-      # Private key for the deploy path (see deploySkylake above).
-      # Materialized at the default /run/agenix/server/skylake-deploy-ssh.
-      age.secrets."server/skylake-deploy-ssh" = {
-        file = ../../../secrets/server/skylake-deploy-ssh.age;
+      # GitHub SSH key for hermes (git push/fetch over ssh): "skylake's
+      # key" — the mihaly@mihaly.codes keypair, which is also skylake's
+      # ssh HOST key (machines/skylake persists it at
+      # /persist/etc/ssh/ssh_host_ed25519_key; secrets/secrets.nix lists
+      # the same pubkey under both names) and is registered on GitHub as
+      # pmihaly. Materialized at the default
+      # /run/agenix/server/hermes-github-ssh (400, hermes-owned), decrypted
+      # on skylake via the host-key identity. The ssh client config
+      # that points git at it lives in the activation script below.
+      age.secrets."server/hermes-github-ssh" = {
+        file = ../../../secrets/server/hermes-github-ssh.age;
         owner = hermesCfg.user;
         group = hermesCfg.group;
         mode = "400";
       };
 
-      # known_hosts dir for the deploy wrapper's ssh (UserKnownHostsFile
-      # points at the service user's home, so accept-new can pin aesop's
-      # host key on first use).
-      system.activationScripts."hermes-deploy-ssh" = {
+      # OpenRouter API key (see environmentFiles above). Materialized at the
+      # default /run/agenix/openrouter-api-key, readable only by the hermes
+      # user. Env-file format because the activation script appends the raw
+      # file content to $HERMES_HOME/.env.
+      age.secrets."openrouter-api-key" = {
+        file = ../../../secrets/openrouter-api-key.age;
+        owner = hermesCfg.user;
+        group = hermesCfg.group;
+        mode = "400";
+      };
+
+      # Matrix bot credentials (env-file: MATRIX_HOMESERVER,
+      # MATRIX_BOT_USER, MATRIX_ACCESS_TOKEN, MATRIX_HOME_ROOM — and
+      # MATRIX_BOT_PASSWORD if a password login is used). Same
+      # env-file format as openrouter above; the matrix adapter reads it
+      # from $HERMES_HOME/.env (appended via environmentFiles above).
+      age.secrets."matrix-bot" = {
+        file = ../../../secrets/matrix-bot.age;
+        owner = hermesCfg.user;
+        group = hermesCfg.group;
+        mode = "400";
+      };
+
+      # known_hosts dir for hermes' ssh client (UserKnownHostsFile
+      # points at the service user's home, so accept-new can pin
+      # github.com's host key on hermes's first push).
+      system.activationScripts."hermes-ssh" = {
         deps = [ "users" ];
         text = ''
           mkdir -p ${hermesCfg.stateDir}/.ssh
           chown ${hermesCfg.user}:${hermesCfg.group} ${hermesCfg.stateDir}/.ssh
           chmod 700 ${hermesCfg.stateDir}/.ssh
+        '';
+      };
+
+      # Git-over-ssh for hermes: pin GitHub to the hermes-github-ssh key
+      # (agenix secret above) via hermes' ~/.ssh/config. HOME is the
+      # service user's stateDir (upstream sets it on every hermes unit), so
+      # ssh reads this config for every `git push`/`git fetch` hermes runs.
+      # known_hosts is the file "hermes-ssh" created; github.com's
+      # host key is pinned on first use (accept-new). BatchMode keeps
+      # pushes non-interactive.
+      system.activationScripts."hermes-github-ssh" = {
+        deps = [
+          "users"
+          "hermes-ssh"
+        ];
+        text = ''
+          ssh_dir=${hermesCfg.stateDir}/.ssh
+          cat > "$ssh_dir/config" <<'EOF'
+          Host github.com
+            IdentityFile /run/agenix/server/hermes-github-ssh
+            IdentitiesOnly yes
+            UserKnownHostsFile ${hermesCfg.stateDir}/.ssh/known_hosts
+            StrictHostKeyChecking accept-new
+            BatchMode yes
+          EOF
+          chmod 600 "$ssh_dir/config"
+          chown ${hermesCfg.user}:${hermesCfg.group} "$ssh_dir/config"
         '';
       };
 
@@ -543,13 +715,73 @@ in
             proxy_send_timeout 3600s;
           '';
         };
+
+        # The SPA's dynamic chunks (its xterm/terminal module) request bare
+        # /assets/* — absolute paths baked into the JS bundle by Vite, NOT
+        # rewritten by the X-Forwarded-Prefix HTML mount (that only rewrites
+        # <script>/<link> tags in index.html). Without this location, a bare
+        # /assets/xterm-*.css falls into the vhost's catch-all `location /`
+        # (301 -> /homer/... -> 301 http://:8080 -> mixed-content block) and
+        # the chat view never mounts (blank page). The backend serves /assets/*
+        # directly at / on port 9119, so proxy it the same way as /hermes/.
+        "/assets/" = {
+          # NOTE: proxy_pass has NO URI part here (vs /hermes/ which uses
+          # "…9119/"). A trailing-slash proxy_pass would STRIP the /assets/
+          # prefix (the documented trap above) and send /assets/xterm.css as
+          # /xterm.css — which the backend treats as an unknown path and
+          # serves the SPA index.html (HTTP 200, wrong content-type). Passing
+          # the URI verbatim (no slash) keeps /assets/xterm-*.css intact, which
+          # the backend's static mount serves correctly.
+          proxyPass = "http://127.0.0.1:${toString port}";
+          proxyWebsockets = false;
+
+          # Same Host-header rewrite the /hermes/ location uses, so the
+          # loopback DNS-rebinding guard accepts these requests too.
+          recommendedProxySettings = false;
+
+          extraConfig = ''
+            allow 100.64.0.0/10;
+            deny all;
+            proxy_set_header Host 127.0.0.1;
+            proxy_set_header Origin "";
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            # The SPA loads the xterm chunk via a <link rel=preload
+            # crossOrigin=...> (react-vendor's runtime preload sets
+            # i.crossOrigin=""), which forces a CORS-mode request even
+            # though the URL is same-origin. Without ACAO the preload
+            # fires 'error' -> "Unable to preload CSS". * is fine here:
+            # this tailnet-only vhost serves no credentialed data.
+            add_header Access-Control-Allow-Origin * always;
+          '';
+        };
       };
 
       # Card on the private Homer board.
+
       modules.homer.services.AI.Hermes = {
         logo = ./hermes.png;
         url = "http://${vars.domainName}/hermes/";
       };
+    }
+    {
+      # Grant the hermes agent shell read-write access to the synced folder
+      # (the ACLs/group cover the host; this exposes the same path rw INSIDE
+      # the agent's sandbox (ProtectSystem=strict whitelists ReadWritePaths).
+      # The upstream unit defaults the list to hermes' own dirs; this concat-merges
+      # (systemd option of list-of-str concatenates across modules) adding the sync root.
+      systemd.services.hermes-agent.serviceConfig.ReadWritePaths = [
+        "/persist/opt/skylake-storage/syncthing"
+      ];
+      # Same for the hermes-backend unit, which is what the file/terminal tools
+      # actually execute under (the backend spawns the tool shell). Without this,
+      # the backend sees /persist read-only (ProtectSystem=strict) and file edits
+      # fail with "Read-only file system", even though the agent process itself
+      # has the rw bind from the grant above. Keep it narrow to the sync tree.
+      systemd.services.hermes-backend.serviceConfig.ReadWritePaths = [
+        "/persist/opt/skylake-storage/syncthing"
+      ];
     }
   ]);
 }

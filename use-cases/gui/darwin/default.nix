@@ -58,6 +58,8 @@ optionalAttrs platform.isDarwin {
       finder.FXEnableExtensionChangeWarning = false;
     };
 
+    nix.enable = false;
+
     services.tailscale = {
       enable = true;
     };
@@ -115,15 +117,15 @@ optionalAttrs platform.isDarwin {
         };
 
         workspace-to-monitor-force-assignment = {
-          "u" = "main";
-          "i" = "main";
-          "o" = "main";
-          "p" = "secondary";
+          "u" = 1;
+          "i" = 1;
+          "o" = 3;
+          "p" = 3;
 
-          "j" = "main";
-          "k" = "main";
-          "l" = "main";
-          "semicolon" = "main";
+          "j" = 2;
+          "k" = 2;
+          "l" = 2;
+          "semicolon" = 2;
         };
 
         mode.main.binding =
@@ -185,7 +187,6 @@ optionalAttrs platform.isDarwin {
     homebrew.casks = [
       "aerial" # screensaver
       "raycast" # command+space
-      "messenger"
       "caffeine" # keep screen alive
       "utm" # virtual machines
       "linearmouse"

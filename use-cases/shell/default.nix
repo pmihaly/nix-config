@@ -28,6 +28,14 @@ in
       default = { };
       type = types.attrs;
     };
+    extraAliases = mkOption {
+      default = { };
+      type = types.attrs;
+    };
+    extraEnv = mkOption {
+      default = { };
+      type = types.attrs;
+    };
     sshServer = {
       hostKeys = mkOption {
         default = [ ];
@@ -38,7 +46,7 @@ in
   config = mkIf cfg.enable (mkMerge [
 
     (optionalAttrs platform.isLinux {
-      environment.shells = [ (getExe pkgs.bash) ];
+      environment.shells = [ (getExe pkgs.bashInteractive) ];
 
       programs.nix-index.enableBashIntegration = false;
       programs.command-not-found.enable = false;
@@ -59,7 +67,16 @@ in
 
     })
 
-    { users.users.${vars.username}.shell = pkgs.bash; }
+    (optionalAttrs platform.isDarwin {
+      environment.shells = [ pkgs.bashInteractive ];
+
+      # nix-darwin only writes UserShell for users listed in knownUsers, so
+      # without this the `shell` below never reaches the account. The matching
+      # `uid` lives with the other user attrs in the machine config.
+      users.knownUsers = [ vars.username ];
+    })
+
+    { users.users.${vars.username}.shell = pkgs.bashInteractive; }
 
     (optionalAttrs platform.isLinux {
       home-manager.users.${vars.username} = {
@@ -85,6 +102,8 @@ in
           shell = {
             enable = true;
             bookmarks = bookmarks // cfg.extraBookmarks;
+            aliases = cfg.extraAliases;
+            env = cfg.extraEnv;
             rebuildSwitch = vars.rebuildSwitch;
           };
 

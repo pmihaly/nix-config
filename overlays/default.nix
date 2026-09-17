@@ -1,4 +1,22 @@
 [
+  # The generated python tree-sitter grammar bindings (pkgs/development/python-modules/
+  # tree-sitter-grammars) set `pname = "python-tree-sitter-<lang>"` while the pyproject.toml
+  # they generate declares `name = "tree_sitter_<lang>"`. pythonMetadataCheckHook looks up
+  # the dist metadata by `pname`, so every one of them dies in pythonMetadataCheckPhase with
+  # `PackageNotFoundError: No package metadata was found for python-tree-sitter-<lang>`.
+  # This breaks anything depending on them (e.g. graphify). Drop when nixpkgs fixes the pname.
+  (final: prev: {
+    pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
+      (pyFinal: pyPrev: {
+        tree-sitter-grammars =
+          pyPrev.tree-sitter-grammars
+          // prev.lib.mapAttrs (_: drv: drv.overrideAttrs { dontCheckPythonMetadata = true; }) (
+            prev.lib.filterAttrs (_: prev.lib.isDerivation) pyPrev.tree-sitter-grammars
+          );
+      })
+    ];
+  })
+
   (final: prev: {
     hanken-grotesk = (
       prev.stdenvNoCC.mkDerivation rec {

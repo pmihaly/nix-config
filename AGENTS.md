@@ -40,27 +40,20 @@ How it works:
 
 - Connects to the Tailscale IP `100.69.8.15`. Port 22 on the public Hetzner IP (`157.180.77.226`) is firewalled (only nginx 80/443 is public), and `~/.ssh/config` `Host skylake` still points at that blocked IP — so a bare `ssh root@skylake` from aesop times out. The flake config overrides the hostname and passes the key explicitly.
 - SSH auth is key-based as user `misi`: `~/.ssh/id_skylake_rescue` (authorized for `misi` on skylake). No password for the SSH login itself.
-- `user = "root"` + `interactiveSudo = true`: deploy-rs rewrites the remote command to `sudo -S -p ""` and prompts for the sudo password locally via rpassword, which reads from `/dev/tty`. That means the password cannot be fed via stdin/pipe — a plain pipe into `deploy` never reaches the prompt.
-- The sudo password lives in the gitignored file `machines/skylake/sudo-password` (chmod 600, same local-secrets policy as `RESCUE.md`). `scripts/deploy-skylake.sh` runs deploy under util-linux `script` (which provides a pty) and feeds that file's content in up front: the line is queued in the pty's line discipline and consumed when rpassword opens `/dev/tty` minutes later. `script -e` propagates deploy's exit code, so `make skylake` fails correctly on activation failure.
-- Known cosmetic quirk: the password is echoed once at the top of the deploy output (the pty is in echo mode until rpassword turns echo off). Local-terminal-only exposure, same as typing it by hand.
+- `user = "root"` + `interactiveSudo = true`: deploy-rs rewrites the remote command to `sudo -S -p ""` and prompts for the sudo password locally via rpassword, which reads from `/dev/tty`. `scripts/deploy-skylake.sh` runs deploy under util-linux `script` (pty) and feeds the gitignored `machines/skylake/sudo-password` in up front; `script -e` propagates the exit code. Known cosmetic quirk: the password is echoed once at the top (local-terminal-only).
 - On activation failure, deploy-rs revokes the deploy and rolls back to the previous generation.
 
-### Deploying from skylake (hermes)
+### Hermes and deployment
 
-The hermes agent on skylake can deploy skylake itself — no aesop session needed. From the skylake side (as the `hermes` user, or `runuser -u hermes -- deploy-skylake` for manual testing):
+Hermes on skylake edits the `/home/misi/.nix-config` checkout and has **one ssh channel only**: `git push`/`git fetch` to `git@github.com:pmihaly/nix-config`, authenticated by the `server/hermes-github-ssh` agenix secret + her `~/.ssh/config` (both from `modules/nixos/hermes-agent`). She cannot reach aesop over ssh — the old forced-command `hermes-deploy` channel, its key copies, and the gitops auto-deploy timer are all gone. Deploying skylake is a human `make skylake` on aesop that builds and activates whatever is in the local checkout (aesop's — the machine doing the deploy).
+
+Hermes CAN apply her own skylake config once deployed (machines/skylake):
 
 ```
-deploy-skylake
+sudo /run/current-system/sw/bin/systemctl start hermes-config-apply.service
 ```
 
-What it does (all least-privilege, one restricted ssh call):
-
-- `deploy-skylake` (on the hermes service PATH, `modules/nixos/hermes-agent`) ssh's to `hermes-deploy@aesop` with a dedicated key (`server/skylake-deploy-ssh` agenix secret, materialized at `/run/agenix/server/skylake-deploy-ssh`, hermes-owned 400).
-- That key is `restrict` + `command=` only: every connection runs `scripts/hermes-deploy.sh` as a forced command — no shell, no other commands, no forwarding, no rhosts (see `machines/aesop/default.nix`).
-- `scripts/hermes-deploy.sh` (runs on aesop as `hermes-deploy`) fast-forwards a dedicated deploy checkout at `/var/lib/hermes-deploy/nix-config` from the skylake checkout (`ssh://misi@100.69.8.15/home/misi/.nix-config`), ff-only — it refuses to deploy if the branches diverged. Then it copies the gitignored `machines/skylake/sudo-password` into that checkout and runs the same `scripts/deploy-skylake.sh` as `make skylake`.
-- So: build happens on aesop, activation on skylake, same rollback-on-failure. Output streams back over the ssh connection. Deploys the **skylake** checkout's current `HEAD` (whatever branch hermes is on) — commit there first; uncommitted changes are not deployed.
-- The main aesop checkout `/home/misi/.nix-config` is never written to by this path; hermes-deploy only reads the (world-readable) deploy script and the gitignored sudo password from it, plus the `600` key copy in its own home. The `hermes-deploy-repo` activation script self-heals this on every aesop activation: the sudo password gets `chgrp hermes-deploy` + `640`, a private `600` **copy** of `~/.ssh/id_skylake_rescue` is installed at `/var/lib/hermes-deploy/.ssh/` (the original stays `600` — ssh ignores group-readable private keys for the owner), and the traverse-only `x` ACL on `/home/misi` is re-applied (idempotent, no manual steps).
-- Don't run `deploy-skylake` and `make skylake` at the same time — two concurrent deploy-rs runs against skylake will fight over the boot.
+That is her ONLY root capability — a passwordless sudo rule (`security.sudo.extraRules`) lets her start two fixed root oneshot services (`hermes-config-apply`, and `hermes-config-apply-rollback` for `nixos-rebuild switch --rollback`); no arbitrary command. The apply service runs `nixos-rebuild switch --flake . --hostname skylake` from `/home/misi/.nix-config`, so she should `git pull --ff-only origin vibecode` first. Logs: `journalctl -u hermes-config-apply`.
 
 ## Nix Search
 
