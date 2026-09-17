@@ -391,6 +391,14 @@ in
           // {
             MATRIX_ALLOWED_USERS = "@misi:matrix.skylake.mihaly.codes";
             MATRIX_E2EE_MODE = "optional";
+            # Free response everywhere: the server is hermes-only (only @misi
+            # and the bot exist on it), so there is no spam-risk from dropping
+            # the @mention requirement. With MATRIX_REQUIRE_MENTION=false the
+            # adapter answers any room message it sees (it still ignores its
+            # own messages, so no reply loop). This is what makes Hermes feel
+            # like a normal chat participant in dedicated rooms rather than a
+            # bot you must @-ping.
+            MATRIX_REQUIRE_MENTION = "false";
           };
 
         # OpenRouter API key + Matrix bot credentials (agenix; env-snippet
