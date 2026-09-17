@@ -186,7 +186,7 @@
   # checkout, so the real trust boundary is what she commits).
   #
   # Usage (as hermes, on skylake):
-  #   git -C /home/misi/.nix-config pull --ff-only origin vibecode    (or just: git pull)
+  #   git -C /home/misi/.nix-config pull --ff-only origin master       (or just: git pull)
   #   systemctl start hermes-config-apply.service                     (polkit — no sudo needed)
   # The apply service itself fetch+pulls first, so a stale checkout can
   # never be applied; hermes must push to origin before starting it.
@@ -212,9 +212,13 @@
       # path from the service PATH first. Hermes must push to origin
       # before starting this service; fetch + ff fails loudly on a
       # dirty/diverged checkout instead of clobbering.
+      #
+      # Deploy line is now `master` (was `vibecode`) — 2026-09-17. The
+      # checkout sits on master and all hermes work lands there, so the
+      # apply fast-forwards master to origin/master before rebuilding.
       GIT=$(command -v git)
       runuser -u hermes -- "$GIT" -C /home/misi/.nix-config fetch origin
-      runuser -u hermes -- "$GIT" -C /home/misi/.nix-config pull --ff-only origin vibecode
+      runuser -u hermes -- "$GIT" -C /home/misi/.nix-config pull --ff-only origin master
       nixos-rebuild switch --flake .#skylake
     '';
   };

@@ -53,7 +53,7 @@ Hermes CAN apply her own skylake config once deployed (machines/skylake):
 sudo /run/current-system/sw/bin/systemctl start hermes-config-apply.service
 ```
 
-That is her ONLY root capability — a passwordless sudo rule (`security.sudo.extraRules`) lets her start two fixed root oneshot services (`hermes-config-apply`, and `hermes-config-apply-rollback` for `nixos-rebuild switch --rollback`); no arbitrary command. The apply service runs `nixos-rebuild switch --flake . --hostname skylake` from `/home/misi/.nix-config`, so she should `git pull --ff-only origin vibecode` first. Logs: `journalctl -u hermes-config-apply`.
+That is her ONLY root capability — a passwordless sudo rule (`security.sudo.extraRules`) lets her start two fixed root oneshot services (`hermes-config-apply`, and `hermes-config-apply-rollback` for `nixos-rebuild switch --rollback`); no arbitrary command. The apply service runs `nixos-rebuild switch --flake . --hostname skylake` from `/home/misi/.nix-config`, so she should `git pull --ff-only origin master` first (the deploy line is `master`, 2026-09-17). Logs: `journalctl -u hermes-config-apply`.
 
 ## Nix Search
 
