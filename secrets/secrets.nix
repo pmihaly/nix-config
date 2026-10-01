@@ -21,4 +21,9 @@ in
   # home room). Created for the Hermes matrix channel task; used by
   # hermes on skylake.
   "matrix-bot.age".publicKeys = allKeys;
+  # SparkyFitness secrets (env-file: SPARKY_FITNESS_DB_PASSWORD,
+  # SPARKY_FITNESS_APP_DB_PASSWORD, SPARKY_FITNESS_API_ENCRYPTION_KEY,
+  # BETTER_AUTH_SECRET). Used by the upstream services.sparkyfitness module
+  # (backend + db-init) on skylake; encrypted for both keys like the rest.
+  "server/sparkyfitness.age".publicKeys = allKeys;
 }

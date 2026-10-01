@@ -86,6 +86,13 @@
       url = "github:NousResearch/hermes-agent";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # SparkyFitness: self-hosted family nutrition/fitness tracker. Ships its
+    # own NixOS module (services.sparkyfitness) with Nix-native backend /
+    # frontend packages (no Docker on skylake); see modules/nixos/sparkyfitness.
+    sparkyfitness = {
+      url = "github:CodeWithCJ/SparkyFitness";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     # FlowState-QMD: anticipatory-memory MCP server over tobi/qmd
     # (sqlite-vec markdown index). Used for search over Hermes' own
     # notes. Not on npm under this name — built from source

@@ -43,6 +43,13 @@ optionalAttrs platform.isLinux {
         it-tools.enable = true;
         copyparty.enable = true;
         ntfy.enable = true;
+        # Self-hosted family nutrition/fitness tracker (TAILNET-ONLY — never
+        # public, family health data stays off the WAN): Nix-native backend
+        # + frontend (no Docker) + local PostgreSQL 16, via the upstream
+        # SparkyFitness module. Web UI at http://skylake…ts.net:3020
+        # (unqualified /fitness redirect + homer card). Secrets in
+        # secrets/server/sparkyfitness.age.
+        sparkyfitness.enable = true;
         hermes-agent.enable = true;
         # WhatsApp platform: DISABLED 2026-08-30 at the operator's
         # request (self-chat channel removed). The gateway was restarted

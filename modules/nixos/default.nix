@@ -12,6 +12,7 @@
     ./matrix
     ./copyparty
     ./ntfy
+    ./sparkyfitness
     ./hermes-agent
     ./matrix-vision-bot
     ./syncthing

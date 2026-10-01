@@ -250,7 +250,6 @@
     '';
   };
 
-
   # The ONLY sudo hermes gets: passwordless start of those two fixed
   # services.
   security.sudo.extraRules = [
@@ -341,6 +340,15 @@
       # under /var/lib/private/matrix-conduit). tmpfs /var would lose all
       # rooms/users on every reboot without this.
       "/var/lib/private/matrix-conduit"
+      # SparkyFitness state (uploads, backups, temp_uploads — the backend's
+      # StateDirectory). tmpfs /var would silently drop family health data
+      # on every reboot.
+      "/var/lib/sparkyfitness"
+      # Local PostgreSQL for SparkyFitness (services.postgresql, provisioned
+      # by the upstream module). Immich's postgres is a podman container
+      # with its data on ${vars.storage}; this is the host instance at
+      # /var/lib/postgresql, used by sparkyfitness only.
+      "/var/lib/postgresql"
     ];
     files = [ "/etc/machine-id" ];
     users.${vars.username} = {
