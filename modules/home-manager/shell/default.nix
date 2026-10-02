@@ -51,7 +51,8 @@ in
       sd # more intuitive search and replace
       choose # frendlier cut
       pup # jq for html
-      yt-dlp-light
+      yt-dlp
+      ffmpeg
       inputs.nh.packages.${pkgs.stdenv.hostPlatform.system}.default
       (pkgs.writeScriptBin "is-up" ''
         #! ${getExe pkgs.nushell}
