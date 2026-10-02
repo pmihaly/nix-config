@@ -83,6 +83,14 @@ in
         xdg.userDirs = {
           enable = true;
           setSessionVariables = true;
+          # Actually create the directories that user-dirs.dirs points at.
+          # Without this, a user-dirs entry can point at a path that never
+          # exists (e.g. $HOME/Desktop on niri, which has no desktop dir),
+          # and Wine's SHGetDesktopFolder then fails with E_UNEXPECTED -- which
+          # crashes Kontakt the moment any file dialog (KONTAKT > Load / Ctrl+O)
+          # is opened. Wine-created prefix shell folders are symlinks to these
+          # paths, so a dangling target breaks every IFileDialog app.
+          createDirectories = true;
         };
       };
     })
