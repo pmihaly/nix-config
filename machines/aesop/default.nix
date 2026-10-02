@@ -114,8 +114,52 @@
   };
 
   hardware.bluetooth.enable = true;
+  hardware.bluetooth.powerOnBoot = true; # adapter on at boot so auto-connect can work
+
   services.blueman.enable = true;
   services.pulseaudio.package = pkgs.pulseaudioFull; # extra bluetooth codecs
+
+  # Auto-connect the Sony WH-1000XM6 (58:18:62:75:7E:D7). BlueZ only
+  # auto-connects trusted devices when it (re)discovers them or when the
+  # remote initiates the link — the XM6 does neither reliably, so this
+  # actively connects to the bonded device whenever it's in range. Polls
+  # with exponential backoff (5s → max 60s) while the headphones are off
+  # or out of range, so it adds no real load. To pause it temporarily:
+  #   sudo systemctl stop bt-autoconnect
+  systemd.services.bt-autoconnect = {
+    description = "Auto-connect Sony WH-1000XM6 (58:18:62:75:7E:D7)";
+    wantedBy = [ "multi-user.target" ];
+    after = [ "bluetooth.service" ];
+    path = with pkgs; [
+      bluez # bluetoothctl
+      coreutils # sleep, timeout
+    ];
+    serviceConfig = {
+      Type = "simple";
+      Restart = "always";
+      RestartSec = "5s";
+    };
+    script = ''
+      MAC="58:18:62:75:7E:D7"
+      delay=5
+      while :; do
+        bluetoothctl power on >/dev/null 2>&1 || true
+        if [[ "$(bluetoothctl info "$MAC" 2>/dev/null)" == *"Connected: yes"* ]]; then
+          # connected: re-check every 20s so a drop gets caught quickly
+          delay=5
+          sleep 20
+        else
+          if timeout 15 bluetoothctl connect "$MAC" >/dev/null 2>&1; then
+            delay=5
+          else
+            # headphones off / out of range → back off up to 60s
+            delay=$(( delay * 2 > 60 ? 60 : delay * 2 ))
+          fi
+          sleep "$delay"
+        fi
+      done
+    '';
+  };
 
   services.logind.settings.Login.HandlePowerKey = "poweroff";
 
