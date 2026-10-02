@@ -136,6 +136,29 @@ in
       };
     };
 
+    # The tailscaled state dir is 0700 root, and since the 2026-09-23
+    # nixpkgs bump the nginx unit runs as User=nginx — so nginx -t (the
+    # pre-start config test) and reloads could no longer traverse
+    # /var/lib/tailscale to read the MagicDNS certs, and nginx refused to
+    # start at all (start-limit-hit; public share down for hours, first hit
+    # on the 2026-10-01 skylake activation). The cert files themselves were
+    # already opened up to the nginx group (rw-r----- root:nginx); only the
+    # parent traversal was missing. 0711 keeps the state dir private-ish
+    # (contents stay 0600/0640 root-owned) while letting any other user
+    # traverse to the certs. tmpfiles re-applies at every boot; the
+    # activation script covers mid-boot nginx restarts (nixos-rebuild
+    # switch restarts nginx after tmpfiles-setup has already run).
+    systemd.tmpfiles.rules = mkIf ts.enable [
+      "z /var/lib/tailscale 0711 root root -"
+    ];
+    system.activationScripts.tailscale-cert-traversal.text = ''
+      # Traverse /var/lib/tailscale for the ts.net certs; no-op when
+      # tailscale is unused or the dir is absent.
+      if [ -d /var/lib/tailscale ]; then
+        chmod o+x /var/lib/tailscale
+      fi
+    '';
+
     networking.firewall = {
       enable = true;
       # Web ports only. SSH is deliberately NOT opened here: on skylake it is
