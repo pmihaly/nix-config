@@ -70,6 +70,11 @@ in
       }
 
       input {
+          // Don't take over the power button (niri would otherwise make it
+          // suspend instead of power off). Let logind handle it: the machine
+          // config sets services.logind.powerKey = "poweroff".
+          disable-power-key-handling
+
           keyboard {
               xkb {
                   model "pc105"
