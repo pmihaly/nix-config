@@ -10,6 +10,63 @@ let
   cfg = config.modules.niri;
   term = config.modules.terminal-emulator;
   wallpaper = ../../../wallpaper.png;
+
+  # Space niri reserves around its layout (see `layout.struts` in config.kdl).
+  # X11 apps cannot see niri's layout, so the EWMH work-area shim below
+  # subtracts these from the X root window geometry.
+  struts = {
+    left = 40;
+    right = 40;
+    top = 40;
+    bottom = 40;
+  };
+
+  # xwayland-satellite (niri's XWayland window manager) never publishes the
+  # EWMH _NET_WORKAREA root property. JUCE -- which Vital's VST3, Dexed and
+  # others embed -- reads it with XInternAtom(display, "_NET_WORKAREA",
+  # onlyIfExists = True) and passes the result straight to XGetWindowProperty.
+  # With no window manager-savvy property present the intern returns None and
+  # that call raises BadAtom. Hosted inside Ardour the X error reaches GTK's
+  # error handler, which stops the GUI event loop: adding Vital to a new MIDI
+  # track (or loading a session containing it) looks like Ardour freezing.
+  # The standalone builds are unaffected because they install their own Xlib
+  # error handler. Publishing the property keeps the atom alive for the whole
+  # X server lifetime, so JUCE takes its "no work area reported" fallback (or
+  # actually uses the value). The loop also re-publishes after an XWayland
+  # restart, which silently wipes root window properties.
+  xwaylandNetWorkarea = pkgs.writeShellScriptBin "xwayland-net-workarea" ''
+    set -eu
+
+    readonly XPROP=${pkgs.xprop}/bin/xprop
+    readonly XDOTOOL=${pkgs.xdotool}/bin/xdotool
+    readonly LEFT=${toString struts.left}
+    readonly TOP=${toString struts.top}
+    readonly RIGHT=${toString struts.right}
+    readonly BOTTOM=${toString struts.bottom}
+
+    work=
+    while true; do
+      if "$XPROP" -root >/dev/null 2>&1; then
+        if [ -z "$work" ]; then
+          geometry=$("$XDOTOOL" getdisplaygeometry) # "2560 1440"
+          width=''${geometry%% *}
+          height=''${geometry##* }
+
+          work="$LEFT,$TOP,$((width - LEFT - RIGHT)),$((height - TOP - BOTTOM))"
+        fi
+        current=$("$XPROP" -root _NET_WORKAREA 2>/dev/null) || current=
+        current=''${current#*= } # "40, 40, 2480, 1360" (or the no-such-atom text)
+        current=''${current// /}
+        if [ "$current" != "$work" ]; then
+          "$XPROP" -root -f _NET_WORKAREA 32c -set _NET_WORKAREA "$work"
+        fi
+      else
+        # XWayland is not up (yet, or again): recompute the geometry next time.
+        work=
+      fi
+      ${pkgs.coreutils}/bin/sleep 10
+    done
+  '';
 in
 {
   options.modules.niri = {
@@ -41,6 +98,24 @@ in
       provider = "manual";
       latitude = 52.3728;
       longitude = 4.8936;
+    };
+
+    # See xwaylandNetWorkarea above: publish _NET_WORKAREA for JUCE-based
+    # plugins hosted in Ardour (Vital add-track freeze).
+    systemd.user.services."xwayland-net-workarea" = {
+      Unit = {
+        Description = "Publish EWMH _NET_WORKAREA on niri's XWayland";
+        After = [ "graphical-session.target" ];
+      };
+      Service = {
+        Type = "simple";
+        ExecStart = lib.getExe xwaylandNetWorkarea;
+        Restart = "always";
+        RestartSec = 5;
+      };
+      Install = {
+        WantedBy = [ "default.target" ];
+      };
     };
 
     programs.rofi = {
@@ -93,10 +168,10 @@ in
       layout {
           gaps 10
           struts {
-              left 40
-              right 40
-              top 40
-              bottom 40
+              left ${toString struts.left}
+              right ${toString struts.right}
+              top ${toString struts.top}
+              bottom ${toString struts.bottom}
           }
           default-column-width { proportion 0.5; }
           focus-ring {
