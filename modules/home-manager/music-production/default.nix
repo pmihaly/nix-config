@@ -24,42 +24,54 @@ let
 
   # Re-sync the yabridge shims to EXACTLY one level, NON-destructively.
   # yabridgectl indexes the plugin dirs recursively and re-discovers its own
-  # 'yabridge/' output shims, nesting one level deeper on EVERY sync (each extra
+  # 'yabridge/' output shims (the chainloaders plus the back-symlinks yabridge
+  # leaves next to them), nesting one level deeper on EVERY sync (each extra
   # level shows up as one more duplicate plugin in Ardour's plugin list).
   #
-  # A plain `sync` does NOT remove the outdated shims from an earlier yabridge
-  # build: yabridgectl reports them as "leftover files" but still indexes them as
-  # plugins, so it happily creates fresh shims *for its own stale shims* one
-  # directory deeper (`~/.vst{,3}/yabridge/yabridge/...`) on every run. That is
-  # why `sync --prune` (drop leftover .so files first) is required in step 1;
-  # without it the nesting below reappears forever.
+  # `sync --prune` alone does not converge either: it deletes leftover .so
+  # files and then re-indexes the back-symlinks, so the shims move one level
+  # deeper on every run. The fix is to take yabridgectl's own output dirs (and
+  # the real-bundle tree of the Ardour VST3 fix) out of its index entirely with
+  # its blacklist; `sync` is then idempotent and `--prune` cleans the nesting
+  # levels created before.
   #
   # Historical trap (2026-09-24): the old wipe-before-sync approach destroyed
   # EVERY shim whenever the sync failed for any reason -- at login the service's
   # `yabridgectl sync` failed, all shims vanished silently (output + exit code
   # swallowed by `> /dev/null 2>&1 || true`), and Ardour froze instantiating a
   # yabridge plugin (MJUCjr) from a session -- it looked like "Vital freezes
-  # Ardour". So:
-  #   1. sync, pruning leftover (stale) shims
-  #   2. drop NESTED duplicate levels (the yabridge/ dirs yabridgectl created
-  #      inside its own yabridge/ output), keeping the top-level shims intact
-  #   3. re-sync at the converged single level
-  # Nothing is hidden: any yabridgectl failure aborts (set -e) and lands in the
-  # service journal instead of vanishing into `|| true`.
+  # Ardour". Nothing is hidden here: any yabridgectl failure aborts (set -e) and
+  # lands in the service journal instead of vanishing into `|| true`.
   yabridgeSync = pkgs.writeShellScriptBin "yabridge-sync" ''
     set -eu
     readonly YABRIDGECTL='${yabridgectl}'
 
-    # 1. sync, pruning leftover shims from earlier yabridge builds first
-    "$YABRIDGECTL" sync --prune
+    # yabridgectl indexes every configured plugin dir *including its own shim
+    # output*, so each plain `sync` treats the previous shims as input and adds
+    # another nesting level (yabridge/ -> yabridge/yabridge/ -> ...); Ardour
+    # then lists every bridged plugin once per level. Blacklisting the output
+    # dirs keeps them out of the index and makes sync idempotent at one level.
+    # `blacklist add` canonicalizes and requires the path to exist.
+    # ~/.vst3/nix is the real bundle tree of the Ardour VST3 fix: it is not
+    # indexed either, but `sync --prune` deletes its .so files as "unrelated"
+    # leftovers when it is not blacklisted.
+    mkdir -p "$HOME/.vst3/nix"
+    for d in "$HOME/.vst3/nix" "$HOME/.vst/yabridge" "$HOME/.vst3/yabridge" "$HOME/.clap/yabridge"; do
+      [ -d "$d" ] || continue
+      "$YABRIDGECTL" blacklist list | grep -qxF "$d" \
+        || "$YABRIDGECTL" blacklist add "$d"
+    done
 
-    # 2. remove only the NESTED duplicate levels that yabridgectl created inside
-    #    its own previous shim output; the top-level yabridge/ dirs stay intact.
+    # drop the nesting levels created before the output dirs were blacklisted,
+    # together with their Ardour cache entries (*.v3i/*.v2i are keyed by module
+    # path), so a later plugin list cannot resurrect a shim that is gone
     find "$HOME/.vst" "$HOME/.vst3" "$HOME/.clap" \
       -type d -path '*/yabridge/yabridge' -prune -exec rm -rf {} + 2>/dev/null || true
+    grep -l -E 'yabridge/yabridge' "$HOME/.cache/ardour9"/vst*/* 2>/dev/null \
+      | xargs -r rm -f
 
-    # 3. rebuild at the converged single level (failures are loud)
-    "$YABRIDGECTL" sync
+    # (re)create/update the shims; --prune drops leftovers from earlier layouts
+    "$YABRIDGECTL" sync --prune
 
     # Ardour blacklists plugins that crashed during scanning, and our shim
     # paths can end up there after a layout change or a mid-sync scan, which
@@ -93,8 +105,16 @@ let
   # already in Ardour's VST3 search path, both via the built-in default and via
   # the configured path), with only the leaf .so symlinked into the store. The
   # identity is then the ~/.vst3 path in both walks, and the cache entries we
-  # generate for it are the only ones that match. Ardour's own cache entries for
-  # the symlinked profile bundles are dropped so they register nothing.
+  # generate for it are the only ones that match.
+  #
+  # Two things make that stick:
+  #  * the Ardour cache entries for the symlinked profile bundles are dropped
+  #    (immediate), and their module paths are blacklisted (so a later rescan
+  #    cannot re-register them -- Ardour checks the blacklist before the cache
+  #    lookup and before scanning);
+  #  * ensureBottle blacklists ~/.vst3/nix in yabridgectl, otherwise
+  #    `yabridgectl sync --prune` deletes the .so files of this tree as
+  #    "unrelated" files on its next run.
   vst3RealBundles = pkgs.writeShellScriptBin "ardour-vst3-realbundles" ''
     set -eu
 
@@ -103,6 +123,10 @@ let
     readonly CACHE="''${XDG_CACHE_HOME:-$HOME/.cache}/ardour9/vst"
     readonly ARDOUR_LIB='${pkgs.ardour}/lib/ardour9'
     readonly SCANNER="$ARDOUR_LIB/ardour-vst3-scanner"
+
+    # systemd's user-manager PATH is minimal -- don't depend on it.
+    PATH='${pkgs.coreutils}/bin:${pkgs.gnused}/bin:${pkgs.gnugrep}/bin'
+    export PATH
 
     [ -d "$PROFILE_VST3" ] || exit 0
 
@@ -142,6 +166,28 @@ let
         rm -f "$f"
       fi
     done
+
+    # ...and keep them out for good. Dropping the cache entries is not enough:
+    # a rescan (the user clicking "Discover Plugins", or Ardour deciding its
+    # cache is stale) walks the profile path again and re-creates them. Ardour
+    # checks its VST3 blacklist *before* the cache lookup and before scanning,
+    # so blacklisting the profile bundles' module paths makes them ignored even
+    # by a full rescan, leaving the real bundles above as the only source.
+    # Entries are keyed by module path and the profile store path changes on
+    # every rebuild, so ours are dropped and re-added on each run.
+    readonly ABL="$(dirname "$CACHE")/vst3_x64_blacklist.txt"
+    readonly PDIR="$(realpath "$PROFILE_VST3")"
+    if [ -f "$ABL" ]; then
+      sed -i -e '\#-home-manager-path/lib/vst3/#d' -e '\#/etc/profiles/per-user/[^/]*/lib/vst3/#d' "$ABL"
+    fi
+    for b in "$PROFILE_VST3"/*.vst3; do
+      [ -e "$b" ] || continue
+      name="$(basename "$b")"
+      base="''${name%.vst3}"
+      # the literal path, and the canonical profile dir Ardour's walk uses
+      printf '%s\n' "$b/Contents/x86_64-linux/$base.so"
+      printf '%s\n' "$PDIR/$name/Contents/x86_64-linux/$base.so"
+    done >> "$ABL"
   '';
 
   # Idempotently create/refresh the Bottles bottle that holds our Windows VST
@@ -208,9 +254,8 @@ let
                 | while IFS= read -r -d ''' f; do [ -e "$f" ] && cp -ru "$f" "$HOME/.vst3/"; done
             done
 
-        # make sure the yabridge dirs are registered, then re-sync via the shared
-        # idempotent wrapper (non-destructive, converges nesting; any failure
-        # aborts loudly below instead of leaving the shims wiped out).
+        # make sure the yabridge dirs are registered (the shared wrapper also
+        # blacklists its own output dirs and $HOME/.vst3/nix before syncing).
         for dir in "$HOME/.vst" "$HOME/.vst3"; do
           "$YABRIDGECTL" add "$dir"
         done
