@@ -27,16 +27,22 @@ let
   # 'yabridge/' output shims, nesting one level deeper on EVERY sync (each extra
   # level shows up as one more duplicate plugin in Ardour's plugin list).
   #
+  # A plain `sync` does NOT remove the outdated shims from an earlier yabridge
+  # build: yabridgectl reports them as "leftover files" but still indexes them as
+  # plugins, so it happily creates fresh shims *for its own stale shims* one
+  # directory deeper (`~/.vst{,3}/yabridge/yabridge/...`) on every run. That is
+  # why `sync --prune` (drop leftover .so files first) is required in step 1;
+  # without it the nesting below reappears forever.
+  #
   # Historical trap (2026-09-24): the old wipe-before-sync approach destroyed
   # EVERY shim whenever the sync failed for any reason -- at login the service's
   # `yabridgectl sync` failed, all shims vanished silently (output + exit code
   # swallowed by `> /dev/null 2>&1 || true`), and Ardour froze instantiating a
   # yabridge plugin (MJUCjr) from a session -- it looked like "Vital freezes
   # Ardour". So:
-  #   1. baseline sync into the EXISTING layout (never destructive)
-  #   2. only AFTER that succeeds, drop NESTED duplicate levels (the yabridge/
-  #      dirs yabridgectl created inside its own previous yabridge/ output),
-  #      keeping the top-level shims intact
+  #   1. sync, pruning leftover (stale) shims
+  #   2. drop NESTED duplicate levels (the yabridge/ dirs yabridgectl created
+  #      inside its own yabridge/ output), keeping the top-level shims intact
   #   3. re-sync at the converged single level
   # Nothing is hidden: any yabridgectl failure aborts (set -e) and lands in the
   # service journal instead of vanishing into `|| true`.
@@ -44,8 +50,8 @@ let
     set -eu
     readonly YABRIDGECTL='${yabridgectl}'
 
-    # 1. baseline sync into whatever layout exists (non-destructive)
-    "$YABRIDGECTL" sync
+    # 1. sync, pruning leftover shims from earlier yabridge builds first
+    "$YABRIDGECTL" sync --prune
 
     # 2. remove only the NESTED duplicate levels that yabridgectl created inside
     #    its own previous shim output; the top-level yabridge/ dirs stay intact.
@@ -61,6 +67,80 @@ let
     # (Ardour will rescan cleanly).
     for bl in "$HOME/.cache/ardour9"/vst*_x64_blacklist.txt; do
       [ -f "$bl" ] && sed -i "\#$HOME/.vst#d" "$bl" || true
+    done
+  '';
+
+  # Ardour lists every nix-installed VST3 instrument twice.
+  #
+  # Ardour's VST3 discovery walks each plugin directory recursively
+  # (PBD::find_paths_matching_filter in libs/pbd/file_utils.cc), and it
+  # realpath()s every directory it descends into (`PBD::path_expand` ends in
+  # `canonical_path` = realpath(3)) -- while the plugin's identity keeps the
+  # *unresolved* path: `vst3_discover()` keys the cache file by
+  # sha1(module_path) and stores module_path in `info->path`
+  # (libs/ardour/plugin_manager.cc, libs/ardour/vst3_scan.cc).
+  #
+  # Home Manager's lib/vst3/*.vst3 bundles are symlinks into the nix store, so
+  # each plugin is discovered twice under two different names:
+  #   /etc/profiles/per-user/$USER/lib/vst3/Dexed.vst3/.../Dexed.so
+  #   /nix/store/<pkg>/lib/vst3/Dexed.vst3/.../Dexed.so
+  # Both are registered => every VST3 instrument appears twice in Ardour's
+  # instrument list (LV2 is unaffected: its bundle path is stable).
+  # Verified by diffing the Add Track -> MIDI -> Instrument list with symlinked
+  # vs. real bundle directories: real bundle dirs => every plugin exactly once.
+  #
+  # Fix: give Ardour a stable REAL bundle tree per plugin under ~/.vst3 (which is
+  # already in Ardour's VST3 search path, both via the built-in default and via
+  # the configured path), with only the leaf .so symlinked into the store. The
+  # identity is then the ~/.vst3 path in both walks, and the cache entries we
+  # generate for it are the only ones that match. Ardour's own cache entries for
+  # the symlinked profile bundles are dropped so they register nothing.
+  vst3RealBundles = pkgs.writeShellScriptBin "ardour-vst3-realbundles" ''
+    set -eu
+
+    readonly PROFILE_VST3="/etc/profiles/per-user/$USER/lib/vst3"
+    readonly REAL="$HOME/.vst3/nix"
+    readonly CACHE="''${XDG_CACHE_HOME:-$HOME/.cache}/ardour9/vst"
+    readonly ARDOUR_LIB='${pkgs.ardour}/lib/ardour9'
+    readonly SCANNER="$ARDOUR_LIB/ardour-vst3-scanner"
+
+    [ -d "$PROFILE_VST3" ] || exit 0
+
+    mkdir -p "$REAL" "$CACHE"
+
+    for b in "$PROFILE_VST3"/*.vst3; do
+      [ -e "$b" ] || continue
+      name="$(basename "$b")"
+      base="''${name%.vst3}"
+      module="$(realpath "$b/Contents/x86_64-linux/$base.so" 2>/dev/null || true)"
+      [ -n "$module" ] && [ -f "$module" ] || continue
+
+      # real bundle dir, with only the leaf .so symlinked into the store
+      mkdir -p "$REAL/$name/Contents/x86_64-linux"
+      ln -sfn "$module" "$REAL/$name/Contents/x86_64-linux/$base.so"
+
+      # (re)generate Ardour's cache entry for this bundle
+      LD_LIBRARY_PATH="$ARDOUR_LIB" "$SCANNER" -q "$REAL/$name" >/dev/null 2>&1 || true
+    done
+
+    # Drop bundles (and their cache entries) for plugins that are gone.
+    for b in "$REAL"/*.vst3; do
+      [ -e "$b" ] || continue
+      name="$(basename "$b")"
+      if [ ! -e "$PROFILE_VST3/$name" ]; then
+        rm -rf "$b"
+      fi
+    done
+
+    # Drop Ardour's cache entries for the *symlinked* profile bundles: Ardour
+    # would register those in addition to the real ones, i.e. list them twice.
+    # Both spellings occur in older caches: the resolved store path and the
+    # literal /etc/profiles/... path.
+    for f in "$CACHE"/*.v3i; do
+      [ -f "$f" ] || continue
+      if grep -qE -- '(-home-manager-path|/etc/profiles/per-user/[^/]*)/lib/vst3/' "$f"; then
+        rm -f "$f"
+      fi
     done
   '';
 
@@ -579,6 +659,27 @@ in
           "XDG_CONFIG_HOME=%h/.config"
         ];
         ExecStart = getExe ensureBottle;
+      };
+      Install = {
+        WantedBy = [ "default.target" ];
+      };
+    };
+
+    # Keep Ardour's VST3 plugin list free of nix-profile duplicates; see
+    # vst3RealBundles above. Runs after the bottle/yabridge sync so the shim
+    # layout it inspects is already converged.
+    systemd.user.services."ardour-vst3-realbundles" = {
+      Unit = {
+        Description = "Materialise real VST3 bundles for Ardour (no profile-path duplicates)";
+        After = [
+          "graphical-session.target"
+          "vst-bottle.service"
+        ];
+      };
+      Service = {
+        Type = "oneshot";
+        RemainAfterExit = true;
+        ExecStart = lib.getExe vst3RealBundles;
       };
       Install = {
         WantedBy = [ "default.target" ];
