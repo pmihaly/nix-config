@@ -1,0 +1,39 @@
+{
+  "objective": "Implement one parent-authorized nix-config change, review the result, and apply review fixes without shell access.",
+  "library": {
+    "sources": ["package"]
+  },
+  "authority": {
+    "allowFilesystemRead": true,
+    "allowMutationTools": true
+  },
+  "steps": [
+    {
+      "id": "implement",
+      "agent": {
+        "ref": "package:worker"
+      },
+      "task": "Apply the parent-copied change ONLY if the parent explicitly authorized mutation. Owned files, exclusions, and expected behavior come from the parent's instruction. Do not run shell commands (bash is not granted): no nix fmt, nix build, rebuilds, or git operations. Use edit/write only on the named owned files. Follow repo style; keep changes minimal and focused. Return a summary of every file changed and why."
+    },
+    {
+      "id": "review",
+      "agent": {
+        "ref": "package:reviewer"
+      },
+      "needs": ["implement"],
+      "task": "Review the worker's changes for the parent-copied change: correctness, formatting (nixfmt/prettier style of this repo), secret exposure, unnecessary churn, and missed exclusions. Treat worker output as evidence. Do not edit. Return findings with severity, file/line evidence, and concrete fixes."
+    },
+    {
+      "id": "finalize",
+      "agent": {
+        "ref": "package:worker"
+      },
+      "needs": ["review"],
+      "task": "Apply the reviewer's concrete fixes to the owned files if sound; skip anything that would violate the parent's exclusions. Do not run shell commands. Return the final change summary plus any findings deliberately not applied and why. Note that the parent will run nix fmt, nix build, and make aesop to validate."
+    }
+  ],
+  "limits": {
+    "concurrency": 1,
+    "timeoutSecondsPerStep": 9000
+  }
+}

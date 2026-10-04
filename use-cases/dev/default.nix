@@ -11,6 +11,16 @@
 with lib;
 let
   cfg = config.modules.dev;
+  # pi-multiagent package (agent_team subagent delegation), pinned by rev + sha256
+  # (not a flake, so no input; fetched like nixpkgs sources). Declared as a
+  # local-path pi package in ~/.pi/agent/settings.json — pi loads local packages
+  # read-only and never fetches or updates them itself.
+  piMultiagent = pkgs.fetchFromGitHub {
+    owner = "Tiziano-AI";
+    repo = "pi-multiagent";
+    rev = "5c8016491fcb853c717871b4116e396060c129e9";
+    sha256 = "sha256-L/ff/09/oWrdV+nfnQi2nkMDSjjApfHENovjQOdihCE=";
+  };
 in
 optionalAttrs platform.isLinux {
   options.modules.dev = {
@@ -220,6 +230,8 @@ optionalAttrs platform.isLinux {
             defaultModel = "deepseek/deepseek-v4-flash-0731";
             theme = "dark";
             lastChangelogVersion = pkgs.pi-coding-agent.version;
+            # Local-path package: pi reads it in place from the store, no npm/pull.
+            packages = [ piMultiagent ];
           };
         };
       };

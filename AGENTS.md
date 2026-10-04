@@ -71,6 +71,27 @@ All configuration changes must be made in this repo — never edit files under `
 
 - `lib/nixos/default.nix` exports `mkService` (sets up nginx reverse proxy + dashboard) and `getDockerVersionFromShield`
 
+## pi-multiagent (agent_team)
+
+This repo has the `pi-multiagent` package installed for pi-coding-agent
+(`~/.pi/agent/settings.json`, local-path store package). The `agent_team`
+tool delegates work to isolated subagent pi sessions; use it for read-only
+fanout/concurrency or when context-window savings matter.
+
+- Templates: `pi-graphs/*.json` (read-only-fanout, plan-only,
+  implement-and-review). Workflow: copy a template to
+  `pi-graphs/runs/<slug>.json` (gitignored), adapt objective + step tasks to
+  the concrete question, then start with
+  `{"action":"start","graphFile":"pi-graphs/runs/<slug>.json"}`.
+  Prefer `graphFile` over inline graph JSON (the default model mangles
+  inline graphs).
+- Lifecycle: `run_status`/`step_result`/`message`/`cancel`/`cleanup` on
+  the short `runId` (r1...). Children run read-only unless the graph grants
+  `allowShellTools`/`allowMutationTools` — grant the minimum, and start
+  mutation graphs only after explicit human authorization.
+- Subagents never notify ntfy (the ntfy extension skips `rpc`-mode
+  sessions).
+
 ## Server Recovery
 
 - `machines/skylake/RESCUE.md` — full guide for entering/exiting Hetzner rescue mode, mounting disks, building and installing a new NixOS generation from the rescue environment (contains secrets, not in git)

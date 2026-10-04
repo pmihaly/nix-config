@@ -28,6 +28,15 @@ function lastAssistant(branch: SessionEntry[]) {
 
 export default function (pi: ExtensionAPI) {
   pi.on("agent_settled", async (_event, ctx) => {
+    // Skip subagent children: pi-multiagent runs detached children as
+    // --mode rpc sessions, so rpc mode is exactly the headless-subagent
+    // signal (documented ExtensionMode: tui | rpc | json | print; use
+    // "tui" to guard interactive-only behavior). Without this guard every
+    // subagent turn would POST a "pi done" notification. Note this also
+    // currently avoids an extension_error in subagent event streams (the
+    // handler otherwise throws on a stale ctx in rpc sessions).
+    if (ctx.mode === "rpc") return;
+
     const { text, stopReason } = lastAssistant(ctx.sessionManager.getBranch());
     if (!text || stopReason === "aborted") return;
 
