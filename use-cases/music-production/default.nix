@@ -31,6 +31,23 @@ let
     '';
   };
 
+  # nixpkgs still pins Vital 1.5.5 (2023). With several Vital instances in one
+  # Ardour session its JUCE GUI -- a single shared "Render Thread" per host
+  # process -- keeps redrawing at ~30% of a core even with all editors closed,
+  # and instantiating a NEW instance re-enters that shared GUI and glitches /
+  # freezes every open Vital editor until Ardour restarts (observed 2026-10-03
+  # on aesop, niri/XWayland). The official builds server carries 1.6.4
+  # (2026-04-30) with the same bundle layout (bin/Vital + lib/{vst,vst3,clap}/),
+  # so only version+src need overriding; the rest of nixpkgs' package logic
+  # (directories, wrapping, patching) is untouched.
+  vital = pkgs.vital.overrideAttrs (old: {
+    version = "1.6.4";
+    src = pkgs.fetchzip {
+      url = "https://builds.vital.audio/VitalAudio/vital/1_6_4/VitalInstaller.zip";
+      hash = "sha256-w4lHlcqkzPcUm+HmERs8+nLCgP1BWNnMSXqdV9Fyc/Q=";
+    };
+  });
+
   # Official release AppImage run via appimage-run (same pattern as minecraft).
   noiseCanvas = pkgs.writeShellScriptBin "noise-canvas" ''
     ${getExe pkgs.appimage-run} ${
