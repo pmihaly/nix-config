@@ -228,37 +228,42 @@ in
                 // Region screenshot: write to the same dir as `screenshot-path`, then copy to clipboard.
                 Mod+S hotkey-overlay-title="Screenshot a region" { spawn-sh "slurp | xargs -I{} sh -c 'd=\"$HOME/Pictures/Screenshots\"; mkdir -p \"$d\"; f=\"$d/Screenshot from $(date \"+%Y-%m-%d %H-%M-%S\").png\"; ${pkgs.grim}/bin/grim -g \"$1\" \"$f\" && ${pkgs.wl-clipboard}/bin/wl-copy --type image/png < \"$f\"' sh {}"; }
 
-                Mod+N { focus-column-left-or-last; }
-                Mod+M { focus-column-right-or-first; }
+                Mod+H { focus-column-left-or-last; }
+                Mod+L { focus-column-right-or-first; }
 
                 Mod+Ctrl+N { swap-window-right; }
                 Mod+Ctrl+M { swap-window-left; }
 
                 // keyd (machines/aesop/default.nix) maps the physical left Alt to Ctrl,
                 // so the physical Alt+Shift+N/M arrives here as Ctrl+Shift+N/M.
-                // Bind both: N moves the window left, M moves it right (like Mod+N/M focus).
+                // Bind both: N moves the window left, M moves it right (like Mod+H/L focus).
                 Alt+Shift+N  { swap-window-left; }
                 Alt+Shift+M  { swap-window-right; }
                 Ctrl+Shift+N { swap-window-left; }
                 Ctrl+Shift+M { swap-window-right; }
 
-                Mod+J { focus-workspace "w1"; }
-                Mod+K { focus-workspace "w2"; }
-                Mod+L { focus-workspace "w3"; }
-                Mod+Semicolon { focus-workspace "w4"; }
-                Mod+U { focus-workspace "w5"; }
-                Mod+I { focus-workspace "w6"; }
-                Mod+O { focus-workspace "w7"; }
-                Mod+P { focus-workspace "w8"; }
+                Mod+J { focus-workspace-down; }
+                Mod+K { focus-workspace-up; }
 
-                Mod+Ctrl+J { move-window-to-workspace "w1"; }
-                Mod+Ctrl+K { move-window-to-workspace "w2"; }
-                Mod+Ctrl+L { move-window-to-workspace "w3"; }
-                Mod+Ctrl+Semicolon { move-window-to-workspace "w4"; }
-                Mod+Ctrl+U { move-window-to-workspace "w5"; }
-                Mod+Ctrl+I { move-window-to-workspace "w6"; }
-                Mod+Ctrl+O { move-window-to-workspace "w7"; }
-                Mod+Ctrl+P { move-window-to-workspace "w8"; }
+                Mod+1 { focus-workspace "w1"; }
+                Mod+2 { focus-workspace "w2"; }
+                Mod+3 { focus-workspace "w3"; }
+                Mod+4 { focus-workspace "w4"; }
+                Mod+5 { focus-workspace "w5"; }
+                Mod+6 { focus-workspace "w6"; }
+                Mod+7 { focus-workspace "w7"; }
+                Mod+8 { focus-workspace "w8"; }
+                Mod+9 { focus-workspace "w9"; }
+
+                Mod+Ctrl+1 { move-window-to-workspace "w1"; }
+                Mod+Ctrl+2 { move-window-to-workspace "w2"; }
+                Mod+Ctrl+3 { move-window-to-workspace "w3"; }
+                Mod+Ctrl+4 { move-window-to-workspace "w4"; }
+                Mod+Ctrl+5 { move-window-to-workspace "w5"; }
+                Mod+Ctrl+6 { move-window-to-workspace "w6"; }
+                Mod+Ctrl+7 { move-window-to-workspace "w7"; }
+                Mod+Ctrl+8 { move-window-to-workspace "w8"; }
+                Mod+Ctrl+9 { move-window-to-workspace "w9"; }
 
                 // Physical Alt+Shift+1..9 arrives as Ctrl+Shift+1..9 (keyd swap); bind both.
                 Alt+Shift+1  { move-window-to-workspace "w1"; }
