@@ -37,12 +37,12 @@ the two names differ because the hermes module consumed the secret first).
 
 Optional tuning (module options, defaults shown):
 
-| Option | Default | Env var |
-|---|---|---|
-| `allowedUsers` | `[]` (any user) | `MATRIX_ALLOWED_USERS` |
-| `maxImageRate` | `6` | `MATRIX_MAX_IMAGE_RATE` |
-| `maxConcurrent` | `2` | `MATRIX_MAX_CONCURRENT` |
-| `analysisPrompt` | `null` | `MATRIX_ANALYSIS_PROMPT` |
+| Option           | Default         | Env var                  |
+| ---------------- | --------------- | ------------------------ |
+| `allowedUsers`   | `[]` (any user) | `MATRIX_ALLOWED_USERS`   |
+| `maxImageRate`   | `6`             | `MATRIX_MAX_IMAGE_RATE`  |
+| `maxConcurrent`  | `2`             | `MATRIX_MAX_CONCURRENT`  |
+| `analysisPrompt` | `null`          | `MATRIX_ANALYSIS_PROMPT` |
 
 `MATRIX_DEVICE_ID` is pinned to `matrix-vision-bot` so the bot keeps a stable
 device identity across restarts.

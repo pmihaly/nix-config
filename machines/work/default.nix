@@ -31,11 +31,11 @@ in
         d = ''cd "$(for w in ~/work/*/branches/*/.git ~/work/*/branches/*/*/.git; do [ -e "$w" ] && dirname "$w"; done | fzf)"'';
         j = ''open "https://fareharbor.atlassian.net/browse/$(git branch --show-current | grep -Po "[A-Z]{3}-[0-9]*")"'';
         mf = "make format";
-	g = ''open "https://gitlab.com/$(git remote get-url origin | sed -E "s|.*gitlab.com[:/]||; s|\.git$||")/-/merge_requests?scope=all&search=$(git branch --show-current | grep -Po "[A-Z]{3}-[0-9]*")"'';
-};
+        g = ''open "https://gitlab.com/$(git remote get-url origin | sed -E "s|.*gitlab.com[:/]||; s|\.git$||")/-/merge_requests?scope=all&search=$(git branch --show-current | grep -Po "[A-Z]{3}-[0-9]*")"'';
+      };
       extraEnv = {
-   "CFLAGS"="-I${pkgs.openssl}/include";
-   "LDFLAGS"="-L${pkgs.openssl}/lib";
+        "CFLAGS" = "-I${pkgs.openssl}/include";
+        "LDFLAGS" = "-L${pkgs.openssl}/lib";
       }
       // workvars.extra-env;
     };
@@ -55,7 +55,7 @@ in
     127.0.0.1 localhost
     255.255.255.255 broadcasthost
     ::1 localhost
-   '';
+  '';
 
   programs.ssh.knownHosts."github.com" = {
     hostNames = [
@@ -134,24 +134,24 @@ in
     programs.claude-code = {
       enable = true;
       rules = {
-          code-style = ''
-          - Follow existing conventions. Write the simplest code possible. No new symbols unless required.
-          - Keep interfaces small; push complexity to implementation. Few deep methods over many shallow ones.
-          - Provide sensible defaults so parameters disappear for the common case.
-          - Vertical slices by business terms. 
-	  - *very important* Max 2 level of nesting. function -> `for` -> `if` allowed, any deeper is not (except context managers in some cases)
-	  - No `else` — use early returns.
-	  - Immutable by default.
-	  - No comments.
-	  - Always write type hints
-	  '';
-          api-design = ''
-          - Make illegal states unrepresentable. Prefer total functions and idempotent operations.
-          - Use types to eliminate invalid states at compile time. Absorb rare cases into the common case.
-          - Hide implementation details. Name for meaning, not mechanism. Question every parameter.
-          - First design errors out of existence. If unavoidable, handle explicitly and visibly.
-          - Fail loudly with context. Never swallow errors without logging.
-	  '';
+        code-style = ''
+                    - Follow existing conventions. Write the simplest code possible. No new symbols unless required.
+                    - Keep interfaces small; push complexity to implementation. Few deep methods over many shallow ones.
+                    - Provide sensible defaults so parameters disappear for the common case.
+                    - Vertical slices by business terms. 
+          	  - *very important* Max 2 level of nesting. function -> `for` -> `if` allowed, any deeper is not (except context managers in some cases)
+          	  - No `else` — use early returns.
+          	  - Immutable by default.
+          	  - No comments.
+          	  - Always write type hints
+          	  '';
+        api-design = ''
+                    - Make illegal states unrepresentable. Prefer total functions and idempotent operations.
+                    - Use types to eliminate invalid states at compile time. Absorb rare cases into the common case.
+                    - Hide implementation details. Name for meaning, not mechanism. Question every parameter.
+                    - First design errors out of existence. If unavoidable, handle explicitly and visibly.
+                    - Fail loudly with context. Never swallow errors without logging.
+          	  '';
       };
       settings = {
         permissions.defaultMode = "auto";
@@ -197,9 +197,9 @@ in
       enable = true;
       settings = {
         ui = {
-	  sound.enabled = false;
-	  toast.delivery = "system";
-	};
+          sound.enabled = false;
+          toast.delivery = "system";
+        };
       };
     };
 
@@ -239,13 +239,12 @@ in
     };
   };
 
-    environment.pathsToLink = ["/lib"];
-    services.postgresql = {
-      enable = true;
-      enableTCPIP = true;
-      package = pkgs.postgresql_18;
-    };
-
+  environment.pathsToLink = [ "/lib" ];
+  services.postgresql = {
+    enable = true;
+    enableTCPIP = true;
+    package = pkgs.postgresql_18;
+  };
 
   homebrew.casks = [
     "docker-desktop"

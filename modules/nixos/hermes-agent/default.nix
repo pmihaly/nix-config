@@ -222,7 +222,10 @@ in
         # must be in the group list for the MATRIX_* env vars (below) to take
         # effect. Added alongside this task's credential wiring.
         package = inputs.hermes-agent.packages.${pkgs.stdenv.system}.minimal.override {
-          extraDependencyGroups = [ "firecrawl" "matrix" ];
+          extraDependencyGroups = [
+            "firecrawl"
+            "matrix"
+          ];
         };
 
         # LLM backend: OpenRouter (built-in provider), model

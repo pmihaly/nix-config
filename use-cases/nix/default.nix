@@ -25,7 +25,11 @@ in
       nix = {
         nixPath = [ "nixpkgs=/etc/channels/nixpkgs" ];
         settings = {
-          experimental-features = [ "nix-command" "flakes" "pipe-operators" ]; 
+          experimental-features = [
+            "nix-command"
+            "flakes"
+            "pipe-operators"
+          ];
           trusted-users = [ vars.username ];
         };
       };
