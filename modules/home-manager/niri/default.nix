@@ -162,6 +162,10 @@ in
                     accel-profile "flat"
                     accel-speed 0
                 }
+                // Mouse focuses whatever it's over; when focus changes another way
+                // (keyboard), warp the pointer to the newly focused window.
+                // center-xy: always jump to the window center (not just the nearest edge).
+                warp-mouse-to-focus mode="center-xy"
                 focus-follows-mouse
             }
 
