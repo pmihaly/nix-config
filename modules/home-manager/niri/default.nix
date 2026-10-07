@@ -231,6 +231,15 @@ in
                 Mod+H { focus-column-left-or-last; }
                 Mod+L { focus-column-right-or-first; }
 
+                // Move the focused window in the direction you'd focus: H left, L right.
+                // (keyd swaps physical Alt↔Ctrl, so bind both variants like the N/M block below.)
+                Mod+Shift+H { swap-window-left; }
+                Mod+Shift+L { swap-window-right; }
+                Alt+Shift+H  { swap-window-left; }
+                Alt+Shift+L  { swap-window-right; }
+                Ctrl+Shift+H { swap-window-left; }
+                Ctrl+Shift+L { swap-window-right; }
+
                 Mod+Ctrl+N { swap-window-right; }
                 Mod+Ctrl+M { swap-window-left; }
 
@@ -242,8 +251,12 @@ in
                 Ctrl+Shift+N { swap-window-left; }
                 Ctrl+Shift+M { swap-window-right; }
 
+                // J/K navigate workspaces; Shift+J/K move the focused window to the
+                // adjacent workspace — the same direction the focus moves with J/K.
                 Mod+J { focus-workspace-down; }
                 Mod+K { focus-workspace-up; }
+                Mod+Shift+J { move-window-to-workspace-down; }
+                Mod+Shift+K { move-window-to-workspace-up; }
 
                 Mod+1 { focus-workspace "w1"; }
                 Mod+2 { focus-workspace "w2"; }
