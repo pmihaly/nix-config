@@ -113,6 +113,8 @@
     };
   };
 
+  hardware.keyboard.qmk.enable = true;
+
   hardware.bluetooth.enable = true;
   hardware.bluetooth.powerOnBoot = true; # adapter on at boot so auto-connect can work
 
