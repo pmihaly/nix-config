@@ -85,6 +85,32 @@ optionalAttrs platform.isLinux {
 
     musnix.enable = true;
 
+    # Never let the Digitakt's USB audio interface become the default output /
+    # input. WirePlumber's ALSA monitor scores devices by priority.session (see
+    # scripts/monitors/alsa.lua: usb +100, analog +9, capture +1000), so the
+    # Digitakt (~1109 sink / ~2109 source) outranks the built-in HDMI card
+    # (~700) and wins find-best-default-node on hotplug. A negative session
+    # priority can never win that selection, so plugging the Digitakt in no
+    # longer hijacks the default sink+source -- it stays fully available as an
+    # explicit target (Ardour, digitakt-bounce) and only becomes default if
+    # the user deliberately picks it (wpctl/pavucontrol).
+    services.pipewire.wireplumber.extraConfig = {
+      "99-digitakt-never-default" = {
+        "monitor.alsa.rules" = [
+          {
+            matches = [
+              { "node.name" = "~alsa_(output|input)\\.usb-Elektron_Music_Machines_Elektron_Digitakt.*"; }
+            ];
+            actions = {
+              "update-props" = {
+                "priority.session" = -1000;
+              };
+            };
+          }
+        ];
+      };
+    };
+
     modules.backup = with config.home-manager.users.${vars.username}; {
       include = [
         "${home.homeDirectory}/.vital"
