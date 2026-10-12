@@ -31,22 +31,29 @@ let
     '';
   };
 
-  # nixpkgs still pins Vital 1.5.5 (2023). With several Vital instances in one
-  # Ardour session its JUCE GUI -- a single shared "Render Thread" per host
-  # process -- keeps redrawing at ~30% of a core even with all editors closed,
-  # and instantiating a NEW instance re-enters that shared GUI and glitches /
-  # freezes every open Vital editor until Ardour restarts (observed 2026-10-03
-  # on aesop, niri/XWayland). The official builds server carries 1.6.4
-  # (2026-04-30) with the same bundle layout (bin/Vital + lib/{vst,vst3,clap}/),
-  # so only version+src need overriding; the rest of nixpkgs' package logic
-  # (directories, wrapping, patching) is untouched.
-  vital = pkgs.vital.overrideAttrs (old: {
-    version = "1.6.4";
-    src = pkgs.fetchzip {
-      url = "https://builds.vital.audio/VitalAudio/vital/1_6_4/VitalInstaller.zip";
-      hash = "sha256-w4lHlcqkzPcUm+HmERs8+nLCgP1BWNnMSXqdV9Fyc/Q=";
-    };
-  });
+  # Vital freeze (aesop, niri/XWayland, Ardour 9.7): adding a Vital instance
+  # to a track freezes the whole host. gdb backtrace (2026-10-12) shows the
+  # main GUI thread deadlocked in the process-exit path:
+  #   exit() -> _dl_fini -> libardour.so.3 global dtors -> __cxa_finalize
+  #   -> pthread_cond_destroy  (blocks forever: Ardour's own worker threads
+  #   -- SessionSignals, AutoConnect, DeviceList, EngineWatchdog, Analyzer --
+  #   are still waiting on that condvar; glibc's pthread_cond_destroy waits
+  #   for waiters to leave, and nobody signals them).
+  # The exit() is triggered by Vital's VST3 instantiation failing: niri logs
+  # GL_INVALID_VALUE in glTexSubImage2D while the JUCE editor window is
+  # created under XWayland, and Ardour's stderr goes to /dev/null so nothing
+  # is logged. No thread is ever inside Vital's code -- the deadlock is
+  # Ardour-side.
+  #
+  # The 1.6.4 override (2026-10-04) did NOT fix this: it reproduced with
+  # 1.6.4 on 2026-10-11 (audio-graph threads busy-spinning at ~70% CPU with
+  # 12 Vital instances) and 2026-10-12 (exit-path deadlock adding the first
+  # instance to a fresh session). 1.6.4 is also the newest Vital on the
+  # builds server (1.6.5/1.6.6/1.7.0 do not exist), so there is no newer
+  # version to bump to. Reverted to the nixpkgs build (1.5.5): the override
+  # only added maintenance without fixing anything. Report upstream: Ardour
+  # (exit-path deadlock -- global dtors must not destroy condvars with live
+  # waiters) and Vital (instantiation failure under XWayland).
 
   # Official release AppImage run via appimage-run (same pattern as minecraft).
   noiseCanvas = pkgs.writeShellScriptBin "noise-canvas" ''
@@ -150,7 +157,7 @@ optionalAttrs platform.isLinux {
         yabridge
         yabridgectl
         ardour
-        vital
+        pkgs.vital
         lspPluginsR3dFixed
         dragonfly-reverb
         calf
