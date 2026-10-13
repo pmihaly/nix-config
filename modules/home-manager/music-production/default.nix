@@ -265,10 +265,48 @@ let
         '${yabridgeSync}/bin/yabridge-sync'
   '';
 
+  # Vital-add freeze (root cause, 2026-10-13): when a Vital instance is added
+  # to a track, Ardour queries VST3Plugin::has_editor(), which asks Vital to
+  # CREATE its JUCE editor. Vital's bundled JUCE (juce_linux_XWindowSystem.cpp
+  # findDisplays, XRANDR path) probes the root window for _NET_WORKAREA with
+  # an UNCHECKED atom from XInternAtom(..., True): when the WM does not define
+  # that atom (niri/XWayland does not -- verified `xprop -root _NET_WORKAREA`
+  # -> "no such atom"), the atom is None (0) and XGetWindowProperty raises
+  # BadAtom (request code 20, serial 62). Ardour's toolkit (libydk) installs
+  # the GTK-style fatal handler gdk_x_error, which calls exit() on ANY X
+  # error; exit() -> _dl_fini -> libardour global dtors -> pthread_cond_destroy
+  # then deadlocks forever because Ardour's own worker threads still wait on
+  # that condvar. Result: the window freezes (process stuck in exit()).
+  #
+  # Standalone Vital survives because JUCE installs its own lenient error
+  # handler there; inside Ardour the fatal one wins. Upstream mtytel/vital
+  # master STILL has the unchecked-atom bug (line ~2217), so no Vital build
+  # fixes it. This shield swaps any X error handler for a lenient one
+  # (log + return 0), the same behavior as standalone -- a BadAtom from a
+  # plugin probe then just logs and the editor opens normally. Verified
+  # 2026-10-13: with the shield, adding Vital works (error suppressed, Ardour
+  # healthy); without it, exit-path deadlock reproduces on Ardour 9.7 and 9.8.
+  # Report upstream: mtytel/vital (JUCE workAreaHints None guard) and Ardour
+  # (global dtors must not destroy condvars with live waiters).
+  xerrorShield = pkgs.stdenv.mkDerivation {
+    pname = "ardour-xerror-shield";
+    version = "1.0";
+    src = ./xerror-shield.c;
+    nativeBuildInputs = [ pkgs.gcc ];
+    buildInputs = [ pkgs.libx11 ];
+    buildPhase = ''
+      gcc -shared -fPIC -o xerror_shield.so "$src" -lX11 -ldl
+    '';
+    installPhase = ''
+      install -Dm644 xerror_shield.so "$out/lib/xerror_shield.so"
+    '';
+  };
+
   # Ardour with the VST bottle as WINEPREFIX (yabridge reads it to locate/run
   # Windows plugins). Native Ardour is unaffected by the variable.
   ardourVst = pkgs.writeShellScriptBin "ardour-vst" ''
     export WINEPREFIX='${bottlePath}'
+    export LD_PRELOAD='${xerrorShield}/lib/xerror_shield.so''${LD_PRELOAD:+:$LD_PRELOAD}'
     exec '${pkgs.ardour}/bin/ardour9' "$@"
   '';
 
@@ -632,6 +670,80 @@ let
         echo "---"; echo "done -> $out (all tracks unmuted)"
   '';
 
+  # Keep Moonlander <-> Digitakt ALSA MIDI routes alive; fall back to Ardour
+  # when the Digitakt is not connected. Hardware/MIDI background (CC19 sample
+  # select, loop-bound switching) lives in the keyboard-layouts repo AGENTS.md.
+  mlMidiRoutes = pkgs.writeShellScriptBin "ml-midi-routes" ''
+    # ALSA client numbers change across replug/reboot/flash — resolve by name on
+    # every wakeup, then (re)assert the routes. "already subscribed" errors are
+    # suppressed: the routes are only actually torn down by USB re-enumeration
+    # (flash/replug) or by our explicit -d below, never by a failed re-assert,
+    # so the live clock link is never interrupted.
+    #
+    # Routes:
+    #   Digitakt present:
+    #     Moonlander -> Digitakt : CC19 (Sample Select) out
+    #     Digitakt   -> Moonlander: MIDI clock (F8) + transport (FA/FB/FC) back in
+    #   Digitakt absent (Ardour running, ALSA backend + "ALSA sequencer" MIDI):
+    #     Moonlander -> Ardour    : CC19 pads as a control surface
+    #     Ardour     -> Moonlander: optional clock, keeps loop-bound switching
+    #
+    # Event-driven: block on udev sound events (fires on USB add/remove of both
+    # devices) instead of polling, so routes are re-asserted immediately after a
+    # replug with zero idle CPU. A short sleep guards against a hot loop if the
+    # monitor ever exits without an event.
+    set -u
+
+    ACONNECT='${pkgs.alsa-utils}/bin/aconnect'
+    UDEVADM='${pkgs.systemd}/bin/udevadm'
+
+    # Resolve an ALSA client number by name substring (e.g. "Moonlander").
+    client_of() {
+      "$ACONNECT" -l | awk -v name="$1" '$0 ~ "^client [0-9]+:.*" name {print $2; exit}' | tr -d ':'
+    }
+
+    # Idempotently connect src:0 -> dst:0; "already subscribed" is fine.
+    assert_route() {
+      [ -n "$1" ] && [ -n "$2" ] && "$ACONNECT" "$1:0" "$2:0" 2>/dev/null || true
+    }
+
+    # Explicitly drop src:0 -> dst:0 (used to un-route Ardour when the Digitakt
+    # comes back, so pads don't double-trigger).
+    drop_route() {
+      [ -n "$1" ] && [ -n "$2" ] && "$ACONNECT" -d "$1:0" "$2:0" 2>/dev/null || true
+    }
+
+    while true; do
+      ml=$(client_of "Moonlander")
+      dt=$(client_of "Digitakt")
+      ar=$(client_of "Ardour")
+
+      if [ -n "$ml" ]; then
+        if [ -n "$dt" ]; then
+          # Digitakt present: full duplex for CC19 out + clock/transport in.
+          assert_route "$ml" "$dt"
+          assert_route "$dt" "$ml"
+          # Exclusive: drop the Ardour fallback so pads don't double-trigger.
+          drop_route "$ml" "$ar"
+          drop_route "$ar" "$ml"
+        elif [ -n "$ar" ]; then
+          # No Digitakt: drive Ardour instead (ALSA backend + ALSA sequencer MIDI).
+          assert_route "$ml" "$ar"
+          assert_route "$ar" "$ml"
+        fi
+      fi
+
+      # Wake on USB/sound changes instead of sleeping; fall back to a 2 s poll
+      # if udevadm is unavailable. grep -m1 filters out the startup banner (which
+      # udevadm prints to stdout) so we only wake on a real KERNEL/UDEV event.
+      if [ -x "$UDEVADM" ]; then
+        "$UDEVADM" monitor --subsystem-match=sound --property --udev 2>/dev/null \
+          | grep -m1 -E '^(KERNEL|UDEV)\[' >/dev/null
+      fi
+      sleep 1
+    done
+  '';
+
 in
 {
   options.modules.music-production.wine = {
@@ -653,6 +765,7 @@ in
       kontaktOpen
       pkgs.alsa-utils
       digitaktBounce
+      mlMidiRoutes
     ];
 
     # .nki/.nkm -> kontakt-open (double-click any instrument in a file manager).
@@ -725,6 +838,24 @@ in
         Type = "oneshot";
         RemainAfterExit = true;
         ExecStart = lib.getExe vst3RealBundles;
+      };
+      Install = {
+        WantedBy = [ "default.target" ];
+      };
+    };
+
+    # Keep Moonlander <-> Digitakt ALSA MIDI routes alive (Ardour fallback
+    # when the Digitakt is unplugged). Event-driven via udevadm monitor; see
+    # mlMidiRoutes above.
+    systemd.user.services."ml-midi-routes" = {
+      Unit = {
+        Description = "Keep Moonlander <-> Digitakt ALSA MIDI routes alive";
+      };
+      Service = {
+        Type = "simple";
+        Restart = "on-failure";
+        RestartSec = 2;
+        ExecStart = getExe mlMidiRoutes;
       };
       Install = {
         WantedBy = [ "default.target" ];

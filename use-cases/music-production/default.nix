@@ -31,29 +31,31 @@ let
     '';
   };
 
-  # Vital freeze (aesop, niri/XWayland, Ardour 9.7): adding a Vital instance
-  # to a track freezes the whole host. gdb backtrace (2026-10-12) shows the
-  # main GUI thread deadlocked in the process-exit path:
-  #   exit() -> _dl_fini -> libardour.so.3 global dtors -> __cxa_finalize
+  # Vital freeze -- FULL root cause (2026-10-13, aesop, niri/XWayland):
+  # adding a Vital instance freezes Ardour. gdb breakpoint on exit() shows
+  # the chain:
+  #   VST3Plugin::has_editor -> try_create_view -> juce::Desktop::Desktop()
+  #     -> GetXProperty(root, workAreaHints = None, ...)   [BadAtom!]
+  #   -> gdk_x_error (libydk fatal X handler) -> exit()
+  #   -> _dl_fini -> libardour.so.3 global dtors -> __cxa_finalize
   #   -> pthread_cond_destroy  (blocks forever: Ardour's own worker threads
-  #   -- SessionSignals, AutoConnect, DeviceList, EngineWatchdog, Analyzer --
-  #   are still waiting on that condvar; glibc's pthread_cond_destroy waits
-  #   for waiters to leave, and nobody signals them).
-  # The exit() is triggered by Vital's VST3 instantiation failing: niri logs
-  # GL_INVALID_VALUE in glTexSubImage2D while the JUCE editor window is
-  # created under XWayland, and Ardour's stderr goes to /dev/null so nothing
-  # is logged. No thread is ever inside Vital's code -- the deadlock is
-  # Ardour-side.
+  #     -- SessionSignals, AutoConnect, DeviceList, EngineWatchdog, Analyzer --
+  #     are still waiting on that condvar; glibc's pthread_cond_destroy waits
+  #     for waiters to leave, and nobody signals them).
+  # The BadAtom is Vital's bundled JUCE bug: findDisplays() (XRANDR path)
+  # passes an UNCHECKED _NET_WORKAREA atom to XGetWindowProperty; niri's
+  # XWayland does not define _NET_WORKAREA, so XInternAtom(..., True) returns
+  # None and the call errors. Upstream mtytel/vital master still has it.
   #
-  # The 1.6.4 override (2026-10-04) did NOT fix this: it reproduced with
-  # 1.6.4 on 2026-10-11 (audio-graph threads busy-spinning at ~70% CPU with
-  # 12 Vital instances) and 2026-10-12 (exit-path deadlock adding the first
-  # instance to a fresh session). 1.6.4 is also the newest Vital on the
-  # builds server (1.6.5/1.6.6/1.7.0 do not exist), so there is no newer
-  # version to bump to. Reverted to the nixpkgs build (1.5.5): the override
-  # only added maintenance without fixing anything. Report upstream: Ardour
-  # (exit-path deadlock -- global dtors must not destroy condvars with live
-  # waiters) and Vital (instantiation failure under XWayland).
+  # Fix: the ardour-vst wrapper (modules/home-manager/music-production)
+  # preloads xerror-shield.so, a tiny lib that swaps any X error handler for
+  # a lenient one (log + return 0) -- exactly how standalone Vital survives.
+  #
+  # Reverted to the nixpkgs build (1.5.5): the 1.6.4 override (2026-10-04)
+  # did NOT affect this (same bundled-JUCE bug, unfixed up to 1.6.4, and the
+  # Ardour-side exit-path deadlock also needs reporting). Report upstream:
+  # mtytel/vital (Juce workAreaHints None guard) and Ardour (exit-path
+  # deadlock -- global dtors must not destroy condvars with live waiters).
 
   # Official release AppImage run via appimage-run (same pattern as minecraft).
   noiseCanvas = pkgs.writeShellScriptBin "noise-canvas" ''
