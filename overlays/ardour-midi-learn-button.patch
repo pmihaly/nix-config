@@ -1,0 +1,274 @@
+diff --git a/gtk2_ardour/plugin_ui.cc b/gtk2_ardour/plugin_ui.cc
+index ba11a78..1d9e739 100644
+--- a/gtk2_ardour/plugin_ui.cc
++++ b/gtk2_ardour/plugin_ui.cc
+@@ -47,11 +47,13 @@
+ #include "widgets/tooltips.h"
+ 
+ #include "ardour/auditioner.h"
++#include "ardour/automation_control.h"
+ #include "ardour/ladspa_plugin.h"
+ #include "ardour/lv2_plugin.h"
+ #include "ardour/plugin.h"
+ #include "ardour/plugin_insert.h"
+ #include "ardour/region_fx_plugin.h"
++#include "ardour/route.h"
+ #include "ardour/session.h"
+ #include "lv2_plugin_ui.h"
+ 
+@@ -83,6 +85,7 @@ extern VST3PluginUI* create_mac_vst3_gui (std::shared_ptr<ARDOUR::PlugInsertBase
+ #endif
+ 
+ #include "ardour_ui.h"
++#include "ardour_message.h"
+ #include "ardour_window.h"
+ #include "gui_thread.h"
+ #include "keyboard.h"
+@@ -94,6 +97,7 @@ extern VST3PluginUI* create_mac_vst3_gui (std::shared_ptr<ARDOUR::PlugInsertBase
+ #include "plugin_ui.h"
+ #include "processor_box.h"
+ #include "public_editor.h"
++#include "route_time_axis.h"
+ #include "timers.h"
+ #include "ui_config.h"
+ #include "utils.h"
+@@ -533,6 +537,7 @@ PlugUIBase::PlugUIBase (std::shared_ptr<PlugInsertBase> pib)
+ 	, _reset_button (_("Reset"))
+ 	, _bypass_button (ArdourButton::led_default_elements)
+ 	, _pin_management_button (_("Pinout"))
++	, _learn_button (_("Learn"))
+ 	, description_expander (_("Description"))
+ 	, plugin_analysis_expander (_("Plugin analysis"))
+ 	, cpuload_expander (_("CPU Profile"))
+@@ -598,6 +603,11 @@ PlugUIBase::PlugUIBase (std::shared_ptr<PlugInsertBase> pib)
+ 	_pin_management_button.set_icon (ArdourIcon::PluginPinout);
+ 	_pin_management_button.signal_clicked.connect (sigc::mem_fun (*this, &PlugUIBase::manage_pins));
+ 
++	_learn_button.set_name ("generic button");
++	_learn_button.set_sensitive (false);
++	set_tooltip (_learn_button, _("Tweak a plugin parameter, then click Learn to show its automation lane and learn a MIDI controller"));
++	_learn_button.signal_clicked.connect (sigc::mem_fun (*this, &PlugUIBase::learn_last_parameter));
++
+ 	_bypass_button.set_name ("plugin bypass button");
+ 	_bypass_button.set_text (_("Bypass"));
+ 	_bypass_button.set_icon (ArdourIcon::PluginBypass);
+@@ -606,6 +616,7 @@ PlugUIBase::PlugUIBase (std::shared_ptr<PlugInsertBase> pib)
+ 	if (_pi) {
+ 		_pi->ActiveChanged.connect (active_connection, invalidator (*this), std::bind (&PlugUIBase::processor_active_changed, this, std::weak_ptr<Processor> (_pi)), gui_context ());
+ 		_bypass_button.set_active (!_pi->enabled ());
++		Controllable::ControlTouched.connect (*this, invalidator (*this), std::bind (&PlugUIBase::remember_touched_parameter, this, _1), gui_context ());
+ 	} else {
+ 		_bypass_button.set_sensitive (false);
+ 	}
+@@ -671,6 +682,8 @@ void
+ PlugUIBase::plugin_going_away ()
+ {
+ 	drop_connections ();
++	_learn_binding.set_controllable (std::shared_ptr<Controllable> ());
++	_learn_button.set_sensitive (false);
+ 	/* drop references to the plugin/insert */
+ 	_pib.reset ();
+ 	_pi.reset ();
+@@ -710,6 +723,7 @@ PlugUIBase::add_common_widgets (Gtk::HBox* b, bool with_focus)
+ 
+ 	if (_pi) {
+ 		b->pack_end (_pin_management_button, false, false);
++		b->pack_end (_learn_button, false, false, 4);
+ 		b->pack_start (_latency_button, false, false, 4);
+ 	}
+ 	else if (std::dynamic_pointer_cast<ARDOUR::RegionFxPlugin> (_pib)) {
+@@ -902,6 +916,53 @@ PlugUIBase::browse_presets ()
+ 	preset_dialog->show_all ();
+ }
+ 
++void
++PlugUIBase::remember_touched_parameter (std::weak_ptr<Controllable> touched)
++{
++	std::shared_ptr<AutomationControl> control = std::dynamic_pointer_cast<AutomationControl> (touched.lock ());
++	if (!_pi || !control || control->parameter ().type () != PluginAutomation) {
++		return;
++	}
++	if (_pi->automation_control (control->parameter (), false) != control) {
++		return;
++	}
++	if (_learn_binding.get_controllable () == control) {
++		return;
++	}
++
++	_learn_binding.set_controllable (control);
++	_learn_button.set_sensitive (true);
++	set_tooltip (_learn_button, string_compose (_("Show automation lane and learn MIDI for: %1"), control->desc ().label));
++}
++
++void
++PlugUIBase::learn_last_parameter ()
++{
++	std::shared_ptr<AutomationControl> control = std::dynamic_pointer_cast<AutomationControl> (_learn_binding.get_controllable ());
++	if (!_pi || !control) {
++		_learn_button.set_sensitive (false);
++		return;
++	}
++
++	Route* owner = dynamic_cast<Route*> (_pi->owner ());
++	std::shared_ptr<Route> route;
++	if (owner) {
++		route = std::dynamic_pointer_cast<Route> (owner->shared_from_this ());
++	}
++	RouteTimeAxisView* view = route ? PublicEditor::instance ().rtav_from_route (route) : nullptr;
++	if (!view || !view->show_automation_lane (control)) {
++		ArdourMessageDialog message (dynamic_cast<Gtk::Window*> (_learn_button.get_toplevel ()), _("Cannot show the automation lane for this plugin parameter."), false, Gtk::MESSAGE_WARNING);
++		message.run ();
++		return;
++	}
++	if (_learn_binding.start_learning ()) {
++		return;
++	}
++
++	ArdourMessageDialog message (dynamic_cast<Gtk::Window*> (_learn_button.get_toplevel ()), _("MIDI learn is unavailable. Enable Generic MIDI in Preferences > Control Surfaces and connect your controller to its input."), false, Gtk::MESSAGE_WARNING);
++	message.run ();
++}
++
+ void
+ PlugUIBase::manage_pins ()
+ {
+diff --git a/gtk2_ardour/plugin_ui.h b/gtk2_ardour/plugin_ui.h
+index 937e82b..e68e29b 100644
+--- a/gtk2_ardour/plugin_ui.h
++++ b/gtk2_ardour/plugin_ui.h
+@@ -55,6 +55,7 @@
+ #include "widgets/ardour_button.h"
+ #include "widgets/ardour_dropdown.h"
+ #include "widgets/ardour_spinner.h"
++#include "widgets/binding_proxy.h"
+ 
+ #include "ardour_window.h"
+ #include "automation_controller.h"
+@@ -146,6 +147,8 @@ protected:
+ 	ArdourWidgets::ArdourButton _bypass_button;
+ 	/** and self-explaining button :) */
+ 	ArdourWidgets::ArdourButton _pin_management_button;
++	ArdourWidgets::ArdourButton _learn_button;
++	ArdourWidgets::BindingProxy _learn_binding;
+ 	/** a button to acquire keyboard focus */
+ 	Gtk::EventBox _focus_button;
+ 	/** an expander containing the plugin description */
+@@ -191,6 +194,8 @@ protected:
+ 	void reset_plugin_parameters ();
+ 	void browse_presets ();
+ 	void manage_pins ();
++	void remember_touched_parameter (std::weak_ptr<PBD::Controllable>);
++	void learn_last_parameter ();
+ 	bool focus_toggled(GdkEventButton*);
+ 	bool bypass_button_release(GdkEventButton*);
+ 	void toggle_description ();
+diff --git a/gtk2_ardour/route_time_axis.cc b/gtk2_ardour/route_time_axis.cc
+index 3dc89de..37d1dcc 100644
+--- a/gtk2_ardour/route_time_axis.cc
++++ b/gtk2_ardour/route_time_axis.cc
+@@ -1750,6 +1750,28 @@ RouteTimeAxisView::maybe_hide_automation (bool hide, WeakAutomationControlList w
+ 	}
+ }
+ 
++bool
++RouteTimeAxisView::show_automation_lane (std::shared_ptr<AutomationControl> control)
++{
++	if (!control) {
++		return false;
++	}
++
++	Gtk::CheckMenuItem* item = find_menu_item_by_ctrl (control);
++	if (item) {
++		item->set_active (true);
++	}
++
++	std::shared_ptr<AutomationTimeAxisView> lane = find_atav_by_ctrl (control, false);
++	if (!lane) {
++		return false;
++	}
++	if (lane->set_marked_for_display (true)) {
++		request_redraw ();
++	}
++	return true;
++}
++
+ void
+ RouteTimeAxisView::show_touched_automation (std::weak_ptr<PBD::Controllable> wctrl)
+ {
+diff --git a/gtk2_ardour/route_time_axis.h b/gtk2_ardour/route_time_axis.h
+index 99d8889..56ad7d1 100644
+--- a/gtk2_ardour/route_time_axis.h
++++ b/gtk2_ardour/route_time_axis.h
+@@ -144,6 +144,7 @@ public:
+ 	void show_all_automation (bool apply_to_selection = false);
+ 	void show_existing_automation (bool apply_to_selection = false);
+ 	void hide_all_automation (bool apply_to_selection = false);
++	bool show_automation_lane (std::shared_ptr<ARDOUR::AutomationControl>);
+ 
+ protected:
+ 	friend class StreamView;
+diff --git a/libs/widgets/binding_proxy.cc b/libs/widgets/binding_proxy.cc
+index f375bea..658cb84 100644
+--- a/libs/widgets/binding_proxy.cc
++++ b/libs/widgets/binding_proxy.cc
+@@ -93,28 +93,37 @@ bool
+ BindingProxy::button_press_handler (GdkEventButton *ev)
+ {
+ 	if ( controllable && is_bind_action(ev) ) {
+-		if (Controllable::StartLearning (controllable)) {
+-			string prompt = _("operate controller now");
+-			if (prompter == 0) {
+-				prompter = new PopUp (Gtk::WIN_POS_MOUSE, 30000, false);
+-				prompter->signal_unmap_event().connect (mem_fun (*this, &BindingProxy::prompter_hiding));
+-			}
+-			prompter->set_text (prompt);
+-			prompter->touch (); // shows popup
+-			controllable->LearningFinished.connect_same_thread (learning_connection, std::bind (&BindingProxy::learning_finished, this));
+-		}
++		start_learning ();
+ 		return true;
+ 	}
+ 
+ 	return false;
+ }
+ 
++bool
++BindingProxy::start_learning ()
++{
++	learning_finished ();
++	if (!controllable || !Controllable::StartLearning (controllable)) {
++		return false;
++	}
++
++	if (!prompter) {
++		prompter = new PopUp (Gtk::WIN_POS_MOUSE, 30000, false);
++		prompter->signal_unmap_event().connect (mem_fun (*this, &BindingProxy::prompter_hiding));
++	}
++	prompter->set_text (_("operate controller now"));
++	controllable->LearningFinished.connect (learning_connection, invalidator (*this), std::bind (&BindingProxy::learning_finished, this), gui_context ());
++	prompter->touch ();
++	return true;
++}
++
+ void
+ BindingProxy::learning_finished ()
+ {
+ 	learning_connection.disconnect ();
+-	if (prompter) {
+-		prompter->touch (); // hides popup
++	if (prompter && prompter->get_visible ()) {
++		prompter->touch ();
+ 	}
+ }
+ 
+diff --git a/libs/widgets/widgets/binding_proxy.h b/libs/widgets/widgets/binding_proxy.h
+index c51c9ed..8370ff1 100644
+--- a/libs/widgets/widgets/binding_proxy.h
++++ b/libs/widgets/widgets/binding_proxy.h
+@@ -50,6 +50,7 @@ public:
+ 
+ 	static bool is_bind_action (GdkEventButton *);
+ 	bool button_press_handler (GdkEventButton *);
++	bool start_learning ();
+ 
+ 	std::shared_ptr<PBD::Controllable> get_controllable() const { return controllable; }
+ 	void set_controllable (std::shared_ptr<PBD::Controllable>);

@@ -116,4 +116,13 @@
       }
     );
   })
+  (final: prev: {
+    # MIDI Learn button in the plugin UI: adds a "Learn" button that shows the
+    # automation lane of the last-touched plugin parameter and starts Generic
+    # MIDI binding for it (libs/widgets BindingProxy). Patch applies to ardour
+    # 9.8 (refs/tags/9.8). See overlays/ardour-midi-learn-button.patch.
+    ardour = prev.ardour.overrideAttrs (old: {
+      patches = (old.patches or [ ]) ++ [ ./ardour-midi-learn-button.patch ];
+    });
+  })
 ]
