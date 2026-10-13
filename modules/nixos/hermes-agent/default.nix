@@ -106,8 +106,12 @@ let
     # npm-deps FOD). Without it the FOD is unhashable and a clean
     # build (e.g. on skylake during deploy) fails with a hash
     # mismatch; the registry contents for this pinned lockfile are
-    # immutable, so the hash is stable.
-    npmDepsHash = "sha256-ZSvXA2Huo1YG+Q37y9gKv3dJSMafOmXAaWDW9O6X+sg=";
+    # immutable, so the hash is stable — EXCEPT that the FOD output
+    # includes the lockfile itself, so reformatting
+    # vendor/flowstate-qmd-package-lock.json (e.g. the 2026-10-04
+    # prettier pass) changes the hash. Keep that file byte-identical
+    # or re-record this hash on a rebuild.
+    npmDepsHash = "sha256-nG4ux0+/RRC/rKajVeUmepHfb/Jl9Piy0HssCbtVrYg=";
   };
 
   # Git-over-ssh for hermes: her only ssh channel is `git push`/`git
