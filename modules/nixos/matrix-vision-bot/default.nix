@@ -29,6 +29,15 @@ let
       inline-snapshot = super.inline-snapshot.overridePythonAttrs (o: {
         doCheck = false;
       });
+      # Same class of problem as inline-snapshot above: anyio's pytest suite
+      # has timing-sensitive tests (test_tls_connectable, unraisable-exception
+      # races) that flake under parallel build load — they pass standalone but
+      # fail ~every run during `make skylake`, taking the whole system build
+      # down non-deterministically. Runtime behavior is unaffected; skip its
+      # tests as well.
+      anyio = super.anyio.overridePythonAttrs (o: {
+        doCheck = false;
+      });
     };
   };
 
