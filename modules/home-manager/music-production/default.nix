@@ -292,6 +292,8 @@ let
     pname = "ardour-xerror-shield";
     version = "1.0";
     src = ./xerror-shield.c;
+    # the source is a single .c file compiled directly from $src — nothing to unpack
+    dontUnpack = true;
     nativeBuildInputs = [ pkgs.gcc ];
     buildInputs = [ pkgs.libx11 ];
     buildPhase = ''
@@ -670,77 +672,173 @@ let
         echo "---"; echo "done -> $out (all tracks unmuted)"
   '';
 
-  # Keep Moonlander <-> Digitakt ALSA MIDI routes alive; fall back to Ardour
-  # when the Digitakt is not connected. Hardware/MIDI background (CC19 sample
-  # select, loop-bound switching) lives in the keyboard-layouts repo AGENTS.md.
+  # Keep Moonlander <-> Ardour MIDI routes alive — ALSA-sequencer OR
+  # JACK/Pipewire, whichever Ardour backend is live (on aesop Ardour runs on
+  # PipeWire's JACK, so Path B is the active one). The pad->cue note mapping
+  # and the launchpad background live in the keyboard-layouts repo
+  # (scripts/Moonlander_Cue_Launch.map).
   mlMidiRoutes = pkgs.writeShellScriptBin "ml-midi-routes" ''
-    # ALSA client numbers change across replug/reboot/flash — resolve by name on
-    # every wakeup, then (re)assert the routes. "already subscribed" errors are
-    # suppressed: the routes are only actually torn down by USB re-enumeration
-    # (flash/replug) or by our explicit -d below, never by a failed re-assert,
-    # so the live clock link is never interrupted.
+    # ALSA client numbers change across replug/reboot/flash; PipeWire links die
+    # with either endpoint. Resolve by name on every wakeup, then (re)assert
+    # the routes. "already subscribed"/"already linked" errors are suppressed:
+    # the routes are only torn down by USB re-enumeration (flash/replug) or an
+    # endpoint restart, never by a failed re-assert, so a live clock link is
+    # never interrupted.
     #
-    # Routes:
-    #   Digitakt present:
-    #     Moonlander -> Digitakt : CC19 (Sample Select) out
-    #     Digitakt   -> Moonlander: MIDI clock (F8) + transport (FA/FB/FC) back in
-    #   Digitakt absent (Ardour running, ALSA backend + "ALSA sequencer" MIDI):
-    #     Moonlander -> Ardour    : CC19 pads as a control surface
-    #     Ardour     -> Moonlander: optional clock, keeps loop-bound switching
-    #
-    # Event-driven: block on udev sound events (fires on USB add/remove of both
-    # devices) instead of polling, so routes are re-asserted immediately after a
-    # replug with zero idle CPU. A short sleep guards against a hot loop if the
-    # monitor ever exits without an event.
+    # Event-driven: block on udev sound events (fires on USB add/remove of the
+    # devices), so routes are re-asserted immediately after a replug with
+    # near-zero idle CPU. The monitor is bounded with `timeout 5` so the loop
+    # also re-asserts at least every ~5 s as a watchdog — a flash/replug can
+    # race the backend/sequencer registration, and a watchdog poll heals that
+    # where the pure event loop would stall.
     set -u
 
+    # systemd's user-manager PATH is minimal — don't depend on it.
     ACONNECT='${pkgs.alsa-utils}/bin/aconnect'
+    PW_LINK='${pkgs.pipewire}/bin/pw-link'
     UDEVADM='${pkgs.systemd}/bin/udevadm'
+    PATH='${pkgs.coreutils}/bin:${pkgs.gawk}/bin:${pkgs.gnugrep}/bin'
+    export PATH
 
     # Resolve an ALSA client number by name substring (e.g. "Moonlander").
     client_of() {
       "$ACONNECT" -l | awk -v name="$1" '$0 ~ "^client [0-9]+:.*" name {print $2; exit}' | tr -d ':'
     }
 
-    # Idempotently connect src:0 -> dst:0; "already subscribed" is fine.
-    assert_route() {
-      [ -n "$1" ] && [ -n "$2" ] && "$ACONNECT" "$1:0" "$2:0" 2>/dev/null || true
+    # Resolve a port id within a client by port-name substring; "" if unmatched.
+    port_of() {
+      local client="$1" name="$2"
+      "$ACONNECT" -l | awk -v c="$client" -v name="$name" '
+        $0 ~ "^client " c ":" { seen=1; next }
+        seen && $0 ~ /^[[:space:]]*[0-9]+ / && $0 ~ name { print $1; exit }
+      '
     }
 
-    # Explicitly drop src:0 -> dst:0 (used to un-route Ardour when the Digitakt
-    # comes back, so pads don't double-trigger).
-    drop_route() {
-      [ -n "$1" ] && [ -n "$2" ] && "$ACONNECT" -d "$1:0" "$2:0" 2>/dev/null || true
+    # Idempotently connect src -> dst; "already subscribed" is fine.
+    assert_route() {
+      [ -n "$1" ] && [ -n "$2" ] && "$ACONNECT" "$1" "$2" 2>/dev/null || true
+    }
+
+    # First pw-link port line matching (node-regex, port-regex); $1 = -o/-i.
+    # Matching is case-insensitive (ports are titled like "MIDI Clock out").
+    pw_first() {
+      "$PW_LINK" "$1" 2>/dev/null | awk -v n="$2" -v p="$3" '
+        { i = index($0, ":"); nd = tolower(substr($0, 1, i-1)); pt = tolower(substr($0, i+1));
+          nn = tolower(n); pp = tolower(p);
+          if ((nn == "" || nd ~ nn) && (pp == "" || pt ~ pp)) { print $0; exit } }'
+    }
+
+    # Idempotently link out -> in; already-linked errors are fine.
+    assert_link() {
+      [ -n "$1" ] && [ -n "$2" ] && "$PW_LINK" "$1" "$2" 2>/dev/null || true
     }
 
     while true; do
       ml=$(client_of "Moonlander")
-      dt=$(client_of "Digitakt")
       ar=$(client_of "Ardour")
 
-      if [ -n "$ml" ]; then
-        if [ -n "$dt" ]; then
-          # Digitakt present: full duplex for CC19 out + clock/transport in.
-          assert_route "$ml" "$dt"
-          assert_route "$dt" "$ml"
-          # Exclusive: drop the Ardour fallback so pads don't double-trigger.
-          drop_route "$ml" "$ar"
-          drop_route "$ar" "$ml"
-        elif [ -n "$ar" ]; then
-          # No Digitakt: drive Ardour instead (ALSA backend + ALSA sequencer MIDI).
-          assert_route "$ml" "$ar"
-          assert_route "$ar" "$ml"
+      if [ -n "$ml" ] && [ -n "$ar" ]; then
+        # --- Path A: Ardour on ALSA backend + "ALSA sequencer" MIDI ---
+        ml_port=0
+        ar_in=$(port_of "$ar" "Control In")
+        [ -z "$ar_in" ] && ar_in=$(port_of "$ar" "MIDI In")
+        [ -z "$ar_in" ] && ar_in=0
+        assert_route "$ml:$ml_port" "$ar:$ar_in"
+
+        ar_clk=$(port_of "$ar" "clock out")
+        [ -z "$ar_clk" ] && ar_clk=0
+        assert_route "$ar:$ar_clk" "$ml:$ml_port"
+      elif [ -z "$ar" ] && [ -x "$PW_LINK" ]; then
+        # --- Path B: Ardour on JACK/Pipewire backend (no ALSA-seq Ardour) ---
+        # The Moonlander ports belong to the Midi-Bridge node; the keyboard
+        # name is in the PORT name. -o only lists sources (capture), -i only
+        # sinks (playback), so the direction already disambiguates them.
+        ml_src=$(pw_first "-o" "" "Moonlander")   # notes out of the keyboard
+        ml_snk=$(pw_first "-i" "" "Moonlander")   # clock back into the keyboard
+        ar_in=$(pw_first "-i" "ardour" "Control In")    # Generic MIDI surface input
+        if [ -z "$ar_in" ]; then
+          # tolerant fallback: any plausible MIDI control input that is not our own
+          ar_in=$(pw_first "-i" "" "Control In")
+          case "$ar_in" in Midi-Bridge:*|*Moonlander*|bluez_midi*) ar_in="";; esac
         fi
+        ar_clk=$(pw_first "-o" "ardour" "clock out")    # Mclk generator output
+
+        [ -n "$ml_src" ] && [ -n "$ar_in" ] && assert_link "$ml_src" "$ar_in"
+        [ -n "$ar_clk" ] && [ -n "$ml_snk" ] && assert_link "$ar_clk" "$ml_snk"
       fi
 
-      # Wake on USB/sound changes instead of sleeping; fall back to a 2 s poll
-      # if udevadm is unavailable. grep -m1 filters out the startup banner (which
-      # udevadm prints to stdout) so we only wake on a real KERNEL/UDEV event.
+      # Wake on USB/sound changes (immediate replug re-assert); `timeout 5`
+      # bounds the wait so a missed/raced event still gets a re-assert poll.
+      # grep -m1 filters out the startup banner (which udevadm prints to
+      # stdout) so we only wake on a real KERNEL/UDEV event.
       if [ -x "$UDEVADM" ]; then
-        "$UDEVADM" monitor --subsystem-match=sound --property --udev 2>/dev/null \
-          | grep -m1 -E '^(KERNEL|UDEV)\[' >/dev/null
+        timeout 5 "$UDEVADM" monitor --subsystem-match=sound --property --udev 2>/dev/null \
+          | grep -m1 -E '^(KERNEL|UDEV)\[|^$' >/dev/null
+      else
+        sleep 2
       fi
-      sleep 1
+    done
+  '';
+
+  # Keep Ardour's master bus connected to the CURRENT default output sink.
+  #
+  # Root cause of "Ardour is silent" (verified 2026-10-13, aesop, Ardour 9.8 +
+  # PipeWire 1.6.9): under pipewire-jack there are NO system:playback_N ports
+  # (pw-dump shows no system: endpoint at all), and WirePlumber never
+  # auto-links JACK clients (the ardour node is media.category=Duplex / no
+  # media.class, unlike e.g. Firefox which is Stream/Output/Audio and gets
+  # auto-linked). So Ardour's session-level "connect master to system:playback"
+  # silently no-ops and Master/audio_out 1/2 dangle with zero links -- the
+  # whole master bus is inaudible no matter what plays. The auditioner only
+  # worked because explicit JACK links to the hardware ports survived in
+  # session_port.rc (same "other=WH-1000XM6-77:playback_FL" entries).
+  #
+  # This helper re-asserts Master/audio_out 1/2 -> current default sink's
+  # playback ports every cycle, so the fix survives Ardour restarts, default-
+  # sink switches (wpctl set-default / BT connect / replug) and machine
+  # reboots. It only ADDS links and never tears down hand-made connections;
+  # the ardour: ports only exist while Ardour runs with the JACK/Pipewire
+  # backend, so the loop is a cheap no-op otherwise.
+  ardourToDefault = pkgs.writeShellScriptBin "ardour-to-default" ''
+    set -u
+    readonly PW_LINK='${pkgs.pipewire}/bin/pw-link'
+    readonly PW_DUMP='${pkgs.pipewire}/bin/pw-dump'
+    readonly SED='${pkgs.gnused}/bin/sed'
+    readonly GREP='${pkgs.gnugrep}/bin/grep'
+    readonly AWK='${pkgs.gawk}/bin/awk'
+    readonly HEAD='${pkgs.coreutils}/bin/head'
+
+    is_linked() { # $1=src port, $2=dst port: dst appears directly under src in pw-link -l -o
+      "$PW_LINK" -l -o 2>/dev/null | "$GREP" -B1 -F "$2" | "$GREP" -qxF "$1"
+    }
+    port_exists() { # $1=port (node:port), listed on the input side when unlinked too
+      "$PW_LINK" -l -i 2>/dev/null | "$GREP" -qxF "$1"
+    }
+    link_pair() { # $1=ardour out 1, $2=ardour out 2, $3=sink name
+      local fl fr
+      fl="$3:playback_FL"
+      fr="$3:playback_FR"
+      if ! port_exists "$fl" || ! port_exists "$fr"; then
+        # non-standard channel layout: take the sink's first two playback ports
+        fl=$("$PW_LINK" -l -i 2>/dev/null | "$AWK" -v s="$3" '$0 ~ "^" s ":" && /playback_/ {print; exit}')
+        fr=$("$PW_LINK" -l -i 2>/dev/null | "$AWK" -v s="$3" -v n1="$fl" '$0 ~ "^" s ":" && /playback_/ && $0 != n1 {print; exit}')
+      fi
+      [ -n "$fl" ] && [ -n "$fr" ] || return 0
+      is_linked "$1" "$fl" || "$PW_LINK" "$1" "$fl" 2>/dev/null
+      is_linked "$2" "$fr" || "$PW_LINK" "$2" "$fr" 2>/dev/null
+    }
+
+    while true; do
+      # default sink from the settings metadata (pw-metadata -n settings 0
+      # default.audio.sink prints nothing on PipeWire 1.6.9; pw-dump has it)
+      sink=$("$PW_DUMP" 2>/dev/null \
+        | "$SED" -n 's/.*"key": "default.audio.sink".*"value": {[^}]*"name": "\([^"]*\)".*/\1/p' \
+        | "$HEAD" -1)
+      if [ -n "$sink" ] \
+        && "$PW_LINK" -l -o 2>/dev/null | "$GREP" -qxF "ardour:Master/audio_out 1"; then
+        link_pair "ardour:Master/audio_out 1" "ardour:Master/audio_out 2" "$sink"
+      fi
+      sleep 2
     done
   '';
 
@@ -766,6 +864,7 @@ in
       pkgs.alsa-utils
       digitaktBounce
       mlMidiRoutes
+      ardourToDefault
     ];
 
     # .nki/.nkm -> kontakt-open (double-click any instrument in a file manager).
@@ -844,18 +943,36 @@ in
       };
     };
 
-    # Keep Moonlander <-> Digitakt ALSA MIDI routes alive (Ardour fallback
-    # when the Digitakt is unplugged). Event-driven via udevadm monitor; see
-    # mlMidiRoutes above.
+    # Keep Moonlander <-> Ardour MIDI routes alive (ALSA-sequencer or
+    # JACK/Pipewire backend, detected automatically). Event-driven via
+    # udevadm monitor + 5 s watchdog; see mlMidiRoutes above.
     systemd.user.services."ml-midi-routes" = {
       Unit = {
-        Description = "Keep Moonlander <-> Digitakt ALSA MIDI routes alive";
+        Description = "Keep Moonlander <-> Ardour MIDI routes alive";
       };
       Service = {
         Type = "simple";
         Restart = "on-failure";
         RestartSec = 2;
         ExecStart = getExe mlMidiRoutes;
+      };
+      Install = {
+        WantedBy = [ "default.target" ];
+      };
+    };
+
+    # Keep Ardour's master bus connected to the current default output (see
+    # ardourToDefault above). Runs at login regardless of Ardour state; the
+    # loop no-ops until the Ardour JACK node appears.
+    systemd.user.services."ardour-to-default" = {
+      Unit = {
+        Description = "Connect Ardour master bus to the default output sink";
+      };
+      Service = {
+        Type = "simple";
+        Restart = "on-failure";
+        RestartSec = 2;
+        ExecStart = getExe ardourToDefault;
       };
       Install = {
         WantedBy = [ "default.target" ];
