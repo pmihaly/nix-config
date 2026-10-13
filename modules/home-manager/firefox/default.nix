@@ -143,7 +143,7 @@ in
                 "browser.tabs.warnOnCloseOtherTabs" = false;
                 "browser.toolbars.bookmarks.visibility" = "newtab";
                 "browser.chrome.toolbar_tips" = false;
-                "media.videocontrols.picture-in-picture.enabled" = false;
+                "media.videocontrols.picture-in-picture.enabled" = true;
                 "browser.newtabpage.pinned" = [ ];
                 "browser.startup.homepage" = "https://search.brave.com/search";
               };
