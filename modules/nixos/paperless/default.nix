@@ -30,6 +30,17 @@ in
       in
       {
 
+        # paperless runs as misi (services.paperless.user below), but the
+        # nixpkgs paperless module only adds the redis-paperless group when the
+        # service uses its default "paperless" user. Without this membership the
+        # paperless processes cannot reach the redis unix socket
+        # /run/redis-paperless/redis.sock (EACCES; services stay dead or stuck
+        # retrying manage.py migrate). Broken by the 2026-10-01 nixpkgs bump that
+        # moved the redis instance to a dedicated redis-paperless user/group.
+        users.users.misi.extraGroups = [
+          config.services.redis.servers.paperless.group
+        ];
+
         systemd.tmpfiles.rules = (map (directory: "d ${directory} 0750 misi backup -") directories);
 
         services.paperless = {
