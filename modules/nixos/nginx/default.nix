@@ -23,6 +23,19 @@ let
   tsCertDir = "/var/lib/tailscale/certs";
   tsCert = "${tsCertDir}/${vars.domainName}.crt";
   tsKey = "${tsCertDir}/${vars.domainName}.key";
+
+  # nginx (the unit runs as User=nginx since the 2026-09-23 nixpkgs bump)
+  # reads TLS certs as the nginx user, but /var/lib/tailscale is 0700 root
+  # by design — tailscaled re-chmods its state dir on EVERY start, including
+  # the restarts during each deploy activation, which happens AFTER the
+  # activation scripts run. So nginx can never reliably traverse it (the
+  # tmpfiles/activationScript chmod o+x hack below was exactly that race,
+  # first hit on the 2026-10-13 deploy). Instead the cert oneshot (root)
+  # copies the certificates into an nginx-readable dir and the vhost uses
+  # the copies; nginx never touches /var/lib/tailscale.
+  tsCopyDir = "/var/lib/nginx/tailscale-certs";
+  tsCertCopy = "${tsCopyDir}/${vars.domainName}.crt";
+  tsKeyCopy = "${tsCopyDir}/${vars.domainName}.key";
   ts = config.services.tailscale;
 in
 {
@@ -40,8 +53,8 @@ in
         # Serve the ts.net vhost on :443 too (keeps the existing :80
         # redirects); TLS terminates with the Tailscale-issued cert.
         addSSL = mkIf ts.enable true;
-        sslCertificate = mkIf ts.enable tsCert;
-        sslCertificateKey = mkIf ts.enable tsKey;
+        sslCertificate = mkIf ts.enable tsCertCopy;
+        sslCertificateKey = mkIf ts.enable tsKeyCopy;
       };
 
       experimentalZstdSettings = true;
@@ -100,6 +113,14 @@ in
           exit 1
         fi
 
+        # Refresh the nginx-readable copies (tsCopyDir above) so nginx -t/
+        # reloads never depend on traversing the 0700 root /var/lib/tailscale.
+        # Runs before nginx starts (Before=nginx.service) and on every renewal,
+        # so the copies are always the current cert.
+        install -d -o root -g nginx -m 0750 ${tsCopyDir}
+        install -o root -g nginx -m 0640 ${tsCert} ${tsCertCopy}
+        install -o root -g nginx -m 0640 ${tsKey} ${tsKeyCopy}
+
         chmod 644 "$LOG"
         after=$(cksum ${tsCert} 2>/dev/null || true)
         if [ "$before" != "$after" ]; then
@@ -136,28 +157,10 @@ in
       };
     };
 
-    # The tailscaled state dir is 0700 root, and since the 2026-09-23
-    # nixpkgs bump the nginx unit runs as User=nginx — so nginx -t (the
-    # pre-start config test) and reloads could no longer traverse
-    # /var/lib/tailscale to read the MagicDNS certs, and nginx refused to
-    # start at all (start-limit-hit; public share down for hours, first hit
-    # on the 2026-10-01 skylake activation). The cert files themselves were
-    # already opened up to the nginx group (rw-r----- root:nginx); only the
-    # parent traversal was missing. 0711 keeps the state dir private-ish
-    # (contents stay 0600/0640 root-owned) while letting any other user
-    # traverse to the certs. tmpfiles re-applies at every boot; the
-    # activation script covers mid-boot nginx restarts (nixos-rebuild
-    # switch restarts nginx after tmpfiles-setup has already run).
-    systemd.tmpfiles.rules = mkIf ts.enable [
-      "z /var/lib/tailscale 0711 root root -"
-    ];
-    system.activationScripts.tailscale-cert-traversal.text = ''
-      # Traverse /var/lib/tailscale for the ts.net certs; no-op when
-      # tailscale is unused or the dir is absent.
-      if [ -d /var/lib/tailscale ]; then
-        chmod o+x /var/lib/tailscale
-      fi
-    '';
+    # Superseded by the tsCopyDir copy approach above: nginx reads the
+    # certs from $tsCopyDir, so /var/lib/tailscale ownership can stay 0700
+    # root and tailscaled's re-chmod on restart is harmless.
+
 
     networking.firewall = {
       enable = true;
