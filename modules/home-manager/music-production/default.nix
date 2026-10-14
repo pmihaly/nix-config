@@ -308,7 +308,7 @@ let
   # Windows plugins). Native Ardour is unaffected by the variable.
   ardourVst = pkgs.writeShellScriptBin "ardour-vst" ''
     export WINEPREFIX='${bottlePath}'
-    export LD_PRELOAD='${xerrorShield}/lib/xerror_shield.so''${LD_PRELOAD:+:$LD_PRELOAD}'
+    export LD_PRELOAD="${xerrorShield}/lib/xerror_shield.so''${LD_PRELOAD:+:$LD_PRELOAD}"
     exec '${pkgs.ardour}/bin/ardour9' "$@"
   '';
 
