@@ -126,6 +126,12 @@
     # applies to ardour 9.8 (refs/tags/9.8). See
     # overlays/ardour-midi-learn-button.patch.
     #
+    # Two-point mapping range: the "Mappings" button (right of Learn) lists
+    # every learned binding with two sliders per row — the parameter value the
+    # MIDI controller produces at 0 and at 127 — plus its live formatted value.
+    # The range defaults to the full sweep and is stored with the binding in
+    # the session. See overlays/ardour-midi-map-range.patch.
+    #
     # Build speed: compile through a persistent ccache (CCACHE_DIR lives in
     # the /var/cache/ccache sandbox bind-mount wired up in
     # use-cases/nix/default.nix) and link with mold. Only ardour gets
@@ -135,7 +141,10 @@
     # `nixos-rebuild switch` on a machine) must run with
     # `--option sandbox false`.
     ardour = (prev.ardour.override { stdenv = prev.ccacheStdenv; }).overrideAttrs (old: {
-      patches = (old.patches or [ ]) ++ [ ./ardour-midi-learn-button.patch ];
+      patches = (old.patches or [ ]) ++ [
+        ./ardour-midi-learn-button.patch
+        ./ardour-midi-map-range.patch
+      ];
       nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ prev.mold ];
       env = (old.env or { }) // {
         CCACHE_DIR = "/var/cache/ccache";
