@@ -140,6 +140,21 @@
         formatting = treefmtEval.${pkgs.system}.config.build.check self;
       });
 
+      # Fast package-level access to the repo-overlaid ardour without
+      # evaluating a whole machine config: `nix build .#ardour` (plus the
+      # ccache/ mold speedups from overlays/default.nix). Uses the same
+      # pinned nixpkgs as the machines (legacyPackages is what the NixOS
+      # modules layer overlay-onto).
+      packages = eachSystem (
+        pkgs:
+        let
+          overlaid = pkgs.extend (nixpkgs.lib.composeManyExtensions (import ./overlays));
+        in
+        {
+          ardour = overlaid.ardour;
+        }
+      );
+
       darwinConfigurations.work = inputs.darwin.lib.darwinSystem {
         specialArgs = {
           inherit inputs;

@@ -31,8 +31,22 @@ in
             "pipe-operators"
           ];
           trusted-users = [ vars.username ];
+
+          # Persistent ccache for the ardour overlay (overlays/default.nix):
+          # bind-mount a writable cache dir into every sandbox (non-store
+          # directories in extra-sandbox-paths are mounted read-write). The
+          # tmpfiles rule below creates it at boot — aesop's root is tmpfs
+          # (impermanence), so the cache is deliberately per-boot (a cache,
+          # not state); within a boot session it survives repeated builds.
+          # 0770 root:nixbld lets sandboxed builds (uid nixbld) write while
+          # regular users cannot.
+          extra-sandbox-paths = [ "/var/cache/ccache" ];
         };
       };
+
+      # ccache target dir must exist before any build runs (nix-daemon
+      # bind-mounts it per-build; tmpfiles runs in sysinit, before the daemon).
+      systemd.tmpfiles.rules = [ "d /var/cache/ccache 0770 root nixbld -" ];
 
       nix.registry.nixpkgs.flake = inputs.nixpkgs;
       environment.etc."channels/nixpkgs".source = inputs.nixpkgs.outPath;

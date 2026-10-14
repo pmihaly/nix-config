@@ -117,12 +117,37 @@
     );
   })
   (final: prev: {
-    # MIDI Learn button in the plugin UI: adds a "Learn" button that shows the
-    # automation lane of the last-touched plugin parameter and starts Generic
-    # MIDI binding for it (libs/widgets BindingProxy). Patch applies to ardour
-    # 9.8 (refs/tags/9.8). See overlays/ardour-midi-learn-button.patch.
-    ardour = prev.ardour.overrideAttrs (old: {
+    # MIDI Learn button in the plugin UI: tweak a plugin parameter, then click
+    # "Learn" to show its automation lane and start Generic MIDI binding for it
+    # (libs/widgets BindingProxy). Right-click for a menu (show lane only,
+    # forget/unmap this parameter, open the "Learned MIDI Mappings" dialog with
+    # track/plugin/parameter + MIDI controller list); a status label reports the
+    # learned controller. Requires the Generic MIDI control surface. Patch
+    # applies to ardour 9.8 (refs/tags/9.8). See
+    # overlays/ardour-midi-learn-button.patch.
+    #
+    # Build speed: compile through a persistent ccache (CCACHE_DIR lives in
+    # the /var/cache/ccache sandbox bind-mount wired up in
+    # use-cases/nix/default.nix) and link with mold. Only ardour gets
+    # ccacheStdenv, so the rest of the nixpkgs closure stays untouched.
+    # Caveat: ccache hard-fails on an unwritable cache dir, so builds made
+    # before the extra-sandbox-paths mount is active (i.e. before the first
+    # `nixos-rebuild switch` on a machine) must run with
+    # `--option sandbox false`.
+    ardour = (prev.ardour.override { stdenv = prev.ccacheStdenv; }).overrideAttrs (old: {
       patches = (old.patches or [ ]) ++ [ ./ardour-midi-learn-button.patch ];
+      nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ prev.mold ];
+      env = (old.env or { }) // {
+        CCACHE_DIR = "/var/cache/ccache";
+        CCACHE_MAXSIZE = "20G";
+        CCACHE_UMASK = "007";
+        CCACHE_SLOPPINESS = "time_macros";
+        CCACHE_COMPILERCHECK = "content";
+        # nixpkgs already passes LINKFLAGS="-lpthread"; waf forwards the env to
+        # every C/C++ link via the g++ driver, and -fuse-ld=mold makes the
+        # driver exec `mold` (on PATH via nativeBuildInputs).
+        LINKFLAGS = (old.env.LINKFLAGS or "") + " -fuse-ld=mold";
+      };
     });
   })
 ]
