@@ -233,6 +233,21 @@ let
           WINEPREFIX="$BOTTLE" "$WINE/bin/wineserver" -k
         fi
 
+        # Expose the Kontakt libraries to Windows. The bobdule Kontakt 8 has no
+        # NI platform framework (no ni-platform.dll / resources_ENG anywhere in
+        # the bottle), so its internal Load browser / Quick Load is a no-op and
+        # the comdlg32 file dialog is the only in-app load path. A junction
+        # under the prefix's My Documents and Desktop puts the libraries right
+        # in that dialog's sidebar without typing Z:\ paths:
+        #   Load... -> My Documents -> Kontakt Libraries -> <lib>/Instruments/*.nki
+        # Both the junction and the dialog's last-visited-folder MRU (user.reg)
+        # live in the bottle, which modules.persistence.directories keeps
+        # across reboots.
+        for j in Documents Desktop; do
+          mkdir -p "$BOTTLE/drive_c/users/misi/$j"
+          ln -sfn '${cfg.kontaktLibs}' "$BOTTLE/drive_c/users/misi/$j/Kontakt Libraries"
+        done
+
         cat > "$BOTTLE/bottle.yml" <<EOF
     Name: ${bottleName}
     Creation Date: $(date '+%Y-%m-%d %H:%M:%S')
@@ -881,6 +896,18 @@ in
       type = types.str;
       default = "VST";
       description = "Name of the Bottles bottle holding your Windows VST installs";
+    };
+    kontaktLibs = mkOption {
+      type = types.str;
+      default = "${home}/Downloads";
+      description = ''
+        Linux directory holding the Kontakt library folders. ensureBottle
+        maintains a "Kontakt Libraries" junction to it under the bottle's My
+        Documents and Desktop so the Windows load dialogs reach the libraries
+        without typing Z:\ paths (the bobdule Kontakt has no NI framework, so
+        its own Load browser is inert). Point it at ~/Documents/musicprod/
+        kontakt-libs once the libraries are moved there.
+      '';
     };
   };
 
