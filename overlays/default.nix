@@ -132,26 +132,17 @@
     # The range defaults to the full sweep and is stored with the binding in
     # the session. See overlays/ardour-midi-map-range.patch.
     #
-    # Build speed: compile through a persistent ccache (CCACHE_DIR lives in
-    # the /var/cache/ccache sandbox bind-mount wired up in
-    # use-cases/nix/default.nix) and link with mold. Only ardour gets
-    # ccacheStdenv, so the rest of the nixpkgs closure stays untouched.
-    # Caveat: ccache hard-fails on an unwritable cache dir, so builds made
-    # before the extra-sandbox-paths mount is active (i.e. before the first
-    # `nixos-rebuild switch` on a machine) must run with
-    # `--option sandbox false`.
-    ardour = (prev.ardour.override { stdenv = prev.ccacheStdenv; }).overrideAttrs (old: {
+    # Build speed: link with mold (measured ~17min -> ~11min). ccache was
+    # tried and removed: ardour's waf `--prefix` bakes the output store path
+    # into every translation unit, so each patch iteration changes the prefix
+    # and 99% of the cache misses no matter what.
+    ardour = prev.ardour.overrideAttrs (old: {
       patches = (old.patches or [ ]) ++ [
         ./ardour-midi-learn-button.patch
         ./ardour-midi-map-range.patch
       ];
       nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ prev.mold ];
       env = (old.env or { }) // {
-        CCACHE_DIR = "/var/cache/ccache";
-        CCACHE_MAXSIZE = "20G";
-        CCACHE_UMASK = "007";
-        CCACHE_SLOPPINESS = "time_macros";
-        CCACHE_COMPILERCHECK = "content";
         # nixpkgs already passes LINKFLAGS="-lpthread"; waf forwards the env to
         # every C/C++ link via the g++ driver, and -fuse-ld=mold makes the
         # driver exec `mold` (on PATH via nativeBuildInputs).

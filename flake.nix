@@ -141,10 +141,9 @@
       });
 
       # Fast package-level access to the repo-overlaid ardour without
-      # evaluating a whole machine config: `nix build .#ardour` (plus the
-      # ccache/ mold speedups from overlays/default.nix). Uses the same
-      # pinned nixpkgs as the machines (legacyPackages is what the NixOS
-      # modules layer overlay-onto).
+      # evaluating a whole machine config: `nix build .#ardour` (with the mold
+      # speedup from overlays/default.nix). Uses the same pinned nixpkgs as the
+      # machines (legacyPackages is what the NixOS modules layer overlay-onto).
       packages = eachSystem (
         pkgs:
         let
