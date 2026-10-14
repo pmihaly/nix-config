@@ -931,6 +931,9 @@ in
         <Binding channel="1" note="80" action="Transport/Loop"/>
         <Binding channel="1" note="81" action="Editor/set-loop-from-edit-range"/>
         <Binding channel="1" note="82" action="Transport/ToggleRoll"/>
+        <Binding channel="1" note="83" action="Common/show-editor"/>
+        <Binding channel="1" note="84" action="Common/show-mixer"/>
+        <Binding channel="1" note="85" action="Common/show-trigger"/>
       </ArdourMIDIBindings>
     '';
 
