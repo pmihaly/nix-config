@@ -925,6 +925,15 @@ in
       ardourToDefault
     ];
 
+    xdg.configFile."ardour9/midi_maps/Moonlander_Transport.map".text = ''
+      <?xml version="1.0" encoding="UTF-8"?>
+      <ArdourMIDIBindings version="1.0.0" name="Moonlander Transport" manufacturer="ZSA">
+        <Binding channel="1" note="80" action="Transport/Loop"/>
+        <Binding channel="1" note="81" action="Editor/set-loop-from-edit-range"/>
+        <Binding channel="1" note="82" action="Transport/ToggleRoll"/>
+      </ArdourMIDIBindings>
+    '';
+
     # .nki/.nkm -> kontakt-open (double-click any instrument in a file manager).
     # Note: no xdg.mimeApps.defaultApplications here on purpose -- it would make
     # Home Manager take over ~/.config/mimeapps.list, which holds the user's
