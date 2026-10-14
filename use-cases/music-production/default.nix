@@ -145,17 +145,17 @@ optionalAttrs platform.isLinux {
         #   - yabridge-host.exe is run with a bundled wow64 (multilib) wine
         # The Bottles bottle "VST" is created declaratively (wineboot) by the
         # music-production module and uses the same wine yabridge runs with.
-        # The vst-bottle systemd user service (login) also copies the bottle's
-        # 64-bit plugin dlls into ~/.vst(~3) and re-syncs the yabridge shims.
+        # The vst-bottle systemd user service (login) mirrors the bottle's
+        # 64-bit plugins into ~/.local/share/bottles/vst-windows -- deliberately
+        # NOT ~/.vst / ~/.vst3, which Ardour's VST3 scanner always walks (a raw
+        # Windows PE there fails with "invalid ELF header") -- and re-syncs the
+        # yabridge shims in ~/.vst{,3}/yabridge.
         # Workflow:
         #   1. vst-run <path>/Setup.exe   to install a Windows VST into the bottle
-        #   2. (the login service auto-syncs; or run: yabridge-sync -- the
-        #      bare `yabridgectl sync` re-nests its own shims and duplicates
-        #      every plugin in Ardour)
+        #   2. (the login service auto-syncs; or run: yabridge-sync)
         #   3. ardour-vst (or the "Ardour" desktop/app-menu entry) to launch
-        #      Ardour with the bottle's WINEPREFIX
-        #   4. Ardour > Preferences > Plugins: add only ~/.vst and ~/.vst3
-        #      (Ardour scans recursively and finds ~/.vst/yabridge shims itself)
+        #      Ardour with the bottle's WINEPREFIX; under ~/.vst{,3} Ardour finds
+        #      only the yabridge shims (plus the ~/.vst3/nix native bundles)
         yabridge
         yabridgectl
         ardour
@@ -360,7 +360,9 @@ optionalAttrs platform.isLinux {
           ".config/ardour9"
           ".config/lsp-plugins"
           ".config/geonkick"
-          # Windows VSTs via yabridge
+          # Windows VSTs via yabridge (shim + config state). The yabridge
+          # sources live under .local/share/bottles (already persisted below),
+          # not in ~/.vst / ~/.vst3 which Ardour scans.
           ".wine"
           ".vst"
           ".vst3"

@@ -58,7 +58,9 @@ let
     mkdir -p "$HOME/.vst3/nix"
     for d in "$HOME/.vst3/nix" "$HOME/.vst/yabridge" "$HOME/.vst3/yabridge" "$HOME/.clap/yabridge"; do
       [ -d "$d" ] || continue
-      "$YABRIDGECTL" blacklist list | grep -qxF "$d" \
+      # grep -c reads ALL input (no early close), so yabridgectl never gets a
+      # SIGPIPE/EPIPE and panics with "failed printing to stdout: Broken pipe".
+      "$YABRIDGECTL" blacklist list | grep -cxF "$d" >/dev/null \
         || "$YABRIDGECTL" blacklist add "$d"
     done
 
@@ -203,14 +205,30 @@ let
         readonly RUNNER="$RUNNERS/${runnerName}"
         readonly WINE='${winePkg}'
         readonly YABRIDGECTL='${yabridgectl}'
+        # Windows plugin sources for yabridge. This MUST stay outside ~/.vst and
+        # ~/.vst3: Ardour's VST3 scanner always walks ~/.vst3, and a raw Windows
+        # PE there is dlopen()ed as a native plugin and fails with "invalid ELF
+        # header". Only the yabridge shims (with their x86_64-linux chainloaders)
+        # may live in the scanned dirs.
+        # It lives UNDER ~/.local/share/bottles on purpose: that tree is already
+        # the persisted bind mount (persistence.directories), so the shim
+        # targets survive reboots without a separate persistence entry, and it
+        # is neither scanned by Ardour nor a wine prefix (no drive_c in any
+        # ancestor), so yabridgectl's post-sync verification does not infer a
+        # WINEPREFIX for it.
+        readonly VSTWIN="$HOME/.local/share/bottles/vst-windows"
 
-        mkdir -p "$BOTTLE" "$RUNNERS" "$HOME/.vst" "$HOME/.vst3" "$HOME/.local/share/yabridge"
+        mkdir -p "$BOTTLE" "$RUNNERS" "$VSTWIN/vst2" "$VSTWIN/vst3" "$HOME/.vst" "$HOME/.vst3" "$HOME/.local/share/yabridge"
         # expose the nix wine to the Bottles GUI as a normal runner
         ln -sfn "$WINE" "$RUNNER"
         # stable yabridge-host.exe location (runtime fallback; silences yabridgectl's warning)
         ln -sfn '${pkgs.yabridge}/bin/yabridge-host.exe' "$HOME/.local/share/yabridge/"
 
-        if [ ! -f "$BOTTLE/drive_c/system.reg" ]; then
+        # system.reg lives at the prefix ROOT, not under drive_c/. Checking
+        # drive_c/system.reg is always true for an existing bottle, so every
+        # login used to re-run wineboot and fight whatever wineserver (e.g. the
+        # 9.21 one a running Ardour's bridged plugins hold) was already live.
+        if [ ! -f "$BOTTLE/system.reg" ]; then
           WINEPREFIX="$BOTTLE" "$WINE/bin/wineboot" --init
           WINEPREFIX="$BOTTLE" "$WINE/bin/wineserver" -k
         fi
@@ -227,16 +245,16 @@ let
     WineVersion: ${runnerName}
     EOF
 
-        # copy 64-bit Windows VSTs installed in the bottle into the yabridge dirs
-        # (NI-style installers use 'VSTPlugins 64 bit'; keep only 64-bit plugins,
-        # yabridge 5.x dropped 32-bit support)
+        # copy 64-bit Windows VSTs installed in the bottle into the unscanned
+        # source tree (NI-style installers use 'VSTPlugins 64 bit'; keep only
+        # 64-bit plugins, yabridge 5.x dropped 32-bit support)
         find "$BOTTLE/drive_c/Program Files" -maxdepth 4 -type d \
           \( -iname "VSTPlugins 64 bit" -o -iname "VST2Plugins*" -o -iname "VSTPlugins" \) 2>/dev/null \
           | while read -r d; do
               case "$d" in *"32 bit"*) continue;; esac
               [ -d "$d" ] || continue
               find "$d" -maxdepth 1 -type f -iname '*.dll' -print0 2>/dev/null \
-                | while IFS= read -r -d ''' f; do cp -u "$f" "$HOME/.vst/"; done
+                | while IFS= read -r -d ''' f; do cp -u "$f" "$VSTWIN/vst2/"; done
             done
         # SoundToys-style bundles keep their dlls in an x64/ subfolder inside the
         # VSTPlugins dir (VSTPlugins/SoundToys/x64); the flat loop above misses them.
@@ -244,19 +262,32 @@ let
           | while read -r d; do
               [ -d "$d" ] || continue
               find "$d" -maxdepth 1 -type f -iname '*.dll' -print0 2>/dev/null \
-                | while IFS= read -r -d ''' f; do cp -u "$f" "$HOME/.vst/"; done
+                | while IFS= read -r -d ''' f; do cp -u "$f" "$VSTWIN/vst2/"; done
             done
         # VST3 plugins (folder-based .vst3 or single-file .vst3, e.g. Kontakt 8)
         find "$BOTTLE/drive_c/Program Files/Common Files" -maxdepth 2 -type d -iname "VST3" 2>/dev/null \
           | while read -r d; do
               [ -d "$d" ] || continue
               find "$d" -maxdepth 3 \( -type d -o -type f \) -iname '*.vst3' -print0 2>/dev/null \
-                | while IFS= read -r -d ''' f; do [ -e "$f" ] && cp -ru "$f" "$HOME/.vst3/"; done
+                | while IFS= read -r -d ''' f; do [ -e "$f" ] && cp -ru "$f" "$VSTWIN/vst3/"; done
             done
 
-        # make sure the yabridge dirs are registered (the shared wrapper also
-        # blacklists its own output dirs and $HOME/.vst3/nix before syncing).
-        for dir in "$HOME/.vst" "$HOME/.vst3"; do
+        # Migrate off the old layout: the raw Windows copies used to be mirrored
+        # straight into ~/.vst and ~/.vst3 (Ardour's scan path). Drop them and
+        # register only the unscanned source dirs; ~/.vst{,3} then contain just
+        # the yabridge shims (plus the native ~/.vst3/nix bundles).
+        # NOTE: -mindepth 1 is load-bearing -- without it find matches the
+        # ~/.vst3 directory itself (its basename ends in ".vst3") and the
+        # cleanup would rm -rf the whole scanned tree.
+        for d in "$HOME/.vst" "$HOME/.vst3" \
+                 "$HOME/.local/share/vst-windows/vst2" "$HOME/.local/share/vst-windows/vst3"; do
+          "$YABRIDGECTL" rm "$d" >/dev/null 2>&1 || true
+        done
+        find "$HOME/.vst" -mindepth 1 -maxdepth 1 -type f -iname '*.dll' -delete 2>/dev/null || true
+        find "$HOME/.vst3" -mindepth 1 -maxdepth 1 \( -type f -o -type d \) -iname '*.vst3' -exec rm -rf {} + 2>/dev/null || true
+        # make sure the source dirs are registered (the shared wrapper also
+        # blacklists its own shim output dirs and $HOME/.vst3/nix before syncing).
+        for dir in "$VSTWIN/vst2" "$VSTWIN/vst3"; do
           "$YABRIDGECTL" add "$dir"
         done
         # NOTE: use the explicit /bin path here — lib.getExe (and bare
