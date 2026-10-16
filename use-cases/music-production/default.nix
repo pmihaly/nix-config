@@ -171,7 +171,6 @@ optionalAttrs platform.isLinux {
         geonkick
         chow-tape-model
         qdelay
-        x42-plugins
         inputs.nixpkgs-working-elektroid.legacyPackages."x86_64-linux".elektroid
         # paulstretch
         distrobox
