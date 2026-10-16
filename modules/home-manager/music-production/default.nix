@@ -925,9 +925,56 @@ in
       ardourToDefault
     ];
 
+    # Single source of truth for the Moonlander launchpad -> Ardour bindings.
+    # Firmware: note = 36 + col*5 + row, channel 1 (0-based ch 0), key-down only
+    # (see keyboard-layouts/launchpad/keymap.c). Selected in Ardour as
+    # "Moonlander Transport" (Preferences > Control Surfaces > Generic MIDI >
+    # Show Protocol Settings -> MIDI Bindings).
     xdg.configFile."ardour9/midi_maps/Moonlander_Transport.map".text = ''
       <?xml version="1.0" encoding="UTF-8"?>
       <ArdourMIDIBindings version="1.0.0" name="Moonlander Transport" manufacturer="ZSA">
+        <!-- col0 (notes 36-40) = whole-row / scene launchers; N = 0 is the top scene.
+             F1..F8 do the same (Cues/trigger-cue-N); this makes it reachable from MIDI. -->
+        <Binding channel="1" note="36" action="Cues/trigger-cue-0"/>
+        <Binding channel="1" note="37" action="Cues/trigger-cue-1"/>
+        <Binding channel="1" note="38" action="Cues/trigger-cue-2"/>
+        <Binding channel="1" note="39" action="Cues/trigger-cue-3"/>
+        <Binding channel="1" note="40" action="Cues/trigger-cue-4"/>
+
+        <!-- col1-5 = per-slot launchers. Physical column 2 = Ardour trigger
+             track 0, col 3 = track 1, ... col 6 = track 4 (slot index =
+             physical column - 2); track 5 has no dedicated column. -->
+        <Binding channel="1" note="41" action="Cues/trigger-slot-0-0"/>
+        <Binding channel="1" note="42" action="Cues/trigger-slot-0-1"/>
+        <Binding channel="1" note="43" action="Cues/trigger-slot-0-2"/>
+        <Binding channel="1" note="44" action="Cues/trigger-slot-0-3"/>
+        <Binding channel="1" note="45" action="Cues/trigger-slot-0-4"/>
+        <Binding channel="1" note="46" action="Cues/trigger-slot-1-0"/>
+        <Binding channel="1" note="47" action="Cues/trigger-slot-1-1"/>
+        <Binding channel="1" note="48" action="Cues/trigger-slot-1-2"/>
+        <Binding channel="1" note="49" action="Cues/trigger-slot-1-3"/>
+        <Binding channel="1" note="50" action="Cues/trigger-slot-1-4"/>
+        <Binding channel="1" note="51" action="Cues/trigger-slot-2-0"/>
+        <Binding channel="1" note="52" action="Cues/trigger-slot-2-1"/>
+        <Binding channel="1" note="53" action="Cues/trigger-slot-2-2"/>
+        <Binding channel="1" note="54" action="Cues/trigger-slot-2-3"/>
+        <Binding channel="1" note="55" action="Cues/trigger-slot-2-4"/>
+        <Binding channel="1" note="56" action="Cues/trigger-slot-3-0"/>
+        <Binding channel="1" note="57" action="Cues/trigger-slot-3-1"/>
+        <Binding channel="1" note="58" action="Cues/trigger-slot-3-2"/>
+        <Binding channel="1" note="59" action="Cues/trigger-slot-3-3"/>
+        <Binding channel="1" note="60" action="Cues/trigger-slot-3-4"/>
+        <Binding channel="1" note="61" action="Cues/trigger-slot-4-0"/>
+        <Binding channel="1" note="62" action="Cues/trigger-slot-4-1"/>
+        <Binding channel="1" note="63" action="Cues/trigger-slot-4-2"/>
+        <Binding channel="1" note="64" action="Cues/trigger-slot-4-3"/>
+
+        <!-- col6 utility = stop controls -->
+        <Binding channel="1" note="66" action="Cues/stop-all-cues-soon"/>
+        <Binding channel="1" note="67" action="Cues/stop-cues-0-soon"/>
+        <Binding channel="1" note="68" action="Cues/stop-cues-1-soon"/>
+
+        <!-- thumb cluster: k50 loop/roll (80-82), k51-k53 window switches (83-85) -->
         <Binding channel="1" note="80" action="Transport/Loop"/>
         <Binding channel="1" note="81" action="Editor/set-loop-from-edit-range"/>
         <Binding channel="1" note="82" action="Transport/ToggleRoll"/>
