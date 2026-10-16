@@ -161,7 +161,6 @@ in
     # certs from $tsCopyDir, so /var/lib/tailscale ownership can stay 0700
     # root and tailscaled's re-chmod on restart is harmless.
 
-
     networking.firewall = {
       enable = true;
       # Web ports only. SSH is deliberately NOT opened here: on skylake it is
