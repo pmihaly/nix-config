@@ -117,37 +117,43 @@
     );
   })
   (final: prev: {
-    # MIDI Learn button in the plugin UI: tweak a plugin parameter, then click
-    # "Learn" to show its automation lane and start Generic MIDI binding for it
-    # (libs/widgets BindingProxy). Right-click for a menu (show lane only,
-    # forget/unmap this parameter, open the "Learned MIDI Mappings" dialog with
-    # track/plugin/parameter + MIDI controller list); a status label reports the
-    # learned controller. Requires the Generic MIDI control surface. Patch
-    # applies to ardour 9.8 (refs/tags/9.8). See
-    # overlays/ardour-midi-learn-button.patch.
+    # Custom MIDI mapping window in the plugin UI: the Learn button, the
+    # two-point range slider, and the grouped Mappings dialog — one merged
+    # net-delta patch against the ardour 9.8 source (refs/tags/9.8), generated
+    # by diffing the pristine tree against the 4-patch development stack.
+    # See overlays/ardour-midi-mapping.patch and the in-tree documentation in
+    # use-cases/music-production/README.md.
     #
-    # Two-point mapping range: the "Mappings" button (right of Learn) lists
-    # every learned binding with two sliders per row — the parameter value the
-    # MIDI controller produces at 0 and at 127 — plus its live formatted value.
-    # The range defaults to the full sweep and is stored with the binding in
-    # the session. See overlays/ardour-midi-map-range.patch.
+    # Learn shows the parameter's automation lane and starts a Generic MIDI
+    # binding (libs/widgets BindingProxy); right-click for show lane only /
+    # forget / mappings; a status label reports the learned controller. The
+    # "Mappings" button opens a dialog grouping learned bindings by channel /
+    # CC with collapsible groups (collapsed by default except the last-tweaked
+    # group; group headings list the mapped parameters), per-parameter rows
+    # carrying a two-handle range slider (value at MIDI 0 and MIDI 127),
+    # Add last tweaked, Replace with last tweaked, and Remove, all through
+    # session undo. Requires the Generic MIDI control surface.
     #
     # Build speed: link with mold (measured ~17min -> ~11min). ccache was
     # tried and removed: ardour's waf `--prefix` bakes the output store path
     # into every translation unit, so each patch iteration changes the prefix
     # and 99% of the cache misses no matter what.
-    ardour = prev.ardour.overrideAttrs (old: {
-      patches = (old.patches or [ ]) ++ [
-        ./ardour-midi-learn-button.patch
-        ./ardour-midi-map-range.patch
-      ];
-      nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ prev.mold ];
-      env = (old.env or { }) // {
-        # nixpkgs already passes LINKFLAGS="-lpthread"; waf forwards the env to
-        # every C/C++ link via the g++ driver, and -fuse-ld=mold makes the
-        # driver exec `mold` (on PATH via nativeBuildInputs).
-        LINKFLAGS = (old.env.LINKFLAGS or "") + " -fuse-ld=mold";
-      };
-    });
+    ardour = prev.ardour.overrideAttrs (
+      old:
+      {
+        patches = (old.patches or [ ]) ++ [
+          ./ardour-midi-mapping.patch
+        ];
+      }
+      // prev.lib.optionalAttrs prev.stdenv.hostPlatform.isLinux {
+        nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ prev.mold ];
+        env = (old.env or { }) // {
+          # nixpkgs already passes LINKFLAGS="-lpthread"; waf forwards the env to
+          # every C/C++ link via the g++ driver, and -fuse-ld=mold makes the
+          # driver exec `mold` (on PATH via nativeBuildInputs).
+          LINKFLAGS = (old.env.LINKFLAGS or "") + " -fuse-ld=mold";
+        };
+      }
+    );
   })
 ]

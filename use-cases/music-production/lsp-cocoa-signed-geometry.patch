@@ -1,0 +1,8 @@
+--- a/modules/lsp-ws-lib/src/main/cocoa/CocoaWindow.mm
++++ b/modules/lsp-ws-lib/src/main/cocoa/CocoaWindow.mm
+@@ -111,1 +111,1 @@
+-                    NSRect frame = NSMakeRect(sSize.nLeft, screenHeight - sSize.nTop - sSize.nHeight + pCocoaDisplay->get_window_title_height(), sSize.nWidth, sSize.nHeight + pCocoaDisplay->get_window_title_height());    
++                    NSRect frame = NSMakeRect(sSize.nLeft, screenHeight - sSize.nTop - sSize.nHeight + static_cast<ssize_t>(pCocoaDisplay->get_window_title_height()), sSize.nWidth, sSize.nHeight + pCocoaDisplay->get_window_title_height());
+@@ -784,1 +784,1 @@
+-                NSRect contentRect = NSMakeRect(sSize.nLeft, screenHeight - sSize.nTop - sSize.nHeight + pCocoaDisplay->get_window_title_height(), sSize.nWidth, sSize.nHeight);
++                NSRect contentRect = NSMakeRect(sSize.nLeft, screenHeight - sSize.nTop - sSize.nHeight + static_cast<ssize_t>(pCocoaDisplay->get_window_title_height()), sSize.nWidth, sSize.nHeight);

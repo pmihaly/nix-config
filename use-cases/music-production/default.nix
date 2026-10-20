@@ -67,7 +67,8 @@ let
     }
   '';
 in
-optionalAttrs platform.isLinux {
+optionalAttrs platform.isDarwin { imports = [ ./darwin.nix ]; }
+// optionalAttrs platform.isLinux {
   options.modules.music-production = {
     enable = mkEnableOption "music-production";
   };

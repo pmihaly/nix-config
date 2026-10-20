@@ -20,6 +20,7 @@ in
 
   modules = {
     nix.enable = true;
+    music-production.enable = true;
 
     shell = {
       enable = true;
@@ -129,6 +130,8 @@ in
       dbeaver-bin
       teleport
       glab
+      ardour
+      (callPackage ../../use-cases/music-production/vital-darwin.nix { })
     ];
 
     programs.claude-code = {

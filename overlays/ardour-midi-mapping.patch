@@ -1,0 +1,1886 @@
+diff -urN a/gtk2_ardour/plugin_ui.cc b/gtk2_ardour/plugin_ui.cc
+--- a/gtk2_ardour/plugin_ui.cc	2026-10-20 18:46:48.907050371 +0200
++++ b/gtk2_ardour/plugin_ui.cc	2026-10-20 19:38:45.438049715 +0200
+@@ -27,15 +27,19 @@
+ #include "gtk2ardour-config.h"
+ #endif
+ 
++#include <algorithm>
++#include <cairomm/context.h>
+ #include <cerrno>
+ #include <climits>
+ #include <cmath>
+ #include <string>
+ 
++#include "pbd/error.h"
+ #include "pbd/failed_constructor.h"
+ #include "pbd/stl_delete.h"
+ #include "pbd/xml++.h"
+ 
++#include "ydk/gdkkeysyms.h"
+ #include "ytkmm/box.h"
+ #include "ytkmm/widget.h"
+ 
+@@ -47,11 +51,18 @@
+ #include "widgets/tooltips.h"
+ 
+ #include "ardour/auditioner.h"
++#include <glibmm/main.h>
++#include "ytkmm/drawingarea.h"
++#include "midi++/types.h"
++
++#include "ardour/automation_control.h"
++#include "ardour/value_as_string.h"
+ #include "ardour/ladspa_plugin.h"
+ #include "ardour/lv2_plugin.h"
+ #include "ardour/plugin.h"
+ #include "ardour/plugin_insert.h"
+ #include "ardour/region_fx_plugin.h"
++#include "ardour/route.h"
+ #include "ardour/session.h"
+ #include "lv2_plugin_ui.h"
+ 
+@@ -83,6 +94,7 @@
+ #endif
+ 
+ #include "ardour_ui.h"
++#include "ardour_message.h"
+ #include "ardour_window.h"
+ #include "gui_thread.h"
+ #include "keyboard.h"
+@@ -94,6 +106,7 @@
+ #include "plugin_ui.h"
+ #include "processor_box.h"
+ #include "public_editor.h"
++#include "route_time_axis.h"
+ #include "timers.h"
+ #include "ui_config.h"
+ #include "utils.h"
+@@ -533,6 +546,8 @@
+ 	, _reset_button (_("Reset"))
+ 	, _bypass_button (ArdourButton::led_default_elements)
+ 	, _pin_management_button (_("Pinout"))
++	, _learn_button (_("Learn"))
++	, _mappings_button (_("Mappings"))
+ 	, description_expander (_("Description"))
+ 	, plugin_analysis_expander (_("Plugin analysis"))
+ 	, cpuload_expander (_("CPU Profile"))
+@@ -598,6 +613,17 @@
+ 	_pin_management_button.set_icon (ArdourIcon::PluginPinout);
+ 	_pin_management_button.signal_clicked.connect (sigc::mem_fun (*this, &PlugUIBase::manage_pins));
+ 
++	_learn_button.set_name ("generic button");
++	set_tooltip (_learn_button, _("Tweak a plugin parameter, then click Learn. Learning replaces this CC's learned assignments. Right-click for lane and Forget actions."));
++	_learn_button.signal_clicked.connect (sigc::mem_fun (*this, &PlugUIBase::learn_last_parameter));
++	_learn_button.signal_button_press_event ().connect (sigc::mem_fun (*this, &PlugUIBase::learn_menu), false);
++	_learn_status.set_ellipsize (Pango::ELLIPSIZE_END);
++	_learn_status.set_max_width_chars (24);
++
++	_mappings_button.set_name ("generic button");
++	set_tooltip (_mappings_button, _("Show and edit all learned MIDI mappings"));
++	_mappings_button.signal_clicked.connect (sigc::mem_fun (*this, &PlugUIBase::show_midi_mappings));
++
+ 	_bypass_button.set_name ("plugin bypass button");
+ 	_bypass_button.set_text (_("Bypass"));
+ 	_bypass_button.set_icon (ArdourIcon::PluginBypass);
+@@ -606,6 +632,8 @@
+ 	if (_pi) {
+ 		_pi->ActiveChanged.connect (active_connection, invalidator (*this), std::bind (&PlugUIBase::processor_active_changed, this, std::weak_ptr<Processor> (_pi)), gui_context ());
+ 		_bypass_button.set_active (!_pi->enabled ());
++		Controllable::ControlTouched.connect (*this, invalidator (*this), std::bind (&PlugUIBase::remember_touched_parameter, this, _1), gui_context ());
++		Controllable::MidiBindingsChanged.connect (*this, invalidator (*this), std::bind (&PlugUIBase::refresh_midi_mappings, this), gui_context ());
+ 	} else {
+ 		_bypass_button.set_sensitive (false);
+ 	}
+@@ -654,6 +682,7 @@
+ 
+ PlugUIBase::~PlugUIBase ()
+ {
++	_midi_dialog.reset ();
+ 	delete eqgui;
+ 	delete stats_gui;
+ 	delete preset_gui;
+@@ -671,6 +700,11 @@
+ PlugUIBase::plugin_going_away ()
+ {
+ 	drop_connections ();
++	_learn_binding.set_controllable (std::shared_ptr<Controllable> ());
++	_learn_button.set_sensitive (false);
++	if (_midi_dialog) {
++		_midi_dialog->hide ();
++	}
+ 	/* drop references to the plugin/insert */
+ 	_pib.reset ();
+ 	_pi.reset ();
+@@ -710,6 +744,9 @@
+ 
+ 	if (_pi) {
+ 		b->pack_end (_pin_management_button, false, false);
++		b->pack_end (_mappings_button, false, false, 4);
++		b->pack_end (_learn_button, false, false, 4);
++		b->pack_end (_learn_status, false, false, 4);
+ 		b->pack_start (_latency_button, false, false, 4);
+ 	}
+ 	else if (std::dynamic_pointer_cast<ARDOUR::RegionFxPlugin> (_pib)) {
+@@ -903,6 +940,650 @@
+ }
+ 
+ void
++PlugUIBase::remember_touched_parameter (std::weak_ptr<Controllable> touched)
++{
++	std::shared_ptr<AutomationControl> control = std::dynamic_pointer_cast<AutomationControl> (touched.lock ());
++	if (!_pi || !control || control->parameter ().type () != PluginAutomation) {
++		return;
++	}
++	if (!(control->flags () & Controllable::NotAutomatable) && !midi_mapping_target (control).empty ()) {
++		if (_last_midi_parameter.lock () != control) {
++			_last_midi_parameter = control;
++			refresh_midi_last_tweaked ();
++			if (_midi_dialog && _midi_dialog->get_visible ()) {
++				open_last_tweaked_group ();
++			}
++		}
++	}
++	if (_pi->automation_control (control->parameter (), false) != control) {
++		return;
++	}
++	if (_learn_binding.get_controllable () == control) {
++		return;
++	}
++
++	_learn_binding.set_controllable (control);
++	_learn_button.set_sensitive (true);
++	set_tooltip (_learn_button, string_compose (_("Show automation lane and learn MIDI for: %1. Learning replaces this CC's learned assignments."), control->desc ().label));
++	refresh_midi_mappings ();
++}
++
++void
++PlugUIBase::learn_last_parameter ()
++{
++	if (!show_last_parameter ()) {
++		return;
++	}
++	if (_learn_binding.start_learning ()) {
++		return;
++	}
++	ArdourMessageDialog message (dynamic_cast<Gtk::Window*> (_learn_button.get_toplevel ()), _("MIDI learn is unavailable. Enable Generic MIDI in Preferences > Control Surfaces and connect your controller to its input."), false, Gtk::MESSAGE_WARNING);
++	message.run ();
++}
++
++bool
++PlugUIBase::show_last_parameter ()
++{
++	auto control = std::dynamic_pointer_cast<AutomationControl> (_learn_binding.get_controllable ());
++	if (!_pi || !control) {
++		ArdourMessageDialog message (dynamic_cast<Gtk::Window*> (_learn_button.get_toplevel ()), _("Tweak a plugin parameter first."));
++		message.run ();
++		return false;
++	}
++
++	Route* owner = dynamic_cast<Route*> (_pi->owner ());
++	std::shared_ptr<Route> route;
++	if (owner) {
++		route = std::dynamic_pointer_cast<Route> (owner->shared_from_this ());
++	}
++	RouteTimeAxisView* view = route ? PublicEditor::instance ().rtav_from_route (route) : nullptr;
++	if (!view || !view->show_automation_lane (control)) {
++		ArdourMessageDialog message (dynamic_cast<Gtk::Window*> (_learn_button.get_toplevel ()), _("Cannot show the automation lane for this plugin parameter."), false, Gtk::MESSAGE_WARNING);
++		message.run ();
++		return false;
++	}
++	return true;
++}
++
++bool
++PlugUIBase::learn_menu (GdkEventButton* event)
++{
++	if (event->button != 3 || !_pi) {
++		return false;
++	}
++	using namespace Menu_Helpers;
++	_learn_menu.items ().clear ();
++	_learn_menu.items ().push_back (MenuElem (_("Show lane only"), sigc::hide_return (sigc::mem_fun (*this, &PlugUIBase::show_last_parameter))));
++	_learn_menu.items ().back ().set_sensitive ((bool) _learn_binding.get_controllable ());
++	_learn_menu.items ().push_back (MenuElem (_("Forget this parameter"), sigc::mem_fun (*this, &PlugUIBase::forget_last_parameter)));
++	std::vector<Controllable::MidiBinding> bindings;
++	Controllable::MidiBindings (bindings);
++	bool mapped = false;
++	for (auto const& binding : bindings) {
++		mapped = mapped || binding.control.lock () == _learn_binding.get_controllable ();
++	}
++	_learn_menu.items ().back ().set_sensitive (mapped);
++	_learn_menu.show_all ();
++	_learn_menu.popup (event->button, event->time);
++	return true;
++}
++
++void
++PlugUIBase::forget_last_parameter ()
++{
++	auto control = _learn_binding.get_controllable ();
++	_learn_binding.set_controllable (control);
++	remove_midi_mapping (control);
++}
++
++void
++PlugUIBase::remove_midi_mapping (std::shared_ptr<Controllable> control)
++{
++	if (!control || !_pi) {
++		return;
++	}
++	if (!Controllable::UnmapMidi (control)) {
++		ArdourMessageDialog message (dynamic_cast<Gtk::Window*> (_learn_button.get_toplevel ()), _("Cannot remove the MIDI mapping. Enable Generic MIDI in Preferences > Control Surfaces."), false, Gtk::MESSAGE_WARNING);
++		message.run ();
++		return;
++	}
++	auto automation = std::dynamic_pointer_cast<AutomationControl> (control);
++	if (!automation) {
++		refresh_midi_mappings ();
++		return;
++	}
++	for (auto const& route : *_pi->session ().get_routes ()) {
++		if (route->automation_control_recurse (control->id ()) != automation) {
++			continue;
++		}
++		auto view = PublicEditor::instance ().rtav_from_route (route);
++		if (view) {
++			view->hide_automation_lane (automation);
++		}
++	}
++	refresh_midi_mappings ();
++}
++
++void
++PlugUIBase::midi_plugin_target (std::weak_ptr<Processor> processor, std::shared_ptr<AutomationControl> control, std::string& label)
++{
++	auto insert = std::dynamic_pointer_cast<PluginInsert> (processor.lock ());
++	if (!insert || insert->automation_control_recurse (control->id ()) != control) {
++		return;
++	}
++	label = insert->name () + " / " + control->desc ().label;
++}
++
++std::string
++PlugUIBase::midi_mapping_target (std::shared_ptr<Controllable> control)
++{
++	auto automation = std::dynamic_pointer_cast<AutomationControl> (control);
++	if (!_pi || !automation) {
++		return "";
++	}
++	for (auto const& route : *_pi->session ().get_routes ()) {
++		if (route->automation_control_recurse (control->id ()) != automation) {
++			continue;
++		}
++		std::string label = automation->desc ().label;
++		route->foreach_processor (std::bind (&PlugUIBase::midi_plugin_target, this, _1, automation, std::ref (label)));
++		return route->name () + " / " + label;
++	}
++	return "";
++}
++
++void
++PlugUIBase::show_midi_mappings ()
++{
++	if (!_pi) {
++		return;
++	}
++	if (!_midi_dialog) {
++		_midi_dialog.reset (new Gtk::Dialog (_("Learned MIDI Mappings")));
++		_midi_dialog->set_default_size (780, 460);
++		auto parent = dynamic_cast<Gtk::Window*> (_learn_button.get_toplevel ());
++		if (parent) {
++			_midi_dialog->set_transient_for (*parent);
++		}
++		_midi_rows.set_spacing (8);
++		_midi_rows.set_border_width (4);
++		_midi_scroll.set_policy (Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
++		_midi_scroll.add (_midi_rows);
++		_midi_last_tweaked.set_alignment (0.0, 0.5);
++		_midi_last_tweaked.set_ellipsize (Pango::ELLIPSIZE_END);
++		_midi_dialog->get_vbox ()->pack_start (_midi_last_tweaked, false, false, 8);
++		_midi_dialog->get_vbox ()->pack_start (_midi_scroll);
++		_midi_dialog->add_button (Gtk::Stock::CLOSE, Gtk::RESPONSE_CLOSE);
++		_midi_dialog->signal_response ().connect (sigc::mem_fun (*this, &PlugUIBase::midi_mapping_response));
++		_midi_dialog->signal_delete_event ().connect ([this] (GdkEventAny*) {
++			midi_mapping_response (Gtk::RESPONSE_CLOSE);
++			return true;
++		});
++	}
++	_midi_dialog->show_all ();
++	refresh_midi_mappings ();
++	_midi_dialog->present ();
++}
++
++void
++PlugUIBase::midi_mapping_response (int response)
++{
++	if (!_midi_dialog) {
++		return;
++	}
++	_midi_dialog->hide ();
++	_midi_groups.clear ();
++	_midi_rows_key.clear ();
++	_midi_add_buttons.clear ();
++	_midi_replace_buttons.clear ();
++	_midi_expanders.clear ();
++}
++
++void
++PlugUIBase::refresh_midi_mappings ()
++{
++	if (!_pi) {
++		return;
++	}
++	std::vector<Controllable::MidiBinding> bindings;
++	Controllable::MidiBindings (bindings);
++	std::string status;
++	for (auto const& binding : bindings) {
++		if (binding.control.lock () == _learn_binding.get_controllable ()) {
++			status = string_compose (_("Mapped: %1"), binding.source);
++		}
++	}
++	_learn_status.set_text (status);
++	set_tooltip (_learn_status, status);
++	if (!_midi_dialog || !_midi_dialog->get_visible ()) {
++		return;
++	}
++
++	refresh_midi_last_tweaked ();
++	const bool first_build = _midi_groups.empty ();
++	std::map<MidiMappingSource, std::vector<Controllable::MidiBinding>> grouped;
++	std::string key = "groups;";
++	for (auto const& binding : bindings) {
++		auto control = binding.control.lock ();
++		const std::string target = midi_mapping_target (control);
++		if (!control || target.empty ()) {
++			continue;
++		}
++		MidiMappingSource source (binding.channel, binding.event, binding.number);
++		_midi_groups[source].label = binding.source;
++		grouped[source].push_back (binding);
++		key += control->id ().to_s () + ':' + binding.source + ':' + target;
++		key += string_compose (":%1:%2;", binding.low, binding.high);
++	}
++	if (first_build) {
++		open_last_tweaked_group ();
++	}
++	if (key == _midi_rows_key) {
++		return;
++	}
++	_midi_rows_key = key;
++	_midi_add_buttons.clear ();
++	_midi_replace_buttons.clear ();
++	_midi_expanders.clear ();
++	const double scroll = _midi_scroll.get_vadjustment ()->get_value ();
++	for (auto child : _midi_rows.get_children ()) {
++		_midi_rows.remove (*child);
++		delete child;
++	}
++	for (auto const& group : _midi_groups) {
++		build_midi_mapping_group (group.first, grouped[group.first]);
++	}
++	if (_midi_groups.empty ()) {
++		Gtk::Label* empty = Gtk::manage (new Gtk::Label (_("Tweak a plugin parameter, click Learn, then move a MIDI controller to create a group.")));
++		empty->set_line_wrap (true);
++		_midi_rows.pack_start (*empty, false, false, 8);
++	}
++	_midi_rows.show_all ();
++	_midi_scroll.get_vadjustment ()->set_value (scroll);
++	refresh_midi_last_tweaked ();
++}
++
++void
++PlugUIBase::preview_midi_mapping_value (std::shared_ptr<Controllable> control, float iface)
++{
++	if (!control) {
++		return;
++	}
++
++	control->set_value (control->interface_to_internal (iface), Controllable::UseGroup);
++}
++
++std::string
++PlugUIBase::midi_mapping_value_string (std::shared_ptr<Controllable> control, float iface)
++{
++	auto actl = std::dynamic_pointer_cast<AutomationControl> (control);
++	if (actl) {
++		return ARDOUR::value_as_string (actl->desc (), actl->interface_to_internal (iface));
++	}
++	return std::to_string (iface);
++}
++
++class MidiMappingRange : public Gtk::DrawingArea
++{
++public:
++	MidiMappingRange (float low, float high) : _low (low), _high (high) {
++		set_size_request (260, 36);
++		set_can_focus (true);
++		add_events (Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK | Gdk::POINTER_MOTION_MASK | Gdk::KEY_PRESS_MASK);
++		set_tooltip (*this, _("Drag either handle. Blue = MIDI 0, orange = MIDI 127. Cross handles to invert. Space switches handles; arrows adjust; Escape cancels a drag."));
++	}
++	~MidiMappingRange () { finish (); }
++	sigc::signal<void> begin;
++	sigc::signal<void, float, float, float> changed;
++	sigc::signal<void> finished;
++
++protected:
++	bool on_expose_event (GdkEventExpose*) override {
++		auto cr = get_window ()->create_cairo_context ();
++		auto background = get_style ()->get_bg (Gtk::STATE_NORMAL);
++		cr->set_source_rgb (background.get_red_p (), background.get_green_p (), background.get_blue_p ());
++		cr->paint ();
++		const double y = get_allocation ().get_height () / 2.0;
++		const double span = std::max (1, get_allocation ().get_width () - 24);
++		cr->set_line_width (4);
++		cr->set_source_rgb (0.4, 0.4, 0.4);
++		cr->move_to (12, y);
++		cr->line_to (12 + span, y);
++		cr->stroke ();
++		cr->set_source_rgb (0.3, 0.65, 0.8);
++		cr->move_to (12 + _low * span, y);
++		cr->line_to (12 + _high * span, y);
++		cr->stroke ();
++		for (int handle = 0; handle < 2; ++handle) {
++			const bool low = handle == 0;
++			cr->set_source_rgb (low ? 0.25 : 1.0, low ? 0.7 : 0.65, low ? 1.0 : 0.25);
++			cr->arc (12 + (low ? _low : _high) * span, y, 8, 0, 2 * M_PI);
++			cr->fill_preserve ();
++			cr->set_source_rgb (0.95, 0.95, 0.95);
++			cr->set_line_width (has_focus () && low == _active_low ? 2.5 : 1.0);
++			cr->stroke ();
++		}
++		return true;
++	}
++	bool on_button_press_event (GdkEventButton* event) override {
++		if (event->button != 1) {
++			return false;
++		}
++		grab_focus ();
++		const float position = pointer_value (event->x);
++		_active_low = std::fabs (position - _low) < std::fabs (position - _high);
++		if (_low == _high) {
++			_active_low = !_last_low;
++		}
++		_last_low = _active_low;
++		_initial_low = _low;
++		_initial_high = _high;
++		_dragging = true;
++		add_modal_grab ();
++		begin.emit ();
++		move (position);
++		return true;
++	}
++	bool on_motion_notify_event (GdkEventMotion* event) override {
++		if (!_dragging) {
++			return false;
++		}
++		move (pointer_value (event->x));
++		return true;
++	}
++	bool on_button_release_event (GdkEventButton* event) override {
++		if (!_dragging || event->button != 1) {
++			return false;
++		}
++		move (pointer_value (event->x));
++		finish ();
++		return true;
++	}
++	bool on_key_press_event (GdkEventKey* event) override {
++		if (event->keyval == GDK_KEY_Escape && _dragging) {
++			_low = _initial_low;
++			_high = _initial_high;
++			changed.emit (_low, _high, _active_low ? _low : _high);
++			queue_draw ();
++			finish ();
++			return true;
++		}
++		if (event->state & (GDK_CONTROL_MASK | GDK_MOD1_MASK | GDK_META_MASK | GDK_SUPER_MASK)) {
++			return false;
++		}
++		if (_dragging) {
++			return true;
++		}
++		if (event->keyval == GDK_KEY_space) {
++			_active_low = !_active_low;
++			queue_draw ();
++			return true;
++		}
++		if (event->keyval != GDK_KEY_Left && event->keyval != GDK_KEY_Right && event->keyval != GDK_KEY_Home && event->keyval != GDK_KEY_End) {
++			return false;
++		}
++		const float step = event->state & GDK_SHIFT_MASK ? 0.01f : 0.001f;
++		float value = (_active_low ? _low : _high) + (event->keyval == GDK_KEY_Left ? -step : step);
++		if (event->keyval == GDK_KEY_Home) {
++			value = 0.0f;
++		}
++		if (event->keyval == GDK_KEY_End) {
++			value = 1.0f;
++		}
++		begin.emit ();
++		move (value);
++		finished.emit ();
++		return true;
++	}
++	void on_unmap () override {
++		finish ();
++		Gtk::DrawingArea::on_unmap ();
++	}
++
++private:
++	float _low;
++	float _high;
++	float _initial_low = 0.0f;
++	float _initial_high = 1.0f;
++	bool _active_low = true;
++	bool _last_low = false;
++	bool _dragging = false;
++	float pointer_value (double x) const {
++		return std::max (0.0f, std::min (1.0f, (float) ((x - 12) / std::max (1, get_allocation ().get_width () - 24))));
++	}
++	void move (float value) {
++		float& endpoint = _active_low ? _low : _high;
++		endpoint = std::max (0.0f, std::min (1.0f, value));
++		changed.emit (_low, _high, endpoint);
++		queue_draw ();
++	}
++	void finish () {
++		if (!_dragging) {
++			return;
++		}
++		_dragging = false;
++		remove_modal_grab ();
++		finished.emit ();
++	}
++};
++
++static std::string
++midi_ellipsize (std::string const& text, size_t maxlen)
++{
++	if (maxlen == 0 || text.size () <= maxlen) {
++		return text;
++	}
++	size_t cut = maxlen;
++	while (cut > 0 && (text[cut] & 0xC0) == 0x80) {
++		--cut;
++	}
++	return text.substr (0, cut) + "...";
++}
++
++void
++PlugUIBase::build_midi_mapping_group (MidiMappingSource const& source, std::vector<Controllable::MidiBinding> const& bindings)
++{
++	auto& group = _midi_groups[source];
++	auto expander = Gtk::manage (new Gtk::Expander ());
++	_midi_expanders[source] = expander;
++	auto header = Gtk::manage (new Gtk::HBox (false, 8));
++	const std::string base_title = std::get<1> (source) == MIDI::controller ? string_compose (_("Channel %1 / CC %2"), std::get<0> (source) + 1, std::get<2> (source)) : group.label;
++	std::string parameters;
++	for (auto const& binding : bindings) {
++		auto mapped = binding.control.lock ();
++		if (!mapped) {
++			continue;
++		}
++		if (!parameters.empty ()) {
++			parameters += ", ";
++		}
++		parameters += midi_mapping_target (mapped);
++	}
++	const std::string full_title = base_title + (parameters.empty () ? "" : ": " + parameters);
++	auto label = Gtk::manage (new Gtk::Label (midi_ellipsize (full_title, 120)));
++	label->set_alignment (0.0, 0.5);
++	label->set_ellipsize (Pango::ELLIPSIZE_END);
++	set_tooltip (*label, full_title);
++	auto count = Gtk::manage (new Gtk::Label (string_compose (_("Mapped: %1"), bindings.size ())));
++	auto add = Gtk::manage (new Gtk::Button (_("Add last tweaked")));
++	add->set_can_focus (true);
++	add->signal_clicked ().connect ([this, source] {
++		Glib::signal_idle ().connect_once (sigc::bind (sigc::mem_fun (*this, &PlugUIBase::add_last_midi_parameter), source));
++	});
++	_midi_add_buttons.push_back ({add, source});
++	auto title_box = Gtk::manage (new Gtk::HBox (false, 8));
++	title_box->pack_start (*label, true, false);
++	title_box->pack_start (*count, false, false);
++	expander->set_label_widget (*title_box);
++	expander->set_expanded (group.expanded);
++	header->pack_start (*expander, true, true);
++	header->pack_end (*add, false, false);
++	auto body = Gtk::manage (new Gtk::VBox (false, 12));
++	body->set_border_width (8);
++	expander->property_expanded ().signal_changed ().connect ([this, source, expander, body] {
++		_midi_groups[source].expanded = expander->get_expanded ();
++		body->set_visible (expander->get_expanded ());
++	});
++	for (auto const& binding : bindings) {
++		auto control = binding.control.lock ();
++		if (!control) {
++			continue;
++		}
++		build_midi_mapping_row (*body, control, midi_mapping_target (control), binding.low, binding.high);
++	}
++	if (bindings.empty ()) {
++		auto empty = Gtk::manage (new Gtk::Label (_("No parameters mapped. Add last tweaked to reuse this CC.")));
++		body->pack_start (*empty, false, false, 4);
++	}
++	auto group_box = Gtk::manage (new Gtk::VBox (false, 2));
++	group_box->pack_start (*header, false, false);
++	group_box->pack_start (*body, false, false);
++	body->show_all ();
++	body->set_no_show_all (true);
++	body->set_visible (group.expanded);
++	_midi_rows.pack_start (*group_box, false, false, 4);
++}
++
++void
++PlugUIBase::build_midi_mapping_row (Gtk::VBox& body, std::shared_ptr<Controllable> control, std::string const& target, float low, float high)
++{
++	auto card = Gtk::manage (new Gtk::VBox (false, 2));
++	auto header = Gtk::manage (new Gtk::HBox (false, 4));
++	auto target_label = Gtk::manage (new Gtk::Label (target));
++	target_label->set_alignment (0.0, 0.5);
++	target_label->set_ellipsize (Pango::ELLIPSIZE_END);
++	set_tooltip (*target_label, target);
++	header->pack_start (*target_label, true, true);
++	auto replace = Gtk::manage (new Gtk::Button (_("Replace with last tweaked")));
++	replace->signal_clicked ().connect ([this, control] {
++		Glib::signal_idle ().connect_once (sigc::bind (sigc::mem_fun (*this, &PlugUIBase::replace_last_midi_parameter), control));
++	});
++	_midi_replace_buttons.push_back ({replace, control});
++	header->pack_start (*replace, false, false);
++	auto remove = Gtk::manage (new Gtk::Button (_("Remove")));
++	remove->signal_clicked ().connect ([this, control] {
++		Glib::signal_idle ().connect_once (sigc::bind (sigc::mem_fun (*this, &PlugUIBase::remove_midi_mapping), control));
++	});
++	header->pack_end (*remove, false, false);
++	auto low_value = Gtk::manage (new Gtk::Label (string_compose (_("MIDI 0: %1"), midi_mapping_value_string (control, low))));
++	auto high_value = Gtk::manage (new Gtk::Label (string_compose (_("MIDI 127: %1"), midi_mapping_value_string (control, high))));
++	low_value->set_alignment (0.0, 0.5);
++	high_value->set_alignment (1.0, 0.5);
++	auto values = Gtk::manage (new Gtk::HBox (false, 4));
++	values->pack_start (*low_value, true, true);
++	values->pack_end (*high_value, true, true);
++	auto range = Gtk::manage (new MidiMappingRange (low, high));
++	range->begin.connect ([control] { Controllable::BeginMidiRange (control); });
++	range->finished.connect ([] { Controllable::EndMidiRange (); });
++	range->changed.connect ([this, control, low_value, high_value] (float a, float b, float preview) {
++		if (!change_midi_range (control, *low_value, *high_value, a, b)) {
++			return;
++		}
++		preview_midi_mapping_value (control, preview);
++	});
++	card->pack_start (*header, false, false);
++	card->pack_start (*range, false, false);
++	card->pack_start (*values, false, false);
++	body.pack_start (*card, false, false);
++}
++
++bool
++PlugUIBase::change_midi_range (std::shared_ptr<Controllable> control, Gtk::Label& low_label, Gtk::Label& high_label, float low, float high)
++{
++	if (!Controllable::MapMidiRange (control, low, high)) {
++		PBD::error << "Cannot change MIDI mapping range: Generic MIDI or the mapping is unavailable" << endmsg;
++		return false;
++	}
++	low_label.set_text (string_compose (_("MIDI 0: %1"), midi_mapping_value_string (control, low)));
++	high_label.set_text (string_compose (_("MIDI 127: %1"), midi_mapping_value_string (control, high)));
++	return true;
++}
++
++std::shared_ptr<Controllable>
++PlugUIBase::last_midi_parameter ()
++{
++	auto control = std::dynamic_pointer_cast<AutomationControl> (_last_midi_parameter.lock ());
++	if (!control || control->parameter ().type () != PluginAutomation || (control->flags () & Controllable::NotAutomatable) || midi_mapping_target (control).empty ()) {
++		return std::shared_ptr<Controllable> ();
++	}
++	return control;
++}
++
++void
++PlugUIBase::open_last_tweaked_group ()
++{
++	std::vector<Controllable::MidiBinding> bindings;
++	Controllable::MidiBindings (bindings);
++	auto last = last_midi_parameter ();
++	MidiMappingSource found;
++	bool have_group = false;
++	for (auto const& binding : bindings) {
++		if (last && binding.control.lock () == last) {
++			found = MidiMappingSource (binding.channel, binding.event, binding.number);
++			have_group = true;
++			break;
++		}
++	}
++	if (!have_group) {
++		return;
++	}
++	if (_midi_expanders.empty ()) {
++		// window not built yet: seed the state for the upcoming build
++		for (auto& entry : _midi_groups) {
++			entry.second.expanded = false;
++		}
++		_midi_groups[found].expanded = true;
++		return;
++	}
++	for (auto& entry : _midi_expanders) {
++		entry.second->set_expanded (entry.first == found);
++	}
++}
++
++void
++PlugUIBase::refresh_midi_last_tweaked ()
++{
++	auto control = last_midi_parameter ();
++	const std::string target = control ? midi_mapping_target (control) : _("none. Tweak a plugin parameter.");
++	_midi_last_tweaked.set_text (string_compose (_("Last tweaked: %1"), target));
++	set_tooltip (_midi_last_tweaked, target);
++	std::vector<Controllable::MidiBinding> bindings;
++	Controllable::MidiBindings (bindings);
++	auto existing = std::find_if (bindings.begin (), bindings.end (), [control] (Controllable::MidiBinding const& binding) { return binding.control.lock () == control; });
++	for (auto const& entry : _midi_add_buttons) {
++		const bool already = existing != bindings.end () && MidiMappingSource (existing->channel, existing->event, existing->number) == entry.second;
++		entry.first->set_sensitive (control && !already && std::get<1> (entry.second) == MIDI::controller);
++		set_tooltip (*entry.first, already ? _("Already mapped to this CC") : string_compose (_("Add last tweaked: %1. Moves its previous assignment here, preserving its range."), target));
++	}
++	for (auto const& entry : _midi_replace_buttons) {
++		entry.first->set_sensitive (control && entry.second.lock () != control);
++		set_tooltip (*entry.first, string_compose (_("Replace with last tweaked: %1. Preserves this row's MIDI source and range."), target));
++	}
++}
++
++void
++PlugUIBase::add_last_midi_parameter (MidiMappingSource source)
++{
++	auto control = last_midi_parameter ();
++	if (control && std::get<1> (source) == MIDI::controller && Controllable::MapMidiCC (control, std::get<0> (source), std::get<2> (source))) {
++		return;
++	}
++	ArdourMessageDialog message (_midi_dialog.get (), _("Cannot add last tweaked. Tweak an available plugin parameter and enable Generic MIDI."), false, Gtk::MESSAGE_WARNING);
++	message.run ();
++}
++
++void
++PlugUIBase::replace_last_midi_parameter (std::shared_ptr<Controllable> previous)
++{
++	auto target = last_midi_parameter ();
++	if (target && Controllable::RetargetMidi (previous, target)) {
++		return;
++	}
++	ArdourMessageDialog message (_midi_dialog.get (), _("Cannot replace this mapping. The parameter or mapping may have been removed, or Generic MIDI is disabled."), false, Gtk::MESSAGE_WARNING);
++	message.run ();
++}
++
++void
+ PlugUIBase::manage_pins ()
+ {
+ 	assert (_pi);
+diff -urN a/gtk2_ardour/plugin_ui.h b/gtk2_ardour/plugin_ui.h
+--- a/gtk2_ardour/plugin_ui.h	2026-10-20 18:46:48.907216886 +0200
++++ b/gtk2_ardour/plugin_ui.h	2026-10-20 19:38:45.438049715 +0200
+@@ -28,7 +28,9 @@
+ #include "gtk2ardour-config.h"
+ #endif
+ 
++#include <tuple>
+ #include <vector>
++#include <memory>
+ #include <map>
+ #include <list>
+ 
+@@ -37,17 +39,23 @@
+ #include <ytkmm/adjustment.h>
+ #include <ytkmm/box.h>
+ #include <ytkmm/button.h>
++#include <ytkmm/dialog.h>
++#include <ytkmm/liststore.h>
++#include <ytkmm/treeview.h>
+ #include <ytkmm/eventbox.h>
+ #include <ytkmm/expander.h>
+ #include <ytkmm/filechooserbutton.h>
+ #include <ytkmm/image.h>
+ #include <ytkmm/label.h>
+ #include <ytkmm/menu.h>
++#include <ytkmm/scale.h>
+ #include <ytkmm/scrolledwindow.h>
++#include <ytkmm/stock.h>
+ #include <ytkmm/socket.h>
+ #include <ytkmm/togglebutton.h>
+ #include <ytkmm/viewport.h>
+ 
++#include "pbd/controllable.h"
+ #include "ardour/types.h"
+ #include "ardour/plugin.h"
+ #include "ardour/variant.h"
+@@ -55,6 +63,7 @@
+ #include "widgets/ardour_button.h"
+ #include "widgets/ardour_dropdown.h"
+ #include "widgets/ardour_spinner.h"
++#include "widgets/binding_proxy.h"
+ 
+ #include "ardour_window.h"
+ #include "automation_controller.h"
+@@ -146,6 +155,28 @@
+ 	ArdourWidgets::ArdourButton _bypass_button;
+ 	/** and self-explaining button :) */
+ 	ArdourWidgets::ArdourButton _pin_management_button;
++	ArdourWidgets::ArdourButton _learn_button;
++	ArdourWidgets::ArdourButton _mappings_button;
++	ArdourWidgets::BindingProxy _learn_binding;
++	Gtk::Label _learn_status;
++	Gtk::Menu _learn_menu;
++	Gtk::VBox _midi_rows;
++	Gtk::ScrolledWindow _midi_scroll;
++	std::unique_ptr<Gtk::Dialog> _midi_dialog;
++	/** identity of the rows currently in _midi_rows, so a refresh does not
++	 *  tear down sliders that the user is dragging */
++	std::string _midi_rows_key;
++	using MidiMappingSource = std::tuple<int, int, int>;
++	struct MidiMappingGroup {
++		std::string label;
++		bool expanded = false;
++	};
++	std::map<MidiMappingSource, MidiMappingGroup> _midi_groups;
++	std::weak_ptr<PBD::Controllable> _last_midi_parameter;
++	Gtk::Label _midi_last_tweaked;
++	std::vector<std::pair<Gtk::Button*, MidiMappingSource>> _midi_add_buttons;
++	std::vector<std::pair<Gtk::Button*, std::weak_ptr<PBD::Controllable>>> _midi_replace_buttons;
++	std::map<MidiMappingSource, Gtk::Expander*> _midi_expanders;
+ 	/** a button to acquire keyboard focus */
+ 	Gtk::EventBox _focus_button;
+ 	/** an expander containing the plugin description */
+@@ -191,6 +222,27 @@
+ 	void reset_plugin_parameters ();
+ 	void browse_presets ();
+ 	void manage_pins ();
++	void remember_touched_parameter (std::weak_ptr<PBD::Controllable>);
++	void learn_last_parameter ();
++	bool show_last_parameter ();
++	bool learn_menu (GdkEventButton*);
++	void forget_last_parameter ();
++	void show_midi_mappings ();
++	void refresh_midi_mappings ();
++	void midi_mapping_response (int);
++	void build_midi_mapping_group (MidiMappingSource const&, std::vector<PBD::Controllable::MidiBinding> const&);
++	void build_midi_mapping_row (Gtk::VBox&, std::shared_ptr<PBD::Controllable>, std::string const& target, float low, float high);
++	void refresh_midi_last_tweaked ();
++	std::shared_ptr<PBD::Controllable> last_midi_parameter ();
++	void open_last_tweaked_group ();
++	void add_last_midi_parameter (MidiMappingSource);
++	void replace_last_midi_parameter (std::shared_ptr<PBD::Controllable>);
++	bool change_midi_range (std::shared_ptr<PBD::Controllable>, Gtk::Label&, Gtk::Label&, float low, float high);
++	std::string midi_mapping_value_string (std::shared_ptr<PBD::Controllable>, float iface);
++	void preview_midi_mapping_value (std::shared_ptr<PBD::Controllable>, float iface);
++	void remove_midi_mapping (std::shared_ptr<PBD::Controllable>);
++	std::string midi_mapping_target (std::shared_ptr<PBD::Controllable>);
++	void midi_plugin_target (std::weak_ptr<ARDOUR::Processor>, std::shared_ptr<ARDOUR::AutomationControl>, std::string&);
+ 	bool focus_toggled(GdkEventButton*);
+ 	bool bypass_button_release(GdkEventButton*);
+ 	void toggle_description ();
+diff -urN a/gtk2_ardour/route_time_axis.cc b/gtk2_ardour/route_time_axis.cc
+--- a/gtk2_ardour/route_time_axis.cc	2026-10-20 18:46:48.928207748 +0200
++++ b/gtk2_ardour/route_time_axis.cc	2026-10-20 19:18:57.467276967 +0200
+@@ -1751,6 +1751,44 @@
+ }
+ 
+ void
++RouteTimeAxisView::hide_automation_lane (std::shared_ptr<AutomationControl> control)
++{
++	if (!control) {
++		return;
++	}
++	Gtk::CheckMenuItem* item = find_menu_item_by_ctrl (control);
++	if (item && item->get_active ()) {
++		item->set_active (false);
++	}
++	std::shared_ptr<AutomationTimeAxisView> lane = find_atav_by_ctrl (control, false);
++	if (lane && lane->set_marked_for_display (false)) {
++		request_redraw ();
++	}
++}
++
++bool
++RouteTimeAxisView::show_automation_lane (std::shared_ptr<AutomationControl> control)
++{
++	if (!control) {
++		return false;
++	}
++
++	Gtk::CheckMenuItem* item = find_menu_item_by_ctrl (control);
++	if (item) {
++		item->set_active (true);
++	}
++
++	std::shared_ptr<AutomationTimeAxisView> lane = find_atav_by_ctrl (control, false);
++	if (!lane) {
++		return false;
++	}
++	if (lane->set_marked_for_display (true)) {
++		request_redraw ();
++	}
++	return true;
++}
++
++void
+ RouteTimeAxisView::show_touched_automation (std::weak_ptr<PBD::Controllable> wctrl)
+ {
+ 	std::shared_ptr<AutomationControl> ac = std::dynamic_pointer_cast<AutomationControl> (wctrl.lock ());
+diff -urN a/gtk2_ardour/route_time_axis.h b/gtk2_ardour/route_time_axis.h
+--- a/gtk2_ardour/route_time_axis.h	2026-10-20 18:46:48.928379652 +0200
++++ b/gtk2_ardour/route_time_axis.h	2026-10-20 19:18:57.467387667 +0200
+@@ -144,6 +144,8 @@
+ 	void show_all_automation (bool apply_to_selection = false);
+ 	void show_existing_automation (bool apply_to_selection = false);
+ 	void hide_all_automation (bool apply_to_selection = false);
++	bool show_automation_lane (std::shared_ptr<ARDOUR::AutomationControl>);
++	void hide_automation_lane (std::shared_ptr<ARDOUR::AutomationControl>);
+ 
+ protected:
+ 	friend class StreamView;
+diff -urN a/libs/pbd/controllable.cc b/libs/pbd/controllable.cc
+--- a/libs/pbd/controllable.cc	2026-10-20 18:46:49.098610615 +0200
++++ b/libs/pbd/controllable.cc	2026-10-20 19:18:57.467431780 +0200
+@@ -34,6 +34,14 @@
+ using namespace PBD;
+ using namespace std;
+ 
++PBD::Signal<void(std::vector<Controllable::MidiBinding>&)> Controllable::MidiBindings;
++PBD::Signal<bool(std::weak_ptr<Controllable>)> Controllable::UnmapMidi;
++PBD::Signal<bool(std::weak_ptr<Controllable>, float, float)> Controllable::MapMidiRange;
++PBD::Signal<bool(std::weak_ptr<Controllable>, int, int)> Controllable::MapMidiCC;
++PBD::Signal<bool(std::weak_ptr<Controllable>, std::weak_ptr<Controllable>)> Controllable::RetargetMidi;
++PBD::Signal<void(std::weak_ptr<Controllable>)> Controllable::BeginMidiRange;
++PBD::Signal<void()> Controllable::EndMidiRange;
++PBD::Signal<void()> Controllable::MidiBindingsChanged;
+ PBD::Signal<bool(std::weak_ptr<PBD::Controllable> )> Controllable::StartLearning;
+ PBD::Signal<void(std::weak_ptr<PBD::Controllable> )> Controllable::StopLearning;
+ PBD::Signal<void(std::weak_ptr<PBD::Controllable> )> Controllable::GUIFocusChanged;
+diff -urN a/libs/pbd/pbd/controllable.h b/libs/pbd/pbd/controllable.h
+--- a/libs/pbd/pbd/controllable.h	2026-10-20 18:46:49.101880313 +0200
++++ b/libs/pbd/pbd/controllable.h	2026-10-20 19:18:57.467472207 +0200
+@@ -25,6 +25,7 @@
+ #include <memory>
+ #include <string>
+ #include <set>
++#include <vector>
+ 
+ #include "pbd/libpbd_visibility.h"
+ #include "pbd/rwlock.h"
+@@ -141,6 +142,29 @@
+ 
+ 	PBD::Signal<void()> LearningFinished;
+ 
++	struct MidiBinding {
++		std::weak_ptr<Controllable> control;
++		std::string source;
++		/* interface-space (0..1) parameter values produced when the MIDI
++		 * controller is at its minimum / maximum. Full range (0, 1) unless
++		 * the user has narrowed it from the mappings dialog. */
++		float low;
++		float high;
++		int channel;
++		int cc;
++		int event;
++		int number;
++	};
++
++	static PBD::Signal<void(std::vector<MidiBinding>&)> MidiBindings;
++	static PBD::Signal<bool(std::weak_ptr<Controllable>)> UnmapMidi;
++	static PBD::Signal<bool(std::weak_ptr<Controllable>, float, float)> MapMidiRange;
++	static PBD::Signal<bool(std::weak_ptr<Controllable>, int, int)> MapMidiCC;
++	static PBD::Signal<bool(std::weak_ptr<Controllable>, std::weak_ptr<Controllable>)> RetargetMidi;
++	static PBD::Signal<void(std::weak_ptr<Controllable>)> BeginMidiRange;
++	static PBD::Signal<void()> EndMidiRange;
++	static PBD::Signal<void()> MidiBindingsChanged;
++
+ 	static PBD::Signal<bool(std::weak_ptr<PBD::Controllable> )> StartLearning;
+ 	static PBD::Signal<void(std::weak_ptr<PBD::Controllable> )> StopLearning;
+ 
+diff -urN a/libs/surfaces/generic_midi/generic_midi_control_protocol.cc b/libs/surfaces/generic_midi/generic_midi_control_protocol.cc
+--- a/libs/surfaces/generic_midi/generic_midi_control_protocol.cc	2026-10-20 18:46:49.129335518 +0200
++++ b/libs/surfaces/generic_midi/generic_midi_control_protocol.cc	2026-10-20 19:18:57.467544784 +0200
+@@ -23,6 +23,7 @@
+ 
+ #include <stdint.h>
+ 
++#include <cmath>
+ #include <sstream>
+ #include <algorithm>
+ #include <regex>
+@@ -40,6 +41,7 @@
+ #include <glibmm/miscutils.h>
+ 
+ #include "pbd/compose.h"
++#include "pbd/memento_command.h"
+ #include "pbd/convert.h"
+ #include "pbd/error.h"
+ #include "pbd/failed_constructor.h"
+@@ -81,6 +83,7 @@
+ GenericMidiControlProtocol::GenericMidiControlProtocol (Session& s, std::string const & config)
+ 	: ControlProtocol (s, _("Generic MIDI"))
+ 	, AbstractUI<GenericMIDIRequest> (name())
++	, _mapping_state (*this)
+ 	, connection_state (ConnectionState (0))
+ 	, _config (config)
+ 	, _motorised (false)
+@@ -129,6 +132,14 @@
+ 	 * thread
+ 	 */
+ 
++	Controllable::MidiBindings.connect_same_thread (*this, std::bind (&GenericMidiControlProtocol::midi_bindings, this, _1));
++	Controllable::UnmapMidi.connect_same_thread (*this, std::bind (&GenericMidiControlProtocol::unmap_midi, this, _1));
++	Controllable::MapMidiRange.connect_same_thread (*this, std::bind (&GenericMidiControlProtocol::map_midi_range, this, _1, _2, _3));
++	Controllable::MapMidiCC.connect_same_thread (*this, std::bind (&GenericMidiControlProtocol::map_midi_cc, this, _1, _2, _3));
++	Controllable::RetargetMidi.connect_same_thread (*this, std::bind (&GenericMidiControlProtocol::retarget_midi, this, _1, _2));
++	Controllable::BeginMidiRange.connect_same_thread (*this, std::bind (&GenericMidiControlProtocol::begin_midi_range, this, _1));
++	Controllable::EndMidiRange.connect_same_thread (*this, std::bind (&GenericMidiControlProtocol::end_midi_range, this));
++	session->register_with_memento_command_factory (_mapping_state.id (), &_mapping_state);
+ 	Controllable::StartLearning.connect_same_thread (*this, std::bind (&GenericMidiControlProtocol::start_learning, this, _1));
+ 	Controllable::StopLearning.connect_same_thread (*this, std::bind (&GenericMidiControlProtocol::stop_learning, this, _1));
+ 
+@@ -407,78 +418,326 @@
+ 	}
+ }
+ 
+-bool
+-GenericMidiControlProtocol::start_learning (std::weak_ptr <Controllable> wc)
++XMLNode&
++GenericMidiControlProtocol::MappingState::get_state () const
+ {
+-	std::shared_ptr<Controllable> c = wc.lock ();
+-	if (!c) {
+-		return false;
++	PBD::Mutex::Lock lock (_owner.controllables_lock);
++	return _owner.mapping_snapshot ();
++}
++
++int
++GenericMidiControlProtocol::MappingState::set_state (XMLNode const& state, int)
++{
++	return _owner.restore_mappings (state);
++}
++
++XMLNode&
++GenericMidiControlProtocol::mapping_snapshot () const
++{
++	XMLNode* state = new XMLNode ("MidiMappings");
++	state->set_property ("id", _mapping_state.id ());
++	for (auto mapping : controllables) {
++		if (!mapping->learned () || !mapping->get_controllable ()) {
++			continue;
++		}
++		state->add_child_nocopy (mapping->get_state ());
+ 	}
++	return *state;
++}
+ 
+-	PBD::Mutex::Lock lm2 (controllables_lock);
+-	DEBUG_TRACE (DEBUG::GenericMidi, string_compose ("Learn binding: Controlable number: %1\n", c));
++void
++GenericMidiControlProtocol::erase_learned_mapping (PBD::ID const& id)
++{
++	for (auto i = controllables.begin (); i != controllables.end ();) {
++		auto control = (*i)->get_controllable ();
++		if (!(*i)->learned () || !control || control->id () != id) {
++			++i;
++			continue;
++		}
++		delete *i;
++		i = controllables.erase (i);
++	}
++}
+ 
+-	/* drop any existing mappings for the same controllable for which
+-	 * learning has just started.
+-	 */
++int
++GenericMidiControlProtocol::restore_mappings (XMLNode const& state)
++{
++	_range_before.reset ();
++	_range_parameter.clear ();
++	for (auto node : state.children ()) {
++		PBD::ID id;
++		if (node->get_property ("id", id)) {
++			stop_learning (Controllable::by_id (id));
++		}
++	}
++	PBD::Mutex::Lock lock (controllables_lock);
++	for (auto node : state.children ()) {
++		PBD::ID id;
++		if (!node->get_property ("id", id)) {
++			PBD::error << "Cannot restore MIDI mapping: missing parameter ID" << endmsg;
++			continue;
++		}
++		erase_learned_mapping (id);
++		if (node->name () == "Removed") {
++			continue;
++		}
++		auto control = Controllable::by_id (id);
++		if (!control) {
++			PBD::warning << "Cannot restore MIDI mapping: parameter " << id.to_s () << " no longer exists" << endmsg;
++			continue;
++		}
++		auto mapping = std::unique_ptr<MIDIControllable> (new MIDIControllable (this, *_input_port->parser (), control, false));
++		if (mapping->set_state (*node, PBD::Stateful::current_state_version) != 0) {
++			PBD::error << "Cannot restore MIDI mapping for parameter " << id.to_s () << endmsg;
++			continue;
++		}
++		controllables.push_back (mapping.release ());
++	}
++	lock.release ();
++	session->set_dirty ();
++	Controllable::MidiBindingsChanged ();
++	return 0;
++}
+ 
+-	MIDIControllables::iterator tmp;
+-	for (MIDIControllables::iterator i = controllables.begin(); i != controllables.end(); ) {
+-		tmp = i;
+-		++tmp;
+-		if ((*i)->get_controllable() == c) {
+-			delete (*i);
+-			controllables.erase (i);
++static std::unique_ptr<XMLNode>
++midi_mapping_delta (XMLNode const& state, XMLNode const& other, std::string const& only_parameter)
++{
++	std::map<std::string, std::pair<XMLNode const*, XMLNode const*>> mappings;
++	for (auto node : state.children ()) {
++		std::string id;
++		node->get_property ("id", id);
++		mappings[id].first = node;
++	}
++	for (auto node : other.children ()) {
++		std::string id;
++		node->get_property ("id", id);
++		mappings[id].second = node;
++	}
++	auto delta = std::unique_ptr<XMLNode> (new XMLNode ("MidiMappings"));
++	for (auto const& entry : mappings) {
++		if (!only_parameter.empty () && entry.first != only_parameter) {
++			continue;
++		}
++		auto current = entry.second.first;
++		auto previous = entry.second.second;
++		if (current && previous && *current == *previous) {
++			continue;
+ 		}
+-		i = tmp;
++		if (current) {
++			delta->add_child_nocopy (*new XMLNode (*current));
++			continue;
++		}
++		auto removed = new XMLNode ("Removed");
++		removed->set_property ("id", entry.first);
++		delta->add_child_nocopy (*removed);
+ 	}
++	return delta;
++}
+ 
+-	/* check pending controllables (those for which a learn is underway) to
+-	 * see if it is for the same one for which learning has just started.
+-	 */
++void
++GenericMidiControlProtocol::record_mapping_change (std::string const& name, std::shared_ptr<XMLNode> before, std::shared_ptr<XMLNode> after, std::string const& only_parameter)
++{
++	if (!before || !after) {
++		return;
++	}
++	auto undo = midi_mapping_delta (*before, *after, only_parameter);
++	if (undo->children ().empty ()) {
++		return;
++	}
++	auto redo = midi_mapping_delta (*after, *before, only_parameter);
++	session->begin_reversible_command (name);
++	session->commit_reversible_command (new MementoCommand<MappingState> (_mapping_state, undo.release (), redo.release ()));
++}
+ 
+-	{
+-		PBD::Mutex::Lock lm (pending_lock);
++void
++GenericMidiControlProtocol::begin_midi_range (std::weak_ptr<Controllable> weak_control)
++{
++	auto control = weak_control.lock ();
++	if (!control) {
++		return;
++	}
++	_range_parameter = control->id ().to_s ();
++	_range_before.reset (&_mapping_state.get_state ());
++}
+ 
+-		for (MIDIPendingControllables::iterator i = pending_controllables.begin(); i != pending_controllables.end(); ) {
+-			if (((*i)->mc)->get_controllable() == c) {
+-				(*i)->connection.disconnect();
+-				if ((*i)->own_mc) {
+-					delete (*i)->mc;
+-				}
+-				delete *i;
+-				i = pending_controllables.erase (i);
+-			} else {
+-				++i;
+-			}
++void
++GenericMidiControlProtocol::end_midi_range ()
++{
++	auto before = std::move (_range_before);
++	auto parameter = std::move (_range_parameter);
++	record_mapping_change (_("Change MIDI mapping range"), before, std::shared_ptr<XMLNode> (&_mapping_state.get_state ()), parameter);
++}
++
++void
++GenericMidiControlProtocol::midi_bindings (std::vector<Controllable::MidiBinding>& bindings)
++{
++	PBD::Mutex::Lock lock (controllables_lock);
++	for (auto const& mapping : controllables) {
++		auto control = mapping->get_controllable ();
++		if (!control || !mapping->learned ()) {
++			continue;
++		}
++		std::string message = string_compose (_("Event %1 / %2"), (int) mapping->get_control_type (), (int) mapping->get_control_additional ());
++		if (mapping->get_control_type () == MIDI::controller) {
++			message = string_compose (_("CC %1"), (int) mapping->get_control_additional ());
+ 		}
++		if (mapping->get_control_type () == MIDI::pitchbend) {
++			message = _("Pitch bend");
++		}
++		bindings.push_back ({control, string_compose (_("Ch %1 / %2"), (int) mapping->get_control_channel () + 1, message), mapping->learned_low (), mapping->learned_high (), (int) mapping->get_control_channel (), mapping->get_control_type () == MIDI::controller ? (int) mapping->get_control_additional () : -1, (int) mapping->get_control_type (), mapping->get_control_type () == MIDI::pitchbend ? 0 : (int) mapping->get_control_additional ()});
+ 	}
++}
+ 
+-	MIDIControllable* mc = 0;
+-	bool own_mc = false;
++bool
++GenericMidiControlProtocol::map_midi_cc (std::weak_ptr<Controllable> weak_control, int channel, int cc)
++{
++	auto control = weak_control.lock ();
++	if (!control || !_input_port || channel < 0 || channel > 15 || cc < 0 || cc > 127) {
++		return false;
++	}
++	stop_learning (weak_control);
++	PBD::Mutex::Lock lock (controllables_lock);
++	auto before = std::shared_ptr<XMLNode> (&mapping_snapshot ());
++	MIDIControllable* mapping = nullptr;
++	for (auto candidate : controllables) {
++		if (candidate->get_controllable () != control || !candidate->learned ()) {
++			continue;
++		}
++		mapping = candidate;
++		break;
++	}
++	if (!mapping) {
++		mapping = new MIDIControllable (this, *_input_port->parser (), control, false);
++		controllables.push_back (mapping);
++	}
++	mapping->bind_midi ((MIDI::channel_t) channel, MIDI::controller, (MIDI::byte) cc);
++	auto after = std::shared_ptr<XMLNode> (&mapping_snapshot ());
++	lock.release ();
++	record_mapping_change (_("Assign last tweaked parameter to MIDI CC"), before, after);
++	session->set_dirty ();
++	Controllable::MidiBindingsChanged ();
++	return true;
++}
+ 
+-	for (MIDIControllables::iterator i = controllables.begin(); i != controllables.end(); ++i) {
+-		if ((*i)->get_controllable() && ((*i)->get_controllable()->id() == c->id())) {
+-			mc = *i;
++bool
++GenericMidiControlProtocol::retarget_midi (std::weak_ptr<Controllable> weak_previous, std::weak_ptr<Controllable> weak_target)
++{
++	auto previous = weak_previous.lock ();
++	auto target = weak_target.lock ();
++	if (!previous || !target) {
++		return false;
++	}
++	if (previous == target) {
++		return true;
++	}
++	stop_learning (weak_previous);
++	stop_learning (weak_target);
++	PBD::Mutex::Lock lock (controllables_lock);
++	auto before = std::shared_ptr<XMLNode> (&mapping_snapshot ());
++	MIDIControllable* mapping = nullptr;
++	for (auto candidate : controllables) {
++		if (candidate->learned () && candidate->get_controllable () == previous) {
++			mapping = candidate;
+ 			break;
+ 		}
+ 	}
+-
+-	if (!mc) {
+-		mc = new MIDIControllable (this, *_input_port->parser(), c, false);
+-		own_mc = true;
++	if (!mapping) {
++		return false;
+ 	}
++	for (auto i = controllables.begin (); i != controllables.end ();) {
++		if (!(*i)->learned () || (*i)->get_controllable () != target) {
++			++i;
++			continue;
++		}
++		delete *i;
++		i = controllables.erase (i);
++	}
++	mapping->set_controllable (target, true);
++	auto after = std::shared_ptr<XMLNode> (&mapping_snapshot ());
++	lock.release ();
++	record_mapping_change (_("Replace MIDI mapped parameter"), before, after);
++	session->set_dirty ();
++	Controllable::MidiBindingsChanged ();
++	return true;
++}
+ 
+-	/* stuff the new controllable into pending */
+-
+-	{
+-		PBD::Mutex::Lock lm (pending_lock);
++bool
++GenericMidiControlProtocol::map_midi_range (std::weak_ptr<Controllable> weak_control, float low, float high)
++{
++	auto control = weak_control.lock ();
++	if (!control || !std::isfinite (low) || !std::isfinite (high) || low < 0.0f || low > 1.0f || high < 0.0f || high > 1.0f) {
++		return false;
++	}
++	PBD::Mutex::Lock lock (controllables_lock);
++	auto before = _range_before;
++	if (!before) {
++		before.reset (&mapping_snapshot ());
++	}
++	bool changed = false;
++	for (auto i = controllables.begin (); i != controllables.end (); ++i) {
++		if ((*i)->get_controllable () != control || !(*i)->learned ()) {
++			continue;
++		}
++		(*i)->set_learned_range (low, high);
++		changed = true;
++	}
++	auto after = _range_before ? std::shared_ptr<XMLNode> () : std::shared_ptr<XMLNode> (&mapping_snapshot ());
++	lock.release ();
++	if (changed) {
++		session->set_dirty ();
++	}
++	if (!_range_before && changed) {
++		record_mapping_change (_("Change MIDI mapping range"), before, after, control->id ().to_s ());
++	}
++	return changed;
++}
+ 
+-		MIDIPendingControllable* element = new MIDIPendingControllable (mc, own_mc);
+-		c->LearningFinished.connect_same_thread (element->connection, std::bind (&GenericMidiControlProtocol::learning_stopped, this, mc));
++bool
++GenericMidiControlProtocol::unmap_midi (std::weak_ptr<Controllable> weak_control)
++{
++	auto control = weak_control.lock ();
++	if (!control) {
++		return false;
++	}
++	stop_learning (weak_control);
++	PBD::Mutex::Lock lock (controllables_lock);
++	auto before = std::shared_ptr<XMLNode> (&mapping_snapshot ());
++	bool removed = false;
++	for (auto i = controllables.begin (); i != controllables.end ();) {
++		if ((*i)->get_controllable () != control || !(*i)->learned ()) {
++			++i;
++			continue;
++		}
++		delete *i;
++		i = controllables.erase (i);
++		removed = true;
++	}
++	auto after = std::shared_ptr<XMLNode> (&mapping_snapshot ());
++	lock.release ();
++	if (removed) {
++		record_mapping_change (_("Remove MIDI mapping"), before, after);
++		session->set_dirty ();
++		Controllable::MidiBindingsChanged ();
++	}
++	return true;
++}
+ 
+-		pending_controllables.push_back (element);
++bool
++GenericMidiControlProtocol::start_learning (std::weak_ptr <Controllable> wc)
++{
++	auto control = wc.lock ();
++	auto event_loop = PBD::EventLoop::get_event_loop_for_thread ();
++	if (!control || !event_loop) {
++		return false;
+ 	}
++	stop_learning (wc);
++	auto mc = new MIDIControllable (this, *_input_port->parser (), control, false);
++	PBD::Mutex::Lock lock (pending_lock);
++	auto element = new MIDIPendingControllable (mc, true);
++	element->event_loop = event_loop;
++	control->LearningFinished.connect_same_thread (element->connection, std::bind (&GenericMidiControlProtocol::learning_stopped, this, mc));
++	pending_controllables.push_back (element);
++	lock.release ();
+ 	mc->learn_about_external_control ();
+ 	return true;
+ }
+@@ -486,24 +745,38 @@
+ void
+ GenericMidiControlProtocol::learning_stopped (MIDIControllable* mc)
+ {
+-	PBD::Mutex::Lock lm (pending_lock);
+-	PBD::Mutex::Lock lm2 (controllables_lock);
+-
+-	for (MIDIPendingControllables::iterator i = pending_controllables.begin(); i != pending_controllables.end(); ) {
+-		if ( (*i)->mc == mc) {
+-			(*i)->connection.disconnect();
+-			delete *i;
+-			i = pending_controllables.erase(i);
+-		} else {
++	PBD::Mutex::Lock pending (pending_lock);
++	PBD::Mutex::Lock lock (controllables_lock);
++	auto before = std::shared_ptr<XMLNode> (&mapping_snapshot ());
++	PBD::EventLoop* event_loop = nullptr;
++	for (auto i = pending_controllables.begin (); i != pending_controllables.end ();) {
++		if ((*i)->mc != mc) {
++			++i;
++			continue;
++		}
++		event_loop = (*i)->event_loop;
++		(*i)->connection.disconnect ();
++		delete *i;
++		i = pending_controllables.erase (i);
++	}
++	for (auto i = controllables.begin (); i != controllables.end ();) {
++		if (!(*i)->learned () || (*i)->get_controllable () != mc->get_controllable ()) {
+ 			++i;
++			continue;
+ 		}
++		delete *i;
++		i = controllables.erase (i);
+ 	}
+-
+-	/* add the controllable for which learning stopped to our list of
+-	 * controllables
+-	 */
+-
++	remove_used_event ((int) mc->get_control_type () | (int) mc->get_control_channel (), (int) mc->get_control_additional ());
+ 	controllables.push_back (mc);
++	auto after = std::shared_ptr<XMLNode> (&mapping_snapshot ());
++	lock.release ();
++	pending.release ();
++	session->set_dirty ();
++	Controllable::MidiBindingsChanged ();
++	if (!event_loop || !event_loop->call_slot (PBD::EventLoop::__invalidator (_mapping_state, __FILE__, __LINE__), std::bind (&GenericMidiControlProtocol::record_mapping_change, this, _("Learn MIDI mapping"), before, after, std::string ()))) {
++		PBD::error << "Could not register MIDI Learn in the session undo history" << endmsg;
++	}
+ }
+ 
+ void
+@@ -538,67 +811,26 @@
+ }
+ 
+ void
+-GenericMidiControlProtocol::check_used_event (int pos, int control_number)
++GenericMidiControlProtocol::remove_used_event (int pos, int control_number)
+ {
+-	PBD::Mutex::Lock lm2 (controllables_lock);
+-
+-	MIDI::channel_t channel = (pos & 0xf);
+-	MIDI::byte value = control_number;
+-
+-	DEBUG_TRACE (DEBUG::GenericMidi, string_compose ("checking for used event: Channel: %1 Controller: %2 value: %3\n", (int) channel, (pos & 0xf0), (int) value));
+-
+-	// Remove any old binding for this midi channel/type/value pair
+-	for (MIDIControllables::iterator iter = controllables.begin(); iter != controllables.end();) {
+-		MIDIControllable* existingBinding = (*iter);
+-		if ( (existingBinding->get_control_type() & 0xf0 ) == (pos & 0xf0) && (existingBinding->get_control_channel() & 0xf ) == channel ) {
+-			if ( ((int) existingBinding->get_control_additional() == (int) value) || ((pos & 0xf0) == MIDI::pitchbend)) {
+-				DEBUG_TRACE (DEBUG::GenericMidi, "checking: found match, delete old binding.\n");
+-				delete existingBinding;
+-				iter = controllables.erase (iter);
+-			} else {
+-				++iter;
+-			}
+-		} else {
+-			++iter;
+-		}
+-	}
+-
+-	for (MIDIFunctions::iterator iter = functions.begin(); iter != functions.end();) {
+-		MIDIFunction* existingBinding = (*iter);
+-		if ( (existingBinding->get_control_type() & 0xf0 ) == (pos & 0xf0) && (existingBinding->get_control_channel() & 0xf ) == channel ) {
+-			if ( ((int) existingBinding->get_control_additional() == (int) value) || ((pos & 0xf0) == MIDI::pitchbend)) {
+-				DEBUG_TRACE (DEBUG::GenericMidi, "checking: found match, delete old binding.\n");
+-				delete existingBinding;
+-				iter = functions.erase (iter);
+-			} else {
+-				++iter;
+-			}
+-		} else {
+-			++iter;
+-		}
+-	}
+-
+-	for (MIDIActions::iterator iter = actions.begin(); iter != actions.end();) {
+-		MIDIAction* existingBinding = (*iter);
+-		if ( (existingBinding->get_control_type() & 0xf0 ) == (pos & 0xf0) && (existingBinding->get_control_channel() & 0xf ) == channel ) {
+-			if ( ((int) existingBinding->get_control_additional() == (int) value) || ((pos & 0xf0) == MIDI::pitchbend)) {
+-				DEBUG_TRACE (DEBUG::GenericMidi, "checking: found match, delete old binding.\n");
+-				delete existingBinding;
+-				iter = actions.erase (iter);
+-			} else {
+-				++iter;
+-			}
+-		} else {
+-			++iter;
++	for (auto i = controllables.begin (); i != controllables.end ();) {
++		auto mapping = *i;
++		const bool same_source = (mapping->get_control_type () & 0xf0) == (pos & 0xf0) && (mapping->get_control_channel () & 0xf) == (pos & 0xf);
++		const bool same_number = (int) mapping->get_control_additional () == control_number || (pos & 0xf0) == MIDI::pitchbend;
++		if (!mapping->learned () || !same_source || !same_number) {
++			++i;
++			continue;
+ 		}
++		delete mapping;
++		i = controllables.erase (i);
+ 	}
+-
+ }
+ 
+ XMLNode&
+ GenericMidiControlProtocol::get_state () const
+ {
+ 	XMLNode& node (ControlProtocol::get_state());
++	node.set_property ("mapping-history-id", _mapping_state.id ());
+ 
+ 
+ 	XMLNode* child;
+@@ -650,6 +882,12 @@
+ 		return -1;
+ 	}
+ 
++	std::string history_id;
++	if (node.get_property ("mapping-history-id", history_id)) {
++		_mapping_state.set_id (history_id);
++	}
++	session->register_with_memento_command_factory (_mapping_state.id (), &_mapping_state);
++
+ 	if ((child = node.child (X_("Input"))) != 0) {
+ 		XMLNode* portnode = child->child (Port::state_node_name.c_str());
+ 		if (portnode) {
+diff -urN a/libs/surfaces/generic_midi/generic_midi_control_protocol.h b/libs/surfaces/generic_midi/generic_midi_control_protocol.h
+--- a/libs/surfaces/generic_midi/generic_midi_control_protocol.h	2026-10-20 18:46:49.129480111 +0200
++++ b/libs/surfaces/generic_midi/generic_midi_control_protocol.h	2026-10-20 19:18:57.467696591 +0200
+@@ -27,6 +27,8 @@
+ #define ABSTRACT_UI_EXPORTS
+ #include "pbd/abstract_ui.h"
+ #include "pbd/mutex.h"
++#include "pbd/controllable.h"
++#include "pbd/statefuldestructible.h"
+ 
+ #include "ardour/types.h"
+ #include "ardour/port.h"
+@@ -98,7 +100,6 @@
+ 	void drop_bindings ();
+ 	void drop_all ();
+ 
+-	void check_used_event (int, int);
+ 
+ 	std::string current_binding() const { return _current_binding; }
+ 
+@@ -161,6 +162,7 @@
+ 		MIDIControllable* mc;
+ 		bool own_mc;
+ 		PBD::ScopedConnection connection;
++		PBD::EventLoop* event_loop = nullptr;
+ 
+ 		MIDIPendingControllable (MIDIControllable* c, bool omc)
+ 			: mc (c)
+@@ -172,6 +174,30 @@
+ 	mutable PBD::Mutex controllables_lock;
+ 	PBD::Mutex pending_lock;
+ 
++	class MappingState : public PBD::StatefulDestructible, public sigc::trackable {
++	public:
++		explicit MappingState (GenericMidiControlProtocol& owner) : _owner (owner) {}
++		~MappingState () { drop_references (); }
++		XMLNode& get_state () const;
++		int set_state (XMLNode const&, int);
++	private:
++		GenericMidiControlProtocol& _owner;
++	};
++	MappingState _mapping_state;
++	std::shared_ptr<XMLNode> _range_before;
++	std::string _range_parameter;
++	void erase_learned_mapping (PBD::ID const&);
++	void remove_used_event (int, int);
++	XMLNode& mapping_snapshot () const;
++	int restore_mappings (XMLNode const&);
++	void record_mapping_change (std::string const&, std::shared_ptr<XMLNode>, std::shared_ptr<XMLNode>, std::string const& only_parameter = std::string ());
++	void begin_midi_range (std::weak_ptr<PBD::Controllable>);
++	void end_midi_range ();
++	bool retarget_midi (std::weak_ptr<PBD::Controllable>, std::weak_ptr<PBD::Controllable>);
++	void midi_bindings (std::vector<PBD::Controllable::MidiBinding>&);
++	bool unmap_midi (std::weak_ptr<PBD::Controllable>);
++	bool map_midi_range (std::weak_ptr<PBD::Controllable>, float low, float high);
++	bool map_midi_cc (std::weak_ptr<PBD::Controllable>, int channel, int cc);
+ 	bool start_learning (std::weak_ptr<PBD::Controllable>);
+ 	void stop_learning (std::weak_ptr<PBD::Controllable>);
+ 
+diff -urN a/libs/surfaces/generic_midi/midicontrollable.cc b/libs/surfaces/generic_midi/midicontrollable.cc
+--- a/libs/surfaces/generic_midi/midicontrollable.cc	2026-10-20 18:46:49.129867232 +0200
++++ b/libs/surfaces/generic_midi/midicontrollable.cc	2026-10-20 19:18:57.467804566 +0200
+@@ -53,6 +53,8 @@
+ 	: _surface (s)
+ 	, _parser (p)
+ 	, _momentary (m)
++	, _learned_low (0.0f)
++	, _learned_high (1.0f)
+ {
+ 	_learned = false; /* from URI */
+ 	_ctltype = Ctl_Momentary;
+@@ -72,6 +74,8 @@
+ 	: _surface (s)
+ 	, _parser (p)
+ 	, _momentary (m)
++	, _learned_low (0.0f)
++	, _learned_high (1.0f)
+ {
+ 	set_controllable (c);
+ 
+@@ -129,7 +133,7 @@
+ }
+ 
+ void
+-MIDIControllable::set_controllable (std::shared_ptr<PBD::Controllable> c)
++MIDIControllable::set_controllable (std::shared_ptr<PBD::Controllable> c, bool preserve_range)
+ {
+ 	PBD::Mutex::Lock lm (controllable_lock);
+ 	if (c && c == _controllable) {
+@@ -140,6 +144,10 @@
+ 
+ 	if (c) {
+ 		_controllable = c;
++		if (!preserve_range) {
++			_learned_low = 0.0f;
++			_learned_high = 1.0f;
++		}
+ 		last_controllable_value = control_to_midi (c->get_value());
+ 	} else {
+ 		_controllable.reset();
+@@ -194,32 +202,30 @@
+ 		return 0;
+ 	}
+ 
+-	if (_controllable->is_gain_like()) {
+-		return _controllable->internal_to_interface (val) * max_value_for_type ();
++	if (_controllable->is_toggle()) {
++		const double mid = _controllable->interface_to_internal ((_learned_low + _learned_high) * 0.5f);
++		return (val >= mid) ? max_value_for_type () : 0;
+ 	}
+ 
+-	float control_min = _controllable->lower ();
+-	float control_max = _controllable->upper ();
+-	float control_range = control_max - control_min;
++	/* map the internal value into interface space (0..1, honouring the
++	 * control's taper), then invert the learned [low, high] sub-range. */
+ 
+-	if (_controllable->is_toggle()) {
+-		if (val >= (control_min + (control_range/2.0f))) {
+-			return max_value_for_type();
+-		} else {
+-			return 0;
+-		}
+-	} else {
+-		std::shared_ptr<AutomationControl> actl = std::dynamic_pointer_cast<AutomationControl> (_controllable);
+-		if (actl) {
+-			control_min = actl->internal_to_interface(control_min);
+-			control_max = actl->internal_to_interface(control_max);
+-			control_range = control_max - control_min;
+-			val = actl->internal_to_interface(val);
+-		}
++	const double iface = _controllable->internal_to_interface (val);
++	const double range = _learned_high - _learned_low;
++
++	double fv = 0.0;
++	if (range != 0.0) {
++		fv = (iface - _learned_low) / range;
++	}
++	if (fv < 0.0) {
++		fv = 0.0;
++	} else if (fv > 1.0) {
++		fv = 1.0;
+ 	}
++
+ 	// fiddle value of max so value doesn't jump from 125 to 127 for 1.0
+ 	// otherwise decrement won't work.
+-	return (val - control_min) / control_range * (max_value_for_type () - 1);
++	return fv * (max_value_for_type () - 1);
+ }
+ 
+ float
+@@ -235,26 +241,24 @@
+ 
+ 	float fv = (val == 0 ? 0 : float (val - 1) / (max_value_for_type() - 1));
+ 
+-	if (_controllable->is_gain_like()) {
+-		return _controllable->interface_to_internal (fv);
+-	}
+-	DEBUG_TRACE (DEBUG::GenericMidi, string_compose ("Raw value %1 float %2\n", val, fv));
++	/* Map the MIDI value onto the learned interface-space [low, high]
++	 * sub-range, then convert back to the control's internal value. The
++	 * default learned range is the full 0..1, which reproduces the
++	 * historical mapping exactly.
++	 */
+ 
+-	float control_min = _controllable->lower ();
+-	float control_max = _controllable->upper ();
+-	float control_range = control_max - control_min;
+-	DEBUG_TRACE (DEBUG::GenericMidi, string_compose ("Min %1 Max %2 Range %3\n", control_min, control_max, control_range));
+-
+-	std::shared_ptr<AutomationControl> actl = std::dynamic_pointer_cast<AutomationControl> (_controllable);
+-	if (actl) {
+-		if (fv == 0.f) return control_min;
+-		if (fv == 1.f) return control_max;
+-		control_min = actl->internal_to_interface(control_min);
+-		control_max = actl->internal_to_interface(control_max);
+-		control_range = control_max - control_min;
+-		return actl->interface_to_internal((fv * control_range) + control_min);
+-	}
+-	return (fv * control_range) + control_min;
++	const double iface = _learned_low + fv * (_learned_high - _learned_low);
++
++	DEBUG_TRACE (DEBUG::GenericMidi, string_compose ("Raw value %1 float %2 iface %3\n", val, fv, iface));
++
++	return _controllable->interface_to_internal (iface);
++}
++
++void
++MIDIControllable::set_learned_range (float low, float high)
++{
++	_learned_low = low;
++	_learned_high = high;
+ }
+ 
+ void
+@@ -530,7 +534,6 @@
+ 		return;
+ 	}
+ 
+-	_surface->check_used_event(msg[0], msg[1]);
+ 	bind_midi ((channel_t) (msg[0] & 0xf), eventType (msg[0] & 0xF0), msg[1]);
+ 
+ 	if (_controllable) {
+@@ -811,6 +814,13 @@
+ 		return -1;
+ 	}
+ 
++	if (node.get_property ("low", _learned_low)) {
++		/* restored from the session */
++	}
++	if (node.get_property ("high", _learned_high)) {
++		/* restored from the session */
++	}
++
+ 	bind_midi (control_channel, control_type, control_additional);
+ 
+ 	return 0;
+@@ -835,6 +845,8 @@
+ 		node->set_property ("channel", (int16_t)control_channel);
+ 		snprintf (buf, sizeof(buf), "0x%x", (int) control_additional);
+ 		node->set_property ("additional", (const char *)buf);
++		node->set_property ("low", _learned_low);
++		node->set_property ("high", _learned_high);
+ 	}
+ 
+ 	return *node;
+diff -urN a/libs/surfaces/generic_midi/midicontrollable.h b/libs/surfaces/generic_midi/midicontrollable.h
+--- a/libs/surfaces/generic_midi/midicontrollable.h	2026-10-20 18:46:49.130002799 +0200
++++ b/libs/surfaces/generic_midi/midicontrollable.h	2026-10-20 19:18:57.467891911 +0200
+@@ -87,6 +87,14 @@
+ 
+ 	bool learned() const { return _learned; }
+ 
++	/* Two-point mapping range for a learned binding: interface-space (0..1,
++	 * the same units as Controllable::internal_to_interface) values produced
++	 * when the MIDI control is at its minimum / maximum. Defaults to the
++	 * full 0..1 range, which reproduces the historical full-sweep mapping. */
++	float learned_low () const { return _learned_low; }
++	float learned_high () const { return _learned_high; }
++	void set_learned_range (float low, float high);
++
+ 	CtlType get_ctltype() const { return _ctltype; }
+ 	void set_ctltype (CtlType val) { _ctltype = val; }
+ 
+@@ -94,7 +102,7 @@
+ 	void set_encoder (Encoder val) { _encoder = val; }
+ 
+ 	MIDI::Parser& get_parser() { return _parser; }
+-	void set_controllable (std::shared_ptr<PBD::Controllable>);
++	void set_controllable (std::shared_ptr<PBD::Controllable>, bool preserve_range = false);
+ 	std::shared_ptr<PBD::Controllable> get_controllable () const;
+ 	const std::string& current_uri() const { return _current_uri; }
+ 
+@@ -132,6 +140,8 @@
+ 	bool            _momentary;
+ 	bool            _is_gain_controller;
+ 	bool            _learned;
++	float            _learned_low;
++	float            _learned_high;
+ 	CtlType         _ctltype;
+ 	Encoder			_encoder;
+ 	int              midi_msg_id;      /* controller ID or note number */
+diff -urN a/libs/widgets/binding_proxy.cc b/libs/widgets/binding_proxy.cc
+--- a/libs/widgets/binding_proxy.cc	2026-10-20 18:46:49.326819724 +0200
++++ b/libs/widgets/binding_proxy.cc	2026-10-20 19:18:57.467936615 +0200
+@@ -93,28 +93,37 @@
+ BindingProxy::button_press_handler (GdkEventButton *ev)
+ {
+ 	if ( controllable && is_bind_action(ev) ) {
+-		if (Controllable::StartLearning (controllable)) {
+-			string prompt = _("operate controller now");
+-			if (prompter == 0) {
+-				prompter = new PopUp (Gtk::WIN_POS_MOUSE, 30000, false);
+-				prompter->signal_unmap_event().connect (mem_fun (*this, &BindingProxy::prompter_hiding));
+-			}
+-			prompter->set_text (prompt);
+-			prompter->touch (); // shows popup
+-			controllable->LearningFinished.connect_same_thread (learning_connection, std::bind (&BindingProxy::learning_finished, this));
+-		}
++		start_learning ();
+ 		return true;
+ 	}
+ 
+ 	return false;
+ }
+ 
++bool
++BindingProxy::start_learning ()
++{
++	learning_finished ();
++	if (!controllable || !Controllable::StartLearning (controllable)) {
++		return false;
++	}
++
++	if (!prompter) {
++		prompter = new PopUp (Gtk::WIN_POS_MOUSE, 30000, false);
++		prompter->signal_unmap_event().connect (mem_fun (*this, &BindingProxy::prompter_hiding));
++	}
++	prompter->set_text (_("operate controller now"));
++	controllable->LearningFinished.connect (learning_connection, invalidator (*this), std::bind (&BindingProxy::learning_finished, this), gui_context ());
++	prompter->touch ();
++	return true;
++}
++
+ void
+ BindingProxy::learning_finished ()
+ {
+ 	learning_connection.disconnect ();
+-	if (prompter) {
+-		prompter->touch (); // hides popup
++	if (prompter && prompter->get_visible ()) {
++		prompter->touch ();
+ 	}
+ }
+ 
+diff -urN a/libs/widgets/widgets/binding_proxy.h b/libs/widgets/widgets/binding_proxy.h
+--- a/libs/widgets/widgets/binding_proxy.h	2026-10-20 18:46:49.329173652 +0200
++++ b/libs/widgets/widgets/binding_proxy.h	2026-10-20 19:18:57.467990738 +0200
+@@ -50,6 +50,7 @@
+ 
+ 	static bool is_bind_action (GdkEventButton *);
+ 	bool button_press_handler (GdkEventButton *);
++	bool start_learning ();
+ 
+ 	std::shared_ptr<PBD::Controllable> get_controllable() const { return controllable; }
+ 	void set_controllable (std::shared_ptr<PBD::Controllable>);
