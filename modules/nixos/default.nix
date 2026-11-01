@@ -1,6 +1,7 @@
 { ... }:
 {
   imports = [
+    ./actualbudget
     ./nginx
     ./homer
     ./deluge

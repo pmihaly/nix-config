@@ -26,4 +26,8 @@ in
   # BETTER_AUTH_SECRET). Used by the upstream services.sparkyfitness module
   # (backend + db-init) on skylake; encrypted for both keys like the rest.
   "server/sparkyfitness.age".publicKeys = allKeys;
+  # Actual Budget admin password (env-file: ACTUAL_ADMIN_PASSWORD). Used by
+  # the actualbudget-bootstrap oneshot on skylake to create the owner ADMIN
+  # account on first start; encrypted for both keys like the rest.
+  "server/actualbudget.age".publicKeys = allKeys;
 }

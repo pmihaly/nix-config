@@ -88,6 +88,19 @@
       allowedUsers = [ "@${vars.username}:matrix.${vars.publicDomainName}" ];
     };
 
+    # Actual Budget — self-hosted budgeting (TAILNET-ONLY, like the matrix
+    # services: never public, finances stay off the WAN). Nix-native
+    # nixpkgs actual-server (no Docker); UI at http://${vars.domainName}:5006
+    # (mkService registers the /budget redirect + the private homer card
+    # under Finance). Data lives in /var/lib/actualbudget (persisted
+    # below). Each boot the actualbudget-bootstrap oneshot (a) creates the
+    # owner ADMIN account with the password from
+    # secrets/server/actualbudget.age and (b) writes actual-auto-login.js
+    # (nginx-injected on the tailnet origin), which auto-signs the web UI in
+    # with the admin password — on a fresh browser/incognito the login form
+    # is auto-filled and submitted, so the login page never stays visible.
+    actualbudget.enable = true;
+
     # Cross-link on the private (tailnet) board to the public board.
     # Everything else on the private board arrives via each service's
     # mkService `dashboard` self-registration; this static group is the
